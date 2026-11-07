@@ -3,6 +3,8 @@ name = "terrific-travel"
 version = "0.0.1"
 description = "Terrific Travel: a text-based multiplayer adventure game built on Evennia."
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"  # Evennia 6.x requires Python 3.12+
 dependencies = [
     "evennia>=6.1,<7",

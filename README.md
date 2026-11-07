@@ -49,3 +49,12 @@ game/               # the Evennia game directory (created by `evennia --init gam
 
 Just scaffolded: the default Evennia game template, with type annotations added to the
 template hooks and one smoke test.
+
+## License
+
+Copyright 2026 Eugene Veselov. Licensed under the [Apache License, Version 2.0](LICENSE).
+
+The license covers everything in this repository. Evennia itself is a separate dependency under
+its own BSD 3-Clause license. Runtime data (the game database, logs, `secret_settings.py`) is
+never part of the repository. A separate license for game prose (room descriptions, stories)
+may be added once such content exists.
