@@ -34,5 +34,8 @@ the agreed direction once it starts.
 5. **Follow Evennia idioms** (typeclasses, cmdsets, prototypes, scripts) rather than working
    around the framework. Customise through `game/`; never patch `.venv`.
 6. **Never commit runtime data**: `*.db3`, logs, `secret_settings.py` (git-ignored).
+7. **Claude does not stage, commit or push.** Only edit files and leave them as uncommitted
+   changes; the maintainer runs `git add`, `git commit` and `git push`. Creating or switching
+   branches, or other history changes (reset, rebase, amend), also need an explicit request.
 
 Hardware and run notes are in [BUILD.md](BUILD.md).

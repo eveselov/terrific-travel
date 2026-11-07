@@ -120,3 +120,93 @@ The next step can be a small demo:
 - a room picture that appears when you walk in.
 
 I'd start with a placeholder image and leave the real map choice to the three of you.
+
+# How To Play in the Demo
+
+## Check the Server Status
+
+From PowerShell, inside the `game` folder:
+
+```powershell
+cd C:\git\terrific-travel\game
+uv run evennia status
+```
+
+When it's running, you'll see:
+```
+Portal: RUNNING (pid 26732)
+Server: RUNNING (pid 24408)
+```
+
+When it's stopped, both lines say `NOT RUNNING`.
+
+Evennia runs as two processes. The **Portal** handles player connections, and the **Server** runs the game itself. Both should say RUNNING. If only the Portal is running, the game crashed or is reloading: run `uv run evennia --log` to see why, then `uv run evennia start`.
+
+A quick check from any folder is to see whether the web port answers:
+```powershell
+Test-NetConnection localhost -Port 4001 -InformationLevel Quiet   # True = running
+```
+
+## Play the game
+
+You're in Limbo, so you're ready. The "tutorial" you see is just the tutorial world's exit listed there. Do this:
+
+**1. Reload the browser page** (F5) once. A **Map** pane should appear on the right, showing "No map for this place." Limbo isn't on any map.
+
+**2. Build the demo.** In the game's input line, type:
+```
+batchcode batch_map_demo
+```
+You should get "Map demo built. Type harbour to go there." Now `look` lists a new exit, **harbour**, next to tutorial.
+
+**3. Go there:**
+```
+harbour
+```
+You should see:
+- a placeholder picture of a pier and a boat, above the room description;
+- in the Map pane, a blue sea with three islands labelled **Harbour**, **Lighthouse** and **Cove**, and a red ring marked "You are here" on Harbour.
+
+**4. Walk around** and watch the marker move:
+```
+north          Harbour → Lighthouse
+southeast      Lighthouse → Cove
+west           Cove → Harbour
+back           Harbour → Limbo (the map says "No map" again)
+```
+Typing `look` in any room shows its exits.
+
+**If something's off:**
+- **The Map pane isn't there:** press F12, open the **Console** tab, and send me any red lines.
+- **The pane is there but stays empty after `harbour`:** tell me, and I'll check the server log.
+- **You want to start the demo over:** `batchcode batch_map_demo_remove`, then build it again.
+
+# How to Access the Server From Another Computer
+
+**On your home network, yes. It's already set up and should work as is.** From outside the house it takes extra setup.
+
+## Same network (Wi-Fi at home)
+By default Evennia listens on every network connection, not just on this PC. On another computer, phone or tablet on the same Wi-Fi, open:
+
+- **Web client:** <http://192.168.0.237:4001>
+- **Telnet / MUD client:** host `192.168.0.237`, port `4000`
+
+`192.168.0.237` is your PC's address on the Wi-Fi right now. I checked that the server answers on that address, and the Windows firewall has an inbound "allow" rule for Python, so other devices should get through. Two caveats:
+- **The address can change** when the router hands out new ones, for example after a restart. `ipconfig` shows the current one. If you want it fixed, most routers let you reserve an address for a PC (often called "DHCP reservation").
+- **Windows treats your Wi-Fi as a "Public" network,** and the Python rule allows connections on Public networks. That's fine at home, but on hotel or café Wi-Fi it means anyone there could reach the game too. To fix it, set your home Wi-Fi to **Private** (Settings → Network & internet → Wi-Fi → your network → Private) and allow the Python rule on Private networks only.
+
+## From outside (the boys at their own homes)
+Your router blocks incoming connections from the internet, so you need one of these:
+
+| Option | Effort | Notes |
+|---|---|---|
+| **Tailscale** (free VPN for a small group) | Easy | Install it on your PC and theirs, and they use your Tailscale address. **Nothing is opened to the public internet.** My recommendation for family play. |
+| **Port forwarding on your router** | Medium | Forward ports 4000–4002 to your PC. The whole internet can then reach it, bots included. Needs the security steps below. |
+| **Rent a small server (VPS)** | More | It runs all the time without your PC. That's for later, if the game grows. |
+
+The web client needs two ports: **4001** for the page and **4002** for the live connection (the websocket). That matters when you forward ports.
+
+## Before anyone outside your home connects
+- Use a strong password on your superuser account.
+- Anyone who can reach the server can create an account, because registration is open by default. That's fine on the home network or over Tailscale. For a public server you'd turn it off with `NEW_ACCOUNT_REGISTRATION_ENABLED = False` and create the boys' accounts yourself.
+- Your secret key is in place: you have `secret_settings.py`, created when the game folder was first set up.

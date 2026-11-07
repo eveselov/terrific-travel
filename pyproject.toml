@@ -24,6 +24,8 @@ package = false
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Evennia puts game/ on sys.path, so its packages (typeclasses, world...) are first-party.
+src = ["game"]
 extend-exclude = ["game/server/conf/settings.py"]
 
 [tool.ruff.lint]
