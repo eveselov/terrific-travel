@@ -8,19 +8,12 @@ travelling by ship (and later by plane) with real historical context, and vessel
 have minds of their own. For now the repository is a clean, working Evennia environment for
 learning the platform.
 
-## Relation to ANIMA
-
-The sibling [anima2](../anima2) project proposes Evennia as the shared world its fine-tuned
-models would eventually live in (see `anima2/docs/MUD.md`). This repo is the place to learn
-Evennia first. **There is no AI code here**, and none is planned for this phase. If that
-changes later, see [BUILD.md](BUILD.md#future-ai-integration) for how to add it without mixing
-dependencies.
-
 ## Quick start
 
 ```powershell
 uv sync                     # create .venv with Evennia and dev tools (pinned by uv.lock)
 cd game
+uv run evennia --initmissing  # create secret_settings.py with a fresh key (first time only)
 uv run evennia migrate      # create the local database (first time only)
 uv run evennia start        # first start asks you to create the superuser (admin) account
 ```

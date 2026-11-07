@@ -25,15 +25,22 @@ pinned by `uv.lock`. Check it:
 uv run evennia --version
 ```
 
-Then create the database. Evennia commands must run **from inside `game/`**:
+Then create the server's secret settings and the database. Evennia commands must run
+**from inside `game/`**:
 
 ```powershell
 cd game
+uv run evennia --initmissing
 uv run evennia migrate
 ```
 
-This creates `game/server/evennia.db3` (SQLite). It is git-ignored, because it holds accounts
-and password hashes.
+`--initmissing` creates `game/server/conf/secret_settings.py` with a freshly generated
+`SECRET_KEY`. It is git-ignored and must stay private. Without it, Evennia falls back to the
+default key published in its own source. That is acceptable for local play only, never for a
+server other people connect to.
+
+`migrate` creates `game/server/evennia.db3` (SQLite). It is git-ignored, because it holds
+accounts and password hashes.
 
 ## Running the server
 
@@ -57,6 +64,11 @@ run `evennia migrate` again.
 
 ### Windows notes
 
+- Clone into a short path such as `C:\git\terrific-travel`. Evennia contains a migration file
+  with a 108-character name, and in a deeply nested folder its path inside `.venv` passes
+  Windows' 260-character limit, so the server and tests fail with a `ModuleNotFoundError` for
+  `evennia.typeclasses.migrations.0003_...`. The other fix is to enable long paths
+  (`LongPathsEnabled` in the registry, or the "Enable Win32 long paths" group policy).
 - Windows may ask to allow Python through the firewall on first start. Allowing private
   networks is enough for local play.
 - If `evennia start` reports the ports are in use, another server is still running.
@@ -112,11 +124,9 @@ Not part of this phase. When it happens, keep the game environment free of ML pa
 
 - Put AI code in its own **uv workspace member** (for example `ai/` with its own
   `pyproject.toml`) or in a separate process, so torch/transformers never become
-  dependencies of the game server. This is the same plan the sibling `anima2` repo uses for
-  its world (`world/` as a separate workspace member).
+  dependencies of the game server.
 - Connect the game and the models through a narrow interface. Two options to compare then:
   an external client that logs in like a player (telnet/websocket), or an in-process Evennia
   script that calls a local model server over HTTP.
 - Any game run with real people in it produces logs and a database that are personal data.
-  If those ever become training material, follow anima2's privacy boundary: keep them outside
-  the repo.
+  If those ever become training material, keep them outside the repo.

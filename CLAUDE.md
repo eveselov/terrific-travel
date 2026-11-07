@@ -9,9 +9,8 @@ details are **not decided yet**. Directions discussed: travel by ship (and later
 with real historical context, possibly ships and planes with minds of their own. Don't invent
 setting, lore or mechanics unless asked. The current phase is learning Evennia.
 
-The sibling `../anima2` repo proposes Evennia as a world for its fine-tuned models
-(`anima2/docs/MUD.md`). That is background only: **no AI or ML code or dependencies in this
-phase**. See BUILD.md "Future AI integration" for the agreed direction once it starts.
+**No AI or ML code or dependencies in this phase.** See BUILD.md "Future AI integration" for
+the agreed direction once it starts.
 
 ## Layout
 
