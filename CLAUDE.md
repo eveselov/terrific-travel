@@ -6,11 +6,16 @@
 [Evennia](https://www.evennia.com/), developed together with young co-designers (around 12
 years old), so it should be both fun and educational. The name is settled; the
 details are **not decided yet**. Directions discussed: travel by ship (and later by plane)
-with real historical context, possibly ships and planes with minds of their own. Don't invent
-setting, lore or mechanics unless asked. The current phase is learning Evennia.
+with real historical context, possibly ships and planes with minds of their own. Loose game
+ideas are collected in [IDEAS.md](IDEAS.md). Don't invent setting, lore or mechanics unless
+asked.
 
-**No AI or ML code or dependencies in this phase.** See BUILD.md "Future AI integration" for
-the agreed direction once it starts.
+**Fun first.** The aim is to learn Evennia by building a game quickly with and for the young
+co-designers. Visuals in the web client (maps, pictures) are welcome. There is **no AI or ML
+work in this project**: no AI code or dependencies, and no design trade-offs made for future AI
+agents. AI research, if any, will be a separate project. The one habit to keep: everything
+shown as a picture also exists as text (descriptions, exits, labels), so telnet players can
+play too.
 
 ## Layout
 

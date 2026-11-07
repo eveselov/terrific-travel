@@ -117,16 +117,3 @@ uv lock --upgrade-package evennia   # upgrade Evennia within the pinned range
 
 Commit `pyproject.toml` and `uv.lock` together. After upgrading Evennia, run
 `uv run evennia migrate` in `game/`: new versions often bring database migrations.
-
-## Future AI integration
-
-Not part of this phase. When it happens, keep the game environment free of ML packages:
-
-- Put AI code in its own **uv workspace member** (for example `ai/` with its own
-  `pyproject.toml`) or in a separate process, so torch/transformers never become
-  dependencies of the game server.
-- Connect the game and the models through a narrow interface. Two options to compare then:
-  an external client that logs in like a player (telnet/websocket), or an in-process Evennia
-  script that calls a local model server over HTTP.
-- Any game run with real people in it produces logs and a database that are personal data.
-  If those ever become training material, keep them outside the repo.
