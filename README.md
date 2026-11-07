@@ -1,10 +1,12 @@
-# Carribean
+# Terrific Travel
 
-A text-based multiplayer game (MUD) built on [Evennia](https://www.evennia.com/).
+A text-based multiplayer adventure game (MUD) built on [Evennia](https://www.evennia.com/),
+meant to be both fun and educational.
 
-The game's purpose and setting aren't decided yet. Ideas being considered: something
-educational, or a game based on historical pirate stories of the Caribbean. For now the
-repository is a clean, working Evennia environment for learning the platform.
+The name is settled; the details are still to be defined. Directions discussed so far:
+travelling by ship (and later by plane) with real historical context, and vessels that might
+have minds of their own. For now the repository is a clean, working Evennia environment for
+learning the platform.
 
 ## Relation to ANIMA
 

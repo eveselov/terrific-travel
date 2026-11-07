@@ -1,7 +1,7 @@
 [project]
-name = "carribean"
+name = "terrific-travel"
 version = "0.0.1"
-description = "A text-based multiplayer game built on Evennia (purpose to be defined)."
+description = "Terrific Travel: a text-based multiplayer adventure game built on Evennia."
 readme = "README.md"
 requires-python = ">=3.12"  # Evennia 6.x requires Python 3.12+
 dependencies = [

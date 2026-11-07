@@ -1,11 +1,13 @@
-# CLAUDE.md — Persistent Context for Carribean Sessions
+# CLAUDE.md — Persistent Context for Terrific Travel Sessions
 
 ## Project identity
 
-A text-based multiplayer game (MUD) built on [Evennia](https://www.evennia.com/). The game's
-purpose and setting are **not decided yet** (maybe educational, maybe historical Caribbean
-pirates). Don't invent a setting, lore or game mechanics unless asked. The current phase is
-learning Evennia.
+**Terrific Travel**: a text-based multiplayer game (MUD) built on
+[Evennia](https://www.evennia.com/), developed together with young co-designers (around 12
+years old), so it should be both fun and educational. The name is settled; the
+details are **not decided yet**. Directions discussed: travel by ship (and later by plane)
+with real historical context, possibly ships and planes with minds of their own. Don't invent
+setting, lore or mechanics unless asked. The current phase is learning Evennia.
 
 The sibling `../anima2` repo proposes Evennia as a world for its fine-tuned models
 (`anima2/docs/MUD.md`). That is background only: **no AI or ML code or dependencies in this
