@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+
+# Evennia runtime data (the game directory has its own .gitignore with more detail).
+# The database holds accounts and password hashes; never commit it.
+*.db3
+game/server/logs/*.log*
+game/server/conf/secret_settings.py
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env
+.env

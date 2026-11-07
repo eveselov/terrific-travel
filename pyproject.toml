@@ -1,0 +1,45 @@
+[project]
+name = "carribean"
+version = "0.0.1"
+description = "A text-based multiplayer game built on Evennia (purpose to be defined)."
+readme = "README.md"
+requires-python = ">=3.12"  # Evennia 6.x requires Python 3.12+
+dependencies = [
+    "evennia>=6.1,<7",
+]
+
+[dependency-groups]
+dev = [
+    "mypy",
+    "ruff",
+]
+
+[tool.uv]
+# The repo is an Evennia game directory, not an installable library: uv only manages the
+# environment. Evennia puts game/ on sys.path itself when the server starts.
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["game/server/conf/settings.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ANN"]
+# Evennia objects are untyped, so `Any` is often the honest annotation at the framework boundary.
+ignore = ["ANN401"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "game"
+explicit_package_bases = true
+# Evennia base classes are untyped (Any), so subclassing them must be allowed.
+disallow_subclassing_any = false
+exclude = ['^game/server/conf/settings[.]py$', '^game/web/static/']
+
+[[tool.mypy.overrides]]
+# Evennia and Django ship no type hints. Treat them as Any instead of failing the strict check.
+module = ["evennia.*", "django.*", "twisted.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
