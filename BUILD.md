@@ -119,7 +119,7 @@ Commit `pyproject.toml` and `uv.lock` together. After upgrading Evennia, run
 `uv run evennia migrate` in `game/`: new versions often bring database migrations.
 
 
-# Reseting The Game
+# Resetting The Game
 
 ## Two separate places things live
 
@@ -129,21 +129,26 @@ Commit `pyproject.toml` and `uv.lock` together. After upgrading Evennia, run
 | Writing code or files: Python typeclasses, commands, JS plugins, images | Files under `game/` | **Yes**, they show up in `git status` |
 | Logs, `__pycache__`, `secret_settings.py` | Local files | No (ignored) |
 
-So an in-game "Hello Travellers" can't leave anything in the repo. Only code we write can, and only once it's committed.
+So building in the game can't leave anything in the repo. Only code can, and only once it's committed.
 
 ## Resetting the database
-**Option A: back up now, restore later** (keeps your superuser and the tutorial world):
+**Option A: back up now, restore later** (keeps your superuser and the tutorial world).
+Snapshots live in `game\server\snapshots\` (git-ignored like every `*.db3`):
 ```powershell
 cd C:\git\terrific-travel\game
 uv run evennia stop
-Copy-Item server\evennia.db3 server\evennia-clean.db3     # snapshot (also git-ignored)
+Copy-Item server\evennia.db3 server\snapshots\evennia-clean.db3     # snapshot
 uv run evennia start
 # ... experiment ...
 uv run evennia stop
-Copy-Item server\evennia-clean.db3 server\evennia.db3 -Force   # back to the snapshot
+Copy-Item server\snapshots\evennia-clean.db3 server\evennia.db3 -Force   # back to the snapshot
 uv run evennia start
 ```
 Always stop the server before copying. Copying the file while the server is writing to it can corrupt it.
+
+For game branches, name each snapshot after its branch (`snapshots\magellan.db3`), not after a
+commit: the database changes whenever you play, not when you commit. Stop the server before
+switching branches too, so it never runs one branch's code on another branch's world.
 
 **Option B: wipe completely** (a fresh, empty Limbo):
 ```powershell
@@ -156,17 +161,20 @@ uv run evennia start      # asks for a superuser again
 
 ## Keeping code experiments throw-away: use a git branch
 ```powershell
-git switch -c try/hello-travellers     # experiment here, commit as you like
+git switch -c magellan     # experiment here, commit as you like
 # ... later, to throw it all away:
 git switch main
-git branch -D try/hello-travellers
+git branch -D magellan
 ```
+Plain lowercase names with dashes (`magellan`, `time-map`, `chemistry-2`) work well: they
+match the snapshot names, and Windows ignores case, so `Magellan` and `magellan` could clash.
 Branches stay on your PC unless you push them, so nothing reaches GitHub. To throw away uncommitted changes, run `git restore .` and then `git clean -fd`, which deletes new untracked files. **Never use `git clean -x`**: it would also delete the ignored files, including your database and `secret_settings.py`.
 
 ## The one catch: reset both together
 Database objects remember which Python class they were made from, for example `typeclasses.ships.Ship`. If you delete the code but keep the database, those objects can't load, and Evennia reports errors about them. The reverse is harmless. So when you throw an experiment away, **switch the branch and restore the database snapshot at the same time.**
 
-When we start the map demo, my suggestion is: take snapshot A first, then work on a `try/...` branch. Either way you're one step from where you are now.
+Before starting an experiment: take a snapshot first, then work on a new branch. Either way
+you're one step from where you started.
 
 # Building A Game With Images
 
@@ -175,35 +183,28 @@ The web client has a **multimedia plugin**. Game code can send an image along wi
 ```python
 character.msg(text="You stand on the quay at Port Royal.", image="/static/images/port_royal.png")
 ```
-The web client shows the picture. Telnet clients, and later your AI agents, simply ignore the `image` part and get only the text. So **one message works for both audiences**, which suits your plan well.
+The web client shows the picture. Telnet clients simply ignore the `image` part and get only the text. So **one message works for both kinds of player**.
 
 There's also an **HTML plugin**: `msg(html="...")` sends ready-made HTML. That's how you'd do "a map with text labels on top": a picture with positioned labels, or an SVG drawing, possibly with a "you are here" marker.
 
 Two practical details:
-- Both plugins are **off by default**. Each player turns them on with the gear icon (Options) in the web client: "Enable multimedia image" and "Prefer … direct-HTML". If we want them on for everyone, we'd add a small change in `game/web/`.
+- Each player can switch them on or off with the gear icon (Options) in the web client: "Enable multimedia image" and "Prefer … direct-HTML". The multimedia plugin is on by default.
 - The web client is made of **panes** you can split and drag. A message can be addressed to a named pane, so the map can live in its own side panel instead of scrolling past in the main text.
 
-## What we'd add ourselves (small, and the usual Evennia way)
-The built-in plugins *add* each image to the bottom of a pane, like a chat log. That's fine for character portraits or a room picture when you walk in. A **world map** should instead stay in one panel and update in place. That needs a short JavaScript plugin of about 30 lines, plus a layout with a "Map" pane. Both go into `game/web/static/webclient/` and `game/web/templates/webclient/`, which are the folders Evennia provides for customising its web client. Nothing in Evennia itself gets patched.
+## What this game adds (small, and the usual Evennia way)
+The built-in plugins *add* each image to the bottom of a pane, like a chat log. That's fine for character portraits or a room picture when you walk in. A **world map** should instead stay in one panel and update in place. So this game has its own short JavaScript plugin and a layout with a "Map" pane, in `game/web/static/webclient/` and `game/web/templates/webclient/`, which are the folders Evennia provides for customising its web client. Nothing in Evennia itself gets patched. [DESIGN.md](DESIGN.md) explains how it works and how to add a map.
 
 Images live under `game/web/static/` and are served by Evennia's own web server.
 
 ## Where the pictures could come from
 This is the educational bonus:
-- **Real 17th–18th-century Caribbean charts.** Many are public domain, from the Library of Congress, Wikimedia Commons or the David Rumsey collection. The boys would sail on a real period map.
-- **Their own drawings.** Scanned or drawn on a tablet, this is a great job for Vincent and Phoenix, and the art is then truly theirs. (We'd ask them about the content license for it later.)
+- **Real 17th–18th-century Caribbean charts.** Many are public domain, from the Library of Congress, Wikimedia Commons or the David Rumsey collection. Players would sail on a real period map.
+- **The co-designers' own drawings.** Scanned or drawn on a tablet, the art is then truly theirs. (Ask them about the content license for it.)
 
-## The limits (as we discussed before)
+## The limits
 Static images, maps that update, portraits and sound effects are all easy. Animation or real-time movement would mean writing a JavaScript game inside the client, and that's not where Evennia shines.
 
-The next step can be a small demo:
-- a `Map` pane in the web client;
-- two or three rooms that each send the map with labels and a "you are here" marker;
-- a room picture that appears when you walk in.
-
-I'd start with a placeholder image and leave the real map choice to the three of you.
-
-# How To Play in the Demo
+# How To Play
 
 ## Check the Server Status
 
@@ -229,17 +230,19 @@ A quick check from any folder is to see whether the web port answers:
 Test-NetConnection localhost -Port 4001 -InformationLevel Quiet   # True = running
 ```
 
-## Play the game
+## Play the map demo
 
-You're in Limbo, so you're ready. The "tutorial" you see is just the tutorial world's exit listed there. Do this:
+The map demo is kept outside `main` (see [DESIGN.md](DESIGN.md#7-the-map-demo)); these steps
+work where its files are present. Log in as superuser and stand in Limbo. The "tutorial" exit
+there belongs to the tutorial world, if you built it. Then:
 
 **1. Reload the browser page** (F5) once. A **Map** pane should appear on the right, showing "No map for this place." Limbo isn't on any map.
 
 **2. Build the demo.** In the game's input line, type:
 ```
-batchcode batch_map_demo
+batchcode map_demo.build
 ```
-You should get "Map demo built. Type harbour to go there." Now `look` lists a new exit, **harbour**, next to tutorial.
+You should get "Map demo built. Type harbour to go there." Now `look` lists a new exit, **harbour**.
 
 **3. Go there:**
 ```
@@ -259,9 +262,9 @@ back           Harbour → Limbo (the map says "No map" again)
 Typing `look` in any room shows its exits.
 
 **If something's off:**
-- **The Map pane isn't there:** press F12, open the **Console** tab, and send me any red lines.
-- **The pane is there but stays empty after `harbour`:** tell me, and I'll check the server log.
-- **You want to start the demo over:** `batchcode batch_map_demo_remove`, then build it again.
+- **The Map pane isn't there:** press F12 and look for red lines in the **Console** tab.
+- **The pane is there but stays empty after `harbour`:** check the server log with `uv run evennia --log`.
+- **You want to start the demo over:** `batchcode map_demo.remove`, then build it again.
 
 # How to Access the Server From Another Computer
 
@@ -270,19 +273,19 @@ Typing `look` in any room shows its exits.
 ## Same network (Wi-Fi at home)
 By default Evennia listens on every network connection, not just on this PC. On another computer, phone or tablet on the same Wi-Fi, open:
 
-- **Web client:** <http://192.168.0.237:4001>
-- **Telnet / MUD client:** host `192.168.0.237`, port `4000`
+- **Web client:** `http://<your-PC-address>:4001`
+- **Telnet / MUD client:** host `<your-PC-address>`, port `4000`
 
-`192.168.0.237` is your PC's address on the Wi-Fi right now. I checked that the server answers on that address, and the Windows firewall has an inbound "allow" rule for Python, so other devices should get through. Two caveats:
+Your PC's address on the network is the "IPv4 Address" that `ipconfig` shows, usually something like `192.168.x.y`. Windows asks to allow Python through the firewall on the first start; allowing it lets other devices get through. Two caveats:
 - **The address can change** when the router hands out new ones, for example after a restart. `ipconfig` shows the current one. If you want it fixed, most routers let you reserve an address for a PC (often called "DHCP reservation").
-- **Windows treats your Wi-Fi as a "Public" network,** and the Python rule allows connections on Public networks. That's fine at home, but on hotel or café Wi-Fi it means anyone there could reach the game too. To fix it, set your home Wi-Fi to **Private** (Settings → Network & internet → Wi-Fi → your network → Private) and allow the Python rule on Private networks only.
+- **If Windows treats your Wi-Fi as a "Public" network** and the Python rule allows connections on Public networks, that's fine at home, but on hotel or café Wi-Fi it means anyone there could reach the game too. To fix it, set your home Wi-Fi to **Private** (Settings → Network & internet → Wi-Fi → your network → Private) and allow the Python rule on Private networks only.
 
-## From outside (the boys at their own homes)
+## From outside (players at their own homes)
 Your router blocks incoming connections from the internet, so you need one of these:
 
 | Option | Effort | Notes |
 |---|---|---|
-| **Tailscale** (free VPN for a small group) | Easy | Install it on your PC and theirs, and they use your Tailscale address. **Nothing is opened to the public internet.** My recommendation for family play. |
+| **Tailscale** (free VPN for a small group) | Easy | Install it on your PC and theirs, and they use your Tailscale address. **Nothing is opened to the public internet.** The best fit for family play. |
 | **Port forwarding on your router** | Medium | Forward ports 4000–4002 to your PC. The whole internet can then reach it, bots included. Needs the security steps below. |
 | **Rent a small server (VPS)** | More | It runs all the time without your PC. That's for later, if the game grows. |
 
@@ -290,5 +293,5 @@ The web client needs two ports: **4001** for the page and **4002** for the live 
 
 ## Before anyone outside your home connects
 - Use a strong password on your superuser account.
-- Anyone who can reach the server can create an account, because registration is open by default. That's fine on the home network or over Tailscale. For a public server you'd turn it off with `NEW_ACCOUNT_REGISTRATION_ENABLED = False` and create the boys' accounts yourself.
-- Your secret key is in place: you have `secret_settings.py`, created when the game folder was first set up.
+- Anyone who can reach the server can create an account, because registration is open by default. That's fine on the home network or over Tailscale. For a public server, turn it off with `NEW_ACCOUNT_REGISTRATION_ENABLED = False` and create the players' accounts yourself.
+- Make sure `game/server/conf/secret_settings.py` exists with its own secret key (see [First-time setup](#first-time-setup)).

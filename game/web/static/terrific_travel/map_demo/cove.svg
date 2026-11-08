@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <!-- Placeholder room picture for the Terrific Travel map demo. -->
+  <rect width="640" height="200" fill="#ffcf99"/>
+  <rect y="190" width="640" height="90" fill="#3a86b8"/>
+  <path d="M0 260 C200 230 440 240 640 270 L640 360 L0 360 Z" fill="#e9d8a6"/>
+  <path d="M0 262 C200 232 440 242 640 272" fill="none" stroke="#ffffff" stroke-width="6" stroke-opacity="0.7"/>
+  <line x1="120" y1="300" x2="150" y2="150" stroke="#8d6346" stroke-width="10"/>
+  <g fill="#2d6a4f">
+    <path d="M150 150 C110 130 80 140 60 165 C95 150 125 152 150 150 Z"/>
+    <path d="M150 150 C190 125 225 130 245 155 C210 145 180 148 150 150 Z"/>
+    <path d="M150 150 C140 110 155 90 175 80 C165 105 160 125 150 150 Z"/>
+  </g>
+  <circle cx="470" cy="160" r="40" fill="#f4a261"/>
+  <text x="620" y="345" text-anchor="end" font-family="Georgia, serif" font-size="20" fill="#5a4632">Placeholder picture: Cove</text>
+</svg>

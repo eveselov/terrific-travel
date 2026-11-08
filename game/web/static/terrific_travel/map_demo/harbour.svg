@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <!-- Placeholder room picture for the Terrific Travel map demo. -->
+  <rect width="640" height="210" fill="#a9d6e5"/>
+  <rect y="210" width="640" height="150" fill="#2b6f9e"/>
+  <circle cx="540" cy="70" r="36" fill="#ffd166"/>
+  <rect x="40" y="200" width="300" height="22" fill="#8d6346"/>
+  <g fill="#6b4a33">
+    <rect x="60" y="222" width="12" height="60"/><rect x="160" y="222" width="12" height="60"/><rect x="260" y="222" width="12" height="60"/>
+  </g>
+  <path d="M390 250 L520 250 L495 280 L415 280 Z" fill="#8d6346"/>
+  <line x1="455" y1="250" x2="455" y2="150" stroke="#3d2b1f" stroke-width="5"/>
+  <path d="M458 155 L458 240 L510 240 Z" fill="#fffbe8"/>
+  <text x="620" y="345" text-anchor="end" font-family="Georgia, serif" font-size="20" fill="#ffffff">Placeholder picture: Harbour</text>
+</svg>

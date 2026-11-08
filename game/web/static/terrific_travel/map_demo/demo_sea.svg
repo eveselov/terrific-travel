@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600">
+  <!-- Placeholder sea map for the Terrific Travel map demo. Replace with a real map later. -->
+  <defs>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fa8d3"/>
+      <stop offset="1" stop-color="#2b6f9e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="600" fill="url(#sea)"/>
+  <g stroke="#ffffff" stroke-opacity="0.18" stroke-width="2">
+    <line x1="0" y1="150" x2="1000" y2="150"/>
+    <line x1="0" y1="300" x2="1000" y2="300"/>
+    <line x1="0" y1="450" x2="1000" y2="450"/>
+    <line x1="200" y1="0" x2="200" y2="600"/>
+    <line x1="400" y1="0" x2="400" y2="600"/>
+    <line x1="600" y1="0" x2="600" y2="600"/>
+    <line x1="800" y1="0" x2="800" y2="600"/>
+  </g>
+  <g fill="#e9d8a6" stroke="#c9a96b" stroke-width="4">
+    <path d="M150 390 C160 300 300 280 380 320 C450 355 430 450 340 470 C250 490 140 470 150 390 Z"/>
+    <path d="M560 160 C570 100 690 90 720 140 C750 190 690 240 620 230 C570 222 552 200 560 160 Z"/>
+    <path d="M720 440 C730 380 840 370 870 420 C895 465 850 510 790 505 C740 500 715 480 720 440 Z"/>
+  </g>
+  <g fill="#7cb518" fill-opacity="0.75">
+    <ellipse cx="270" cy="400" rx="70" ry="40"/>
+    <ellipse cx="650" cy="180" rx="40" ry="22"/>
+    <ellipse cx="805" cy="455" rx="35" ry="20"/>
+  </g>
+  <g transform="translate(90 500)" fill="#fffbe8" stroke="#1d2b36" stroke-width="2">
+    <polygon points="0,-55 10,-10 0,0 -10,-10"/>
+    <polygon points="0,55 10,10 0,0 -10,10" fill="#1d2b36"/>
+    <polygon points="-55,0 -10,-10 0,0 -10,10" fill="#1d2b36"/>
+    <polygon points="55,0 10,-10 0,0 10,10" fill="#1d2b36"/>
+    <text x="0" y="-62" text-anchor="middle" font-family="Georgia, serif" font-size="20" stroke="none" fill="#fffbe8">N</text>
+  </g>
+  <text x="980" y="585" text-anchor="end" font-family="Georgia, serif" font-size="22" fill="#ffffff" fill-opacity="0.5">placeholder map</text>
+</svg>
