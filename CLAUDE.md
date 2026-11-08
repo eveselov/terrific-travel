@@ -21,21 +21,24 @@ play too.
 
 - The repo root holds the uv environment (`pyproject.toml`, `uv.lock`). It is not an
   installable package (`[tool.uv] package = false`).
-- `game/` is the Evennia game directory. Evennia puts it on `sys.path`, so imports inside it
-  are top-level (`from typeclasses.rooms import Room`, not `from game.typeclasses...`).
-- Evennia CLI commands run from inside `game/`; ruff and mypy run from the repo root.
+- `game/` is an Evennia game directory. The repo can hold several games as sibling folders at
+  the root, each independent, with its own database and `mypy.ini` (see BUILD.md, "Several
+  games in one repo"). Evennia puts the game folder on `sys.path`, so imports inside it are
+  top-level (`from typeclasses.rooms import Room`, not `from game.typeclasses...`).
+- Evennia CLI commands, mypy and tests run from inside a game folder; ruff runs from the
+  repo root and covers all games.
 
 ## Implementation rules
 
 1. **Explicit type annotations everywhere.** All parameters, return values and non-trivial
-   locals are annotated. Use `list[T]`, `dict[K, V]`, `T | None`. `uv run mypy game` (strict)
-   must pass. Evennia/Django are untyped: annotate with this game's own typeclasses where
+   locals are annotated. Use `list[T]`, `dict[K, V]`, `T | None`. `uv run mypy .` (strict),
+   run inside each game folder, must pass. Evennia/Django are untyped: annotate with this game's own typeclasses where
    possible, and `Any` only for raw framework objects.
 2. **uv only**, no raw `pip`/`venv`. `uv add <pkg>` / `uv add --group dev <pkg>`, run things
    with `uv run`. Commit `uv.lock`. Keep dependencies minimal; ask before adding any.
-3. **Lint and format with ruff** (`uv run ruff check game`, `uv run ruff format game`).
+3. **Lint and format with ruff** (`uv run ruff check`, `uv run ruff format`, from the repo root).
 4. **Tests** are `EvenniaTest` subclasses in `tests.py` modules, run with
-   `uv run evennia test --settings settings.py .` from `game/`.
+   `uv run evennia test --settings settings.py .` from inside the game folder.
 5. **Follow Evennia idioms** (typeclasses, cmdsets, prototypes, scripts) rather than working
    around the framework. Customise through `game/`; never patch `.venv`.
 6. **Never commit runtime data**: `*.db3`, logs, `secret_settings.py` (git-ignored).

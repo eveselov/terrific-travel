@@ -24,26 +24,16 @@ package = false
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-# Evennia puts game/ on sys.path, so its packages (typeclasses, world...) are first-party.
+# Every game folder at the root is an Evennia game dir, which Evennia puts on sys.path, so its
+# packages (typeclasses, world...) are first-party. List each game here.
 src = ["game"]
-extend-exclude = ["game/server/conf/settings.py"]
+# Each game's settings.py is a star import of Evennia's defaults by design.
+extend-exclude = ["*/server/conf/settings.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ANN"]
 # Evennia objects are untyped, so `Any` is often the honest annotation at the framework boundary.
 ignore = ["ANN401"]
 
-[tool.mypy]
-python_version = "3.12"
-strict = true
-mypy_path = "game"
-explicit_package_bases = true
-# Evennia base classes are untyped (Any), so subclassing them must be allowed.
-disallow_subclassing_any = false
-exclude = ['^game/server/conf/settings[.]py$', '^game/web/static/']
-
-[[tool.mypy.overrides]]
-# Evennia and Django ship no type hints. Treat them as Any instead of failing the strict check.
-module = ["evennia.*", "django.*", "twisted.*"]
-ignore_missing_imports = true
-follow_imports = "skip"
+# mypy settings live in each game's own mypy.ini (game/mypy.ini): games share module names
+# (typeclasses, world...), so mypy checks one game at a time, run from inside its folder.

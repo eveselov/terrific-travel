@@ -76,20 +76,25 @@ run `evennia migrate` again.
 
 ## Checks
 
-Run from the repository root:
+Ruff runs from the repository root and covers every game at once:
 
 ```powershell
-uv run ruff check game        # lint
-uv run ruff format game       # format
-uv run mypy game              # strict type check
+uv run ruff check             # lint
+uv run ruff format            # format
 ```
 
-Run tests from inside `game/`:
+Mypy and the tests run from inside a game folder, one game at a time:
 
 ```powershell
 cd game
+uv run mypy .                 # strict type check
 uv run evennia test --settings settings.py .
 ```
+
+In VS Code the Ruff and Mypy Type Checker extensions run the same checks as you edit (the repo
+recommends them in `.vscode/extensions.json`). Ruff also formats each file on save. Make sure
+VS Code uses the project's `.venv` interpreter ("Python: Select Interpreter"), because both
+extensions take their tools from it.
 
 Evennia's test runner is Django's, so the tests are `EvenniaTest` subclasses, not pytest
 tests. Put tests in a `tests.py` next to the code they cover (see `game/typeclasses/tests.py`).
@@ -97,15 +102,35 @@ tests. Put tests in a `tests.py` next to the code they cover (see `game/typeclas
 ### Type checking and Evennia
 
 Code is fully type-annotated and mypy runs in `strict` mode. Evennia and Django ship no type
-hints, so in `pyproject.toml`:
+hints, so:
 
-- their imports are treated as `Any`;
-- subclassing their classes is allowed (`disallow_subclassing_any = false`);
-- ruff's `ANN401` (no `Any`) is off. `Any` is the honest type for a raw Evennia object, but
-  prefer this game's own typeclasses (`Character`, `Room`...) in annotations where you can.
+- their imports are treated as `Any`, and subclassing their classes is allowed
+  (`disallow_subclassing_any = False`), in each game's `mypy.ini`;
+- ruff's `ANN401` (no `Any`) is off, in `pyproject.toml`. `Any` is the honest type for a raw
+  Evennia object, but prefer this game's own typeclasses (`Character`, `Room`...) in
+  annotations where you can.
 
-`game/server/conf/settings.py` is excluded from both tools, because it is a star import of
-Evennia's defaults by design.
+Each game's `server/conf/settings.py` is excluded from both tools, because it is a star import
+of Evennia's defaults by design.
+
+## Several games in one repo
+
+Every folder at the repo root that is an Evennia game dir (so far just `game/`) is a separate
+game with its own database, `secret_settings.py` and `mypy.ini`. They share the one uv
+environment, so all games use the same Evennia version. To start a new game, copy an existing
+game folder (or run `uv run evennia --init <name>` at the root), then:
+
+- add its name to `src` under `[tool.ruff]` in `pyproject.toml`, so ruff sorts its imports
+  correctly;
+- make sure it has a `mypy.ini` (a copy of `game/mypy.ini`);
+- in the copy, run `uv run evennia --initmissing` and `uv run evennia migrate` as in
+  [First-time setup](#first-time-setup). A copied folder also brings the original's database
+  and secret key; delete `server/evennia.db3` and `server/conf/secret_settings.py` first if
+  the new game should start fresh.
+
+Mypy checks one game per run because every game has packages with the same names
+(`typeclasses`, `world`...), and mypy would report them as duplicates. Run only one game's
+server at a time, or give each game its own ports in its `settings.py`.
 
 ## Managing dependencies
 

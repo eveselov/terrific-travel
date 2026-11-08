@@ -4,8 +4,10 @@
     "ruff.importStrategy": "fromEnvironment",
     "mypy-type-checker.importStrategy": "fromEnvironment",
 
-    // mypy reads [tool.mypy] in pyproject.toml; run it from the repo root like the CLI does.
-    "mypy-type-checker.cwd": "${workspaceFolder}",
+    // Run mypy from the game folder that holds the file (the one with mypy.ini), so it checks
+    // one game at a time. No daemon: it is shared by the workspace and would mix the games.
+    "mypy-type-checker.cwd": "${nearestConfig}",
+    "mypy-type-checker.preferDaemon": false,
 
     // Format with ruff and sort imports on every save.
     "[python]": {

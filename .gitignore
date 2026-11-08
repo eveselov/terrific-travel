@@ -11,8 +11,9 @@ dist/
 # Evennia runtime data (the game directory has its own .gitignore with more detail).
 # The database holds accounts and password hashes; never commit it.
 *.db3
-game/server/logs/*.log*
-game/server/conf/secret_settings.py
+# Patterns cover every game folder at the root, not just game/.
+*/server/logs/*.log*
+*/server/conf/secret_settings.py
 
 # Editor / OS
 # Shared VS Code setup is committed; anything else in .vscode/ stays local.
