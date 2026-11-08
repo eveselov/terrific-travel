@@ -1,0 +1,8 @@
+{
+    // VS Code offers to install these when the repo is opened.
+    "recommendations": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-python.mypy-type-checker"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    // Use the ruff and mypy pinned in uv.lock (from .venv), not the copies bundled
+    // with the extensions, so the editor agrees with `uv run ruff` / `uv run mypy`.
+    "ruff.importStrategy": "fromEnvironment",
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+
+    // mypy reads [tool.mypy] in pyproject.toml; run it from the repo root like the CLI does.
+    "mypy-type-checker.cwd": "${workspaceFolder}",
+
+    // Format with ruff and sort imports on every save.
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.ruff": "explicit"
+        }
+    }
+}

@@ -15,7 +15,10 @@ game/server/logs/*.log*
 game/server/conf/secret_settings.py
 
 # Editor / OS
-.vscode/
+# Shared VS Code setup is committed; anything else in .vscode/ stays local.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 .DS_Store
 Thumbs.db
