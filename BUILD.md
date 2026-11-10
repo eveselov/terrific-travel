@@ -115,22 +115,36 @@ of Evennia's defaults by design.
 
 ## Several games in one repo
 
-Every folder at the repo root that is an Evennia game dir (so far just `game/`) is a separate
-game with its own database, `secret_settings.py` and `mypy.ini`. They share the one uv
-environment, so all games use the same Evennia version. To start a new game, copy an existing
-game folder (or run `uv run evennia --init <name>` at the root), then:
+Every folder at the repo root that is an Evennia game dir is a separate game with its own
+database, `secret_settings.py`, `mypy.ini` and ports. They share the one uv environment, so all
+games use the same Evennia version. Games share no code: a game copies what it needs from
+another.
 
+| Folder | What it is | Ports (telnet / web / websocket) |
+|---|---|---|
+| `game/` | The playground, for learning Evennia and trying features | 4000 / 4001 / 4002 |
+| `phantom_island/` | The first adventure | 4010 / 4011 / 4012 |
+
+To start a new game the way `phantom_island/` was made:
+
+- run `uv run evennia --init <name>` at the root. This creates the folder with Evennia's
+  template, a fresh `secret_settings.py` and an empty database;
+- copy the annotated template hooks from an existing game (Evennia's template has no type
+  annotations, so strict mypy would fail), plus its `mypy.ini` and `typeclasses/tests.py`;
 - add its name to `src` under `[tool.ruff]` in `pyproject.toml`, so ruff sorts its imports
   correctly;
-- make sure it has a `mypy.ini` (a copy of `game/mypy.ini`);
-- in the copy, run `uv run evennia --initmissing` and `uv run evennia migrate` as in
-  [First-time setup](#first-time-setup). A copied folder also brings the original's database
-  and secret key; delete `server/evennia.db3` and `server/conf/secret_settings.py` first if
-  the new game should start fresh.
+- give it its own ports in `server/conf/settings.py`: the next free block of ten (4020...),
+  including the internal `AMP_PORT` and the second number in `WEBSERVER_PORTS`, so it can run
+  next to the other games;
+- put its design documents in `<name>/docs/`.
+
+Copying a whole game folder also works, but it brings the original's database and secret key.
+Delete `server/evennia.db3` and `server/conf/secret_settings.py` in the copy, then run
+`uv run evennia --initmissing` and `uv run evennia migrate` as in
+[First-time setup](#first-time-setup).
 
 Mypy checks one game per run because every game has packages with the same names
-(`typeclasses`, `world`...), and mypy would report them as duplicates. Run only one game's
-server at a time, or give each game its own ports in its `settings.py`.
+(`typeclasses`, `world`...), and mypy would report them as duplicates.
 
 ## Managing dependencies
 
@@ -171,9 +185,10 @@ uv run evennia start
 ```
 Always stop the server before copying. Copying the file while the server is writing to it can corrupt it.
 
-For game branches, name each snapshot after its branch (`snapshots\magellan.db3`), not after a
-commit: the database changes whenever you play, not when you commit. Stop the server before
-switching branches too, so it never runs one branch's code on another branch's world.
+This works the same in every game folder, each with its own `server\snapshots\`. If you also
+use a git branch for an experiment (below), name the snapshot after the branch
+(`snapshots\magellan.db3`), and stop the server before switching branches, so it never runs one
+branch's code on another branch's world.
 
 **Option B: wipe completely** (a fresh, empty Limbo):
 ```powershell
@@ -257,8 +272,8 @@ Test-NetConnection localhost -Port 4001 -InformationLevel Quiet   # True = runni
 
 ## Play the map demo
 
-The map demo is kept outside `main` (see [DESIGN.md](DESIGN.md#7-the-map-demo)); these steps
-work where its files are present. Log in as superuser and stand in Limbo. The "tutorial" exit
+The map demo lives in the playground, `game/` (see [DESIGN.md](DESIGN.md#7-the-map-demo)).
+Log in as superuser and stand in Limbo. The "tutorial" exit
 there belongs to the tutorial world, if you built it. Then:
 
 **1. Reload the browser page** (F5) once. A **Map** pane should appear on the right, showing "No map for this place." Limbo isn't on any map.
@@ -314,9 +329,9 @@ Your router blocks incoming connections from the internet, so you need one of th
 | **Port forwarding on your router** | Medium | Forward ports 4000–4002 to your PC. The whole internet can then reach it, bots included. Needs the security steps below. |
 | **Rent a small server (VPS)** | More | It runs all the time without your PC. That's for later, if the game grows. |
 
-The web client needs two ports: **4001** for the page and **4002** for the live connection (the websocket). That matters when you forward ports.
+The web client needs two ports: **4001** for the page and **4002** for the live connection (the websocket). That matters when you forward ports. For Phantom Island the ports are **4010–4012** instead (see [Several games in one repo](#several-games-in-one-repo)).
 
 ## Before anyone outside your home connects
 - Use a strong password on your superuser account.
 - Anyone who can reach the server can create an account, because registration is open by default. That's fine on the home network or over Tailscale. For a public server, turn it off with `NEW_ACCOUNT_REGISTRATION_ENABLED = False` and create the players' accounts yourself.
-- Make sure `game/server/conf/secret_settings.py` exists with its own secret key (see [First-time setup](#first-time-setup)).
+- Make sure the game's `server/conf/secret_settings.py` (for example `phantom_island/server/conf/secret_settings.py`) exists with its own secret key (see [First-time setup](#first-time-setup)).

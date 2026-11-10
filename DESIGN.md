@@ -1,12 +1,14 @@
 # Design
 
-A developer's guide to how this game is built on Evennia: which parts are Evennia's, which are
-ours, and what each of our files and classes does. Setup and running are in
-[BUILD.md](BUILD.md); game ideas are in [IDEAS.md](IDEAS.md).
+A developer's guide to how the **playground** (`game/`) is built on Evennia: which parts are
+Evennia's, which are ours, and what each of our files and classes does. Setup and running are
+in [BUILD.md](BUILD.md); game ideas are in [IDEAS.md](IDEAS.md).
 
-So far the game has one general feature, **picture maps and room pictures**. Actual game
-content (maps, rooms, pictures) belongs on the game branches. A small **map demo** that shows
-the feature working is kept outside `main` (see [section 7](#7-the-map-demo)).
+So far the playground has one general feature, **picture maps and room pictures**, and a small
+**map demo** that shows it working (see [section 7](#7-the-map-demo)). Real games live in their
+own folders at the repo root (the first is `phantom_island/`, which has its own design
+documents in `phantom_island/docs/`). A game that wants this feature copies these files. In
+the sections below, "a game" means any game folder that has them.
 
 ## 1. Evennia in brief
 
@@ -80,7 +82,7 @@ game. In a room that is on no map, the pane shows "No map for this place."
 | File | What it is |
 |---|---|
 | [game/world/maps.py](game/world/maps.py) | The picture-map model, map discovery and the renderer. Plain Python, no typeclasses. |
-| [game/world/picture_maps/](game/world/picture_maps/__init__.py) | The package where maps are defined, one module per map. Empty on `main`. |
+| [game/world/picture_maps/](game/world/picture_maps/__init__.py) | The package where maps are defined, one module per map. Holds only the demo's map. |
 | [game/typeclasses/rooms.py](game/typeclasses/rooms.py) | `Room` knows its map and picture and sends them to a viewer. |
 | [game/typeclasses/characters.py](game/typeclasses/characters.py) | `Character` asks its room for visuals after every move and on login. |
 | [game/world/tests.py](game/world/tests.py) | Tests for discovery, rendering and the hooks. |
@@ -91,8 +93,8 @@ game. In a room that is on no map, the pane shows "No map for this place."
 - `discover_maps()`, `all_maps()`, `get_map(key)`: maps are found automatically. Every module in
   `world/picture_maps/` that has a `PICTURE_MAPS: list[PictureMap]` is imported the first time
   a map is looked up, and the result is cached until the next `evennia reload`. A key defined
-  twice is an error. So a game branch adds a map by **adding a file**, without editing any
-  file that `main` also has.
+  twice is an error. So a game adds a map by **adding a file**, without editing the
+  feature's own code.
 - `MAP_TAG_CATEGORY = "map"`: the tag category that puts a room on a map.
 - `map_pos_of(room)`: reads a room's `map_pos` attribute as `(x, y)`.
 - `MapPlace`, `places_on_map(map, here)`: finds every room tagged with the map's key (one
@@ -158,7 +160,7 @@ Static files are copied into the server's static folder on every `evennia start`
 `evennia reload`. After changing JS, CSS or images, reload the server and refresh the browser
 (Ctrl+F5 if the browser still shows the old file).
 
-## 5. Adding a map and places (what a game branch does)
+## 5. Adding a map and places (what a game does)
 
 1. Put the map picture under `game/web/static/terrific_travel/<game>/`.
 2. Add a module `game/world/picture_maps/<game>.py` with `PICTURE_MAPS = [PictureMap(...)]`,
@@ -194,8 +196,7 @@ Run them from `game/` with `uv run evennia test --settings settings.py .`. Tests
 ## 7. The map demo
 
 A throw-away example of the feature: three placeholder rooms (Harbour, Lighthouse, Cove) on a
-placeholder map. It is not part of `main`. Where it is kept, it consists of exactly three
-things:
+placeholder map, kept in the playground. It consists of exactly three things:
 
 - `game/world/map_demo/`: `builder.py` (creates and removes the rooms and exits, all tagged
   `map_demo` so removal is one search), the batch files `build.py` and `remove.py`, and

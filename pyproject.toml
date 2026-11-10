@@ -8,6 +8,8 @@ license-files = ["LICENSE"]
 requires-python = ">=3.12"  # Evennia 6.x requires Python 3.12+
 dependencies = [
     "evennia>=6.1,<7",
+    # Story content files (characters, clues...) that co-designers can edit.
+    "pyyaml>=6.0",
     # Local language model for characters (llm_lab/ now, the game later).
     "torch>=2.10,<3",
     "transformers>=5.22.0",
@@ -17,6 +19,7 @@ dependencies = [
 dev = [
     "mypy",
     "ruff",
+    "types-pyyaml>=6.0.12.20261103",
 ]
 
 [tool.uv]
@@ -40,7 +43,7 @@ line-length = 100
 target-version = "py312"
 # Every game folder at the root is an Evennia game dir, which Evennia puts on sys.path, so its
 # packages (typeclasses, world...) are first-party. List each game here, and llm_lab.
-src = ["game", "llm_lab"]
+src = ["game", "phantom_island", "llm_lab"]
 # Each game's settings.py is a star import of Evennia's defaults by design.
 extend-exclude = ["*/server/conf/settings.py"]
 

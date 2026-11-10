@@ -4,11 +4,16 @@
 
 **Terrific Travel**: a text-based multiplayer game (MUD) built on
 [Evennia](https://www.evennia.com/), developed together with young co-designers (around 12
-years old), so it should be both fun and educational. The name is settled; the
-details are **not decided yet**. Directions discussed: travel by ship (and later by plane)
-with real historical context, possibly ships and planes with minds of their own. Loose game
-ideas are collected in [IDEAS.md](IDEAS.md). Don't invent setting, lore or mechanics unless
-asked.
+years old), so it should be both fun and educational. "Terrific Travel" is the series name.
+Directions discussed: travel by ship (and later by plane) with real historical context,
+possibly ships and planes with minds of their own. Loose game ideas are collected in
+[IDEAS.md](IDEAS.md). Don't invent setting, lore or mechanics unless asked.
+
+**The first adventure is Phantom Island** (working title) in `phantom_island/`: an expedition
+with a mystery, built first as a complete game without AI, then with AI characters. Its settled
+decisions (staging, ports, solo play, checkpoints, YAML content, no conversation logging...)
+are in [phantom_island/docs/DECISIONS.md](phantom_island/docs/DECISIONS.md); read it before
+working on that game. The game is in English only.
 
 **Fun first.** The aim is to learn Evennia by building a game quickly with and for the young
 co-designers. Visuals in the web client (maps, pictures) are welcome. The one habit to keep:
@@ -19,10 +24,15 @@ players can play too.
 
 - The repo root holds the uv environment (`pyproject.toml`, `uv.lock`). It is not an
   installable package (`[tool.uv] package = false`).
-- `game/` is an Evennia game directory. The repo can hold several games as sibling folders at
-  the root, each independent, with its own database and `mypy.ini` (see BUILD.md, "Several
-  games in one repo"). Evennia puts the game folder on `sys.path`, so imports inside it are
-  top-level (`from typeclasses.rooms import Room`, not `from game.typeclasses...`).
+- **One folder per game** at the root, each an independent Evennia game directory with its own
+  database, `mypy.ini` and ports (see BUILD.md, "Several games in one repo"). Games share no
+  code: a game copies what it needs, and common code is extracted only once two real games
+  exist. Design documents for a game go in its `docs/` folder. Evennia puts the game folder
+  on `sys.path`, so imports inside it are top-level (`from typeclasses.rooms import Room`,
+  not `from game.typeclasses...`).
+  - `game/` is the **playground**: for learning Evennia and trying features (the picture
+    maps, the map demo). Not a game to finish. Ports 4000–4006.
+  - `phantom_island/` is the first real game. Ports 4010–4016.
 - `llm_lab/` is not a game: a standalone program for trying small local language models
   (Qwen3) as game characters, run in-process with `transformers` (see its README). It has its
   own `mypy.ini` and imports top-level like a game folder.
@@ -41,7 +51,7 @@ players can play too.
 4. **Tests** are `EvenniaTest` subclasses in `tests.py` modules, run with
    `uv run evennia test --settings settings.py .` from inside the game folder.
 5. **Follow Evennia idioms** (typeclasses, cmdsets, prototypes, scripts) rather than working
-   around the framework. Customise through `game/`; never patch `.venv`.
+   around the framework. Customise through the game folder; never patch `.venv`.
 6. **Never commit runtime data**: `*.db3`, logs, `secret_settings.py` (git-ignored).
 7. **Claude does not stage, commit or push.** Only edit files and leave them as uncommitted
    changes; the maintainer runs `git add`, `git commit` and `git push`. Creating or switching

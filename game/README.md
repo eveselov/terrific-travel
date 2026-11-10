@@ -1,40 +1,14 @@
-# Welcome to Evennia!
+# game: the playground
 
-This is your game directory, set up to let you start with
-your new game right away. An overview of this directory is found here:
-https://github.com/evennia/evennia/wiki/Directory-Overview#the-game-directory
+An Evennia game directory for learning Evennia and trying out general features. It isn't a game
+to finish. Real games live in their own folders at the repository root (the first one is
+[../phantom_island/](../phantom_island/README.md)) and copy from here whatever they need.
 
-You can delete this readme file when you've read it and you can
-re-arrange things in this game-directory to suit your own sense of
-organisation (the only exception is the directory structure of the
-`server/` directory, which Evennia expects). If you change the structure
-you must however also edit/add to your settings file to tell Evennia
-where to look for things.
+What's here so far:
 
-Your game's main configuration file is found in
-`server/conf/settings.py` (but you don't need to change it to get
-started). If you just created this directory (which means you'll already
-have a `virtualenv` running if you followed the default instructions),
-`cd` to this directory then initialize a new database using
+- **Picture maps and room pictures** in the web client, explained in [../DESIGN.md](../DESIGN.md).
+- **The map demo**: three placeholder rooms that show the feature working
+  (`batchcode map_demo.build`; see [../BUILD.md](../BUILD.md#play-the-map-demo)).
 
-    evennia migrate
-
-To start the server, stand in this directory and run
-
-    evennia start
-
-This will start the server, logging output to the console. Make
-sure to create a superuser when asked. By default you can now connect
-to your new game using a MUD client on `localhost`, port `4000`.  You can
-also log into the web client by pointing a browser to
-`http://localhost:4001`.
-
-# Getting started
-
-From here on you might want to look at one of the beginner tutorials:
-http://github.com/evennia/evennia/wiki/Tutorials.
-
-Evennia's documentation is here:
-https://github.com/evennia/evennia/wiki.
-
-Enjoy!
+Ports: telnet 4000, web 4001, websocket 4002 (Evennia's defaults). Setup, running and checks
+are in [../BUILD.md](../BUILD.md).
