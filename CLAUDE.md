@@ -23,8 +23,11 @@ players can play too.
   the root, each independent, with its own database and `mypy.ini` (see BUILD.md, "Several
   games in one repo"). Evennia puts the game folder on `sys.path`, so imports inside it are
   top-level (`from typeclasses.rooms import Room`, not `from game.typeclasses...`).
-- Evennia CLI commands, mypy and tests run from inside a game folder; ruff runs from the
-  repo root and covers all games.
+- `llm_lab/` is not a game: a standalone program for trying small local language models
+  (Qwen3) as game characters, run in-process with `transformers` (see its README). It has its
+  own `mypy.ini` and imports top-level like a game folder.
+- Evennia CLI commands, mypy and tests run from inside a game folder (or `llm_lab/`); ruff
+  runs from the repo root and covers everything.
 
 ## Implementation rules
 

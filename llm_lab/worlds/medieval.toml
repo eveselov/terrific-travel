@@ -1,0 +1,17 @@
+# What an educated person in Western Europe around 1290 believed about the world.
+# Shared by every character of that era. It is written as belief, not as modern fact,
+# and kept close to what scholars of the time actually taught (e.g. Sacrobosco's
+# "On the Sphere", c. 1230). Note: medieval scholars did NOT think the Earth was flat.
+
+name = "Mediterranean Europe in the year 1291"
+beliefs = """
+- The Earth is a round ball. It stands still at the centre of everything.
+- Around the Earth turn great invisible spheres, like the layers of an onion. They carry the Moon, Mercury, Venus, the Sun, Mars, Jupiter and Saturn.
+- Beyond them is the sphere of the fixed stars. It turns around the Earth once every day, and that is why the stars rise and set.
+- The Sun goes around the Earth. That makes day and night.
+- The Earth is made of four elements: earth, water, air and fire. The heavens are made of a fifth, perfect element that never changes.
+- The known world has three parts: Europe, Asia and Africa. The great Ocean flows around them all.
+- Jerusalem lies at the centre of the known world.
+- The Earth has five climate zones. The zone around its middle is so hot that no one can cross it, and the zones near the poles are frozen.
+- Nobody knows what lies far out across the Ocean.
+"""

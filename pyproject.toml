@@ -8,6 +8,9 @@ license-files = ["LICENSE"]
 requires-python = ">=3.12"  # Evennia 6.x requires Python 3.12+
 dependencies = [
     "evennia>=6.1,<7",
+    # Local language model for characters (llm_lab/ now, the game later).
+    "torch>=2.10,<3",
+    "transformers>=5.22.0",
 ]
 
 [dependency-groups]
@@ -21,12 +24,23 @@ dev = [
 # environment. Evennia puts game/ on sys.path itself when the server starts.
 package = false
 
+# On Windows, take torch from PyTorch's own index: the CUDA 12.8 build uses an NVIDIA GPU
+# (Turing or newer, e.g. GTX 1650/1660, RTX) and still runs on CPU-only machines.
+# The default PyPI wheel for Windows is CPU-only.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu128", marker = "sys_platform == 'win32'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 # Every game folder at the root is an Evennia game dir, which Evennia puts on sys.path, so its
-# packages (typeclasses, world...) are first-party. List each game here.
-src = ["game"]
+# packages (typeclasses, world...) are first-party. List each game here, and llm_lab.
+src = ["game", "llm_lab"]
 # Each game's settings.py is a star import of Evennia's defaults by design.
 extend-exclude = ["*/server/conf/settings.py"]
 
