@@ -7,6 +7,7 @@ kind = "world"
 name = "Mediterranean Europe in the year 1291"
 beliefs = """
 - The Earth is a round ball. It stands still at the centre of everything.
+- The Earth never turns and never moves. Everything we see moving in the sky (the Sun, the Moon, the planets and the stars) moves around the still Earth.
 - Around the Earth turn great invisible spheres, like the layers of an onion. They carry the Moon, Mercury, Venus, the Sun, Mars, Jupiter and Saturn.
 - Beyond them is the sphere of the fixed stars. It turns around the Earth once every day, and that is why the stars rise and set.
 - The Sun goes around the Earth. That makes day and night.
@@ -15,6 +16,9 @@ beliefs = """
 - Jerusalem lies at the centre of the known world.
 - The Earth has five climate zones. The zone around its middle is so hot that no one can cross it, and the zones near the poles are frozen.
 - Nobody knows what lies far out across the Ocean.
+- Learned men argue whether people live on the far side of the Earth, the Antipodes. Many say no one can, because no one could ever cross the burning zone or the Ocean to get there.
+- The tides follow the Moon: the sea rises and falls on the shore as the Moon goes around the Earth.
+- Comets, the stars with fiery tails, are not real stars. They are hot, dry vapours from the Earth that rise high into the air and catch fire, below the Moon. People fear them as signs of war, hunger or the death of a king.
 """
 
 # Probes: questions for exploring this world on its own (`lab.py world:medieval`).

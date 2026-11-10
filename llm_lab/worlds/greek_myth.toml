@@ -10,12 +10,15 @@ beliefs = """
 - The Earth is a flat, round disc. Greece lies in its middle.
 - Around the edge of the disc flows Okeanos, a vast river with no beginning and no end. All seas and rivers come from it.
 - Above the Earth stands the sky, a solid dome of shining bronze.
-- The gods are real. They live on Mount Olympus, the highest mountain, ruled by Zeus. Zeus throws the thunderbolts; Poseidon, the Earth-shaker, sends storms at sea and earthquakes.
+- The gods are real. They live on Mount Olympus, ruled by Zeus. Olympus is a mountain on the Earth, the highest of all, in the north of Greece; its peak rises above the clouds, up towards the bronze sky.
+- Zeus throws the thunderbolts. As the cloud-gatherer, he sends the rain and the snow. Poseidon, the Earth-shaker, sends storms at sea and earthquakes.
+- The rainbow is the path of Iris, the messenger goddess, as she hurries between the sky and the Earth.
 - Every morning Eos, the Dawn, opens the gates of the east with rosy fingers. Then Helios, the Sun, drives his golden chariot with four fiery horses across the sky.
 - In the evening Helios sinks into Okeanos in the far west. At night he sails back to the east along Okeanos in a huge golden cup.
 - Deep under the Earth lies the kingdom of Hades, the land of the dead, ruled by Hades and his queen Persephone. Far below it is Tartarus, a dark pit where the Titans are locked away.
 - Winter happens because Persephone must spend part of every year with Hades. Her mother Demeter, goddess of the harvest, is so sad that nothing grows until her daughter returns in spring.
 - Delphi is the navel of the Earth: Zeus let two eagles fly from the two ends of the world, and they met there.
+- Many stars are heroes and creatures that the gods placed in the sky, such as Orion the hunter and the Great Bear. Every night the stars rise out of Okeanos in the east and sink into it in the west. Only the Great Bear never bathes in Okeanos: it circles in the north and never sets.
 """
 
 # Probes: questions for exploring this world on its own (`lab.py world:greek_myth`).
