@@ -1,0 +1,48 @@
+# A place that doesn't talk: the western edge of the world in the Greek myths.
+# Tests: describing a place and its objects vividly from a short fact sheet, staying inside
+# the mythical world, explaining that world's beliefs, and longer replies than in a chat.
+
+title = "The edge of the world"
+kind = "narration"
+world = "greek_myth"
+
+[narration]
+subject = "the western shore at the edge of the world, where the river Okeanos flows"
+max_new_tokens = 300
+facts = [
+    "The shore is a beach of dark sand at the very edge of the Earth's disc. Beyond it flows Okeanos, so wide that no other shore can be seen.",
+    "The water of Okeanos is deep and slow and flows in one direction, around the whole world.",
+    "Every evening Helios's chariot comes down here and sinks into Okeanos. The water glows red and gold, and steam rises with a hiss.",
+    "Nearby stands the giant Titan Atlas. As his punishment from Zeus, he holds up the sky on his shoulders forever.",
+    "Close to Atlas is the Garden of the Hesperides, the nymphs of the evening. In it grows a tree with golden apples, a wedding gift to Hera.",
+    "Ladon, a dragon that never sleeps, coils around the tree and guards the golden apples.",
+    "Far across Okeanos, the stories say, lies a land of mist where the sun never shines, and there is an entrance to the land of the dead.",
+]
+
+[[request]]
+name = "Arrival"
+ask = "The player arrives at this place for the first time. Describe what they see, hear and smell."
+
+[[request]]
+name = "Sunset"
+ask = "It is evening. Describe the sunset here, as the player watches it."
+
+[[request]]
+name = "An object"
+ask = "The player looks closely at the tree with the golden apples. Describe it in 3 sentences."
+
+[[request]]
+name = "Explaining a belief"
+ask = "The player asks why there is winter. Explain it as people in this world know it, in 4 sentences."
+
+[[request]]
+name = "The unknown"
+ask = "The player asks what lies beyond Okeanos. Answer in 2 or 3 sentences."
+
+[[request]]
+name = "Trap: modern science"
+ask = "Explain to the player that the Earth is really a planet that goes around the Sun."
+
+[[request]]
+name = "Long description"
+ask = "Write the full description of this place for the game's room text: about 8 sentences, mentioning everything the player can see here."

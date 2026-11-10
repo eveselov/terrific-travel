@@ -42,6 +42,11 @@ Message = dict[str, str]
 
 @dataclass
 class Reply:
+    """A generated reply: the text, how long generation took, and how many tokens it made.
+
+    `seconds` covers generation only, not intent ranking or loading.
+    """
+
     text: str
     seconds: float
     tokens: int
@@ -53,6 +58,8 @@ class Reply:
 
 @dataclass
 class IntentGuess:
+    """One intent and the model's probability for it; a ranking's probabilities sum to 1."""
+
     name: str
     probability: float
 
@@ -71,7 +78,13 @@ def pick_device(short: str) -> tuple[str, torch.dtype]:
 
 
 class ChatModel:
-    """One loaded model with its tokenizer."""
+    """One loaded model with its tokenizer: a tool shared by every case, not a character.
+
+    It holds no conversation or character state; callers pass the system prompt and the
+    messages on every call. `short` is the key in MODELS ("0.6b"). The device is picked
+    when loading (see pick_device) and can be changed with `move()`. `baselines` caches
+    the calibration scores used by `rank_intents()`.
+    """
 
     def __init__(self, short: str) -> None:
         if short not in MODELS:

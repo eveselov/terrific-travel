@@ -3,6 +3,7 @@
 # and admitting what he doesn't know. The world sheet is in worlds/medieval.toml.
 
 title = "The sailor of Genoa"
+kind = "character"
 world = "medieval"
 
 [character]

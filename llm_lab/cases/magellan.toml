@@ -1,0 +1,64 @@
+# A scenario that doesn't talk: an overview of Magellan's voyage around the world.
+# Tests: introducing a whole scenario, summing up "the story so far" at a given stage,
+# giving hints without spoiling what comes later, and sticking to real history.
+# In the game, the logic would pass only the facts up to the player's stage; here all
+# the facts are given, so the "no spoilers" requests also test whether the model obeys.
+#
+# Sources: Antonio Pigafetta's journal of the voyage, and standard histories.
+
+title = "Magellan's voyage"
+kind = "narration"
+
+[narration]
+subject = "the voyage of Ferdinand Magellan's fleet around the world, from 1519 to 1522, for a player who sails with the fleet"
+max_new_tokens = 300
+facts = [
+    "Ferdinand Magellan was a Portuguese captain sailing for the King of Spain, Charles I.",
+    "The goal: reach the Spice Islands (the Moluccas, in today's Indonesia) by sailing west, and bring back cloves and nutmeg, worth more than gold in Europe.",
+    "On 20 September 1519 five ships left Sanlúcar de Barrameda in Spain: the Trinidad (Magellan's flagship), the San Antonio, the Concepción, the Victoria and the Santiago. About 240 men were on board.",
+    "An Italian traveller, Antonio Pigafetta, sailed with them and wrote a journal of the whole voyage.",
+    "The fleet crossed the Atlantic Ocean and reached the bay of Rio de Janeiro in South America in December 1519.",
+    "They sailed south along the coast looking for a passage to the other ocean. In March 1520 they stopped for the winter at Port San Julián, in Patagonia.",
+    "At Port San Julián three captains rebelled against Magellan. He crushed the mutiny.",
+    "In May 1520 the Santiago was wrecked while exploring the coast. Its crew was rescued.",
+    "On 21 October 1520 they found the passage, a narrow, stormy strait full of twisting channels: today it is called the Strait of Magellan. Getting through took 38 days.",
+    "In the strait, the crew of the San Antonio turned back secretly and sailed home to Spain.",
+    "At the end of November 1520 three ships came out into a new ocean. It was so calm that Magellan called it the Pacific, the peaceful ocean.",
+    "Crossing the Pacific took more than three months. Food ran out: the sailors ate biscuits full of worms, sawdust, rats and the leather from the masts. Many died of scurvy.",
+    "In March 1521 they reached the island of Guam, and then the Philippines.",
+    "On 27 April 1521 Magellan was killed in a battle on the island of Mactan, fighting the warriors of the chief Lapulapu.",
+    "There were too few men left for three ships, so the Concepción was burned.",
+    "In November 1521 the Trinidad and the Victoria reached the Spice Islands and loaded cloves.",
+    "The Trinidad tried to sail back east across the Pacific, but was captured by the Portuguese.",
+    "The Victoria, under its captain Juan Sebastián Elcano, sailed on west across the Indian Ocean and around Africa.",
+    "On 6 September 1522 the Victoria came back to Spain with 18 men. It was the first ship to sail all the way around the world.",
+    "The survivors found that their calendar was one day behind the calendar in Spain: by sailing west around the world, they had lost a day.",
+]
+
+[[request]]
+name = "Overview before departure"
+ask = "The player joins the fleet in Spain in September 1519. Give an overview of the voyage ahead: who leads it, why, and which ships sail. Don't tell how it ends."
+
+[[request]]
+name = "The story so far"
+ask = "The player's ship has just arrived at Port San Julián in March 1520. Tell them in 4 sentences what has happened on the voyage so far."
+
+[[request]]
+name = "A hint without spoilers"
+ask = "It is October 1520 and the fleet is searching for a passage to the other ocean. Give the player a hint about what to watch out for, without telling what happens next."
+
+[[request]]
+name = "Explaining a name"
+ask = "The player asks why the new ocean is called the Pacific. Explain in 2 sentences."
+
+[[request]]
+name = "The ending"
+ask = "The voyage is over. Sum up the whole voyage for the player in 5 sentences."
+
+[[request]]
+name = "Puzzle: the lost day"
+ask = "The player asks why the survivors' calendar was one day behind. Explain it simply, in 3 sentences."
+
+[[request]]
+name = "Trap: invented history"
+ask = "Tell the player about the big battle Magellan won against pirates in the Atlantic."

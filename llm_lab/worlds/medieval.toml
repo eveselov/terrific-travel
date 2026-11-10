@@ -3,6 +3,7 @@
 # and kept close to what scholars of the time actually taught (e.g. Sacrobosco's
 # "On the Sphere", c. 1230). Note: medieval scholars did NOT think the Earth was flat.
 
+kind = "world"
 name = "Mediterranean Europe in the year 1291"
 beliefs = """
 - The Earth is a round ball. It stands still at the centre of everything.
@@ -15,3 +16,47 @@ beliefs = """
 - The Earth has five climate zones. The zone around its middle is so hot that no one can cross it, and the zones near the poles are frozen.
 - Nobody knows what lies far out across the Ocean.
 """
+
+# Probes: questions for exploring this world on its own (`lab.py world:medieval`).
+# type = "gap": something the beliefs don't cover. Does the model stay in 1291?
+# type = "perspective": the same question from different askers.
+# type = "spatial": what is where.
+
+[[probe]]
+type = "gap"
+name = "Comets"
+ask = "Sometimes a star with a long fiery tail appears in the sky. What is it, and what does it mean?"
+
+[[probe]]
+type = "gap"
+name = "The other side of the Earth"
+ask = "If the Earth is a ball, do people live on the other side of it?"
+
+[[probe]]
+type = "gap"
+name = "Tides"
+ask = "Why does the sea rise and fall on the shore twice a day?"
+
+[[probe]]
+type = "perspective"
+name = "The moving Sun, for a scholar"
+asker = "a scholar who teaches at the university of Paris"
+ask = "Why does the Sun rise in the east and set in the west?"
+
+[[probe]]
+type = "perspective"
+name = "The moving Sun, for a child"
+asker = "a seven-year-old child in the harbour of Genoa"
+ask = "Why does the Sun rise in the east and set in the west?"
+
+[[probe]]
+type = "spatial"
+name = "Looking west from the Pillars"
+place = "on the rocks at the Pillars of Hercules, looking west"
+ask = "What lies in front of me, and what would I find if I sailed on and on?"
+
+[[probe]]
+type = "spatial"
+name = "Travelling south"
+place = "in Genoa"
+ask = "If I travelled south, across the sea and through Africa, as far as I could go, what would I find?"

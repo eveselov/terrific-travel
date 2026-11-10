@@ -1,0 +1,69 @@
+# The world of the Greek myths, as told by Homer and Hesiod (around 700 BC).
+# Written as truths of that world, for the narrator to describe as real.
+# Sources of the pictures: the Iliad and the Odyssey (the bronze sky, Okeanos, the
+# entrance to the land of the dead), Hesiod's Theogony (Atlas, Tartarus), and later poets
+# (Helios's golden cup, Delphi as the navel of the Earth).
+
+kind = "world"
+name = "the world of the Greek myths"
+beliefs = """
+- The Earth is a flat, round disc. Greece lies in its middle.
+- Around the edge of the disc flows Okeanos, a vast river with no beginning and no end. All seas and rivers come from it.
+- Above the Earth stands the sky, a solid dome of shining bronze.
+- The gods are real. They live on Mount Olympus, the highest mountain, ruled by Zeus. Zeus throws the thunderbolts; Poseidon, the Earth-shaker, sends storms at sea and earthquakes.
+- Every morning Eos, the Dawn, opens the gates of the east with rosy fingers. Then Helios, the Sun, drives his golden chariot with four fiery horses across the sky.
+- In the evening Helios sinks into Okeanos in the far west. At night he sails back to the east along Okeanos in a huge golden cup.
+- Deep under the Earth lies the kingdom of Hades, the land of the dead, ruled by Hades and his queen Persephone. Far below it is Tartarus, a dark pit where the Titans are locked away.
+- Winter happens because Persephone must spend part of every year with Hades. Her mother Demeter, goddess of the harvest, is so sad that nothing grows until her daughter returns in spring.
+- Delphi is the navel of the Earth: Zeus let two eagles fly from the two ends of the world, and they met there.
+"""
+
+# Probes: questions for exploring this world on its own (`lab.py world:greek_myth`).
+# type = "gap": something the beliefs don't cover. Does the model stay in the myths?
+# type = "perspective": the same question from different askers.
+# type = "spatial": what is where.
+
+[[probe]]
+type = "gap"
+name = "Rain"
+ask = "Where does the rain come from?"
+
+[[probe]]
+type = "gap"
+name = "The stars"
+ask = "What are the stars, and why do they move across the night sky?"
+
+[[probe]]
+type = "gap"
+name = "Rainbows"
+ask = "What is a rainbow?"
+
+[[probe]]
+type = "perspective"
+name = "Sunset, for a priest"
+asker = "a priest of Apollo at Delphi"
+ask = "Where does the Sun go in the evening?"
+
+[[probe]]
+type = "perspective"
+name = "Sunset, for a fisherman"
+asker = "a fisherman on the western shore at the edge of the world"
+ask = "Where does the Sun go in the evening?"
+
+[[probe]]
+type = "spatial"
+name = "Walking east"
+place = "in Greece"
+ask = "If I walked east, as far as the land goes, what would I find at the end?"
+
+[[probe]]
+type = "spatial"
+name = "Digging down"
+place = "in a field in Greece"
+ask = "If I could dig down, deeper and deeper, what would I find under the Earth?"
+
+[[probe]]
+type = "spatial"
+name = "Looking up"
+place = "on the top of Mount Olympus"
+ask = "What do I see when I look up, and what is above the sky?"

@@ -3,6 +3,7 @@
 # and reading what the player means (the intents). Names and details are placeholders.
 
 title = "The fisherman's boat"
+kind = "character"
 
 [character]
 name = "Tomas"

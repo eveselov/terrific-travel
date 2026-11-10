@@ -17,6 +17,9 @@ uv run python llm_lab/lab.py fisherman              # talk to the fisherman (0.6
 uv run python llm_lab/lab.py sailor --model 1.7b    # talk to the medieval sailor (1.7B)
 uv run python llm_lab/lab.py fisherman --replay     # test lines through 0.6B and 1.7B
 uv run python llm_lab/lab.py sailor --replay --models 0.6b
+uv run python llm_lab/lab.py magellan               # be the game, ask the narrator
+uv run python llm_lab/lab.py world:medieval         # explore a world on its own
+uv run python llm_lab/lab.py world:greek_myth --replay --models 0.6b
 ```
 
 The first use of a model downloads it from Hugging Face into the local cache (about 1.5 GB
@@ -40,19 +43,145 @@ otherwise the CPU in fp32. On the Surface Book (GTX 1650, 4 GB) that means 0.6B 
 
 ## Files
 
-- `model.py`: loads a model; `reply()` plays the character, `rank_intents()` scores each
+- `model.py`: loads a model; `reply()` generates the next turn, `rank_intents()` scores each
   intent name as a complete answer and turns the scores into probabilities.
-- `case.py`: reads case files and builds the two prompts (character, intent sorting).
+- `case.py`: reads case and world files and builds the prompts (character, intent sorting,
+  narration, world probing).
 - `lab.py`: the interactive chat and the replay.
-- `cases/*.toml`: one character each: personality, the facts they know, the intents, and
-  conversations of test lines with the expected intent.
-- `worlds/*.toml`: what people of an era believe, shared by every character of that era.
+- `cases/*.toml`: the cases, in two kinds (below).
+- `worlds/*.toml`: what is true or believed in an era or a mythical world, shared by every
+  case set there.
+
+## Kinds of file
+
+Every file states its kind with a required `kind = "..."` line. `cases/` holds everything that
+can be run, of any kind; `worlds/` holds shared material that cases include.
+
+- **Characters** (`kind = "character"`: `fisherman`, `sailor`): someone the player talks to.
+  A personality, the facts they know, intents, and conversations of test lines with the
+  expected intent.
+- **Narrations** (`kind = "narration"`: `okeanos`, `magellan`): something that
+  doesn't talk, such as a place, an object or a whole scenario. The game logic sends it
+  requests ("describe this place as the player arrives", "sum up the story so far") and
+  decides what to show. Each request stands alone: no history, no intents. In the
+  interactive mode you play the game logic and type the requests yourself. Replies are
+  longer, so the case sets its own `max_new_tokens` (300 by default).
+- **Worlds** (`kind = "world"`, in `worlds/`): included by cases, like a header, with
+  `world = "medieval"`. A world can also be explored on its own, to test the sheet before
+  characters depend on it: `lab.py world:medieval` puts a neutral informant in front of it
+  who knows only the sheet. Each question stands alone. The world file's `[[probe]]` entries
+  are its tests: `type = "gap"` asks about something the sheet doesn't cover (does the model
+  fill it with modern knowledge? then the sheet needs a line), `"perspective"` asks the same
+  thing from different askers (`asker = "..."`), and `"spatial"` asks what is where
+  (`place = "..."`). Interactively, set a perspective with ` | `:
+  `Asked by: a child | Where: Genoa | Question: Why is the sea salty?`
 
 ## Writing a case
 
-Copy `cases/fisherman.toml` and change it. Things worth knowing:
+Copy `cases/fisherman.toml` (a character) or `cases/okeanos.toml` (a narration) and change it.
+Things worth knowing:
 
-- **Facts are the only things the character knows.** Small models invent freely, so anything
+- **Facts are the only things the model knows.** Small models invent freely, so anything
   true in the game must be written here. For history, check the facts.
 - **Intents need clear, different descriptions.** Keep an `other` intent for everything else.
-- **Write test lines for both the happy path and attempts to break the character.**
+- **Write tests for both the happy path and attempts to break the case**: tricks for
+  characters, modern knowledge or invented history for narrations.
+
+
+## Model Capacities Note
+
+1.7B is clearly better than 0.6B at sticking to the facts and following instructions. It still fell for both traps, and on this laptop it's too slow for live play.
+
+**Speed:** 2–3 tokens/s on the CPU, so 30–70 s per reply, against 6–14 s for 0.6B on the GPU.
+
+**Where 1.7B did better:**
+
+| Request | 0.6B | 1.7B |
+| --- | --- | --- |
+| Beyond Okeanos | ignored the fact | used it: *"the land of the dead, where the sun never shines… an entrance to Hades' kingdom"* |
+| Room description | included things not visible from the beach (Olympus, the dawn in the east) | mostly what you can see from the beach, and includes Ladon and the misty land |
+| Departure overview | leader and ships | also the reason (spices, sailing west) and who Magellan sailed for, with no ending given away |
+| Story so far | told the whole voyage, ending included | no spoilers, but invented details (a storm, a ship "barely holding together") and skipped the real events: Rio, the Atlantic crossing |
+| Hint in October 1520 | named the Strait of Magellan | stayed vague: "watch for storms and strong currents" |
+| Sentence counts | mostly ignored | closer, but not exact |
+
+**Where it was no better:**
+- **Traps:** it invented a full victory over pirates again. For the modern-science request it mixed both worlds: "the Earth spinning around the Sun… The Earth is a big, round disc".
+- **Small invented details:** it called Persephone "goddess of the harvest" (that's Demeter) and put a circle of nymphs around the apple tree.
+- **The lost day:** still a muddled explanation ("like they traveled backward in time").
+- **The ending:** it left out Magellan's death and Elcano's return. Better than 0.6B's false claim, but incomplete.
+
+**What I take from this:**
+1. **The three design rules from last time hold for both sizes.** Pass only the facts up to the player's stage, keep player text out of narration requests, and generate room text when building the game, then review it. No model size made the traps safe.
+2. **On this Surface Book:** 0.6B on the GPU is the live model, at a few seconds per reply. 1.7B suits content generated while building the game, where a minute per description doesn't matter and quality does.
+3. **To run 1.7B live,** it would need a GPU with about 6 GB of free memory, or a compressed (quantized) version to squeeze it onto this 4 GB card. That would mean a new dependency, so it's only worth looking at if 0.6B turns out too weak for characters.
+
+The full transcripts are in [llm_lab/runs/](llm_lab/runs/): `okeanos-20261109-202516.md` and `magellan-20261109-203108.md`.
+
+## Kinds of fixtures
+
+Your understanding is right, with two refinements.
+
+**Cases: yes.** A case is something you can prompt and get a response from, whether the prompt comes from a player (a character) or from game logic (a narration). Treating history as a general feature, with "no history" as the corner case, is the right way to see it. Two refinements:
+
+- **History is the caller's choice, not part of the kind.** Narrations currently get no earlier turns, only the current request: your length-1 case. But a narrator could benefit from history too, for example to keep descriptions consistent across one visit ("you described the beach as foggy a moment ago"). In the game, the logic decides how much history each call gets.
+- **What really differs between kinds is the output contract.** A character returns a reply *plus an intent*. A narration returns text only. Later kinds might return a choice or a yes/no verdict, for example "does the player's plan work?". That's where kinds will differ most, more than in history.
+
+**Worlds: yes, they're headers.** That's why there's no way to talk to one. But probing a world on its own is a good idea, because it tests the world sheet before any character depends on it. Three kinds of probe would be useful:
+
+1. **Gap probes:** ask about things the sheet *doesn't* cover. Where the model fills a gap with modern knowledge, the sheet needs another line. For example: "What are comets?" in 1291, or "Where do rivers end?" in the myth world.
+2. **Perspective probes:** ask the same question from different askers or places. How does a scholar at Delphi explain the sunset, and how does a fisherman on the western shore? This checks the world holds together from every viewpoint and doesn't depend on one character's wording.
+3. **Spatial probes:** "You stand at the edge of the disc and look west. What do you see?" This checks the world's geography stays consistent, which matters for the 12 levels × 100 locations plan.
+
+It fits the lab cheaply: worlds stay headers, and you can probe them too. A world file could carry optional `[[probe]]` entries, each with a question and optionally who asks and where. A built-in neutral "informant of this world" prompt would answer each probe single-turn, using only the world sheet. Something like `lab.py world:medieval` would run it interactively, and `--replay` would run the probes. Without probes in the file, you'd just ask your own questions.
+
+I'd keep probing single-turn. Its purpose is to see what the sheet alone produces, and a conversation history would mix the model's own earlier answers into that.
+
+## Probing the Worlds
+
+The probes do what they were meant to: they show where each world sheet is thin. They found real gaps, and also a few places where 0.6B contradicts what the sheet *does* say.
+
+**Medieval world (1291):**
+
+| Probe | Answer | Verdict |
+| --- | --- | --- |
+| Comets (gap) | *"called a supernova… the star exploded"* | modern knowledge leaked in |
+| Other side of the Earth (gap) | *"people live on the other side"* | stated flatly as fact; in 1291 this was disputed |
+| Tides (gap) | *"The Earth turns around once every day"* | **contradicts the sheet**, which says the Earth stands still |
+| Moving Sun, child (perspective) | *"because of the Earth's rotation"* | **contradicts the sheet** again |
+| Moving Sun, scholar (perspective) | spheres carry the Sun around the Earth | correct |
+| West from the Pillars (spatial) | *"I would see the stars… find the stars behind me"* | nonsense; ignores the Ocean |
+| South through Africa (spatial) | *"Genoa, which is the center of the known world"* | nonsense; ignores the uncrossable hot zone |
+
+**Greek myth world:**
+
+| Probe | Answer | Verdict |
+| --- | --- | --- |
+| Rain (gap) | *"comes from Okeanos"* | an in-world guess; in the myths Zeus sends rain |
+| Stars (gap) | lights on the bronze dome | acceptable |
+| Rainbows (gap) | *"sunlight hits the Earth's atmosphere"* | modern knowledge leaked in; in the myths it's the goddess Iris |
+| Sunset, priest vs fisherman (perspective) | both correct, from the sheet | correct, but the two answers barely differ |
+| Walking east (spatial) | ends at Okeanos | correct; misses Eos's gates |
+| Digging down (spatial) | Hades, then Tartarus | correct |
+| Looking up (spatial) | *"Above the sky, the gods live on Mount Olympus"* | muddled: Olympus is a mountain |
+
+**What this shows:**
+1. **Gaps get filled with modern science.** Where the sheet is silent, 0.6B reaches for supernovas and the atmosphere. Each such answer points to one line the sheet should get.
+2. **On the Earth's motion, the model's modern prior beat the sheet.** Twice in the medieval world it said the Earth turns, although the sheet says it stands still. That's a warning for characters too: the most "obviously modern" beliefs may need to be stated more strongly, or repeated in the character's own facts.
+3. **Perspective made little difference with 0.6B.** The child and the scholar got similar answers. This may need 1.7B, or a stronger instruction in the informant prompt.
+4. **The spatial answers are the weakest.** For a game with many locations, it's safer to keep geography as data in the game, such as rooms, exits and a map. The model should describe that data rather than invent where things are.
+
+**Possible sheet additions.** I haven't made these, since they add lore and the choice is yours:
+- **Medieval:**
+  - comets as fiery vapours high in the air, seen as omens
+  - tides caused by the Moon
+  - whether people can live on the far side of the Earth
+  - "the Earth never turns or moves"
+- **Greek myth:**
+  - rain sent by Zeus
+  - the rainbow as Iris, messenger of the gods
+  - the stars and constellations as heroes placed in the sky
+
+Transcripts: [world-medieval-20261109-224337.md](llm_lab/runs/world-medieval-20261109-224337.md) and [world-greek_myth-20261109-224423.md](llm_lab/runs/world-greek_myth-20261109-224423.md).
+
+Do you want me to add those sheet lines and re-run the probes, on 0.6B and 1.7B? That would show both whether the additions work and whether 1.7B handles perspective better.
