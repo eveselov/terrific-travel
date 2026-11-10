@@ -37,6 +37,33 @@ the model splits text (`boat|'s|`). Replays never stream.
 A replay writes a Markdown transcript to `runs/` (git-ignored) with intent hits and speed per
 model at the top. Read the replies too: the numbers only count intents.
 
+## Recording and playback
+
+Every interactive session is recorded automatically to `runs/<case>-<time>.log.toml`
+(the file appears with the first question). The double suffix keeps recordings apart from
+other TOML files such as cases and worlds. While you chat:
+
+- a line starting with `#` is a **comment** for the recording, not sent to the model
+  (`# here he gives in and says banana`);
+- `/save banana` keeps the recording as `runs/banana.log.toml` instead of the timestamp name;
+- commands that change later replies (`/model`, `/trim`, `/tokens`, `/reset`, `/cpu`, `/gpu`)
+  are recorded too.
+
+A recording is plain TOML: edit it freely, delete dull steps, fix typos, add steps with
+`comment = "..."`. Then show it step by step, for example in a presentation:
+
+```powershell
+uv run python llm_lab/lab.py --play banana                         # the saved answers
+uv run python llm_lab/lab.py --play banana --live                  # ask again, streamed
+uv run python llm_lab/lab.py --play banana --live --model 1.7b     # ask another model
+```
+
+Each stop shows the comments, then the question; Enter shows the answer, Enter again goes on.
+`b` goes back one question, `q` quits. Recorded playback needs no model, so it is instant and
+runs on any laptop. Live playback generates new answers; with the same model on the same
+device they come out the same as recorded (the seeds are fixed), elsewhere they may differ.
+A good session is also material for tests: copy its lines into a case's conversations.
+
 ## The device
 
 The model picks its device itself: the GPU in fp16 if the weights fit in its free memory,
@@ -49,7 +76,8 @@ otherwise the CPU in fp32. On the Surface Book (GTX 1650, 4 GB) that means 0.6B 
   intent name as a complete answer and turns the scores into probabilities.
 - `case.py`: reads case and world files and builds the prompts (character, intent sorting,
   narration, world probing).
-- `lab.py`: the interactive chat and the replay.
+- `lab.py`: the interactive chat, the replay and the step-by-step playback.
+- `session.py`: recording sessions to TOML and reading them back.
 - `cases/*.toml`: the cases, in two kinds (below).
 - `worlds/*.toml`: what is true or believed in an era or a mythical world, shared by every
   case set there.

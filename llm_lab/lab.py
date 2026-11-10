@@ -7,6 +7,8 @@ A world (`world:<name>`) can be explored the same way: each line is a question t
 informant who knows only the world sheet.
 Replay: every conversation (or request, or probe) runs through each model, and a Markdown
 transcript with intent hits and speed lands in runs/.
+Every interactive session is recorded to runs/*.log.toml (see session.py); --play shows
+a recording again step by step, from the saved answers or (--live) by asking again.
 
 Usage (from the repo root):
   uv run python llm_lab/lab.py fisherman
@@ -15,6 +17,8 @@ Usage (from the repo root):
   uv run python llm_lab/lab.py fisherman --replay --models 0.6b
   uv run python llm_lab/lab.py okeanos --replay
   uv run python llm_lab/lab.py world:medieval --replay --models 0.6b
+  uv run python llm_lab/lab.py --play banana
+  uv run python llm_lab/lab.py --play banana --live --model 1.7b
 """
 
 from __future__ import annotations
@@ -26,7 +30,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from case import (
-    LAB,
     NEUTRAL_SAY,
     Case,
     Request,
@@ -44,8 +47,11 @@ from case import (
     world_names,
 )
 from model import MAX_NEW_TOKENS, MODELS, ChatModel, IntentGuess, Message, Reply
+from session import RUNS, SUFFIX, Recorder, Recording, Step, load_recording, recording_stem
 
-RUNS: Path = LAB / "runs"
+DEFAULT_MODEL: str = "0.6b"
+# Commands that change later replies: recorded, and repeated in a live playback.
+RECORDED_COMMANDS: tuple[str, ...] = ("/model", "/cpu", "/gpu", "/tokens", "/trim", "/reset")
 # How much conversation a character remembers by default, in exchanges (player line + reply).
 HISTORY_EXCHANGES: int = 10
 # Reply limit when exploring a world: answers of a few sentences.
@@ -61,6 +67,8 @@ HELP: str = """Commands:
   /prompt       show the system prompt the model gets
   /reset        start the conversation over
   /list         show the loaded models and settings
+  /save NAME    keep this session's recording as runs/NAME.log.toml (recorded anyway)
+  # TEXT        a comment for the recording, not sent to the model
   /help         show this help
   /quit         leave"""
 
@@ -85,6 +93,7 @@ class Lab:
     model follows its own conversation. `active` is the model the interactive mode talks
     to. `max_new_tokens` and `history_exchanges` are the /tokens and /trim settings, and
     `stream` is the /stream setting ("off", "text" or "tokens"; interactive mode only).
+    `recorder`, set in interactive mode, records the session (see session.py).
     For a character it runs `turn()`; for a narration or a world being explored, `ask()`.
     """
 
@@ -96,6 +105,7 @@ class Lab:
     max_new_tokens: int = MAX_NEW_TOKENS
     history_exchanges: int = HISTORY_EXCHANGES
     stream: str = "off"
+    recorder: Recorder | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.case, Scene):
@@ -244,12 +254,51 @@ def handle_command(line: str, lab: Lab) -> bool:
             f"  active={lab.active} compare={lab.compare} tokens={lab.max_new_tokens} "
             f"trim={lab.history_exchanges} stream={lab.stream}"
         )
+    elif command == "/save":
+        if lab.recorder is None or not argument:
+            print("  usage: /save NAME (in an interactive session)")
+        else:
+            try:
+                print(f"  recording now in {lab.recorder.save_as(argument)}")
+            except ValueError as error:
+                print(f"  {error}; choose another name")
     else:
         print(f"  unknown command {line!r}; /help lists them")
     return True
 
 
-def interactive(lab: Lab) -> None:
+def answer(lab: Lab, short: str, line: str, label: str, stream: str) -> Step:
+    """Ask one model, print the reply (streamed or whole) and its stats; return the step.
+
+    `label` starts the reply line ("[0.6b] " in /compare mode); a character's name is added.
+    """
+    if isinstance(lab.case, Case):
+        label += f"{lab.case.name}: "
+    on_token: Callable[[str], None] | None = None
+    if stream != "off":
+        print(label, end="", flush=True)
+        on_token = print_token if stream == "text" else print_marked_token
+    if not isinstance(lab.case, Case):
+        reply: Reply = lab.ask(short, line.replace(" | ", "\n"), on_token=on_token)
+        print() if on_token else print(f"{label}{reply.text}")
+        print(f"    ({timing(reply)})")
+        return Step(say=line, model=short, reply=reply.text, seconds=reply.seconds)
+    turn: Turn = lab.turn(short, line, on_token=on_token)
+    print() if on_token else print(f"{label}{turn.reply.text}")
+    print(f"    ({stats(turn)})")
+    best: IntentGuess = turn.intents[0]
+    return Step(
+        say=line,
+        model=short,
+        reply=turn.reply.text,
+        intent=best.name,
+        probability=best.probability,
+        seconds=turn.reply.seconds,
+    )
+
+
+def interactive(lab: Lab, name: str) -> None:
+    """Chat with the case, recording every step; `name` is the case as given to lab.py."""
     if isinstance(lab.case, Scene):
         print(f"{lab.case.title}: you are the game, asking the narrator about {lab.case.subject}.")
     elif isinstance(lab.case, World):
@@ -262,6 +311,9 @@ def interactive(lab: Lab) -> None:
     else:
         print(f"{lab.case.title}: you are talking to {lab.case.name}, {lab.case.role}.")
     print(HELP)
+    recorder: Recorder = Recorder(name, lab.title())
+    lab.recorder = recorder
+    print(f"Recording to {recorder.path} (created with the first step)")
     lab.load(lab.active)
     while True:
         try:
@@ -270,27 +322,140 @@ def interactive(lab: Lab) -> None:
             break
         if not line:
             continue
+        if line.startswith("#"):
+            note: str = line.lstrip("#").strip()
+            if note:
+                recorder.add(Step(comment=note))
+                print("  (comment recorded)")
+            continue
         if line.startswith("/"):
             if not handle_command(line, lab):
                 break
+            if line.split()[0] in RECORDED_COMMANDS:
+                recorder.add(Step(command=line))
             continue
         targets: list[str] = list(lab.models) if lab.compare else [lab.active]
         for short in targets:
             label: str = f"[{short}] " if lab.compare else ""
-            if isinstance(lab.case, Case):
-                label += f"{lab.case.name}: "
-            on_token: Callable[[str], None] | None = None
-            if lab.stream != "off":
-                print(label, end="", flush=True)
-                on_token = print_token if lab.stream == "text" else print_marked_token
-            if not isinstance(lab.case, Case):
-                reply: Reply = lab.ask(short, line.replace(" | ", "\n"), on_token=on_token)
-                print() if on_token else print(f"{label}{reply.text}")
-                print(f"    ({timing(reply)})")
-            else:
-                turn: Turn = lab.turn(short, line, on_token=on_token)
-                print() if on_token else print(f"{label}{turn.reply.text}")
-                print(f"    ({stats(turn)})")
+            recorder.add(answer(lab, short, line, label, lab.stream))
+    if recorder.recording.steps:
+        print(f"Session recorded in {recorder.path}")
+
+
+# --- playback ----------------------------------------------------------------------------
+
+
+@dataclass
+class Frame:
+    """What playback shows at one stop: the comments and commands before a `say` step,
+    then that step. The last frame may have no step (comments at the very end)."""
+
+    notes: list[str]
+    commands: list[str]
+    step: Step | None
+
+
+def frames(recording: Recording) -> list[Frame]:
+    result: list[Frame] = []
+    notes: list[str] = []
+    commands: list[str] = []
+    for step in recording.steps:
+        if step.comment is not None:
+            notes.append(step.comment)
+        elif step.command is not None:
+            commands.append(step.command)
+        elif step.say is not None:
+            result.append(Frame(notes, commands, step))
+            notes, commands = [], []
+    if notes:
+        result.append(Frame(notes, [], None))
+    return result
+
+
+def pause(prompt: str) -> str:
+    """Wait for Enter; returns "b" (back), "q" (quit) or "" (go on)."""
+    try:
+        key: str = input(f"  [{prompt}] ").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        return "q"
+    return key if key in ("b", "q") else ""
+
+
+def play(recording: Recording, live: bool, override: str | None) -> None:
+    """Show a recording step by step: comments, then the question, Enter, then the answer.
+
+    Recorded playback shows the saved answers and needs no model. Live playback asks every
+    question again (streamed), repeating the recorded commands, with the recorded models or
+    with `override`. "b" goes back one question (recorded playback only), "q" quits.
+    """
+    subject: Case | Scene | World = load_subject(recording.case)
+    lab: Lab | None = None
+    if live:
+        used: list[str] = [override] if override else []
+        used = used or list(dict.fromkeys(s.model for s in recording.steps if s.model))
+        lab = Lab(subject, active=(used or [DEFAULT_MODEL])[0])
+        for short in used:  # load up front, so loading messages don't interrupt the show
+            lab.load(short)
+    print(f"{recording.title} ({recording.case}), recorded {recording.started}")
+    print("Enter: next, b: back, q: quit." + (" Live: new answers." if live else ""))
+    stops: list[Frame] = frames(recording)
+    index: int = 0
+    previous: Step | None = None
+    while index < len(stops):
+        frame: Frame = stops[index]
+        print()
+        for note in frame.notes:
+            print(f"# {note}")
+        for command in frame.commands:
+            if override and command.startswith("/model"):
+                continue  # one model for the whole playback
+            print(f"  {command}")
+            if lab is not None:
+                handle_command(command, lab)
+        step: Step | None = frame.step
+        if step is None or step.say is None:
+            break
+        # In /compare mode one question was recorded once per model: with one model, ask once.
+        repeat: bool = previous is not None and previous.say == step.say
+        if not (lab is not None and override and repeat):
+            if not repeat:
+                print(f"> {step.say}")
+            key: str = pause("Enter: answer")
+            if key == "q":
+                return
+            if key == "b" and lab is None:
+                index = max(0, index - 1)
+                previous = None
+                continue
+            show(subject, lab, step, override)
+            key = pause("Enter: next")
+            if key == "q":
+                return
+            if key == "b" and lab is None:
+                index = max(0, index - 1)
+                previous = None
+                continue
+        previous = step
+        index += 1
+    print("  (end of recording)")
+
+
+def show(subject: Case | Scene | World, lab: Lab | None, step: Step, override: str | None) -> None:
+    """Print a step's answer: the recorded one, or (live) a new one from a model."""
+    assert step.say is not None
+    if lab is not None:
+        short: str = override or step.model or DEFAULT_MODEL
+        answer(lab, short, step.say, f"[{short}] ", "text")
+        return
+    name: str = f"{subject.name}: " if isinstance(subject, Case) else ""
+    print(f"[{step.model}] {name}{step.reply}")
+    details: list[str] = []
+    if step.intent is not None and step.probability is not None:
+        details.append(f"intent {step.intent} {step.probability:.2f}")
+    if step.seconds is not None:
+        details.append(f"{step.seconds:.1f} s")
+    if details:
+        print(f"    ({' | '.join(details)})")
 
 
 def print_token(piece: str) -> None:
@@ -408,25 +573,49 @@ def write_transcript(lab: Lab, header: list[str], body: list[str]) -> Path:
     return path
 
 
+def load_subject(name: str) -> Case | Scene | World:
+    """A case by its name, or a world for "world:<name>"."""
+    if name.startswith(WORLD_PREFIX):
+        return load_world(name.removeprefix(WORLD_PREFIX))
+    return load_case(name)
+
+
+def recording_path(given: str) -> Path:
+    """The file as given, or else the name looked up in runs/ (the suffix is optional)."""
+    path: Path = Path(given)
+    if path.exists():
+        return path
+    return RUNS / f"{recording_stem(given)}{SUFFIX}"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     choices: list[str] = case_names() + [WORLD_PREFIX + name for name in world_names()]
     parser.add_argument(
-        "case", choices=choices, help="a case in cases/, or world:<name> to explore a world"
+        "case",
+        nargs="?",
+        choices=choices,
+        help="a case in cases/, or world:<name> to explore a world (not with --play)",
     )
-    parser.add_argument("--model", default="0.6b", choices=list(MODELS), help="to talk to")
+    parser.add_argument(
+        "--model", choices=list(MODELS), help=f"to talk to (default {DEFAULT_MODEL})"
+    )
     parser.add_argument("--replay", action="store_true", help="run the case's test lines")
     parser.add_argument("--models", default="0.6b,1.7b", help="comma-separated models for --replay")
+    parser.add_argument("--play", metavar="FILE", help="show a recorded session step by step")
+    parser.add_argument(
+        "--live", action="store_true", help="with --play: ask again instead of saved answers"
+    )
     args = parser.parse_args()
 
-    subject: Case | Scene | World = (
-        load_world(args.case.removeprefix(WORLD_PREFIX))
-        if args.case.startswith(WORLD_PREFIX)
-        else load_case(args.case)
-    )
-    lab: Lab = Lab(subject, active=args.model)
+    if args.play:
+        play(load_recording(recording_path(args.play)), args.live, args.model)
+        return
+    if args.case is None:
+        parser.error("give a case (or world:<name>), or --play FILE")
+    lab: Lab = Lab(load_subject(args.case), active=args.model or DEFAULT_MODEL)
     if args.replay:
         shorts: list[str] = [short.strip() for short in args.models.split(",")]
         unknown: list[str] = [short for short in shorts if short not in MODELS]
@@ -434,7 +623,7 @@ def main() -> None:
             raise SystemExit(f"unknown models {unknown}; have {list(MODELS)}")
         print(f"transcript: {replay(lab, shorts)}")
     else:
-        interactive(lab)
+        interactive(lab, args.case)
 
 
 if __name__ == "__main__":
