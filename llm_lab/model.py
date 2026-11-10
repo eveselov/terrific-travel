@@ -10,11 +10,13 @@ from __future__ import annotations
 import math
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, cast
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizerBase
+from transformers.generation.streamers import BaseStreamer
 
 # Short name -> Hugging Face id. Add a line to try another size.
 MODELS: dict[str, str] = {
@@ -38,6 +40,31 @@ END_OF_TURN: str = "<|im_end|>"
 THINK_RE: re.Pattern[str] = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 Message = dict[str, str]
+
+
+class TokenStreamer(BaseStreamer):
+    """Hands each newly generated token, as text, to a callback, while generation runs.
+
+    `generate()` calls `put()` from its own loop, in the same thread: first once with the
+    prompt (skipped here), then with every new token. Tokens are decoded one by one, so the
+    pieces are raw: often part of a word, and a letter like "é" may arrive in two broken
+    halves. The returned Reply has the properly decoded text.
+    """
+
+    def __init__(self, tokenizer: PreTrainedTokenizerBase, on_token: Callable[[str], None]) -> None:
+        self.tokenizer: PreTrainedTokenizerBase = tokenizer
+        self.on_token: Callable[[str], None] = on_token
+        self.prompt_seen: bool = False
+
+    def put(self, value: torch.Tensor) -> None:
+        if not self.prompt_seen:
+            self.prompt_seen = True
+            return
+        for token_id in value.flatten().tolist():
+            self.on_token(str(self.tokenizer.decode([token_id], skip_special_tokens=True)))
+
+    def end(self) -> None:
+        pass
 
 
 @dataclass
@@ -141,10 +168,13 @@ class ChatModel:
         messages: list[Message],
         seed: int = 0,
         max_new_tokens: int = MAX_NEW_TOKENS,
+        on_token: Callable[[str], None] | None = None,
     ) -> Reply:
         """Sample the next assistant turn. The fixed seed makes replays repeatable.
 
         `max_new_tokens` is a ceiling, not a target: the prompt sets how long replies are.
+        `on_token`, if given, is called with the text of each new token as it is generated
+        (see TokenStreamer); the complete reply is returned either way.
         """
         prompt: str = self.render(system, messages)
         encoded = self.tokenizer(prompt, return_tensors="pt", add_special_tokens=False).to(
@@ -160,6 +190,7 @@ class ChatModel:
             top_p=TOP_P,
             top_k=TOP_K,
             pad_token_id=self.tokenizer.pad_token_id,
+            streamer=TokenStreamer(self.tokenizer, on_token) if on_token else None,
         )
         seconds: float = time.perf_counter() - started
         new_tokens: torch.Tensor = output[0, encoded["input_ids"].shape[1] :]

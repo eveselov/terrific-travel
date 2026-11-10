@@ -30,7 +30,9 @@ then uses the cache only and doesn't try the network. Unset it again to allow do
 In a chat, `/help` lists the commands: `/model 1.7b` switches models, `/compare` sends every
 line to all loaded models, `/cpu` and `/gpu` move the model, `/tokens 300` raises the reply
 limit (for descriptions), `/prompt` shows what the model is told, `/reset` starts over. The
-character remembers the last 10 exchanges; `/trim 20` changes that.
+character remembers the last 10 exchanges; `/trim 20` changes that. `/stream` shows the reply
+as it is generated, and `/stream tokens` marks every token with a bar, so you can see how
+the model splits text (`boat|'s|`). Replays never stream.
 
 A replay writes a Markdown transcript to `runs/` (git-ignored) with intent hits and speed per
 model at the top. Read the replies too: the numbers only count intents.
@@ -116,8 +118,6 @@ Things worth knowing:
 2. **On this Surface Book:** 0.6B on the GPU is the live model, at a few seconds per reply. 1.7B suits content generated while building the game, where a minute per description doesn't matter and quality does.
 3. **To run 1.7B live,** it would need a GPU with about 6 GB of free memory, or a compressed (quantized) version to squeeze it onto this 4 GB card. That would mean a new dependency, so it's only worth looking at if 0.6B turns out too weak for characters.
 
-The full transcripts are in [llm_lab/runs/](llm_lab/runs/): `okeanos-20261109-202516.md` and `magellan-20261109-203108.md`.
-
 ## Kinds of fixtures
 
 Your understanding is right, with two refinements.
@@ -182,6 +182,52 @@ The probes do what they were meant to: they show where each world sheet is thin.
   - the rainbow as Iris, messenger of the gods
   - the stars and constellations as heroes placed in the sky
 
-Transcripts: [world-medieval-20261109-224337.md](llm_lab/runs/world-medieval-20261109-224337.md) and [world-greek_myth-20261109-224423.md](llm_lab/runs/world-greek_myth-20261109-224423.md).
+  ## Probmg the Worlds After Lore Aditions
 
-Do you want me to add those sheet lines and re-run the probes, on 0.6B and 1.7B? That would show both whether the additions work and whether 1.7B handles perspective better.
+  The new sheet lines worked: most gaps are now answered from the sheet, by both models. Two problems remain: the modern idea that the Earth spins still leaks in once, and the asker still makes almost no difference to the answers.
+
+**Medieval: fixed**
+- **Comets:** both models now give the 1291 answer, and both name the sheet's signs of war, hunger and a king's death. 1.7B gives the full explanation, burning vapours below the Moon. It then adds an invented detail, that comets "come from the far side of the Earth".
+- **Tides:** both now say the tides follow the Moon.
+- **The moving Sun:** fixed for both askers and both models: *"The Earth never turns, so the Sun follows a circular path around it."* The extra line saying it outright solved it.
+- **Antipodes:** 1.7B handles it well: *"Some say no one can… Others argue that maybe someone could."* 0.6B contradicts itself within two sentences.
+
+**Medieval: still weak, the spatial probes**
+- **Travelling south:** 0.6B now mentions the hot zone. 1.7B got worse, with modern names (the Sahara) and no uncrossable zone.
+- **West from the Pillars:** 1.7B is reasonable, with the endless sea and unknown lands; 0.6B only says "the ocean" and the stars.
+
+**Greek myth: fixed**
+- **Rainbow:** both models now say it's Iris's path.
+- **Rain:** 1.7B now says Zeus; 0.6B still says Okeanos.
+- **Olympus:** looking up from it now gives the bronze sky.
+- **The Great Bear:** both models picked up that it never sets.
+
+**Greek myth: modern leaks**
+- **The stars:** 1.7B says they move *"because the Earth spins on its axis"*. That's the same modern prior as the medieval Sun problem before. The Greek sheet never says the Earth stands still, so it needs the same explicit line the medieval one got.
+- **Above the sky:** 1.7B says *"the endless expanse of space"*.
+
+**Perspective: still almost no effect.** The priest and the fisherman, or the scholar and the child, get practically the same answers from both models. The informant prompt only says to answer "for that person". It probably needs an explicit instruction: simple words and a small picture for a child, learned words for a scholar, local detail for a fisherman.
+
+**What I'd take from this round:**
+1. **A missing belief gets filled from modern knowledge.** A belief stated in the sheet gets used, so writing beliefs down works well.
+2. **The most "obviously modern" ideas must be denied outright,** like the Earth turning. Each world sheet needs its own "the Earth does not move" line.
+3. **Spatial answers stay unreliable.** That confirms keeping geography as game data rather than leaving it to the model.
+
+**Speed:** 1.7B took 37–58 s per answer on the CPU. 0.6B ran on the CPU for the Greek world, probably because my streaming test was using the GPU at the time.
+
+## Streaming the Replies from the Model
+
+Streaming is in, as a `/stream` command for interactive chats. I tested both modes in a scripted session, and ruff and strict mypy pass.
+
+**How it works:**
+- `/stream` turns streaming on or off. The reply then appears word by word as the model generates it.
+- `/stream tokens` shows the raw tokens, each followed by a bar: `Sure|,| but| I| need| to| fix| my| boat|'s| plank|.| Let| me| see|.| I|'ll| fix| it|…`
+- `/list` shows the current setting, and the README describes the command.
+- Replays never stream.
+
+**Effect on the architecture: almost none.**
+- **model.py:** `reply()` gets one optional parameter, `on_token`. A small `TokenStreamer` class passes each new token to it. transformers calls the streamer from inside `generate()`, in the same thread, so no threads are needed. `reply()` still returns the complete reply, so history, replay, transcripts and intent ranking are unchanged.
+- **lab.py:** a `stream` setting and two small printing functions.
+- **Later in the game:** the same `on_token` parameter is the hook for sending replies sentence by sentence. The one difference there is that generation will run in a worker thread, so the callback has to pass each piece safely to Evennia's main thread.
+
+**One quirk you'll see in token mode:** tokens are decoded one by one, so a letter like "é" in "Concepción" may appear as two broken halves. The complete reply is always decoded properly.

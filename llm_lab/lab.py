@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -55,6 +56,7 @@ HELP: str = """Commands:
   /cpu, /gpu    move the active model to the CPU (fp32) or the GPU (fp16)
   /tokens N     set the reply length limit (default 120 tokens; descriptions need ~300-400)
   /trim N       remember the last N exchanges (default 10; 0 = only the current line)
+  /stream       toggle: show the reply as it is generated; /stream tokens marks each token
   /compare      toggle: every line goes to all loaded models, each with its own conversation
   /prompt       show the system prompt the model gets
   /reset        start the conversation over
@@ -81,7 +83,8 @@ class Lab:
     It holds one case, the models loaded so far (loaded on first use and kept, so switching
     back is instant), and one conversation history per model, so in /compare mode each
     model follows its own conversation. `active` is the model the interactive mode talks
-    to. `max_new_tokens` and `history_exchanges` are the /tokens and /trim settings.
+    to. `max_new_tokens` and `history_exchanges` are the /tokens and /trim settings, and
+    `stream` is the /stream setting ("off", "text" or "tokens"; interactive mode only).
     For a character it runs `turn()`; for a narration or a world being explored, `ask()`.
     """
 
@@ -92,6 +95,7 @@ class Lab:
     compare: bool = False
     max_new_tokens: int = MAX_NEW_TOKENS
     history_exchanges: int = HISTORY_EXCHANGES
+    stream: str = "off"
 
     def __post_init__(self) -> None:
         if isinstance(self.case, Scene):
@@ -132,7 +136,9 @@ class Lab:
             print(f"  {self.models[short].describe()}")
         return self.models[short]
 
-    def turn(self, short: str, say: str, seed: int = 0) -> Turn:
+    def turn(
+        self, short: str, say: str, seed: int = 0, on_token: Callable[[str], None] | None = None
+    ) -> Turn:
         """Read the player's intent, then let the character answer.
 
         The history keeps the last `history_exchanges` exchanges, so the prompt stays small.
@@ -147,17 +153,21 @@ class Lab:
             list(self.case.intents),
         )
         history.append({"role": "user", "content": say})
-        reply: Reply = chat.reply(character_prompt(self.case), history, seed, self.max_new_tokens)
+        reply: Reply = chat.reply(
+            character_prompt(self.case), history, seed, self.max_new_tokens, on_token
+        )
         history.append({"role": "assistant", "content": reply.text})
         self.trim(history)
         return Turn(reply, intents)
 
-    def ask(self, short: str, text: str, seed: int = 0) -> Reply:
+    def ask(
+        self, short: str, text: str, seed: int = 0, on_token: Callable[[str], None] | None = None
+    ) -> Reply:
         """Answer one request to a narrator or one probe of a world; each stands alone."""
         assert not isinstance(self.case, Case)
         chat: ChatModel = self.load(short)
         messages: list[Message] = [{"role": "user", "content": text}]
-        return chat.reply(self.prompt(), messages, seed, self.max_new_tokens)
+        return chat.reply(self.prompt(), messages, seed, self.max_new_tokens, on_token)
 
     def trim(self, history: list[Message]) -> None:
         """Drop the oldest messages beyond the limit (two messages per exchange)."""
@@ -211,6 +221,14 @@ def handle_command(line: str, lab: Lab) -> bool:
         for history in lab.histories.values():
             lab.trim(history)
         print(f"  remembering the last {lab.history_exchanges} exchanges")
+    elif command == "/stream":
+        if argument == "tokens":
+            lab.stream = "tokens"
+        elif argument == "off":
+            lab.stream = "off"
+        else:
+            lab.stream = "off" if lab.stream != "off" else "text"
+        print(f"  streaming {lab.stream}")
     elif command == "/compare":
         lab.compare = not lab.compare
         print(f"  compare {'on' if lab.compare else 'off'}: {list(lab.models)}")
@@ -224,7 +242,7 @@ def handle_command(line: str, lab: Lab) -> bool:
             print(f"  {loaded.describe()}")
         print(
             f"  active={lab.active} compare={lab.compare} tokens={lab.max_new_tokens} "
-            f"trim={lab.history_exchanges}"
+            f"trim={lab.history_exchanges} stream={lab.stream}"
         )
     else:
         print(f"  unknown command {line!r}; /help lists them")
@@ -259,14 +277,30 @@ def interactive(lab: Lab) -> None:
         targets: list[str] = list(lab.models) if lab.compare else [lab.active]
         for short in targets:
             label: str = f"[{short}] " if lab.compare else ""
+            if isinstance(lab.case, Case):
+                label += f"{lab.case.name}: "
+            on_token: Callable[[str], None] | None = None
+            if lab.stream != "off":
+                print(label, end="", flush=True)
+                on_token = print_token if lab.stream == "text" else print_marked_token
             if not isinstance(lab.case, Case):
-                reply: Reply = lab.ask(short, line.replace(" | ", "\n"))
-                print(f"{label}{reply.text}")
+                reply: Reply = lab.ask(short, line.replace(" | ", "\n"), on_token=on_token)
+                print() if on_token else print(f"{label}{reply.text}")
                 print(f"    ({timing(reply)})")
             else:
-                turn: Turn = lab.turn(short, line)
-                print(f"{label}{lab.case.name}: {turn.reply.text}")
+                turn: Turn = lab.turn(short, line, on_token=on_token)
+                print() if on_token else print(f"{label}{turn.reply.text}")
                 print(f"    ({stats(turn)})")
+
+
+def print_token(piece: str) -> None:
+    print(piece, end="", flush=True)
+
+
+def print_marked_token(piece: str) -> None:
+    """A token followed by a bar, so the token boundaries show (end of turn decodes to "")."""
+    if piece:
+        print(piece + "|", end="", flush=True)
 
 
 # --- replay ------------------------------------------------------------------------------
