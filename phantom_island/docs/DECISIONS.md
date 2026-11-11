@@ -32,17 +32,28 @@ in (two browser windows are enough).
 | 3 | **Repo docs** | Updated to "one folder per game", with `game/` as the playground. | — |
 | 4 | **Ports** | Telnet 4010, web 4011, websocket 4012 (internal: web 4015, AMP 4016). | Set in `server/conf/settings.py`. It can run at the same time as `game/`. |
 | 5 | **Language** | English only. | All texts, character topics and, later, AI prompts and tests. |
-| 6 | **Connection and player count** | Mostly online from two homes, sometimes on a shared computer. **The game must also be playable by one player alone.** | Hosting over the internet (see BUILD.md: Tailscale is the simplest safe option). Two players must not be required. *How solo play works (both roles, switching role, or something else) gets its own discussion before the game details are designed.* |
+| 6 | **Connection and player count** | Mostly online from two homes, sometimes on a shared computer. **The game must also be playable by one player alone.** | Hosting over the internet (see BUILD.md: Tailscale is the simplest safe option). Two players must not be required. |
+| 6a | **Solo play and roles** (2026-11-11) | **No exclusive roles.** Every player is an expedition member and can find every clue. Navigator and naturalist knowledge lives in the world: instruments (sextant, chronometer, spyglass), books aboard, and the Ship explaining things when asked. Cooperation is an advantage, not a requirement: with timed events (tide, dusk, Jonah's hours), two players who split up finish sooner. | The same game for one player, two friends, or a grandparent playing alongside as an adviser. No role tags; extra description lines come from using an instrument or book, not from who is looking. |
+| 6b | **No dead ends** (2026-11-11) | **Move players forward gently; test understanding at the end.** Each bottleneck (above all At Sea) has several routes and escalating hints from the Ship. Reaching the island is guaranteed; *why* the chart was wrong is asked in the `report`. | Every gate needs at least two ways through and a hint path. |
 | 7 | **World model** | One shared world. During solo development, resets are done by hand (wiping or restoring the database, see BUILD.md). **Checkpoints and rollbacks** are decided when the game goes to the co-designers. | Nothing to build now. Keeping the adventure's state (clues found, gates opened, journal) in one well-defined place will make checkpoints easy to add later. |
 | 8 | **Privacy** | The real game does not log conversations. `llm_lab`'s replayable logs are for development only. | No transcript storage in the game. Playtest transcripts, if any, are made deliberately by the developer. |
 | 9 | **History and culture** | Invented but plausible story. Real facts are checked and listed with sources. The islanders are an invented people, shown as capable and kind. The level of scariness is set by the co-designers. | A sources list goes with the epilogue and the educational facts. |
 | 10 | **Scope guard** | None for now. Claude may suggest limits as work goes on. | The first month is solo development. Scope is discussed with the co-designers after the draft. |
-| 11 | **How the co-designers take part** | Open. To be discussed once the draft exists. | — |
-| 12 | **Story content format** | **YAML** files, so the co-designers can edit characters later. | Story content is kept in data files separate from the code. `pyyaml` is a declared dependency, and `types-pyyaml` (dev) lets strict mypy check code that reads it. |
+| 11 | **How the co-designers take part** (2026-11-11) | **Eugene builds Phantom Island alone**, learning Evennia and game design along the way. The kids play, test and give feedback, and are not shown the game's secrets (co-designing a mystery spoils it). Their contributions are spoiler-free: e.g. the ship's name, how scary it gets. Later adventures can be co-designed openly. | Design documents in `docs/` are spoilers and are not shown to the kids. The grandson will likely play first (with Eugene), so he will know the answers when his friend plays; he can act as the friend's guide. |
+| 12 | **Story content format** | **YAML** files, so story content can be edited without touching code. | Story content is kept in data files separate from the code. `pyyaml` is a declared dependency, and `types-pyyaml` (dev) lets strict mypy check code that reads it. |
+
+## World and screen
+
+Settled on 2026-11-11.
+
+| # | Topic | Decision | What it means for the work |
+|---|---|---|---|
+| 13 | **Rooms** | 12 places: **Port** (Society Office, Quay, Market), **Ship** (Deck, Cabin), **Island** (Lagoon Beach, Village, Western Reef, Forest Path, Spring, Hilltop, Boat Cove), plus Limbo as the prologue. | The island layout in A1 is a first sketch, open to change. |
+| 14 | **The ship: two rooms that travel** | **Deck** is for observing: sky, sea, birds, coastlines; `sail`, the noon sight and going ashore happen here. **Cabin** is for instruments and records: chronometer, chart table with the *Halcyon*'s chart and the ship's own track, water casks, books, the Ship's voice, later `report`. Longitude needs both: noon seen on deck, the chronometer read below (it really stayed below). | The ship doesn't move between rooms; its Deck view and its `ashore` exit change with where the ship is (Quay, positions at sea, island anchorage). Places the ship can sail to are kept as data. Gates live in the destination rooms (e.g. the Western Reef checks the tide), so no exit can bypass them. |
+| 15 | **Limbo is the prologue** | The game starts in Evennia's Limbo (`#2`), dressed as a title page: its description is the pitch, with one exit into the Society Office. | Limbo is not one of the 12 places and has no map; the Focus pane can show a title picture. |
+| 16 | **Screen: three panes, maps switch by act** | **Main** (text scroll: descriptions, conversations, journal), **Map** (where am I?) and **Focus** (the current room's picture, or whatever is being examined: compass, letter, chart). The map switches with the act: a **port plan**, the **sea chart** (the *Halcyon*'s chart with the island where she put it and the ship's track; the true island appears once found) and an **island map**. | The picture-map feature is copied from `game/` and extended with the Focus pane. Pictures stay out of the text scroll. Everything shown in Map or Focus also exists as text, for telnet players. Placeholder pictures in A1; real art in A5. |
 
 ## Open questions
 
-- Solo play: how does one player get past role-only clues? Not blocking A1–A2; needed before
-  A3, where role-based descriptions come in. (from 6)
 - Checkpoints: needed when the game goes to the co-designers; which commands, and what is saved? (from 7)
-- The questions for the co-designers at the end of [GAME_STORY.md](GAME_STORY.md).
+- The spoiler-free questions for the kids at the end of [GAME_STORY.md](GAME_STORY.md).

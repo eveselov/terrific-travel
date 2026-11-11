@@ -1,8 +1,6 @@
 # Phantom Island
 
-The first Terrific Travel adventure (working title): an expedition with a mystery at its
-centre. Two players, a navigator and a naturalist, look for a ship that vanished fifteen years
-ago and find out why nobody ever found her. It is also playable alone.
+The first Terrific Travel adventure (working title): an expedition with a mystery at its centre. The players, alone or together, look for a ship that vanished fifteen years ago and find out why nobody ever found her.
 
 This is an Evennia game directory, created with `evennia --init phantom_island`, separate from
 the playground in `../game/`. It has its own database, `secret_settings.py` and `mypy.ini`.

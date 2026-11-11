@@ -1,8 +1,9 @@
 # Proposal: "The Island That Moved"
 
 A draft for the first Terrific Travel adventure: an expedition (structure #2) with a mystery
-at its centre (#3), built on free exploration (#1). Everything here is a proposal for the
-co-designers to change, rename or throw away. Names in particular are placeholders.
+at its centre (#3), built on free exploration (#1). Everything here is a proposal to change,
+rename or throw away. Names in particular are placeholders. This file contains the solution:
+don't show it to the players.
 
 ## Pitch (to read aloud)
 
@@ -10,10 +11,14 @@ co-designers to change, rename or throw away. Names in particular are placeholde
 > the ocean, and never came back. Most people say she sank in a storm. But last month a
 > trader in the port began selling a brass compass with one word engraved on it: HALCYON.
 >
-> You are two members of a new expedition. One of you is the **navigator**, who reads the
-> stars, the clock and the charts. The other is the **naturalist**, who reads plants,
-> animals, birds and the land. Your job: find out what really happened to the *Halcyon* and
-> her crew. Nobody can solve it alone.
+> You join a new expedition. Your ship carries the tools of two sciences: the navigator's
+> sextant, clock and charts, which read the sun, the stars and the sea, and the naturalist's
+> books, which read plants, animals, birds and the land. Your job: find out what really
+> happened to the *Halcyon* and her crew.
+
+The game is played alone or together (see DECISIONS.md, 6a and 6b). There are no exclusive
+roles: anyone can use any instrument and find any clue. Two players who split up just get
+there sooner.
 
 ## The idea underneath
 
@@ -46,6 +51,20 @@ The game keeps this as data. Characters reveal parts of it; they never make up n
 
 ## Structure: three acts, one session (30–60 minutes)
 
+### Prologue: Limbo
+
+The game starts in Limbo, dressed as a title page. Its description is the pitch above, and
+its one exit leads into the Society Office.
+
+### The ship
+
+The players' ship is two rooms that travel with them through all three acts:
+
+| Place | What's there |
+|---|---|
+| Deck | For observing: the sky, the sea, birds, coastlines. `sail`, the noon sight and going ashore happen here. What you see changes with where the ship is and the time of day. |
+| Cabin | For instruments and records: the chronometer, the chart table with the *Halcyon*'s chart and the ship's own track, water casks, books, the Ship's voice, and the `report`. |
+
 ### Act 1: The Port
 
 Get the mission, find the first real clue, and set sail.
@@ -55,26 +74,32 @@ Get the mission, find the first real clue, and set sail.
 | Society Office | The patron gives the mission, the *Halcyon*'s old chart and her last letter home. |
 | Quay | The old sailor tells the storm story (the wrong version). The players' ship is moored here. |
 | Market | The trader has the HALCYON compass and lies about where it came from. |
-| Ship's Cabin | Chart table, chronometer, supplies. Leaving the port starts Act 2. |
+
+Sailing from the Deck starts Act 2.
 
 **Gate:** the players must learn from the trader that the compass came "from fishermen
 who sailed in from the west". Then the ship can leave.
 
 ### Act 2: At Sea
 
-This is the main two-role puzzle.
+This is the main puzzle.
 
 - The ship reaches the charted position. **There is nothing there.** Just open sea. (Big
   moment: "the map is wrong".)
-- The **navigator** can take a noon sight (latitude matches the chart) and check the
-  chronometer (longitude doesn't). From this the navigator learns that the latitude can be
-  trusted and the longitude can't. The fix is to sail along the same latitude.
-  This is a real technique called *latitude sailing*.
-- The **naturalist** watches the sky at dusk: seabirds that fish at sea return to land in
+- **Navigation:** a player takes a noon sight with the sextant on the Deck (latitude matches
+  the chart) and compares the moment of noon with the chronometer in the Cabin (longitude
+  doesn't). Two players can do it together: one calls "noon!", the other reads the clock. So the latitude can be trusted
+  and the longitude can't, and the fix is to sail along the same latitude. This is a real
+  technique called *latitude sailing*.
+- **Nature:** a player on the Deck watches the sky at dusk: seabirds that fish at sea return to land in
   the evening. Their flight shows which direction the land is. (Pacific navigators really
   used birds this way.)
-- Only by combining both (same latitude, birds going west) do they know to `sail west`.
-  Sailing the wrong way costs a day and some water. That's the only resource pressure in
+- **Several routes west:** the trader's "fishermen from the west" (C3), the birds (C6) and
+  the navigation (C5) each point west, and any one is enough to try `sail west`.
+- **No dead end:** if players sail the wrong way or drift for a while, the Ship's hints get
+  more direct until they all but say "west". Reaching the island is guaranteed; *why* the
+  chart was wrong is asked again in the report.
+- Sailing the wrong way costs a day and some water. That's the only resource pressure in
   the draft.
 
 ### Act 3: The Island
@@ -83,15 +108,15 @@ Explore, talk, collect clues, then make the report.
 
 | Place | What's there |
 |---|---|
-| Lagoon Beach | Landing place. Goats (naturalist: "goats aren't native to islands like this"). |
+| Lagoon Beach | Landing place. Goats (the animal guide: "goats aren't native to islands like this"). |
 | Village | The elder, the child, a hut built with a dark, heavy timber. |
 | Western Reef | **Only reachable at low tide.** Ship's ribs in the coral, a corroded cannon. |
-| Forest Path | Native trees (naturalist can name them, and they are not oak). |
+| Forest Path | Native trees (the plant guide names them, and they are not oak). |
 | Spring | Fresh water (refill casks). A small onion patch nearby. |
-| Hilltop | View of the whole island. The navigator can compare the coastline to the chart. |
+| Hilltop | View of the whole island. With the chart, the coastline can be compared to it. |
 | Boat Cove | Old wood chips, a slipway, a carved board. Jonah Pike is often here. |
 
-**Ending:** back on the ship, the players `report` what happened. The game checks three
+**Ending:** back in the ship's Cabin, the players `report` what happened. The game checks three
 questions against the journal:
 - Where did the *Halcyon* wreck?
 - Why was she never found?
@@ -111,33 +136,34 @@ what gets revealed.
 |---|---|---|---|
 | **Mrs. Fairweather**, patron of the Society | Office | Gives the mission | The *Halcyon*'s plan, the chart, her last letter. Honest but knows little. |
 | **Old Barnaby**, retired sailor | Quay | **Mistaken** | Sure the *Halcyon* sank in "the great storm of '75". Right about the storm, wrong about the sinking. Good on weather and sailing lore. |
-| **Silas Crane**, trader | Market | **Hiding something** | Claims he "found the compass on the beach". The truth: he traded for it with fishermen from the west and fears being called a looter. He admits it if shown a journal clue that contradicts him (e.g. coral crust on the compass that the naturalist spotted). |
+| **Silas Crane**, trader | Market | **Hiding something** | Claims he "found the compass on the beach". The truth: he traded for it with fishermen from the west and fears being called a looter. He admits it if shown a journal clue that contradicts him (e.g. coral crust on the compass, spotted on a close look). |
 | **Elder Ama** | Village | **Holds the key, cautious** | Remembers the rescue. Talks openly only after the players show respect (asking before going to the reef, or helping with something). |
 | **Tui**, a village child | Village / Reef | **Knows the truth, not its meaning** | Plays on "the big bones in the reef", collects brass buttons, knows a song about "people from the sea who made a canoe with a white wing". Kids playing will probably love Tui most. |
 | **Jonah Pike**, the *Halcyon*'s carpenter | Boat Cove | **Final witness** | Knows almost everything, including the direction the boat sailed. Only met late (after the reef and the elder), so he confirms the story rather than solving it. |
-| **The Ship** (named by the co-designers) | Always aboard | **Hint-giver** | The players' own ship, with "a mind of her own". Says a few scripted hints when the players seem stuck. A natural first AI character later. |
+| **The Ship** (named by the kids) | Always aboard | **Hint-giver and explainer** | The players' own ship, with "a mind of her own". Gives hints that get more direct when the players seem stuck, and explains the instruments and the science when asked. A natural first AI character later. |
 
 ## Clues (the authoritative table)
 
-| ID | Clue | Found by | Who can find it | Shows |
+Any player can find any clue. The "Needs" column says what it takes.
+
+| ID | Clue | Found by | Needs | Shows |
 |---|---|---|---|---|
-| C1 | Compass engraved HALCYON | Market | anyone | The ship didn't vanish without a trace |
-| C2 | Coral crust in the compass hinge | examine compass | naturalist | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
-| C3 | "From fishermen who came from the west" | Crane, after C2 | anyone | Direction to search |
-| C4 | Empty sea at the charted position | At Sea | anyone | The chart is wrong |
-| C5 | Latitude right, longitude wrong | noon sight + chronometer | navigator | *Why* the chart is wrong |
-| C6 | Birds flying west at dusk | At Sea, evening | naturalist | Land is to the west |
-| C7 | Ship's ribs and cannon on the reef | Western Reef, low tide | anyone | Where she wrecked |
-| C8 | Oak timbers in a village hut | Village | naturalist | Ship wood was reused, so the crew survived to build |
-| C9 | Goats and onions | Beach, Spring | naturalist | Europeans lived here for a while |
-| C10 | Coastline matches the chart's shape | Hilltop | navigator | This *is* the charted island, just misplaced |
-| C11 | Tui's song about the winged canoe | Tui | anyone | The crew built a boat and left |
-| C12 | Elder's account of the rescue | Elder Ama | anyone, after respect | Nobody died; the crew lived here |
-| C13 | Jonah Pike's story | Boat Cove | anyone, after C7 + C12 | Confirms everything; the boat sailed west |
+| C1 | Compass engraved HALCYON | Market | — | The ship didn't vanish without a trace |
+| C2 | Coral crust in the compass hinge | examine compass | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
+| C3 | "From fishermen who came from the west" | Crane | C2 | Direction to search |
+| C4 | Empty sea at the charted position | Deck, at sea | — | The chart is wrong |
+| C5 | Latitude right, longitude wrong | noon sight + chronometer | sextant, chronometer | *Why* the chart is wrong |
+| C6 | Birds flying west at dusk | Deck, at sea | evening | Land is to the west |
+| C7 | Ship's ribs and cannon on the reef | Western Reef | low tide | Where she wrecked |
+| C8 | Oak timbers in a village hut | Village | plant guide, or a close look | Ship wood was reused, so the crew survived to build |
+| C9 | Goats and onions | Beach, Spring | animal and plant guides | Europeans lived here for a while |
+| C10 | Coastline matches the chart's shape | Hilltop | the chart | This *is* the charted island, just misplaced |
+| C11 | Tui's song about the winged canoe | Tui | — | The crew built a boat and left |
+| C12 | Elder's account of the rescue | Elder Ama | showing respect | Nobody died; the crew lived here |
+| C13 | Jonah Pike's story | Boat Cove | C7 + C12 | Confirms everything; the boat sailed west |
 
 **Report needs:** wreck site = C7; why not found = C4 + C5 (or C10); crew = C12 or C13, plus
-C11 or C8. Several paths reach each answer, so the two players can find things in different
-orders.
+C11 or C8. Several paths reach each answer, so players can find things in different orders.
 
 ## World events (things that happen without the players)
 
@@ -163,24 +189,29 @@ and sailed away. The players have just solved a mystery shaped like a real one.
 
 - **Clues** are stored data (a module or prototypes) with the fields in the table above.
   Discovering one writes it to a **shared journal** object for the expedition (`journal` command).
-- **Roles** are a tag or attribute on the character. Rooms and objects show extra
-  description lines only to the matching role.
+- **Expertise** lives in objects, not in roles: instruments and books aboard the ship. Using one (`use sextant`, `read bird guide`) reveals extra description lines or a clue, for whoever uses it.
 - **Conversation:** `ask <character> about <topic>`. Each character has a topic dictionary;
   each entry has a reply, the clue it reveals, and its conditions.
-- **Gates** (leaving port, reaching Jonah) are simple conditions on exits or topics.
+- **Gates** (leaving port, the reef at low tide, reaching Jonah) are conditions checked by
+  the destination room or the topic, so no exit can bypass them.
 - **Events** (tide, evening, characters moving) are Evennia Scripts.
-- **The sea** is one room whose state (position, day) changes with `sail <direction>`.
-- **Ending:** a `report` command that checks the journal.
-- **The map** pane shows the port and the island, and the chart shows the island in the
-  wrong place until C10. Everything on the map is also in text.
+- **The ship** is two rooms (Deck, Cabin) that never move. The Deck's view and its `ashore`
+  exit change with the ship's position (Quay, positions at sea, island anchorage), which
+  `sail <direction>` updates. The places the ship can reach are kept as data.
+- **Ending:** a `report` command in the Cabin that checks the journal.
+- **The screen** has three panes: Main (text), Map and Focus (the room's picture, or the
+  thing being examined). The map switches by act: the port plan, the sea chart (the
+  *Halcyon*'s chart, with the island in the wrong place until it's found, and the ship's
+  track) and the island map. Everything in Map and Focus is also in text.
 
-Size: about 12 rooms, 7 characters, 13 clues. That's small enough to build quickly and play in
+Size: 12 rooms (3 port, 2 ship, 7 island) plus the Limbo prologue, 7 characters, 13 clues. That's small enough to build quickly and play in
 one visit.
 
-## Questions for the co-designers
+## Questions for the kids (spoiler-free)
 
 1. What is our ship called, and does she really have a mind of her own?
-2. Who plays the navigator and who plays the naturalist? Do you want to swap roles and play it again?
-3. Should the island be invented (as here) or a real place?
-4. How scary should the storm and the wreck be?
-5. What happened to the crew who sailed west? Leave it as a mystery for a later adventure?
+2. How scary should storms and wrecks be?
+
+## Open questions for the author
+
+1. What happened to the crew who sailed west? Leave it as a mystery for a later adventure?
