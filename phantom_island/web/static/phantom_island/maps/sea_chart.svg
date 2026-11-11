@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600">
+  <!-- Placeholder for the Halcyon's chart (stage A1). Ship marker and track are drawn by
+       the game (world/maps.py). The true island is deliberately not on this chart. -->
+  <rect width="1000" height="600" fill="#efe1bb"/>
+  <rect x="12" y="12" width="976" height="576" fill="none" stroke="#7a4a21" stroke-width="6"/>
+  <!-- Grid of latitude and longitude lines -->
+  <g stroke="#c9a96e" stroke-width="2">
+    <path d="M 12 150 H 988 M 12 290 H 988 M 12 430 H 988"/>
+    <path d="M 150 12 V 588 M 350 12 V 588 M 550 12 V 588 M 750 12 V 588"/>
+  </g>
+  <!-- The home coast in the east -->
+  <path d="M 988 12 L 920 12 C 900 90 950 150 905 230 C 880 270 900 320 930 360
+           C 960 420 900 500 940 588 L 988 588 Z" fill="#cdb98a" stroke="#7a4a21" stroke-width="4"/>
+  <!-- The island as the Halcyon's chart shows it: dashed, because it is only a drawing -->
+  <path d="M 520 300 C 510 260 560 245 590 265 C 625 285 610 330 575 335
+           C 545 340 525 330 520 300 Z" fill="#dccb98" stroke="#7a4a21" stroke-width="4"
+        stroke-dasharray="10 7"/>
+  <!-- Compass rose -->
+  <g transform="translate(120,480)" stroke="#7a4a21" stroke-width="3" fill="#efe1bb">
+    <circle r="55"/>
+    <path d="M 0 -70 L 12 0 L 0 70 L -12 0 Z" fill="#7a4a21"/>
+    <path d="M -70 0 L 0 12 L 70 0 L 0 -12 Z"/>
+    <text y="-78" text-anchor="middle" font-family="Georgia, serif" font-size="24"
+          stroke="none" fill="#7a4a21">N</text>
+  </g>
+  <!-- Waves -->
+  <g stroke="#c9a96e" stroke-width="3" fill="none">
+    <path d="M 300 90 q 15 -10 30 0 t 30 0"/>
+    <path d="M 700 470 q 15 -10 30 0 t 30 0"/>
+    <path d="M 380 520 q 15 -10 30 0 t 30 0"/>
+    <path d="M 220 210 q 15 -10 30 0 t 30 0"/>
+  </g>
+</svg>

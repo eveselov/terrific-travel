@@ -16,4 +16,7 @@ does what you expect it to.
 
 
 def at_initial_setup() -> None:
-    pass
+    """Build Phantom Island from the content files, so a new database starts ready to play."""
+    from world.builder import build_world
+
+    build_world()

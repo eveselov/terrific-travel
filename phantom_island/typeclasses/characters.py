@@ -8,9 +8,15 @@ creation commands.
 
 """
 
+from typing import Any
+
 from evennia.objects.objects import DefaultCharacter
 
+from world.focus import render_focus_html
+from world.maps import render_no_map_html
+
 from .objects import ObjectParent
+from .rooms import Room
 
 
 class Character(ObjectParent, DefaultCharacter):
@@ -21,6 +27,24 @@ class Character(ObjectParent, DefaultCharacter):
     See mygame/typeclasses/objects.py for a list of
     properties and methods available on all Object child classes like this.
 
+    Each move and each login also updates the web client's Map and Focus panes.
     """
 
-    pass
+    def show_location_visuals(self) -> None:
+        """Update this character's Map and Focus panes for where they are."""
+        location: Any = self.location
+        if isinstance(location, Room):
+            location.send_visuals(self)
+        else:
+            self.msg(map=render_no_map_html())
+            self.msg(focus=render_focus_html("Nowhere", None))
+
+    def at_post_move(self, source_location: Any, move_type: str = "move", **kwargs: Any) -> None:
+        """After a move: update the panes, then show the room description as usual."""
+        self.show_location_visuals()
+        super().at_post_move(source_location, move_type=move_type, **kwargs)
+
+    def at_post_puppet(self, **kwargs: Any) -> None:
+        """On entering the game, also fill the Map and Focus panes for this location."""
+        self.show_location_visuals()
+        super().at_post_puppet(**kwargs)

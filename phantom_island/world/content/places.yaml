@@ -1,0 +1,149 @@
+# The places of Phantom Island: the Limbo prologue, the port and the island.
+# The ship's two rooms and where she can sail are in ship.yaml; the map pictures in maps.yaml.
+#
+# After editing, rebuild the world in the game as a builder: `batchcode build`.
+# Rebuilding updates the rooms in place, so players standing in them stay where they are.
+#
+# Each place has:
+#   name     the room's name, shown to players (and on the map)
+#   map      which map it is on (a key from maps.yaml), and
+#   map_pos  where on that map picture, as [x, y] pixels from the top left
+#   image    optional: a picture for the Focus pane (/static/...). Without one, the pane shows
+#            a placeholder card with the place's name.
+#   desc     what players read when they look
+#   exits    direction: place id. Compass directions, up, down, in and out get their short
+#            forms (n, se, u...) automatically. For other aliases: `name: {to: id, aliases: [..]}`.
+#
+# Placeholder texts for stage A1: short on purpose. Clues come in stage A3.
+
+limbo:
+  name: Phantom Island
+  desc: >
+    It is 1790. Fifteen years ago the ship Halcyon sailed to chart a small island far out in
+    the ocean, and never came back. Most people say she sank in a storm. But last month a
+    trader in the port began selling a brass compass with one word engraved on it: HALCYON.
+
+
+    You join a new expedition. Your ship carries the tools of two sciences: the navigator's
+    sextant, clock and charts, which read the sun, the stars and the sea, and the naturalist's
+    books, which read plants, animals, birds and the land. Your job: find out what really
+    happened to the Halcyon and her crew.
+
+
+    Type |wbegin|n to start.
+  exits:
+    begin: {to: office, aliases: [start]}
+
+# --- The port ---------------------------------------------------------------------------
+
+office:
+  name: Society Office
+  map: port
+  map_pos: [300, 230]
+  desc: >
+    A quiet room above the street, lined with bookshelves and rolled-up charts. A large
+    desk stands by the window, which looks down over the harbour.
+  exits:
+    southeast: quay
+    east: market
+
+market:
+  name: Market
+  map: port
+  map_pos: [700, 230]
+  desc: >
+    Stalls crowd the square: fish, rope, spices, lamps and odd things from far away.
+    Traders call out their prices over the noise.
+  exits:
+    west: office
+    southwest: quay
+
+quay:
+  name: Quay
+  map: port
+  map_pos: [500, 450]
+  desc: >
+    A long stone quay where ships load and unload. Barrels and coils of rope are stacked
+    along the edge, and gulls argue over scraps of fish.
+  exits:
+    northwest: office
+    northeast: market
+
+# --- The island -------------------------------------------------------------------------
+
+beach:
+  name: Lagoon Beach
+  map: island
+  map_pos: [780, 390]
+  desc: >
+    A curve of white sand around a calm green lagoon. Palm trees lean over the water, and
+    a path leads inland.
+  exits:
+    west: village
+
+village:
+  name: Village
+  map: island
+  map_pos: [520, 410]
+  desc: >
+    A cluster of huts with roofs of woven leaves stands around an open space of beaten
+    earth. Smoke rises from a cooking fire.
+  exits:
+    east: beach
+    west: reef
+    north: forest
+    southwest: cove
+
+reef:
+  name: Western Reef
+  map: island
+  map_pos: [170, 390]
+  desc: >
+    The western shore ends in a long coral reef. Waves break white over its outer edge,
+    and the water in between is shallow and very clear.
+  exits:
+    east: village
+    southeast: cove
+
+forest:
+  name: Forest Path
+  map: island
+  map_pos: [520, 260]
+  desc: >
+    A narrow path climbs between tall trees with broad leaves. Birds call somewhere above
+    you, and the air is warm and damp.
+  exits:
+    south: village
+    north: hilltop
+    west: spring
+
+spring:
+  name: Spring
+  map: island
+  map_pos: [320, 220]
+  desc: >
+    Clear water bubbles up between mossy rocks and runs off in a little stream. It is cool
+    and quiet here.
+  exits:
+    east: forest
+
+hilltop:
+  name: Hilltop
+  map: island
+  map_pos: [560, 110]
+  desc: >
+    From the top of the hill you can see the whole island: the lagoon in the east, the
+    reef in the west, and the open ocean all around.
+  exits:
+    south: forest
+
+cove:
+  name: Boat Cove
+  map: island
+  map_pos: [330, 570]
+  desc: >
+    A small sheltered cove, hidden from the open sea by two arms of rock. The sand slopes
+    gently down to the water.
+  exits:
+    northeast: village
+    northwest: reef

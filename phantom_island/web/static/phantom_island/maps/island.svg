@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700">
+  <!-- Placeholder island map for stage A1. Labels are drawn by the game (world/maps.py). -->
+  <rect width="1000" height="700" fill="#4f8fb4"/>
+  <g stroke="#78afcf" stroke-width="3" fill="none">
+    <path d="M 60 80 q 20 -10 40 0 t 40 0"/>
+    <path d="M 860 120 q 20 -10 40 0 t 40 0"/>
+    <path d="M 700 640 q 20 -10 40 0 t 40 0"/>
+  </g>
+  <!-- Western reef: a band of coral in shallow water -->
+  <path d="M 90 220 C 60 320 70 460 110 560" fill="none" stroke="#e8d9c0" stroke-width="22"
+        stroke-dasharray="6 14" stroke-linecap="round"/>
+  <!-- Shallow water around the island -->
+  <path d="M 140 300 C 160 160 360 90 560 60 C 760 40 900 200 940 380
+           C 970 520 820 640 600 660 C 420 680 230 650 170 540 C 130 470 130 380 140 300 Z"
+        fill="#7fc3d6"/>
+  <!-- The island -->
+  <path d="M 190 320 C 210 200 380 130 560 110 C 720 95 830 220 820 330
+           C 815 360 760 380 760 410 C 760 450 800 470 780 520
+           C 740 600 600 620 470 610 C 420 606 390 640 340 620
+           C 300 600 330 560 290 540 C 230 510 180 420 190 320 Z"
+        fill="#9cc56b" stroke="#e6d6a3" stroke-width="16"/>
+  <!-- The lagoon on the east side -->
+  <path d="M 820 330 C 900 340 960 420 930 520 C 900 560 820 540 780 520
+           C 800 470 760 450 760 410 C 760 380 815 360 820 330 Z" fill="#a8dbe3"/>
+  <!-- Boat cove notch in the south-west -->
+  <path d="M 290 540 C 330 560 300 600 340 620 C 360 600 360 560 330 540 Z" fill="#7fc3d6"/>
+  <!-- Hill -->
+  <g fill="none" stroke="#6f9a45" stroke-width="4">
+    <ellipse cx="560" cy="135" rx="120" ry="50"/>
+    <ellipse cx="560" cy="130" rx="70" ry="28"/>
+  </g>
+  <!-- Forest -->
+  <g fill="#4f8a3a">
+    <circle cx="450" cy="250" r="20"/><circle cx="480" cy="215" r="18"/>
+    <circle cx="590" cy="250" r="20"/><circle cx="620" cy="290" r="18"/>
+    <circle cx="420" cy="300" r="18"/><circle cx="660" cy="220" r="17"/>
+    <circle cx="380" cy="250" r="16"/><circle cx="680" cy="330" r="16"/>
+  </g>
+  <!-- Spring and its stream -->
+  <path d="M 320 225 C 300 300 260 360 230 430" fill="none" stroke="#5aa9d6" stroke-width="5"/>
+  <circle cx="320" cy="220" r="14" fill="#5aa9d6"/>
+  <!-- Village huts -->
+  <g fill="#c49a5c" stroke="#6b4a21" stroke-width="3">
+    <circle cx="480" cy="430" r="14"/><circle cx="560" cy="440" r="14"/>
+    <circle cx="520" cy="460" r="13"/><circle cx="590" cy="400" r="12"/>
+  </g>
+  <!-- Paths -->
+  <g fill="none" stroke="#d8c08a" stroke-width="5" stroke-dasharray="10 8">
+    <path d="M 760 400 L 520 410 L 200 395"/>
+    <path d="M 520 410 L 520 260 L 560 120"/>
+    <path d="M 520 260 L 330 222"/>
+    <path d="M 520 410 L 340 560"/>
+  </g>
+</svg>

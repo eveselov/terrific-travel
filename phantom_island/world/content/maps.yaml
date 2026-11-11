@@ -1,0 +1,23 @@
+# The map pictures shown in the web client's Map pane. The map switches with the act.
+#
+# Each map has a title, a picture (served from web/static/) and the picture's size in pixels.
+# Places are put on a map in places.yaml (`map`, `map_pos`); the ship in ship.yaml.
+# The pictures are placeholders for stage A1.
+
+port:
+  title: The port
+  image: /static/phantom_island/maps/port.svg
+  width: 1000
+  height: 700
+
+sea_chart:
+  title: The Halcyon's chart
+  image: /static/phantom_island/maps/sea_chart.svg
+  width: 1000
+  height: 600
+
+island:
+  title: The island
+  image: /static/phantom_island/maps/island.svg
+  width: 1000
+  height: 700

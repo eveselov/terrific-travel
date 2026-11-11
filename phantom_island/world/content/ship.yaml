@@ -1,0 +1,105 @@
+# The players' ship: her two rooms, and the positions she can sail to.
+#
+# The ship's rooms never move. What players see from them, and where the `ashore` exit leads,
+# depends on where the ship is. `sail <direction>` on the Deck moves her along a route.
+#
+# After editing, rebuild the world in the game as a builder: `batchcode build`.
+
+rooms:
+  deck:
+    name: Deck
+    kind: deck        # where `sail` works and the sea and sky are seen
+    desc: >
+      The deck of your expedition's ship: masts and rigging overhead, the wheel at the
+      stern, and a hatch leading down to the cabin.
+    exits:
+      down: {to: cabin, aliases: [below, cabin]}
+  cabin:
+    name: Cabin
+    kind: cabin       # instruments and records
+    desc: >
+      A low wooden cabin under the deck. A chart table fills the middle, with a brass
+      clock fixed beside it. Books are wedged onto a shelf so they can't slide off when
+      the ship rolls.
+    exits:
+      up: {to: deck, aliases: [deck]}
+
+# The exit from the Deck to the shore, and the one back from the shore to the Deck.
+# They only exist while the ship is at a position with `ashore`.
+ashore_exit: {key: ashore, aliases: [land]}
+aboard_exit: {key: aboard, aliases: [board, ship]}
+
+# Where the ship is when the game begins.
+start: port
+
+# The map shown aboard when a position has no map of its own.
+sea_chart: sea_chart
+
+# Each position has:
+#   name       a short name for where the ship is
+#   chart_pos  where it is on the sea chart, [x, y]
+#   map        optional: a closer map to show aboard instead of the sea chart, and
+#   map_pos    the ship's place on it
+#   ashore     optional: the place the `ashore` exit leads to
+#   deck       what is seen from the Deck here
+#   cabin      what is noticed in the Cabin here
+#   shore      what players on the shore see of the ship (only with `ashore`)
+#   routes     direction: {to: position id, text: what players aboard read while sailing}
+positions:
+  port:
+    name: Moored at the Quay
+    chart_pos: [880, 290]
+    map: port
+    map_pos: [520, 610]
+    ashore: quay
+    deck: >
+      The ship is moored at the quay. Sailors carry the last barrels aboard, and the
+      harbour opens to the west, towards the ocean.
+    cabin: >
+      Through the small stern window you can see the harbour wall and the town behind it.
+    shore: >
+      Your expedition's ship is moored at the end of the quay, her sails neatly furled.
+    routes:
+      west:
+        to: charted
+        text: >
+          The ropes are cast off and the sails fill. The port grows small behind you, and
+          for many days there is nothing but ocean.
+
+  charted:
+    name: The charted position
+    chart_pos: [560, 290]
+    deck: >
+      Open sea in every direction. According to the Halcyon's old chart, the island should
+      be right here. There is nothing but water, all the way to the horizon.
+    cabin: >
+      The cabin creaks as the ship rolls on the open sea.
+    routes:
+      west:
+        to: anchorage
+        text: >
+          The ship turns west and sails on. After a long day a lookout shouts from the
+          masthead: land!
+      east:
+        to: port
+        text: >
+          The ship turns for home. Days later, the familiar harbour comes into view.
+
+  anchorage:
+    name: Anchored off the island
+    chart_pos: [230, 290]
+    map: island
+    map_pos: [900, 470]
+    ashore: beach
+    deck: >
+      The ship lies at anchor in a calm lagoon. A green island rises in front of you, with
+      a white beach and palm trees along the shore.
+    cabin: >
+      Through the small window you can hear waves on a beach, and birds you don't know.
+    shore: >
+      Your ship lies at anchor out in the lagoon.
+    routes:
+      east:
+        to: charted
+        text: >
+          The anchor comes up and the island falls behind you as the ship sails east.

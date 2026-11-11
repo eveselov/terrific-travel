@@ -14,6 +14,10 @@ just overloads its hooks to have it perform its function.
 
 from evennia.scripts.scripts import DefaultScript
 
+from world.content import load_content
+
+EXPEDITION_KEY: str = "expedition"
+
 
 class Script(DefaultScript):
     """
@@ -101,3 +105,37 @@ class Script(DefaultScript):
     """
 
     pass
+
+
+class Expedition(Script):
+    """
+    The state of the expedition: the one place where the adventure's progress is kept.
+
+    In stage A1 that is only where the ship is and where she has been. Clues found, gates
+    opened and the journal will join it later, which keeps checkpoints simple to add
+    (DECISIONS.md, 7). Find it with `world.expedition.get_expedition()`.
+    """
+
+    def at_script_creation(self) -> None:
+        """Start with the ship where the content files say she begins."""
+        self.key = EXPEDITION_KEY
+        self.desc = "Phantom Island: the expedition's progress"
+        self.persistent = True
+        start: str = load_content().start_position
+        self.db.ship_position = start
+        self.db.track = [start]
+
+    @property
+    def ship_position(self) -> str:
+        """The id of the ship's current position (see world/content/ship.yaml)."""
+        return str(self.db.ship_position)
+
+    @property
+    def track(self) -> list[str]:
+        """The positions the ship has been at, in order, the current one last."""
+        return [str(position) for position in self.db.track or []]
+
+    def move_ship(self, position_id: str) -> None:
+        """Record that the ship is now at this position."""
+        self.db.ship_position = position_id
+        self.db.track = [*self.track, position_id]

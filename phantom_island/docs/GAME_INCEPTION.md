@@ -225,6 +225,13 @@ For the build, the most important part is the clue table: 13 clues, each saying 
 
 All names, the island and the era are placeholders. The file ends with five questions for your grandson and his friend, including naming the ship.
 
+**Halcyon** Name Choice Reasons
+
+- **The meaning fits the story.** A halcyon is the kingfisher of Greek myth. "Halcyon days" were the calm days at sea when the kingfisher nested on the water. A ship named for calm weather that disappears in a storm is a quiet irony that adults will notice and kids can be told about.
+- **It's a bird.** Birds are part of the mystery: the seabirds flying west at dusk show where land is. A ship named after a bird, found partly by watching birds, ties the two together.
+- **It sounds right for 1790.** British ships of that time often had classical or poetic names, and Halcyon is in that style.
+- **It works as the hook.** The whole mystery starts with one word engraved on a brass compass. That word needs to be short, unusual and easy to recognise. A common name like "Mary" or "Hope" wouldn't make anyone stop and think "that's the lost ship".
+- **It's easy to spot in text.** In a text game, players will type and read it often, and it can't be mistaken for a place or a person.
 ---
 ## Game Development Staging
 
@@ -319,3 +326,83 @@ More adventures, more islands, the crew who sailed west, a competitive mode, eve
 The full plan is about **30–50 sessions**, or roughly 4–6 months at a relaxed pace. The milestone that matters most is the end of Phase A: a game the kids have played and approved, and a clear list of what the AI must do. I'd start with A1.
 
 If it's useful, I can save this as a roadmap file in the repo, so the stages and "done when" checks stay next to the code.
+
+---
+---
+---
+## A1. Island Skeleton
+
+**CLAUDE:** *A1 is built: the Phantom Island world now exists and the "done when" condition is met. Two players can walk everywhere and see each other. Nothing is staged or committed.*
+
+**Checks:** 26 tests pass, and `mypy` (strict) and `ruff` are clean. I also started the server briefly: the web client page, the pane plugin, the CSS and the three map pictures are all served. I haven't looked at it in a browser, so the two-window test is still yours to do.
+
+**What you can do in the game now:**
+- **Limbo is the title page**, showing the pitch. `begin` leads into the Society Office.
+- **12 places with exits and short placeholder texts:** 3 in the port, the ship's Deck and Cabin, and 7 on the island. The island layout is a first sketch.
+- **The ship:**
+  - On the Quay, `aboard` takes you onto the Deck; `down` goes to the Cabin.
+  - On the Deck, `sail` lists where she can go. The route is port → `sail west` → the charted position (empty sea) → `sail west` → anchored at the island → `ashore` to Lagoon Beach.
+  - What you see on the Deck and in the Cabin changes with where she is, and so does where the `ashore`/`aboard` exits lead.
+- **Map and Focus panes:**
+  - The Map pane switches between the port plan, the *Halcyon*'s sea chart (with the ship's track drawn on it) and the island map. All three pictures are placeholders.
+  - The Focus pane shows a placeholder card with the room's name.
+  - For telnet, a new `map` command describes the same map in words.
+
+**How it's put together:**
+- All story content is in YAML in [world/content/](phantom_island/world/content/), with comments on how to edit it. A loader checks it, for example that every exit leads to a real place, and names the file and entry if something's wrong.
+- `batchcode build` builds or rebuilds the world from those files. Rebuilding after an edit is safe: rooms are updated in place and nobody gets moved. On a brand-new database it builds by itself.
+- Where the ship is and her track are kept in one `Expedition` script, as decision 7 asks. The journal and clues can go there later.
+- [README.md](phantom_island/README.md) has a short guide to building, playing and how the files fit together.
+
+**Your database:** I built the world into your existing `phantom_island/server/evennia.db3`, which only had Admin and Limbo. The original is saved at `phantom_island/server/snapshots/before-a1.db3` (git-ignored) if you want it back.
+
+**Three choices I made that aren't in DECISIONS.md yet:**
+1. The ship won't sail while another connected player is still ashore, so nobody gets stranded (decision 6b). Players still in Limbo don't count.
+2. A player who joins while the ship is away has no way to reach her yet. An admin can `teleport` them; this needs a proper answer later.
+3. Text placed in pictures should eventually be readable in text too: the chart shows the island as charted with a dashed outline, and the true island isn't drawn.
+
+Should I add 1 and 2 to DECISIONS.md? Next stage is A2, the scripted inhabitants.
+
+## Late Joiners Problem
+
+*It's the geography that breaks.*
+
+## Where the problem comes from
+
+There's **one shared world** (decision 7), and the ship is a single thing in it. When the first kid sails to the island, the ship's position changes for everyone.
+
+A brand-new character always starts in Limbo. `begin` takes them to the Society Office, in the port. If the ship is still in port, nothing goes wrong: they walk to the Quay and go `aboard`. But if the ship is at the island, the port's `aboard` exit is gone, because it only exists while the ship is moored there. The newcomer can walk around the Office, Quay and Market, and that's all. There's no other way to the island. Only the ship goes there, and only someone on her Deck can sail her.
+
+The first kid could sail back to fetch them (`sail east` twice, then back), and that does work. But a 12-year-old has to think of it. It also means going back across the sea, which later costs time and water.
+
+Players who are already in the game are fine. When someone logs out, Evennia remembers where they were and puts them back there on return. So the first kid can stop on the island and pick up there the next day. Only a **new** character has this problem.
+
+## The story side
+
+This part is closer to your picture. Once the journal exists (A3), it's shared, so the friend can type `journal` and read everything found so far. That's the "overall description of the situation", built into the game. And the first kid can explain the rest. Decision 11 already expects your grandson to act as guide.
+
+The game itself has no problem with a player who missed Act 1. Gates like "learn from the trader before leaving port" are already open for the whole expedition. The friend never sees the empty sea or meets the trader, so he misses some moments, but the first kid can tell him about them.
+
+## Ways to fix it
+
+1. **Admin teleport** (what we have now). You type `teleport <friend> = Deck`. It works when you're there, but it's not in the story, and it fails if the kids play without you.
+2. **`begin` leads to wherever the expedition is.** If the ship is in port, `begin` goes to the Society Office as now. If she's away, it goes straight onto the Deck, with a line such as "You've been aboard all along, seasick in your hammock. You come up on deck…". It's a few lines of code, and kids would probably enjoy it.
+3. **`join <name>`** puts you next to a friend who's already playing. It's flexible, but more of a game-system feature than part of the story.
+4. **Fetch them by ship.** No code needed, but it's slow and depends on the first kid thinking of it.
+
+## A question to settle first: same expedition, or a fresh one?
+
+Decision 11 imagines your grandson playing first with you, and his friend playing later with your grandson as guide. In that case the friend may simply get **a new run from the start**: you reset the world (back up or wipe the database, as in BUILD.md), and both start in Limbo. Then the late-join problem never comes up. Your grandson knows the answers, but that's what makes him a good guide.
+
+The problem only matters if the friend should join the **same ongoing** expedition.
+
+**My recommendation:** option 2. It's cheap, it fits the story, it works without you, and it doesn't stop you from also doing fresh runs. It fits best in A3 or A4, next to the journal, since the two together make a good "catch up" for a newcomer.
+
+I've recorded option 2 as decision 18 in [DECISIONS.md](phantom_island/docs/DECISIONS.md#L56), replacing the temporary "admin teleport" entry:
+
+- **While the ship is in port**, `begin` goes to the Society Office as it does now.
+- **While she's away**, `begin` puts the new player on the Deck, with a short line from the story: they were aboard all along, seasick below.
+- **Catching up** happens through the shared journal (A3), with the other player as guide.
+- **Fresh runs** (a reset world) stay possible.
+
+It gets built in A3 or A4, next to the journal. Until then you can bring a late joiner aboard yourself with `teleport`.

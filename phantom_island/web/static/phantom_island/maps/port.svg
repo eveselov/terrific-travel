@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700">
+  <!-- Placeholder port plan for stage A1. Labels are drawn by the game (world/maps.py). -->
+  <rect width="1000" height="700" fill="#e9dcb8"/>
+  <!-- Streets and squares -->
+  <rect x="0" y="0" width="1000" height="500" fill="#d8c79c"/>
+  <path d="M 0 330 L 1000 330" stroke="#c4b182" stroke-width="40"/>
+  <path d="M 500 0 L 500 500" stroke="#c4b182" stroke-width="34"/>
+  <!-- Society Office building -->
+  <rect x="200" y="120" width="200" height="150" fill="#b98b5e" stroke="#5b3b1d" stroke-width="5"/>
+  <path d="M 190 125 L 300 70 L 410 125 Z" fill="#8a3b2a" stroke="#5b3b1d" stroke-width="5"/>
+  <!-- Market stalls -->
+  <g fill="#c96a3a" stroke="#5b3b1d" stroke-width="4">
+    <rect x="610" y="150" width="60" height="45"/>
+    <rect x="690" y="150" width="60" height="45"/>
+    <rect x="770" y="150" width="60" height="45"/>
+    <rect x="650" y="240" width="60" height="45"/>
+    <rect x="730" y="240" width="60" height="45"/>
+  </g>
+  <!-- Houses -->
+  <g fill="#c8a679" stroke="#5b3b1d" stroke-width="3">
+    <rect x="40" y="380" width="90" height="70"/>
+    <rect x="150" y="390" width="80" height="60"/>
+    <rect x="800" y="380" width="90" height="70"/>
+    <rect x="40" y="40" width="90" height="70"/>
+    <rect x="870" y="40" width="90" height="70"/>
+  </g>
+  <!-- Harbour water -->
+  <path d="M 0 500 L 1000 500 L 1000 700 L 0 700 Z" fill="#6fa8c7"/>
+  <g stroke="#9cc6dc" stroke-width="3" fill="none">
+    <path d="M 60 600 q 20 -10 40 0 t 40 0"/>
+    <path d="M 760 640 q 20 -10 40 0 t 40 0"/>
+    <path d="M 220 660 q 20 -10 40 0 t 40 0"/>
+  </g>
+  <!-- The quay: a stone pier into the harbour -->
+  <path d="M 380 480 L 620 480 L 620 520 L 560 520 L 560 660 L 440 660 L 440 520 L 380 520 Z"
+        fill="#a59d8f" stroke="#5e584f" stroke-width="5"/>
+  <!-- Harbour wall -->
+  <path d="M 0 500 L 380 500 M 620 500 L 1000 500" stroke="#5e584f" stroke-width="10"/>
+</svg>
