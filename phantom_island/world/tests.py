@@ -274,16 +274,31 @@ class TestMapsAndFocus(WorldTest):
     def test_aboard_the_map_shows_which_ship_room_you_are_in(self) -> None:
         quay: MapView | None = self.rooms["quay"].map_view()
         assert quay is not None
-        self.assertEqual(quay.aboard, [])
+        self.assertEqual([m.label for m in quay.ship_rooms], ["Deck", "Cabin"])
+        self.assertFalse(any(m.is_here for m in quay.ship_rooms))
         for place_id, here_label in (("deck", "Deck"), ("cabin", "Cabin")):
             view: MapView | None = self.rooms[place_id].map_view()
             assert view is not None
-            self.assertEqual([m.label for m in view.aboard if m.is_here], [here_label])
+            self.assertEqual([m.label for m in view.ship_rooms if m.is_here], [here_label])
             ship: list[MapPlace] = [p for p in view.places if p.is_ship]
             self.assertEqual(ship[0].label, f"{SHIP_LABEL} ({here_label})")
             self.assertIn(
                 f"You are here: {SHIP_LABEL} ({here_label})", self.rooms[place_id].map_text()
             )
+
+    def test_the_callout_follows_the_ship(self) -> None:
+        self.assertIn("<line", render_map_html(self._view("quay")))
+        get_expedition().move_ship("charted")
+        on_quay: MapView = self._view("quay")
+        self.assertEqual(on_quay.ship_rooms, [])
+        self.assertNotIn("<line", render_map_html(on_quay))
+        self.assertNotIn("Cabin", render_map_html(on_quay))
+        self.assertEqual(len(self._view("cabin").ship_rooms), 2)  # on the sea chart now
+
+    def _view(self, place_id: str) -> MapView:
+        view: MapView | None = self.rooms[place_id].map_view()
+        assert view is not None
+        return view
 
     def test_going_below_updates_the_map(self) -> None:
         self.char1.move_to(self.rooms["deck"], quiet=True)

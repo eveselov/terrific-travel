@@ -8,9 +8,10 @@ Copied from the playground (`game/world/maps.py`) and changed for this game:
   `MAP_TAG_CATEGORY` category, and its position on the picture is its `map_pos` attribute.
   The world builder sets both from `places.yaml`.
 - **The ship** is drawn too, wherever she is: on the port plan when moored, on the sea chart
-  at sea, on the island map at anchor. Her two rooms show the map she is on, with her marker
-  as "You are here", plus a small side view of the ship in a corner of the map showing which
-  of her rooms (Deck or Cabin) you are in. On the sea chart her track is a dashed line.
+  at sea, on the island map at anchor. Whenever she is on the map, a side view of her (Deck
+  and Cabin) sits in a free corner, joined to her marker by a callout line; on a map she isn't
+  on, neither appears. Her own rooms show the map she is on, with her marker as "You are
+  here" and your room ringed in the side view. On the sea chart her track is a dashed line.
 
 The map is rendered on the server as an inline SVG string and sent to the web client as a
 `map` message (see `web/static/webclient/js/plugins/panes.js`). Telnet clients never see it;
@@ -51,7 +52,7 @@ class MapPlace:
 
 @dataclass(frozen=True)
 class ShipRoomMark:
-    """One of the ship's rooms in the "aboard" inset."""
+    """One of the ship's rooms in the ship's side view (the callout)."""
 
     label: str
     kind: str  # "deck" or "cabin"
@@ -66,7 +67,9 @@ class MapView:
     places: list[MapPlace]
     track: list[Point]
     track_names: list[str]
-    aboard: list[ShipRoomMark] = field(default_factory=list)  # empty unless aboard
+    # The ship's rooms for the callout: empty when the ship is not on this map.
+    ship_rooms: list[ShipRoomMark] = field(default_factory=list)
+    ship_pos: Point | None = None
 
 
 def room_map_location(room: Any) -> MapLocation | None:
@@ -104,7 +107,7 @@ def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> M
     The map a viewer sees from `here`, a room at `location`.
 
     `ship_kind` is the kind of ship's room `here` is ("deck" or "cabin"), or None ashore.
-    Aboard, the ship's marker is "You are here" and the map gets the ship inset.
+    Aboard, the ship's marker is "You are here" and your room is ringed in the callout.
     """
     content: Content = load_content()
     picture_map: MapSpec | None = content.maps.get(location.map_key)
@@ -112,15 +115,16 @@ def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> M
         return None
     places: list[MapPlace] = places_on_map(picture_map.key, here)
     ship: MapLocation = ship_map_location(current_position(), content)
-    if ship.map_key == picture_map.key:
+    ship_on_map: bool = ship.map_key == picture_map.key
+    if ship_on_map:
         x, y = ship.pos
         label: str = SHIP_LABEL
         if ship_kind is not None:
             label = f"{SHIP_LABEL} ({content.place_of_kind(ship_kind).name})"
         places.append(MapPlace(label=label, x=x, y=y, is_here=ship_kind is not None, is_ship=True))
-    aboard: list[ShipRoomMark] = []
-    if ship_kind is not None:
-        aboard = [
+    ship_rooms: list[ShipRoomMark] = []
+    if ship_on_map:
+        ship_rooms = [
             ShipRoomMark(
                 label=content.place_of_kind(kind).name, kind=kind, is_here=kind == ship_kind
             )
@@ -139,7 +143,8 @@ def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> M
         places=places,
         track=track,
         track_names=track_names,
-        aboard=aboard,
+        ship_rooms=ship_rooms,
+        ship_pos=ship.pos if ship_on_map else None,
     )
 
 
@@ -193,31 +198,70 @@ def _track_svg(track: list[Point]) -> str:
     )
 
 
-# Where each ship's room is in the inset's side view (inset units: 260 x 160).
-_INSET_ROOM_POS: dict[str, Point] = {"deck": (70, 62), "cabin": (95, 112)}
+# The ship's side view, in its own units (scaled with the map's width).
+_CALLOUT_SIZE: Point = (260, 160)
+_CALLOUT_MARGIN: int = 16
+# Keep the callout this far (in its units) from any place, so it hides none of them.
+_CALLOUT_CLEARANCE: int = 60
+# Where each ship's room is in the side view.
+_CALLOUT_ROOM_POS: dict[str, Point] = {"deck": (70, 62), "cabin": (95, 112)}
 
 
-def _aboard_inset_svg(view: MapView) -> str:
-    """A small side view of the ship in the bottom right corner, marking your room."""
-    if not view.aboard:
-        return ""
+def _callout_box(view: MapView, scale: float) -> tuple[float, float, float, float]:
+    """
+    Where the callout goes: the first corner (bottom right, bottom left, top left, top right)
+    that covers no place on the map. Returns (x, y, width, height) in map pixels.
+    """
+    map_w: int = view.picture_map.width
+    map_h: int = view.picture_map.height
+    width: float = _CALLOUT_SIZE[0] * scale
+    height: float = _CALLOUT_SIZE[1] * scale
+    margin: float = _CALLOUT_MARGIN * scale
+    clear: float = _CALLOUT_CLEARANCE * scale
+    corners: list[tuple[float, float]] = [
+        (map_w - width - margin, map_h - height - margin),
+        (margin, map_h - height - margin),
+        (margin, margin),
+        (map_w - width - margin, margin),
+    ]
+    for x, y in corners:
+        if not any(
+            x - clear <= p.x <= x + width + clear and y - clear <= p.y <= y + height + clear
+            for p in view.places
+        ):
+            return x, y, width, height
+    return corners[0][0], corners[0][1], width, height
+
+
+def _ship_callout_svg(view: MapView) -> tuple[str, str]:
+    """
+    The ship's side view in a free corner, with your room ringed, and the line from it to her
+    marker. Returns (line, side view), so the line can be drawn under the place markers.
+    """
+    if not view.ship_rooms or view.ship_pos is None:
+        return "", ""
     scale: float = view.picture_map.width / 1000
-    width: float = 260 * scale
-    height: float = 160 * scale
-    x: float = view.picture_map.width - width - 16 * scale
-    y: float = view.picture_map.height - height - 16 * scale
+    x, y, width, height = _callout_box(view, scale)
+    ship_x, ship_y = view.ship_pos
+    # The line runs from the ship to the nearest point of the callout's edge.
+    edge_x: float = min(max(ship_x, x), x + width)
+    edge_y: float = min(max(ship_y, y), y + height)
+    line: str = (
+        f'<line x1="{ship_x}" y1="{ship_y}" x2="{edge_x:.0f}" y2="{edge_y:.0f}" '
+        f'stroke="#7a4a21" stroke-width="{3 * scale:.1f}" stroke-dasharray="8 6"/>'
+    )
     parts: list[str] = [
         f'<g transform="translate({x:.0f},{y:.0f}) scale({scale:.3f})">',
-        '<rect width="260" height="160" rx="12" fill="#f3e6c4" fill-opacity="0.92" '
-        'stroke="#7a4a21" stroke-width="4"/>',
+        f'<rect width="{_CALLOUT_SIZE[0]}" height="{_CALLOUT_SIZE[1]}" rx="12" fill="#f3e6c4" '
+        'fill-opacity="0.92" stroke="#7a4a21" stroke-width="4"/>',
         # Mast and sail, then the hull with the deck as its top edge.
         '<path d="M 175 72 L 175 14" stroke="#3b2a14" stroke-width="4"/>',
         '<path d="M 178 18 L 178 64 L 225 64 Z" fill="#fffbe8" stroke="#3b2a14" stroke-width="2"/>',
         '<path d="M 20 72 L 240 72 L 212 144 L 48 144 Z" fill="#b98b5e" stroke="#3b2a14" '
         'stroke-width="4"/>',
     ]
-    for mark in view.aboard:
-        mx, my = _INSET_ROOM_POS.get(mark.kind, (130, 100))
+    for mark in view.ship_rooms:
+        mx, my = _CALLOUT_ROOM_POS.get(mark.kind, (130, 100))
         if mark.is_here:
             parts.append(
                 f'<circle cx="{mx}" cy="{my}" r="15" fill="none" stroke="#e63946" '
@@ -232,7 +276,7 @@ def _aboard_inset_svg(view: MapView) -> str:
             f'font-weight="{weight}" fill="#1d2b36">{escape(mark.label)}</text>'
         )
     parts.append("</g>")
-    return "".join(parts)
+    return line, "".join(parts)
 
 
 def render_map_html(view: MapView) -> str:
@@ -242,6 +286,7 @@ def render_map_html(view: MapView) -> str:
     height: int = picture_map.height
     # The current place is drawn last, so its marker is on top.
     ordered: list[MapPlace] = sorted(view.places, key=lambda place: place.is_here)
+    callout_line, callout = _ship_callout_svg(view)
     return (
         '<div class="pi-map">'
         f'<div class="pi-pane-title">{escape(picture_map.title)}</div>'
@@ -251,8 +296,9 @@ def render_map_html(view: MapView) -> str:
         f'<image href="{escape(picture_map.image)}" x="0" y="0" '
         f'width="{width}" height="{height}"/>'
         f"{_track_svg(view.track)}"
+        f"{callout_line}"
         f"{''.join(_place_svg(place) for place in ordered)}"
-        f"{_aboard_inset_svg(view)}"
+        f"{callout}"
         "</svg></div>"
     )
 

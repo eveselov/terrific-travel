@@ -89,7 +89,7 @@ positions:
     name: Anchored off the island
     chart_pos: [230, 290]
     map: island
-    map_pos: [900, 470]
+    map_pos: [875, 545]
     ashore: beach
     deck: >
       The ship lies at anchor in a calm lagoon. A green island rises in front of you, with
