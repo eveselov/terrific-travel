@@ -9,6 +9,7 @@ At sea both are put nowhere (location None), so they disappear until the ship mo
 from typing import Any
 
 from typeclasses.rooms import Room, ShipRoom
+from world.clues import discover
 from world.content import (
     DIRECTION_ALIASES,
     LIMBO_ID,
@@ -17,7 +18,7 @@ from world.content import (
     RouteSpec,
     load_content,
 )
-from world.expedition import current_position, get_expedition
+from world.expedition import connected_characters, current_position, get_expedition
 from world.places import find_place, find_ship_exit
 
 ASHORE: str = "ashore"
@@ -59,18 +60,6 @@ def moor_ship(position: PositionSpec) -> None:
     aboard_exit.destination = deck
 
 
-def connected_characters() -> list[Any]:
-    """The characters puppeted by someone who is connected right now."""
-    from evennia import SESSION_HANDLER
-
-    characters: list[Any] = []
-    for session in SESSION_HANDLER.get_sessions():
-        puppet: Any = session.get_puppet()
-        if puppet is not None and puppet not in characters:
-            characters.append(puppet)
-    return characters
-
-
 def crew_ashore() -> list[Any]:
     """
     Connected players who are not aboard, so the ship mustn't leave without them.
@@ -87,6 +76,29 @@ def crew_ashore() -> list[Any]:
             continue
         ashore.append(character)
     return ashore
+
+
+LATE_JOINER: str = (
+    "You've been aboard all along, too seasick to leave your hammock below. Today you feel "
+    "better at last, and climb up on deck. (Type |wjournal|n to catch up on what the "
+    "expedition has found so far.)"
+)
+
+
+def begin_destination(default: Any) -> tuple[Any, str | None]:
+    """
+    Where `begin` leads, and what a player is told on the way (DECISIONS.md, 18).
+
+    While the ship is in port, the usual place (the Society Office). While she's away, the
+    Deck, with a line for a player joining an expedition already under way.
+    """
+    content: Content = load_content()
+    if current_position().id == content.start_position:
+        return default, None
+    deck: Any = find_place(content.place_of_kind("deck").id)
+    if deck is None:
+        return default, None
+    return deck, LATE_JOINER
 
 
 def normalise_direction(text: str) -> str:
@@ -138,4 +150,6 @@ def sail(caller: Any, text: str) -> bool:
             character.msg(room.return_appearance(character))
     if new_shore is not None:
         new_shore.msg_contents(SHORE_ARRIVAL)
+    if new_position.clue is not None:  # what the Deck shows here (the empty sea, C4)
+        discover(new_position.clue, caller)
     return True

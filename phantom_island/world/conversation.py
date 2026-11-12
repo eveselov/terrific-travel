@@ -7,8 +7,10 @@ and Cabin), the Ship. What they say comes from `world/content/characters.yaml`.
 Conversations are heard by everyone in the room, so players exploring together hear the same
 answers. Nothing is logged (DECISIONS.md, 8).
 
-In stage A2 every topic gives its `reply`. The `truth` replies of characters who hide
-something, and the clues replies reveal, come with the journal and the conditions (A3, A4).
+A character who hides something gives their `truth` reply once its `needs` are met: clue ids
+in the journal (Crane admits the truth once the coral in the compass hinge, C2, has been
+found), or flags set by what players do (Ama's `respect`, from stage A4). A reply that reveals
+a clue shows the fact in yellow and writes the clue into the journal (`world/clues.py`).
 """
 
 from dataclasses import dataclass
@@ -16,7 +18,17 @@ from typing import Any
 
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import ShipRoom
-from world.content import CharacterSpec, Content, TopicSpec, load_content, normalise_words
+from world.clues import discover, show_marks
+from world.content import (
+    CharacterSpec,
+    Content,
+    Reveal,
+    TopicSpec,
+    TruthSpec,
+    load_content,
+    normalise_words,
+)
+from world.expedition import get_expedition
 
 ABOUT: str = "about"
 USAGE: str = "Usage: |wask <someone> about <something>|n, or just |wask <someone>|n."
@@ -90,10 +102,21 @@ def split_request(caller: Any, text: str) -> tuple[str, str]:
 
 
 def speech(spec: CharacterSpec, text: str) -> str:
-    """A line from a character: `Old Barnaby says: "..."`, or the text itself if it narrates."""
+    """
+    A line from a character: `Old Barnaby says: "..."`, or the text itself if it narrates.
+    A clue's fact in it, marked `[[...]]`, is shown in yellow.
+    """
     if text.startswith('"'):
-        return f"{spec.name[0].upper()}{spec.name[1:]} says: {text}"
-    return text
+        text = f"{spec.name[0].upper()}{spec.name[1:]} says: {text}"
+    return show_marks(text)
+
+
+def answer(topic: TopicSpec) -> Reveal:
+    """What a character says about a topic now: the truth, once its `needs` are met."""
+    truth: TruthSpec | None = topic.truth
+    if truth is not None and get_expedition().met(truth.needs):
+        return Reveal(text=truth.reply, clue=truth.clue)
+    return Reveal(text=topic.reply, clue=topic.clue)
 
 
 def suggestions(spec: CharacterSpec) -> str:
@@ -174,5 +197,8 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
     if topic is None:
         _say_to_room(caller, mine, theirs, f"{speech(spec, spec.fallback)}\n{suggestions(spec)}")
         return None
-    _say_to_room(caller, mine, theirs, speech(spec, topic.reply))
+    said: Reveal = answer(topic)
+    _say_to_room(caller, mine, theirs, speech(spec, said.text))
+    if said.clue is not None:
+        discover(said.clue, caller)
     return topic

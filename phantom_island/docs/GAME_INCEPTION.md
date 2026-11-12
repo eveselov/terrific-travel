@@ -406,3 +406,45 @@ I've recorded option 2 as decision 18 in [DECISIONS.md](phantom_island/docs/DECI
 - **Fresh runs** (a reset world) stay possible.
 
 It gets built in A3 or A4, next to the journal. Until then you can bring a late joiner aboard yourself with `teleport`.
+
+## A2 Completed
+
+The A2 code is done. All 51 tests pass, and ruff and strict mypy are clean. I tested through `ask` and `execute_cmd`, but didn't start your server, so you'll be the first to see it in the web client. Everything is left uncommitted for you.
+
+**What's new**
+- **[content.py](phantom_island/world/content.py):** reads `characters.yaml` and checks it. It stops the build with a clear message if a character stands in an unknown place, a suggested topic doesn't exist, or one word means two topics for the same character.
+- **Topic matching** ignores capitals, punctuation, "the" and "'s". So `The Storm?`, `great storm` and `storm of '75` all reach Barnaby's *storm*. If the exact text doesn't match, one word of it can, as long as it points to only one topic.
+- **[inhabitants.py](phantom_island/typeclasses/inhabitants.py):** the six inhabitants are characters nobody plays. Rooms list them under "Characters:", and they can't be picked up or played. What they say stays in the YAML.
+- **[builder.py](phantom_island/world/builder.py):** `batchcode build` now also places the inhabitants. A rebuild updates them in place and deletes characters that are no longer in the file. The Ship has no object: `ask` finds her on the Deck and in the Cabin.
+- **[conversation.py](phantom_island/world/conversation.py) and [talk.py](phantom_island/commands/talk.py):** the `ask` command. It handles:
+  - `ask barnaby`: greeting plus suggested topics.
+  - `ask barnaby about storm`, or `ask barnaby storm`.
+  - `ask about storm`, when only one person is in the room.
+  - A fallback plus suggestions for unknown topics.
+  - "The Ship can only hear you when you're aboard" if you ask her ashore.
+- **Speech or narration:** a reply that starts with a quote is shown as `Old Barnaby says: "..."`. Any other reply is narration and is shown as written. This rule is now in the YAML header.
+- **Everyone in the room hears the conversation:** this suits playing together.
+- **Docs:** I added a "Playing stage A2" section and a file-table row to the [README](phantom_island/README.md), and a note in the YAML header on when a `reload` is enough and when you also need `batchcode build`.
+
+**One choice I made without asking:** Tui stands in the Village (her first `where`), since moving between places comes in A4. As agreed, Crane and Ama always give their first replies for now.
+
+**To try it**
+1. `uv run evennia reload`, or `start` if the server isn't running. This is needed because there's new code.
+2. Log in as admin and run `batchcode build`.
+3. Then try:
+
+```
+ask fairweather
+ask fairweather about letter
+se                                  (Quay)
+ask barnaby about the storm
+ask about pirates                   → his fallback
+ask ship about longitude            → "only aboard"
+aboard
+ask ship about longitude
+teleport Village
+ask about goats                     → "Who do you want to ask?"
+ask tui about song
+```
+
+For two players, open a second browser at `http://127.0.0.1:4011`. The second player hears what the first one asks.

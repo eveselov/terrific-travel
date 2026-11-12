@@ -18,27 +18,42 @@ from typeclasses.characters import Character
 from typeclasses.exits import Exit
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
+from typeclasses.scripts import JournalEntry
 from world.builder import build_world
+from world.clues import journal_text, show_marks
 from world.content import (
     CHARACTERS_FILE,
+    CLUES_FILE,
     CONTENT_DIR,
     LIMBO_ID,
     MAPS_FILE,
     PLACES_FILE,
     SHIP_FILE,
+    THINGS_FILE,
     CharacterSpec,
     Content,
     ContentError,
     TopicSpec,
+    all_texts,
     load_content,
     read_content,
 )
 from world.conversation import ask, listeners
+from world.discovery import return_things_home
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
-from world.places import find_inhabitant, find_ship_exit
-from world.ship import ABOARD, ASHORE, moor_ship, normalise_direction, sail
+from world.places import find_inhabitant, find_ship_exit, find_thing
+from world.ship import ABOARD, ASHORE, LATE_JOINER, moor_ship, normalise_direction, sail
+
+CONTENT_FILES: tuple[str, ...] = (
+    PLACES_FILE,
+    SHIP_FILE,
+    MAPS_FILE,
+    CHARACTERS_FILE,
+    CLUES_FILE,
+    THINGS_FILE,
+)
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
 SHIP_PLACES: set[str] = {"deck", "cabin"}
@@ -84,7 +99,7 @@ class TestContent(TestCase):
     def _broken_copy(self, file: str, old: str, new: str) -> ContentError:
         """Copy the content files with one change, and return the error reading them gives."""
         with TemporaryDirectory() as tmp:
-            for name in (PLACES_FILE, SHIP_FILE, MAPS_FILE, CHARACTERS_FILE):
+            for name in CONTENT_FILES:
                 text: str = (CONTENT_DIR / name).read_text(encoding="utf-8")
                 if name == file:
                     self.assertIn(old, text)
@@ -115,6 +130,42 @@ class TestContent(TestCase):
             CHARACTERS_FILE, "aliases: [sky, wind]", "aliases: [sky, wind, storm]"
         )
         self.assertIn("storm", str(error))
+
+    def test_the_thirteen_clues_and_the_things(self) -> None:
+        content: Content = read_content()
+        self.assertEqual(list(content.clues), [f"C{n}" for n in range(1, 14)])
+        self.assertEqual(content.things["sextant"].where, "cabin")
+        self.assertTrue(content.things["plant_guide"].portable)
+        self.assertFalse(content.things["compass"].portable)
+
+    def test_every_clue_can_be_found_somewhere(self) -> None:
+        content: Content = read_content()
+        revealed: set[str] = {clue for _, _, clue in all_texts(content) if clue}
+        self.assertEqual(revealed, set(content.clues))
+
+    def test_a_clue_text_without_a_mark_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(THINGS_FILE, "[[HALCYON]]", "HALCYON")
+        self.assertIn("marks no part", str(error))
+
+    def test_a_mark_without_a_clue_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            PLACES_FILE, "Traders call out", "[[Traders]] call out"
+        )
+        self.assertIn("no `clue`", str(error))
+
+    def test_an_unknown_clue_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(THINGS_FILE, "clue: C1\n", "clue: C99\n")
+        self.assertIn("C99", str(error))
+
+    def test_with_an_unknown_thing_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(PLACES_FILE, "animal_guide:", "animal_gide:")
+        self.assertIn("animal_gide", str(error))
+
+    def test_needing_a_flag_nothing_sets_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            THINGS_FILE, "needs: [sight_charted]", "needs: [sight_chartd]"
+        )
+        self.assertIn("sight_chartd", str(error))
 
 
 class TestCharacterContent(TestCase):
@@ -460,9 +511,20 @@ class TestAsk(WorldTest):
         self.assertIn("Elder Ama", heard)
         self.assertIn("Tui", heard)
 
-    def test_hidden_truths_wait_for_stage_a4(self) -> None:
+    def test_crane_lies_until_the_coral_is_found(self) -> None:
         self.at("market")
-        self.assertIn("Found it on a", self.ask("crane about compass"))
+        with patch("world.clues.connected_characters", return_value=[]):
+            self.assertIn("Found it on a", self.ask("crane about compass"))
+            self.assertEqual(get_expedition().journal, [])
+            get_expedition().add_clue("C2", "someone", "Market")
+            heard: str = self.ask("crane about compass")
+        self.assertIn("I didn't find it", heard)
+        self.assertIn("New in the journal", heard)
+        self.assertTrue(get_expedition().has_clue("C3"))
+
+    def test_ama_still_waits_for_respect(self) -> None:
+        self.at("village")
+        self.assertIn("Not every story", self.ask("ama about halcyon"))
 
     def test_others_in_the_room_hear_the_conversation(self) -> None:
         self.at("quay")
@@ -491,3 +553,209 @@ class TestAsk(WorldTest):
         with patch.object(self.char1, "msg") as mock_msg:
             self.char1.execute_cmd("ask barnaby about compass")
         self.assertIn("waving that compass", texts(mock_msg))
+
+
+class TestClueMarks(TestCase):
+    def test_marked_parts_are_yellow(self) -> None:
+        self.assertEqual(show_marks("A [[coral]] crust."), "A |ycoral|n crust.")
+
+    def test_white_words_inside_a_clue_go_back_to_yellow(self) -> None:
+        self.assertEqual(show_marks("[[the |wcove|n, here]]"), "|ythe |wcove|n|y, here|n")
+
+
+class DiscoveryTest(WorldTest):
+    """A world test where both players count as connected, so both hear of new clues."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        connected: Any = patch(
+            "world.clues.connected_characters", return_value=[self.char1, self.char2]
+        )
+        connected.start()
+        self.addCleanup(connected.stop)
+
+    def at(self, character: Character, place_id: str) -> None:
+        character.move_to(self.rooms[place_id], quiet=True)
+
+    def do(self, character: Character, command: str) -> str:
+        """What a character reads after typing a command."""
+        with patch.object(character, "msg") as mock_msg:
+            character.execute_cmd(command)
+        return texts(mock_msg)
+
+    def journal_ids(self) -> list[str]:
+        return [entry.clue for entry in get_expedition().journal]
+
+    def ship_at(self, position_id: str) -> None:
+        get_expedition().move_ship(position_id)
+        moor_ship(current_position())
+
+    def thing(self, thing_id: str) -> Any:
+        found: Any | None = find_thing(thing_id)
+        assert found is not None, thing_id
+        return found
+
+
+class TestThings(DiscoveryTest):
+    def test_things_are_built_in_their_places(self) -> None:
+        for spec in load_content().things.values():
+            thing: Any = find_thing(spec.id)
+            self.assertIsNotNone(thing, spec.id)
+            self.assertEqual(thing.location, self.rooms[spec.where], spec.id)
+            self.assertEqual(thing.key, spec.name)
+
+    def test_the_compass_stays_on_the_stall(self) -> None:
+        self.at(self.char1, "market")
+        self.assertIn("Looking is free", self.do(self.char1, "get compass"))
+        self.assertEqual(self.thing("compass").location, self.rooms["market"])
+
+    def test_books_can_be_carried(self) -> None:
+        self.at(self.char1, "cabin")
+        self.do(self.char1, "get plant guide")
+        self.assertEqual(self.thing("plant_guide").location, self.char1)
+
+    def test_rebuilding_leaves_carried_things_with_their_carrier(self) -> None:
+        self.at(self.char1, "cabin")
+        self.do(self.char1, "get chart")
+        build_world(limbo=self.room1)
+        self.assertEqual(self.thing("chart").location, self.char1)
+
+    def test_carried_things_go_home_when_their_carrier_leaves(self) -> None:
+        self.at(self.char1, "cabin")
+        self.do(self.char1, "get chart")
+        self.at(self.char1, "hilltop")
+        return_things_home(self.char1)
+        self.assertEqual(self.thing("chart").location, self.rooms["cabin"])
+
+
+class TestLookingAndTheJournal(DiscoveryTest):
+    def test_the_compass_reveals_a_clue_in_yellow(self) -> None:
+        self.at(self.char1, "market")
+        seen: str = self.do(self.char1, "look compass")
+        self.assertIn("|yHALCYON|n", seen)
+        self.assertIn("New in the journal:|n Silas Crane is selling", seen)
+        entry: JournalEntry = get_expedition().journal[0]
+        self.assertEqual((entry.clue, entry.finder, entry.place), ("C1", self.char1.key, "Market"))
+
+    def test_a_player_elsewhere_hears_who_found_it(self) -> None:
+        self.at(self.char1, "market")
+        self.at(self.char2, "quay")
+        with patch.object(self.char2, "msg") as mock_msg:
+            self.char1.execute_cmd("look compass")
+        self.assertIn(f"{self.char1.key} found something at Market.", texts(mock_msg))
+
+    def test_a_clue_is_written_down_once(self) -> None:
+        self.at(self.char1, "market")
+        self.do(self.char1, "look compass")
+        self.assertIn("Already in the journal", self.do(self.char1, "look compass"))
+        self.assertEqual(self.journal_ids(), ["C1"])
+
+    def test_examine_looks_closer(self) -> None:
+        self.at(self.char1, "market")
+        self.assertIn("coral, grown right into the brass", self.do(self.char1, "examine compass"))
+        self.assertEqual(self.journal_ids(), ["C2"])
+
+    def test_a_detail_with_a_closer_look(self) -> None:
+        self.at(self.char1, "village")
+        self.assertIn("much heavier", self.do(self.char1, "look beams"))
+        self.assertEqual(self.journal_ids(), [])
+        self.assertIn("shipwrights", self.do(self.char1, "x old beams"))
+        self.assertEqual(self.journal_ids(), ["C8"])
+
+    def test_a_book_shows_more(self) -> None:
+        self.at(self.char1, "spring")
+        self.assertNotIn("onions", self.do(self.char1, "look shoots"))
+        self.thing("plant_guide").move_to(self.char1, quiet=True)
+        self.assertIn("|yonions", self.do(self.char1, "look shoots"))
+        self.assertEqual(self.journal_ids(), ["C9"])
+
+    def test_the_chart_on_the_hilltop(self) -> None:
+        self.thing("chart").move_to(self.char1, quiet=True)
+        self.at(self.char1, "hilltop")
+        self.assertIn("same island", self.do(self.char1, "look coastline"))
+        self.assertEqual(self.journal_ids(), ["C10"])
+
+    def test_look_still_finds_characters_and_rooms(self) -> None:
+        self.at(self.char1, "quay")
+        self.assertIn("retired sailor", self.do(self.char1, "look barnaby"))
+        self.assertIn("long stone quay", self.do(self.char1, "look"))
+
+    def test_a_reply_with_a_clue(self) -> None:
+        self.at(self.char1, "village")
+        heard: str = self.do(self.char1, "ask tui about song")
+        self.assertIn("|ymade a new canoe", heard)
+        self.assertEqual(self.journal_ids(), ["C11"])
+
+    def test_the_journal_command(self) -> None:
+        self.assertIn("still empty", self.do(self.char1, "journal"))
+        self.at(self.char1, "reef")
+        self.do(self.char1, "look bones")
+        listed: str = self.do(self.char2, "journal")
+        self.assertIn("1. |yA wreck on the Western Reef|n", listed)
+        self.assertIn(f"found by {self.char1.key}, Western Reef", listed)
+        self.assertEqual(listed, journal_text())
+
+
+class TestAtSea(DiscoveryTest):
+    def test_the_empty_sea_is_noticed_on_arrival(self) -> None:
+        self.at(self.char1, "deck")
+        self.at(self.char2, "deck")
+        with patch("world.ship.crew_ashore", return_value=[]):
+            sail(self.char1, "west")
+        self.assertEqual(self.journal_ids(), ["C4"])
+
+    def test_the_birds_at_dusk(self) -> None:
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+        self.assertIn("|yall flying the same way: west", self.do(self.char1, "look birds"))
+        self.assertIn("C6", self.journal_ids())
+
+    def test_the_sextant_needs_the_deck(self) -> None:
+        self.at(self.char1, "cabin")
+        self.assertIn("Take the sextant up", self.do(self.char1, "use sextant"))
+
+    def test_noon_sight_and_chronometer_find_the_longitude_clue(self) -> None:
+        self.ship_at("charted")
+        self.at(self.char2, "cabin")
+        self.assertIn("Take a noon sight", self.do(self.char2, "read chronometer"))
+        self.at(self.char1, "cabin")
+        self.do(self.char1, "get sextant")
+        self.at(self.char1, "deck")
+        self.assertIn("Latitude 14 degrees South", self.do(self.char1, "use sextant"))
+        self.assertIn("|ylatitude is easy", self.do(self.char2, "read chronometer"))
+        self.assertIn("C5", self.journal_ids())
+
+    def test_at_the_island_the_longitude_is_ten_degrees_out(self) -> None:
+        self.ship_at("anchorage")
+        self.thing("sextant").move_to(self.char1, quiet=True)
+        self.at(self.char1, "deck")
+        self.do(self.char1, "use sextant")
+        self.at(self.char1, "cabin")
+        self.assertIn("10 degrees further west", self.do(self.char1, "read chronometer"))
+
+    def test_others_in_the_room_hear_what_is_read(self) -> None:
+        self.at(self.char1, "cabin")
+        self.at(self.char2, "cabin")
+        with patch.object(self.char2, "msg") as mock_msg:
+            self.char1.execute_cmd("read plant guide")
+        heard: str = texts(mock_msg)
+        self.assertIn(f"{self.char1.key} reads the plant guide.", heard)
+        self.assertIn("Oak is heavy", heard)
+
+
+class TestLateJoiners(DiscoveryTest):
+    def begin(self, character: Character) -> str:
+        character.move_to(self.room1, quiet=True)
+        with patch.object(character, "msg") as mock_msg:
+            self.go(character, "begin")
+        return texts(mock_msg)
+
+    def test_in_port_begin_leads_to_the_office(self) -> None:
+        self.begin(self.char1)
+        self.assertEqual(self.char1.location, self.rooms["office"])
+
+    def test_with_the_ship_away_begin_leads_to_the_deck(self) -> None:
+        self.ship_at("charted")
+        told: str = self.begin(self.char1)
+        self.assertEqual(self.char1.location, self.rooms["deck"])
+        self.assertIn(LATE_JOINER, told)

@@ -3,6 +3,7 @@
 #
 # After editing, rebuild the world in the game as a builder: `batchcode build`.
 # Rebuilding updates the rooms in place, so players standing in them stay where they are.
+# Changing only the texts of details needs just a `reload`.
 #
 # Each place has:
 #   name     the room's name, shown to players (and on the map)
@@ -13,8 +14,21 @@
 #   desc     what players read when they look
 #   exits    direction: place id. Compass directions, up, down, in and out get their short
 #            forms (n, se, u...) automatically. For other aliases: `name: {to: id, aliases: [..]}`.
+#   details  optional: parts of the place that aren't objects, seen with `look <detail>`
+#            (`look beams`). Mark the word to look at in `desc` |wlike this|n.
 #
-# Placeholder texts for stage A1: short on purpose. Clues come in stage A3.
+# Each detail has (things in things.yaml have the same looking fields):
+#   aliases  other words for it
+#   desc     what `look <detail>` shows. With a `clue`, the fact itself is marked
+#            [[like this]] and shown in yellow (DECISIONS.md, 20).
+#   clue     optional: the clue (see clues.yaml) that `desc` reveals
+#   close    optional: what `examine <detail>` shows, a closer look: {text, clue}
+#   with     optional: more to see when the looker carries a thing from things.yaml (a
+#            book, the chart): {thing id: {text, clue}}
+#
+# SPOILERS below: details reveal clues. Don't show this file to the players.
+#
+# Placeholder texts: short on purpose. Better writing comes in stage A5.
 
 limbo:
   name: Phantom Island
@@ -53,10 +67,16 @@ market:
   map_pos: [700, 230]
   desc: >
     Stalls crowd the square: fish, rope, spices, lamps and odd things from far away.
-    Traders call out their prices over the noise.
+    Traders call out their prices over the noise. One |wstall|n draws a small crowd.
   exits:
     west: office
     southwest: quay
+  details:
+    stall:
+      aliases: [stalls, crowd, table]
+      desc: >
+        Silas Crane's stall: pots, cloth, knives, and right in the middle, where everyone
+        can see it, a brass |wcompass|n. People keep pointing at it and whispering.
 
 quay:
   name: Quay
@@ -77,9 +97,22 @@ beach:
   map_pos: [780, 390]
   desc: >
     A curve of white sand around a calm green lagoon. Palm trees lean over the water, and
-    a path leads inland.
+    a path leads inland. A few |wgoats|n are nibbling at the bushes above the beach.
   exits:
     west: village
+  details:
+    goats:
+      aliases: [goat, bushes]
+      desc: >
+        Three brown goats with clever yellow eyes. One is chewing a palm leaf and watches
+        you while it chews. Nobody seems to look after them.
+      with:
+        animal_guide:
+          clue: C9
+          text: >
+            You look them up in the animal guide. Goats never reach islands like this on
+            their own: [[sailors bring goats on their ships, and leave them where they
+            stay]].
 
 village:
   name: Village
@@ -87,12 +120,32 @@ village:
   map_pos: [520, 410]
   desc: >
     A cluster of huts with roofs of woven leaves stands around an open space of beaten
-    earth. Smoke rises from a cooking fire.
+    earth. Smoke rises from a cooking fire. One hut is bigger than the others, held up by
+    dark, heavy |wbeams|n.
   exits:
     east: beach
     west: reef
     north: forest
     southwest: cove
+  details:
+    beams:
+      aliases: [beam, timbers, timber, hut, big hut, wood]
+      desc: >
+        The big hut stands on thick, dark beams, much heavier than the light wood of the
+        other huts. They look very old. Maybe worth a closer look (|wexamine beams|n).
+      close:
+        clue: C8
+        text: >
+          You run your hand over a beam. It's hard and close-grained, and an old iron nail
+          is rusted into it, bent over flat. Square holes run along one side, where pegs
+          once went: [[these beams were cut by shipwrights, long before they held up a
+          hut]].
+      with:
+        plant_guide:
+          clue: C8
+          text: >
+            You compare the beams with the plant guide. Heavy, dark and hard: [[this is
+            oak, and no oak grows anywhere near here]]. Ships are built of oak.
 
 reef:
   name: Western Reef
@@ -100,22 +153,42 @@ reef:
   map_pos: [170, 390]
   desc: >
     The western shore ends in a long coral reef. Waves break white over its outer edge,
-    and the water in between is shallow and very clear.
+    and the water in between is shallow and very clear. Out in the shallows, huge dark
+    shapes stand up from the coral like |wbones|n.
   exits:
     east: village
     southeast: cove
+  details:
+    bones:
+      aliases: [big bones, shapes, ribs, wreck, cannon]
+      clue: C7
+      desc: >
+        You wade out carefully over the coral. The bones are curved timbers, black with age
+        and furred with weed, standing up in two rows. Between them lies a long lump of
+        coral with a round mouth at one end: [[a ship's ribs, and a cannon, grown over with
+        coral where she struck the reef]].
 
 forest:
   name: Forest Path
   map: island
   map_pos: [520, 260]
   desc: >
-    A narrow path climbs between tall trees with broad leaves. Birds call somewhere above
-    you, and the air is warm and damp.
+    A narrow path climbs between tall |wtrees|n with broad leaves. Birds call somewhere
+    above you, and the air is warm and damp.
   exits:
     south: village
     north: hilltop
     west: spring
+  details:
+    trees:
+      aliases: [tree, leaves, fruit]
+      desc: >
+        Tall smooth trunks, broad shiny leaves, and big green fruit hanging high up.
+      with:
+        plant_guide:
+          text: >
+            The plant guide names them: breadfruit, pandanus and coconut palms, the trees
+            of warm islands. Nothing like the oaks of home.
 
 spring:
   name: Spring
@@ -123,9 +196,21 @@ spring:
   map_pos: [320, 220]
   desc: >
     Clear water bubbles up between mossy rocks and runs off in a little stream. It is cool
-    and quiet here.
+    and quiet here. Beside the stream grows a patch of green |wshoots|n, in neat rows.
   exits:
     east: forest
+  details:
+    shoots:
+      aliases: [shoot, patch, rows, garden]
+      desc: >
+        Thin green shoots, planted in straight rows like a garden at home. You pull one up:
+        a small white bulb, with a sharp smell that makes your eyes water.
+      with:
+        plant_guide:
+          clue: C9
+          text: >
+            The plant guide has a drawing of exactly this: [[onions, which sailors carry on
+            ships and plant wherever they stay a while]].
 
 hilltop:
   name: Hilltop
@@ -133,9 +218,22 @@ hilltop:
   map_pos: [560, 110]
   desc: >
     From the top of the hill you can see the whole island: the lagoon in the east, the
-    reef in the west, and the open ocean all around.
+    reef in the west, and the open ocean all around. The |wcoastline|n is spread out below
+    you like a map.
   exits:
     south: forest
+  details:
+    coastline:
+      aliases: [coast, shape, view, shore]
+      desc: >
+        Round in the east, with the lagoon. A long reef down the west side. A little cove in
+        the south, curled like a hook. You feel you've seen this shape before.
+      with:
+        chart:
+          clue: C10
+          text: >
+            You unroll the Halcyon's chart and hold it up against the view. The lagoon, the
+            reef, the hook of the cove: [[it is the same island, line for line]].
 
 cove:
   name: Boat Cove
@@ -143,7 +241,14 @@ cove:
   map_pos: [330, 570]
   desc: >
     A small sheltered cove, hidden from the open sea by two arms of rock. The sand slopes
-    gently down to the water.
+    gently down to the water, past an old |wslipway|n of logs.
   exits:
     northeast: village
     northwest: reef
+  details:
+    slipway:
+      aliases: [logs, chips, wood chips]
+      desc: >
+        A row of smooth logs laid down to the water, for rolling boats in and out. Old wood
+        chips lie half buried in the sand all around. Someone has built more than canoes
+        here.

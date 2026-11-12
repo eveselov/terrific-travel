@@ -26,6 +26,25 @@ Each dict is on the form
 
 HELP_ENTRY_DICTS = [
     {
+        "key": "colours",
+        "aliases": ["colors", "colour", "color", "white", "yellow"],
+        "category": "General",
+        "text": """
+            Two colours in the text mean something.
+
+            |wWhite|n words are worth following up: ask someone about them (|wask tui about
+            song|n), or take a look (|wlook beams|n). Commands to try are white too.
+
+            |yYellow|n words are a clue: a fact that helps solve the mystery. Whenever
+            you find one, a line is written into the expedition's journal, and everyone in
+            the expedition hears about it. Type |wjournal|n to read everything found so
+            far.
+
+            Not everyone tells the truth, and some people are simply wrong. Compare what
+            people say, and trust what you can see for yourself.
+        """,
+    },
+    {
         "key": "evennia",
         "aliases": ["ev"],
         "category": "General",

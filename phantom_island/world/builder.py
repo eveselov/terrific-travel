@@ -12,7 +12,9 @@ Building again after editing the YAML files is safe and is the normal way to wor
 - Limbo (`settings.DEFAULT_HOME`) is dressed as the title page;
 - the ship's `ashore` and `aboard` exits are put where the ship is now;
 - inhabitants are found by their character id and updated in place, and put back in their
-  place if they aren't in one of their places; characters removed from the file are deleted.
+  place if they aren't in one of their places; characters removed from the file are deleted;
+- things are found by their thing id and updated in place, and put back in their place
+  unless a player is carrying them; things removed from the file are deleted.
 """
 
 from typing import Any
@@ -22,15 +24,18 @@ from evennia.utils import logger
 from evennia.utils.create import create_object
 from evennia.utils.search import search_object, search_tag
 
+from typeclasses.characters import Character
 from typeclasses.exits import Exit
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
+from typeclasses.things import Thing
 from world.content import (
     LIMBO_ID,
     CharacterSpec,
     Content,
     ExitName,
     PlaceSpec,
+    ThingSpec,
     reload_content,
 )
 from world.expedition import current_position
@@ -41,9 +46,12 @@ from world.places import (
     INHABITANT_TAG_CATEGORY,
     PLACE_TAG_CATEGORY,
     SHIP_EXIT_TAG_CATEGORY,
+    THING_TAG_CATEGORY,
     all_inhabitants,
+    all_things,
     find_inhabitant,
     find_place,
+    find_thing,
 )
 from world.ship import ABOARD, ASHORE, moor_ship
 
@@ -148,6 +156,39 @@ def place_inhabitants(content: Content, rooms: dict[str, Room]) -> int:
     return count
 
 
+def _place_thing(spec: ThingSpec, rooms: dict[str, Room]) -> Thing:
+    """Make or update one thing. It goes back to its place unless a player is carrying it."""
+    home: Room = rooms[spec.where]
+    found: Any = find_thing(spec.id)
+    thing: Thing
+    if found is None:
+        thing = create_object(Thing, key=spec.name, location=home, home=home)
+        thing.tags.add(spec.id, category=THING_TAG_CATEGORY)
+    else:
+        thing = found
+        if not thing.is_typeclass(Thing, exact=True):
+            thing.swap_typeclass(Thing, clean_attributes=False)
+    thing.key = spec.name
+    thing.aliases.clear()
+    thing.aliases.add(list(spec.aliases))
+    thing.home = home
+    thing.locks.add("get:true()" if spec.portable else "get:false()")
+    thing.db.get_err_msg = spec.stays or f"The {spec.name} stays where it is."
+    if not isinstance(thing.location, Character) and thing.location != home:
+        thing.move_to(home, quiet=True, move_type="teleport")
+    return thing
+
+
+def place_things(content: Content, rooms: dict[str, Room]) -> int:
+    """Make, update or remove the things. Returns how many there are."""
+    for spec in content.things.values():
+        _place_thing(spec, rooms)
+    for thing in all_things():
+        if not isinstance(thing, Thing) or thing.thing_id not in content.things:
+            thing.delete()
+    return len(content.things)
+
+
 def build_world(caller: Any | None = None, limbo: Room | None = None) -> dict[str, Room]:
     """
     Build (or rebuild) every place and exit from the content files.
@@ -182,10 +223,12 @@ def build_world(caller: Any | None = None, limbo: Room | None = None) -> dict[st
     moor_ship(current_position())
 
     inhabitant_count: int = place_inhabitants(content, rooms)
+    thing_count: int = place_things(content, rooms)
 
     _tell(
         caller,
-        f"Phantom Island built: {len(rooms)} places, {exit_count} exits and "
-        f"{inhabitant_count} inhabitants, the ship {current_position().name.lower()}.",
+        f"Phantom Island built: {len(rooms)} places, {exit_count} exits, "
+        f"{inhabitant_count} inhabitants and {thing_count} things, the ship "
+        f"{current_position().name.lower()}.",
     )
     return rooms

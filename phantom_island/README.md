@@ -90,13 +90,73 @@ changing where they stand, also `batchcode build`. In A2 everyone gives their fi
 answer: Crane doesn't admit the truth yet, and Ama doesn't wait for respect. Those come
 with the clues and conditions in A3 and A4.
 
+## Playing stage A3
+
+Clues can now be found, and every clue goes into the expedition's shared **journal**:
+
+- **Two colours carry meaning** (`help colours`): white words are worth following up (ask
+  about them, or look at them), yellow words are a clue. A journal line always follows the
+  yellow text, and every connected player hears about the new clue.
+- `look <something>` looks at things (`look compass`) and at parts of a room
+  (`look beams`); `examine <something>` (or `x`) looks closer. Builders still have Evennia's
+  own `@examine` (and `ex`).
+- **Things**: the compass in the Market (it stays on Crane's stall) and, in the Cabin, the
+  sextant, the chronometer, the *Halcyon*'s chart and two guide books. `get` and `drop`
+  the portable ones. Carrying a book or the chart shows more of what you look at: the plant
+  guide in the Village and at the Spring, the animal guide on the Beach, the chart on the
+  Hilltop. Carried things go back to their place when their carrier leaves the game.
+- `read <thing>` and `use <thing>` are heard by the whole room. The longitude puzzle: at sea,
+  `use sextant` on the Deck (the noon sight), then `read chronometer` in the Cabin. One
+  player can do each.
+- `journal` lists everything found, in the order it was found, with who found it and
+  where.
+- Crane tells the truth about the compass once the coral in its hinge (`examine compass`)
+  is in the journal. Ama still waits for respect, which comes in A4.
+- **Late joiners**: while the ship is away, `begin` puts a new player on the Deck with a
+  line about being seasick below. The journal is how they catch up.
+
+In A3 nothing waits for time yet: the Western Reef is always open, the birds are always
+there at the charted position, and noon is whenever you use the sextant. The tide, dusk and
+noon come in A4.
+
+To try it (spoilers):
+
+```
+uv run evennia reload        (new code: a reload is needed, then)
+batchcode build              (as admin: places the things)
+journal                      → still empty
+teleport Market
+look compass                 → C1
+examine compass              → C2
+ask crane about compass      → now he admits the truth, C3
+teleport Cabin
+get sextant
+up
+sail west                    → the empty sea, C4
+look sky                     → the birds, C6
+use sextant
+down
+read chronometer             → C5
+journal
+```
+
+What each clue is, and the line it writes in the journal, is in
+[world/content/clues.yaml](world/content/clues.yaml). The things are in
+[world/content/things.yaml](world/content/things.yaml), and the details of each place in
+`places.yaml` and `ship.yaml`. The content check stops the build if a text with a `clue`
+has no `[[marked]]` part, if a marked part has no `clue`, or if a clue, thing or flag
+doesn't exist. To start the journal again, reset the database (see BUILD.md).
+
 ## How it fits together
 
 | Part | Files |
 |---|---|
 | Story content (YAML) and its typed loader | `world/content/*.yaml`, `world/content.py` |
 | World builder (`batchcode build`) | `world/builder.py`, `world/build.py`, `server/conf/at_initial_setup.py` |
-| Expedition state (where the ship is, her track) | `typeclasses/scripts.py` (`Expedition`), `world/expedition.py` |
+| Expedition state (where the ship is, her track, the journal, flags) | `typeclasses/scripts.py` (`Expedition`), `world/expedition.py` |
+| Clues, yellow marks and the journal | `world/content/clues.yaml`, `world/clues.py`, `commands/discover.py` (`journal`) |
+| Things, details, `look`/`examine`/`read`/`use` | `world/content/things.yaml`, `typeclasses/things.py`, `world/discovery.py`, `commands/discover.py` |
+| Late joiners (`begin` while the ship is away) | `typeclasses/exits.py`, `world/ship.py` |
 | Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
 | Map and Focus panes, `map` command | `world/maps.py`, `world/focus.py`, `commands/explore.py` |

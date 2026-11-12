@@ -12,6 +12,8 @@ just overloads its hooks to have it perform its function.
 
 """
 
+from dataclasses import dataclass
+
 from evennia.scripts.scripts import DefaultScript
 
 from world.content import load_content
@@ -107,23 +109,72 @@ class Script(DefaultScript):
     pass
 
 
+@dataclass(frozen=True)
+class JournalEntry:
+    """One clue in the journal: which clue, who found it and where."""
+
+    clue: str
+    finder: str
+    place: str
+
+
 class Expedition(Script):
     """
     The state of the expedition: the one place where the adventure's progress is kept.
 
-    In stage A1 that is only where the ship is and where she has been. Clues found, gates
-    opened and the journal will join it later, which keeps checkpoints simple to add
-    (DECISIONS.md, 7). Find it with `world.expedition.get_expedition()`.
+    That is where the ship is and where she has been, the shared journal (the clues found,
+    in the order they were found) and the flags set by what players did (a noon sight
+    taken, say). Keeping it all here keeps checkpoints simple to add (DECISIONS.md, 7).
+    Find it with `world.expedition.get_expedition()`.
     """
 
     def at_script_creation(self) -> None:
-        """Start with the ship where the content files say she begins."""
+        """Start with the ship where the content files say she begins, and nothing found."""
         self.key = EXPEDITION_KEY
         self.desc = "Phantom Island: the expedition's progress"
         self.persistent = True
         start: str = load_content().start_position
         self.db.ship_position = start
         self.db.track = [start]
+        self.db.journal = []
+        self.db.flags = []
+
+    @property
+    def journal(self) -> list[JournalEntry]:
+        """The clues found so far, the first found first."""
+        return [
+            JournalEntry(clue=str(e["clue"]), finder=str(e["finder"]), place=str(e["place"]))
+            for e in self.db.journal or []
+        ]
+
+    def has_clue(self, clue_id: str) -> bool:
+        """Whether this clue is in the journal."""
+        return any(entry.clue == clue_id for entry in self.journal)
+
+    def add_clue(self, clue_id: str, finder: str, place: str) -> bool:
+        """Write a clue into the journal. Returns False if it was already there."""
+        if self.has_clue(clue_id):
+            return False
+        self.db.journal = [
+            *(self.db.journal or []),
+            {"clue": clue_id, "finder": finder, "place": place},
+        ]
+        return True
+
+    @property
+    def flags(self) -> list[str]:
+        """The flags set so far (see things.yaml: `sets`)."""
+        return [str(flag) for flag in self.db.flags or []]
+
+    def set_flag(self, flag: str) -> None:
+        """Remember a flag for the whole expedition."""
+        if flag not in self.flags:
+            self.db.flags = [*self.flags, flag]
+
+    def met(self, needs: tuple[str, ...]) -> bool:
+        """Whether every clue id or flag in `needs` has been found or set."""
+        found: set[str] = {entry.clue for entry in self.journal} | set(self.flags)
+        return all(need in found for need in needs)
 
     @property
     def ship_position(self) -> str:

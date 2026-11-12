@@ -1,0 +1,184 @@
+# The things of Phantom Island: objects players can look at, read, use and sometimes carry.
+#
+# SPOILERS: some of these reveal clues. Don't show this file to the players.
+#
+# Expertise lives in things, not in roles (DECISIONS.md, 6a): the instruments measure, and
+# the books tell you what you're looking at, for whoever carries or uses them. A detail of a
+# place can show more to someone carrying a book (`with:` in places.yaml).
+#
+# After editing texts, `reload` in the game is enough. Adding or removing things, or changing
+# names or `where`, also needs `batchcode build`. Building again never takes a thing out of
+# a player's hands: it is put back in its place only if it's lying somewhere else.
+# Things a player carries go back to their place when that player leaves the game, so
+# nobody can walk off with a book the others need.
+#
+# Each thing has:
+#   name      shown to players (`You see: a sextant`)
+#   aliases   other words for it (`get guide`, `read plants`)
+#   where     the place id it starts in
+#   portable  true if players can pick it up (default false)
+#   stays     optional: what a player reads when they try to pick up a thing that isn't
+#             portable
+#   desc      what `look <thing>` shows. Like every text that reveals something, it can
+#             have a `clue` (see clues.yaml) with the fact itself marked [[like this]].
+#   clue      optional: the clue `desc` reveals
+#   close     optional: what `examine <thing>` shows (a closer look): {text, clue}
+#   with      optional: more to see when the looker carries another thing:
+#             {thing id: {text, clue}}
+#   read      optional: what `read <thing>` does (see "Actions" below)
+#   use       optional: what `use <thing>` does
+#
+# Actions (read, use) have:
+#   text       what happens, shown to everyone in the room. It can have a `clue`.
+#   clue       optional
+#   only_in    optional: the place id where it works (the sextant needs the Deck), and
+#   elsewhere  what players read anywhere else
+#   at         optional, aboard only: what happens instead at a ship position
+#              (see ship.yaml). Each one has `text` and optional `clue`, plus:
+#     sets       a flag to remember for the whole expedition (`sight_charted`)
+#     needs      flags or clue ids that must already be found, and
+#     otherwise  what happens until they are
+#
+# Flags are remembered by the expedition, so they work between players: one takes the noon
+# sight on the Deck, the other reads the chronometer in the Cabin.
+
+things:
+  # --- In the port ------------------------------------------------------------------------
+
+  compass:
+    name: brass compass
+    aliases: [compass, halcyon compass]
+    where: market
+    stays: >
+      Crane's hand comes down on the compass. "Looking is free, friend. Taking isn't."
+    desc: >
+      A heavy brass compass in pride of place on Crane's stall. Its needle still swings
+      north. On the lid, one word is engraved: [[HALCYON]]. It might be worth a closer look
+      (|wexamine compass|n).
+    clue: C1
+    close:
+      text: >
+        You turn the compass over in your hands. The hinge of the lid is crusted with
+        something hard, pale and rough. Not sand, not rust: [[coral, grown right into the
+        brass]]. Coral only grows under the sea.
+      clue: C2
+
+  # --- Aboard -------------------------------------------------------------------------------
+
+  sextant:
+    name: sextant
+    aliases: [the sextant]
+    where: cabin
+    portable: true
+    desc: >
+      A brass instrument shaped like a slice of pie, with a small telescope, mirrors and a
+      curved scale. Navigators |wuse|n it to measure how high the sun stands. Ask the Ship
+      about the |wsextant|n to learn how.
+    use:
+      only_in: deck
+      elsewhere: >
+        You need the sun and a clear horizon for that. Take the sextant up on the Deck.
+      text: >
+        You wait for noon, when the sun stands highest, and measure it. Latitude 14 degrees
+        South: the harbour's own latitude, as every chart of it says. Noon here is noon at
+        home, of course. This is home.
+      at:
+        charted:
+          sets: sight_charted
+          text: >
+            You wait for noon, when the sun stands highest, and measure it. Latitude 14
+            degrees South: exactly the latitude written beside the island on the Halcyon's
+            chart. Someone should note the time of noon on the chronometer in the Cabin.
+        anchorage:
+          sets: sight_island
+          text: >
+            You wait for noon, when the sun stands highest, and measure it. Latitude 14
+            degrees South: the island's latitude on the Halcyon's chart, to the minute.
+            Someone should note the time of noon on the chronometer in the Cabin.
+
+  chronometer:
+    name: chronometer
+    aliases: [clock, sea clock, brass clock]
+    where: cabin
+    stays: >
+      The chronometer is screwed into its box, and the box is screwed to the ship. It
+      stays where it is. (And it really should: moving it would spoil its timekeeping.)
+    desc: >
+      A fat brass clock in a wooden box, fixed beside the chart table. It keeps the time
+      of the home port, all voyage long. You can |wread|n it.
+    read:
+      text: >
+        The chronometer ticks steadily. It shows the time at home, which here in port is
+        simply the time.
+      at:
+        charted:
+          needs: [sight_charted]
+          clue: C5
+          text: >
+            Noon on deck came when the chronometer showed twenty to three in the afternoon,
+            home time: 160 minutes after noon at home. Four minutes for every degree makes
+            40 degrees West. That is the longitude on the Halcyon's chart, and the noon
+            sight gave her latitude too. You are exactly where her numbers point, and there
+            is no island. So one of her numbers is wrong, and it isn't hard to guess which:
+            [[latitude is easy to measure from the noon sun, but longitude needs a clock
+            like this one, and the Halcyon had none]].
+          otherwise: >
+            The chronometer ticks steadily, keeping home time. On its own it can't say
+            where you are: you also need the moment of noon out here. Take a noon sight
+            with the sextant on the Deck first.
+        anchorage:
+          needs: [sight_island]
+          clue: C5
+          text: >
+            Noon on deck came when the chronometer showed twenty past three, home time: 200
+            minutes after noon at home. Four minutes for every degree makes 50 degrees
+            West. [[The island lies at exactly the chart's latitude, but 10 degrees further
+            west than the chart's longitude.]]
+          otherwise: >
+            The chronometer ticks steadily, keeping home time. On its own it can't say
+            where you are: you also need the moment of noon out here. Take a noon sight
+            with the sextant on the Deck first.
+
+  chart:
+    name: Halcyon's chart
+    aliases: [chart, old chart, the chart, map, halcyon chart]
+    where: cabin
+    portable: true
+    desc: >
+      A fair copy of the Halcyon's chart, lent by the Society. It shows an island drawn in
+      careful ink, with its latitude and longitude written beside it. You can |wread|n it.
+    read:
+      text: >
+        "Island, found by the Halcyon, 1775. Latitude 14 degrees South, longitude 40
+        degrees West of home." The coastline is drawn with care: round in the east with a
+        lagoon, a hill in the middle, a long reef down the west side, and a little cove in
+        the south, like a hook.
+
+  plant_guide:
+    name: plant guide
+    aliases: [guide to plants, plants, plant book, botany]
+    where: cabin
+    portable: true
+    desc: >
+      "A Naturalist's Guide to Useful Plants", a thick book full of careful drawings. Carry
+      it, and you'll know more about the plants you look at. You can also |wread|n it.
+    read:
+      text: >
+        You leaf through it. Breadfruit, coconut and pandanus grow on warm islands. Oak is
+        heavy, dark and hard, and grows only in cool lands far from here: ships are built
+        of it. Onions keep for months, so ships carry them, and sailors plant them wherever
+        they stay a while.
+
+  animal_guide:
+    name: animal guide
+    aliases: [guide to animals, animals, animal book, zoology]
+    where: cabin
+    portable: true
+    desc: >
+      "A Naturalist's Guide to Animals", with drawings of beasts, birds and fish. Carry it,
+      and you'll know more about the animals you look at. You can also |wread|n it.
+    read:
+      text: >
+        You leaf through it. Few land animals ever reach islands far out in the ocean on
+        their own: birds fly there, lizards drift on logs. Goats never do. Sailors carry
+        goats on ships for milk and meat, and sometimes leave a few ashore.

@@ -1,0 +1,90 @@
+# The clues of Phantom Island: what goes into the expedition's journal.
+#
+# SPOILERS: this file holds the solution of the mystery. Don't show it to the players.
+#
+# The authoritative table, with where each clue is found and what it proves, is in
+# docs/GAME_STORY.md ("Clues"). This file holds what the game needs from it: a short title
+# and the line written into the journal when the clue is found.
+#
+# A clue is found wherever the other content files say `clue: C<n>`: in a character's reply
+# (characters.yaml), a detail of a place (places.yaml, ship.yaml), a thing or what it shows
+# when read or used (things.yaml). The text that reveals it marks the fact itself with
+# [[double brackets]]; the game shows that part in yellow, then the journal line
+# (DECISIONS.md, 20). The content check makes sure every text with a `clue` has a marked
+# part, and that no other text does.
+#
+# The journal line is written from the expedition's point of view. It says what was found,
+# and a little of why it matters, but leaves the big conclusions to the players.
+#
+# Each clue has:
+#   title    a few words, shown in the journal and when the clue is found again
+#   journal  the line written into the journal
+#
+# After editing, `reload` in the game is enough.
+
+clues:
+  C1:
+    title: The Halcyon's compass
+    journal: >
+      Silas Crane is selling a brass compass engraved HALCYON in the Market. Something of
+      the ship survived.
+  C2:
+    title: Coral in the hinge
+    journal: >
+      There is coral grown into the compass hinge. Coral only grows under the sea: the
+      compass lay in seawater for years, not on a beach.
+  C3:
+    title: Fishermen from the west
+    journal: >
+      Crane admits he didn't find the compass. He traded for it with fishermen who sailed
+      in from many days to the west.
+  C4:
+    title: Nothing at the charted position
+    journal: >
+      At the position written on the Halcyon's chart there is only open sea. The chart is
+      wrong.
+  C5:
+    title: Latitude right, longitude wrong
+    journal: >
+      With sextant and chronometer: the island's latitude on the chart is right, but its
+      longitude is wrong. The Halcyon carried no sea clock, so her longitude was a guess.
+  C6:
+    title: Birds flying west at dusk
+    journal: >
+      At dusk, seabirds that fish far out at sea all fly the same way, west. They go home
+      to land for the night.
+  C7:
+    title: A wreck on the Western Reef
+    journal: >
+      At low tide the Western Reef shows a ship's oak ribs and an old cannon grown over
+      with coral. A ship was wrecked there long ago.
+  C8:
+    title: Oak timbers in the village
+    journal: >
+      A hut in the village is built with oak beams. No oak grows on the island: it is ship
+      timber, reused by people who lived through the wreck.
+  C9:
+    title: Goats and onions
+    journal: >
+      Goats and onions on the island. Neither belongs on an island like this: European
+      sailors brought them, and lived here long enough to farm.
+  C10:
+    title: The coastline on the chart
+    journal: >
+      From the Hilltop, the island's coastline has exactly the shape drawn on the Halcyon's
+      chart. This is her island, only charted in the wrong place.
+  C11:
+    title: Tui's song
+    journal: >
+      Tui's song tells of people from the sea whose canoe broke on the reef. They made a new
+      canoe with a white wing and flew away to the west.
+  C12:
+    title: Elder Ama's account
+    journal: >
+      Elder Ama says her people brought the whole crew of the wrecked ship ashore alive.
+      They lived in the village for a season, built a boat, and most of them left.
+  C13:
+    title: Jonah Pike's story
+    journal: >
+      Jonah Pike was the Halcyon's carpenter. She wrecked on the Western Reef in the storm,
+      nobody died, and most of the crew sailed west in a boat they built at the cove.

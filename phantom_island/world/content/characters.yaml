@@ -2,11 +2,13 @@
 #
 # SPOILERS: this file holds the solution of the mystery. Don't show it to the players.
 #
-# Draft for stage A2. Only `reply` is used in A2. `stance`, `clue`, `needs` and the `truth`
-# variants are written down now so the format doesn't change in A3 (clues and journal) and
-# A4 (conditions), and so the AI characters of phase B know what each character may reveal.
+# `stance` isn't used by the game yet: it's a note for the writer, and for the AI characters
+# of phase B, who need to know what each character may reveal.
 #
 # Topic words in replies are marked |wlike this|n (white), so players see what else to ask.
+# A reply with a `clue` marks the fact itself [[like this]]: the game shows it in yellow and
+# writes the clue into the journal (see clues.yaml). Only true clues are marked, never a
+# mistaken or lying reply (DECISIONS.md, 20).
 # A reply (or greeting, or fallback) that starts with a quote is shown as speech:
 # `Old Barnaby says: "..."`. One that starts otherwise is narration, shown as written.
 #
@@ -35,8 +37,9 @@
 #   stance    truth (what they say is true), mistaken (they believe it, but it's wrong),
 #             hiding (they know better and don't say)
 #   clue      optional: the clue (C1..C13, see GAME_STORY.md) this reply reveals (A3)
-#   truth     optional, for what a character hides: the reply given once `needs` holds (A4)
-#     needs   clue ids, or flags such as `respect` (set by things players do)
+#   truth     optional, for what a character hides: the reply given once `needs` holds
+#     needs   clue ids already in the journal, or flags such as `respect` (set by things
+#             players do; the flags come in A4)
 #     reply   what they say then
 #     clue    the clue that reply reveals
 
@@ -169,7 +172,7 @@ characters:
           clue: C3
           reply: >
             Crane looks at the coral in the hinge and sighs. "All right. I didn't find it.
-            I traded for it with |wfishermen|n who sailed in from the west, a long way out.
+            I traded for it with [[|wfishermen|n who sailed in from the west]], a long way out.
             I kept quiet because people would call me a wreck looter. I'm not. I paid fair."
       beach:
         stance: hiding
@@ -185,8 +188,8 @@ characters:
           needs: [C2]
           clue: C3
           reply: >
-            "They came in a big canoe with an outrigger, from many days' sailing to the
-            west. They didn't care for brass. They wanted iron nails, and they knew a good
+            "They came in a big canoe with an outrigger, [[from many days' sailing to the
+            west]]. They didn't care for brass. They wanted iron nails, and they knew a good
             trade when they saw one."
       halcyon:
         stance: truth
@@ -245,8 +248,8 @@ characters:
           clue: C12
           reply: >
             "Fifteen winters ago a great storm threw a ship onto the western reef. Our
-            people paddled out into the storm and brought every one of them ashore, alive.
-            They lived with us for a season. They ate our food and learned our songs. Then
+            people paddled out into the storm and [[brought every one of them ashore,
+            alive]]. They lived with us for a season. They ate our food and learned our songs. Then
             most of them went away again."
       crew:
         stance: hiding
@@ -256,7 +259,7 @@ characters:
           needs: [respect]
           clue: C12
           reply: >
-            "They built a boat at the |wcove|n, with wood from their broken ship and rope
+            "[[They built a boat at the |wcove|n, with wood from their broken ship]] and rope
             from our trees. One of them stayed. He still lives among us."
 
   tui:
@@ -294,8 +297,8 @@ characters:
 
           "People came out of the sea,
            their big canoe broke on the reef.
-           They made a new canoe with a white wing
-           and flew away to where the sun goes to sleep."
+           They [[made a new canoe with a white wing
+           and flew away to where the sun goes to sleep]]."
       goats:
         aliases: [goat]
         stance: truth
@@ -327,29 +330,29 @@ characters:
         stance: truth
         clue: C13
         reply: >
-          "I was her carpenter. Jonah Pike. We found this island, fixed its place on the
+          "[[I was her carpenter.]] Jonah Pike. We found this island, fixed its place on the
           |wchart|n, or thought we had, and anchored off the west side. Then the storm came."
       wreck:
         aliases: [reef, storm, great storm, sinking]
         stance: truth
         clue: C13
         reply: >
-          "Wind out of the west, and the anchors dragged. She struck the reef in the night.
-          If the islanders hadn't come out in their canoes, we'd all have drowned. Not one
-          of us was lost."
+          "Wind out of the west, and the anchors dragged. [[She struck the reef in the
+          night.]] If the islanders hadn't come out in their canoes, we'd all have drowned.
+          [[Not one of us was lost.]]"
       boat:
         aliases: [canoe, white wing]
         stance: truth
         clue: C13
         reply: >
-          "We built her right here, from the Halcyon's own oak, with rope from island
+          "[[We built her right here, from the Halcyon's own oak]], with rope from island
           fibre and a sail of patched canvas. A white wing, the children call it."
       crew:
         aliases: [west, the others]
         stance: truth
         clue: C13
         reply: >
-          "Most of them sailed west in her, to reach the trading routes. I never heard
+          "[[Most of them sailed west in her]], to reach the trading routes. I never heard
           what became of them. I stayed. I'd married by then, and this was home."
       chart:
         aliases: [longitude, position]

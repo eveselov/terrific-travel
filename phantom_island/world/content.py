@@ -11,6 +11,8 @@ position, every character stands in a known place, and so on. A mistake raises
 again (the world builder does that, so `batchcode build` picks up edits without a reload).
 """
 
+import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
@@ -23,6 +25,12 @@ PLACES_FILE: str = "places.yaml"
 SHIP_FILE: str = "ship.yaml"
 MAPS_FILE: str = "maps.yaml"
 CHARACTERS_FILE: str = "characters.yaml"
+CLUES_FILE: str = "clues.yaml"
+THINGS_FILE: str = "things.yaml"
+
+# A clue's fact inside a text: `[[coral, grown into the brass]]` (DECISIONS.md, 20).
+CLUE_MARK: re.Pattern[str] = re.compile(r"\[\[(.+?)\]\]", re.DOTALL)
+CLUE_ID: re.Pattern[str] = re.compile(r"C\d+")
 
 LIMBO_ID: str = "limbo"
 ROOM_KINDS: tuple[str, ...] = ("room", "deck", "cabin")
@@ -65,6 +73,31 @@ class ExitSpec:
 
 
 @dataclass(frozen=True)
+class Reveal:
+    """A text that may reveal a clue; the clue's fact is marked `[[...]]` in it."""
+
+    text: str
+    clue: str | None
+
+
+@dataclass(frozen=True)
+class LookSpec:
+    """
+    Something to look at: a detail of a place (`look beams`) or a thing (`look compass`).
+
+    `desc` is what `look` shows, `close` what `examine` shows (if it has nothing closer,
+    `examine` is the same as `look`), and `extras` what's added for someone carrying a thing
+    (by thing id), on either.
+    """
+
+    id: str
+    words: tuple[str, ...]  # the id and its aliases, normalised
+    desc: Reveal
+    close: Reveal | None
+    extras: dict[str, Reveal]
+
+
+@dataclass(frozen=True)
 class PlaceSpec:
     """One room: Limbo, a place in the port or on the island, or a room of the ship."""
 
@@ -76,6 +109,7 @@ class PlaceSpec:
     map_pos: Point | None
     image: str | None
     exits: tuple[ExitSpec, ...]
+    details: dict[str, LookSpec]
 
 
 @dataclass(frozen=True)
@@ -98,6 +132,8 @@ class PositionSpec:
     map_pos: Point | None
     ashore: str | None
     deck: str
+    clue: str | None  # revealed by the `deck` text
+    details: dict[str, LookSpec]  # seen from the Deck
     cabin: str
     shore: str
     routes: tuple[RouteSpec, ...]
@@ -136,6 +172,81 @@ def normalise_words(text: str) -> str:
     while len(words) > 1 and words[0] in _LEADING_WORDS:
         words.pop(0)
     return " ".join(words)
+
+
+def match_words[T](text: str, candidates: Sequence[tuple[T, tuple[str, ...]]]) -> T | None:
+    """
+    The candidate a player means by `text`, from (candidate, its normalised words) pairs.
+
+    First the whole text (`big hut`); if that finds nothing, any single word of it, as long
+    as only one candidate matches (`old beams` finds `beams`; two matches find nothing).
+    """
+    wanted: str = normalise_words(text)
+    if not wanted:
+        return None
+    for candidate, words in candidates:
+        if wanted in words:
+            return candidate
+    found: list[T] = []
+    for word in wanted.split():
+        for candidate, words in candidates:
+            if word in words and candidate not in found:
+                found.append(candidate)
+    return found[0] if len(found) == 1 else None
+
+
+def find_look(text: str, looks: Sequence[LookSpec]) -> LookSpec | None:
+    """The detail (or thing's look) a player means, or None."""
+    return match_words(text, [(look, look.words) for look in looks])
+
+
+@dataclass(frozen=True)
+class ClueSpec:
+    """One clue of the mystery, as written into the journal."""
+
+    id: str
+    title: str
+    journal: str
+
+
+@dataclass(frozen=True)
+class StepSpec:
+    """What reading or using a thing does at one ship position."""
+
+    text: str
+    clue: str | None
+    needs: tuple[str, ...]  # flags or clue ids that must already be found
+    sets: str | None  # a flag to remember for the expedition
+    otherwise: str | None  # shown while `needs` isn't met
+
+    @property
+    def reveal(self) -> Reveal:
+        return Reveal(text=self.text, clue=self.clue)
+
+
+@dataclass(frozen=True)
+class ActionSpec:
+    """What `read <thing>` or `use <thing>` does."""
+
+    default: Reveal
+    only_in: str | None  # the place id where it works, or None for anywhere
+    elsewhere: str | None  # shown anywhere else
+    at: dict[str, StepSpec]  # by ship position id, aboard only
+
+
+@dataclass(frozen=True)
+class ThingSpec:
+    """An object in the world: something to look at, read, use, and perhaps carry."""
+
+    id: str
+    name: str
+    aliases: tuple[str, ...]
+    where: str
+    portable: bool
+    stays: str | None
+    look: LookSpec
+    read: ActionSpec | None
+    use: ActionSpec | None
 
 
 @dataclass(frozen=True)
@@ -211,6 +322,8 @@ class Content:
     ashore_exit: ExitName
     aboard_exit: ExitName
     characters: dict[str, CharacterSpec]
+    clues: dict[str, ClueSpec]
+    things: dict[str, ThingSpec]
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -290,6 +403,37 @@ def _exit(key: str, value: Any, where: str) -> ExitSpec:
     return ExitSpec(key=key, aliases=tuple(aliases), to=_text(data, "to", where))
 
 
+def _reveal(data: dict[str, Any], field: str, where: str) -> Reveal:
+    """A text (in `field`) and the clue it may reveal (in `clue`)."""
+    return Reveal(text=_text(data, field, where), clue=_optional_text(data, "clue", where))
+
+
+def _look(look_id: str, data: dict[str, Any], aliases: tuple[str, ...], where: str) -> LookSpec:
+    close: Reveal | None = None
+    if data.get("close") is not None:
+        close = _reveal(_mapping(data["close"], f"{where}, close"), "text", f"{where}, close")
+    extras_data: dict[str, Any] = _mapping(data.get("with") or {}, f"{where}, with")
+    return LookSpec(
+        id=look_id,
+        words=tuple(dict.fromkeys(normalise_words(word) for word in (look_id, *aliases))),
+        desc=_reveal(data, "desc", where),
+        close=close,
+        extras={
+            thing_id: _reveal(_mapping(item, f"{where}, with {thing_id}"), "text", where)
+            for thing_id, item in extras_data.items()
+        },
+    )
+
+
+def _details(value: Any, where: str) -> dict[str, LookSpec]:
+    details: dict[str, LookSpec] = {}
+    for key, item in _mapping(value or {}, f"{where}, details").items():
+        detail_where: str = f"{where}, detail {key}"
+        data: dict[str, Any] = _mapping(item, detail_where)
+        details[key] = _look(key, data, _aliases(data.get("aliases"), detail_where), detail_where)
+    return details
+
+
 def _place(place_id: str, value: Any, file: str) -> PlaceSpec:
     where: str = f"{file}, {place_id}"
     data: dict[str, Any] = _mapping(value, where)
@@ -306,6 +450,7 @@ def _place(place_id: str, value: Any, file: str) -> PlaceSpec:
         map_pos=_point(data, "map_pos", where),
         image=_optional_text(data, "image", where),
         exits=tuple(_exit(key, item, f"{where}, exit {key}") for key, item in exits_data.items()),
+        details=_details(data.get("details"), where),
     )
 
 
@@ -332,6 +477,8 @@ def _position(position_id: str, value: Any) -> PositionSpec:
         map_pos=_point(data, "map_pos", where),
         ashore=ashore,
         deck=_text(data, "deck", where),
+        clue=_optional_text(data, "clue", where),
+        details=_details(data.get("details"), where),
         cabin=_text(data, "cabin", where),
         shore=_text(data, "shore", where) if ashore else "",
         routes=tuple(
@@ -420,6 +567,76 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
     )
 
 
+def _clues(data: dict[str, Any]) -> dict[str, ClueSpec]:
+    clues_data: dict[str, Any] = _mapping(data.get("clues") or {}, f"{CLUES_FILE}, clues")
+    clues: dict[str, ClueSpec] = {}
+    for clue_id, value in clues_data.items():
+        where: str = f"{CLUES_FILE}, {clue_id}"
+        if not CLUE_ID.fullmatch(clue_id):
+            raise ContentError(f"{where}: clue ids are C and a number, like C7.")
+        item: dict[str, Any] = _mapping(value, where)
+        clues[clue_id] = ClueSpec(
+            id=clue_id, title=_text(item, "title", where), journal=_text(item, "journal", where)
+        )
+    return clues
+
+
+def _step(value: Any, where: str) -> StepSpec:
+    data: dict[str, Any] = _mapping(value, where)
+    needs: tuple[str, ...] = _words(data.get("needs"), "needs", where)
+    otherwise: str | None = _optional_text(data, "otherwise", where)
+    if needs and otherwise is None:
+        raise ContentError(f"{where}: with `needs`, also say what happens `otherwise`.")
+    return StepSpec(
+        text=_text(data, "text", where),
+        clue=_optional_text(data, "clue", where),
+        needs=needs,
+        sets=_optional_text(data, "sets", where),
+        otherwise=otherwise,
+    )
+
+
+def _action(value: Any, where: str) -> ActionSpec | None:
+    if value is None:
+        return None
+    data: dict[str, Any] = _mapping(value, where)
+    only_in: str | None = _optional_text(data, "only_in", where)
+    at_data: dict[str, Any] = _mapping(data.get("at") or {}, f"{where}, at")
+    return ActionSpec(
+        default=_reveal(data, "text", where),
+        only_in=only_in,
+        elsewhere=_text(data, "elsewhere", where) if only_in else None,
+        at={key: _step(item, f"{where}, at {key}") for key, item in at_data.items()},
+    )
+
+
+def _thing(thing_id: str, value: Any) -> ThingSpec:
+    where: str = f"{THINGS_FILE}, {thing_id}"
+    data: dict[str, Any] = _mapping(value, where)
+    portable: Any = data.get("portable", False)
+    if not isinstance(portable, bool):
+        raise ContentError(f"{where}: `portable` must be true or false.")
+    name: str = _text(data, "name", where)
+    aliases: tuple[str, ...] = _aliases(data.get("aliases"), where)
+    look: LookSpec = _look(thing_id, data, (name, *aliases), where)
+    return ThingSpec(
+        id=thing_id,
+        name=name,
+        aliases=aliases,
+        where=_text(data, "where", where),
+        portable=portable,
+        stays=_optional_text(data, "stays", where),
+        look=look,
+        read=_action(data.get("read"), f"{where}, read"),
+        use=_action(data.get("use"), f"{where}, use"),
+    )
+
+
+def _things(data: dict[str, Any]) -> dict[str, ThingSpec]:
+    things_data: dict[str, Any] = _mapping(data.get("things") or {}, f"{THINGS_FILE}, things")
+    return {key: _thing(key, value) for key, value in things_data.items()}
+
+
 def _characters(data: dict[str, Any]) -> dict[str, CharacterSpec]:
     shared_data: dict[str, Any] = _mapping(
         data.get("topic_aliases") or {}, f"{CHARACTERS_FILE}, topic_aliases"
@@ -497,6 +714,141 @@ def _check(content: Content) -> None:
                 )
 
     _check_characters(content)
+    _check_things(content)
+    _check_clue_marks(content)
+
+
+def _look_texts(where: str, look: LookSpec) -> list[tuple[str, str, str | None]]:
+    texts: list[tuple[str, str, str | None]] = [(where, look.desc.text, look.desc.clue)]
+    if look.close is not None:
+        texts.append((f"{where}, close", look.close.text, look.close.clue))
+    for thing_id, extra in look.extras.items():
+        texts.append((f"{where}, with {thing_id}", extra.text, extra.clue))
+    return texts
+
+
+def _action_texts(where: str, action: ActionSpec | None) -> list[tuple[str, str, str | None]]:
+    if action is None:
+        return []
+    texts: list[tuple[str, str, str | None]] = [(where, action.default.text, action.default.clue)]
+    if action.elsewhere is not None:
+        texts.append((f"{where}, elsewhere", action.elsewhere, None))
+    for position_id, step in action.at.items():
+        texts.append((f"{where}, at {position_id}", step.text, step.clue))
+        if step.otherwise is not None:
+            texts.append((f"{where}, at {position_id}, otherwise", step.otherwise, None))
+    return texts
+
+
+def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
+    """Every text players can read, as (where it is, the text, the clue it reveals)."""
+    texts: list[tuple[str, str, str | None]] = []
+    for place in content.places.values():
+        texts.append((f"place {place.id}", place.desc, None))
+        for detail in place.details.values():
+            texts.extend(_look_texts(f"place {place.id}, detail {detail.id}", detail))
+    for position in content.positions.values():
+        where: str = f"position {position.id}"
+        texts.append((f"{where}, deck", position.deck, position.clue))
+        texts.append((f"{where}, cabin", position.cabin, None))
+        if position.shore:
+            texts.append((f"{where}, shore", position.shore, None))
+        for route in position.routes:
+            texts.append((f"{where}, route {route.direction}", route.text, None))
+        for detail in position.details.values():
+            texts.extend(_look_texts(f"{where}, detail {detail.id}", detail))
+    for character in content.characters.values():
+        where = f"{CHARACTERS_FILE}, {character.id}"
+        for field, text in (
+            ("desc", character.desc),
+            ("greeting", character.greeting),
+            ("fallback", character.fallback),
+        ):
+            texts.append((f"{where}, {field}", text, None))
+        for topic in character.topics.values():
+            texts.append((f"{where}, topic {topic.id}", topic.reply, topic.clue))
+            if topic.truth is not None:
+                texts.append(
+                    (f"{where}, topic {topic.id}, truth", topic.truth.reply, topic.truth.clue)
+                )
+    for thing in content.things.values():
+        where = f"{THINGS_FILE}, {thing.id}"
+        texts.extend(_look_texts(where, thing.look))
+        if thing.stays is not None:
+            texts.append((f"{where}, stays", thing.stays, None))
+        texts.extend(_action_texts(f"{where}, read", thing.read))
+        texts.extend(_action_texts(f"{where}, use", thing.use))
+    return texts
+
+
+def _check_clue_marks(content: Content) -> None:
+    """Every text with a clue marks its fact `[[...]]`, and no other text has marks."""
+    for where, text, clue in all_texts(content):
+        marked: bool = CLUE_MARK.search(text) is not None
+        leftover: str = CLUE_MARK.sub("", text)
+        if "[[" in leftover or "]]" in leftover:
+            raise ContentError(f"{where}: a [[ has no matching ]] (or the other way round).")
+        if clue is None:
+            if marked:
+                raise ContentError(f"{where}: has a [[marked]] part but no `clue`.")
+            continue
+        if clue not in content.clues:
+            raise ContentError(f"{where}: unknown clue {clue!r} (see {CLUES_FILE}).")
+        if not marked:
+            raise ContentError(f"{where}: reveals {clue} but marks no part of it [[like this]].")
+
+
+def _check_extras(where: str, look: LookSpec, things: dict[str, ThingSpec]) -> None:
+    for thing_id in look.extras:
+        if thing_id not in things:
+            raise ContentError(f"{where}: `with` names unknown thing {thing_id!r}.")
+
+
+def _check_needs(where: str, needs: tuple[str, ...], content: Content, flags: set[str]) -> None:
+    for need in needs:
+        if CLUE_ID.fullmatch(need):
+            if need not in content.clues:
+                raise ContentError(f"{where}: needs unknown clue {need!r}.")
+        elif need not in flags:
+            raise ContentError(f"{where}: needs flag {need!r}, but nothing `sets` it.")
+
+
+def _check_things(content: Content) -> None:
+    for place in content.places.values():
+        for detail in place.details.values():
+            _check_extras(f"place {place.id}, detail {detail.id}", detail, content.things)
+    for position in content.positions.values():
+        for detail in position.details.values():
+            _check_extras(f"position {position.id}, detail {detail.id}", detail, content.things)
+    flags: set[str] = set()
+    for thing in content.things.values():
+        for action in (thing.read, thing.use):
+            if action is not None:
+                flags.update(step.sets for step in action.at.values() if step.sets)
+    for character in content.characters.values():
+        for topic in character.topics.values():
+            if topic.truth is not None:
+                # Flags such as `respect` are set by what players do (stage A4).
+                clue_needs: tuple[str, ...] = tuple(
+                    need for need in topic.truth.needs if CLUE_ID.fullmatch(need)
+                )
+                where: str = f"{CHARACTERS_FILE}, {character.id}, topic {topic.id}"
+                _check_needs(where, clue_needs, content, flags)
+    for thing in content.things.values():
+        where = f"{THINGS_FILE}, {thing.id}"
+        start: PlaceSpec | None = content.places.get(thing.where)
+        if start is None or start.id == LIMBO_ID:
+            raise ContentError(f"{where}: `where` must be a place, not {thing.where!r}.")
+        _check_extras(where, thing.look, content.things)
+        for verb, action in (("read", thing.read), ("use", thing.use)):
+            if action is None:
+                continue
+            if action.only_in is not None and action.only_in not in content.places:
+                raise ContentError(f"{where}, {verb}: unknown place {action.only_in!r}.")
+            for position_id, step in action.at.items():
+                if position_id not in content.positions:
+                    raise ContentError(f"{where}, {verb}: unknown position {position_id!r}.")
+                _check_needs(f"{where}, {verb}, at {position_id}", step.needs, content, flags)
 
 
 def _check_characters(content: Content) -> None:
@@ -539,6 +891,8 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
     ship_data: dict[str, Any] = _read_yaml(directory, SHIP_FILE)
     maps_data: dict[str, Any] = _read_yaml(directory, MAPS_FILE)
     characters_data: dict[str, Any] = _read_yaml(directory, CHARACTERS_FILE)
+    clues_data: dict[str, Any] = _read_yaml(directory, CLUES_FILE)
+    things_data: dict[str, Any] = _read_yaml(directory, THINGS_FILE)
 
     places: dict[str, PlaceSpec] = {
         key: _place(key, value, PLACES_FILE) for key, value in places_data.items()
@@ -563,6 +917,8 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         ashore_exit=_exit_name(ship_data, "ashore_exit"),
         aboard_exit=_exit_name(ship_data, "aboard_exit"),
         characters=_characters(characters_data),
+        clues=_clues(clues_data),
+        things=_things(things_data),
     )
     _check(content)
     return content

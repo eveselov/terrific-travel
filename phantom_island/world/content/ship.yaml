@@ -42,6 +42,10 @@ sea_chart: sea_chart
 #   map_pos    the ship's place on it
 #   ashore     optional: the place the `ashore` exit leads to
 #   deck       what is seen from the Deck here
+#   clue       optional: the clue (clues.yaml) the `deck` text reveals, its fact marked
+#              [[like this]]. It's found when the ship arrives, or someone looks around.
+#   details    optional: what can be seen from the Deck here with `look <detail>`, written
+#              like the details in places.yaml
 #   cabin      what is noticed in the Cabin here
 #   shore      what players on the shore see of the ship (only with `ashore`)
 #   routes     direction: {to: position id, text: what players aboard read while sailing}
@@ -71,7 +75,16 @@ positions:
     chart_pos: [560, 290]
     deck: >
       Open sea in every direction. According to the Halcyon's old chart, the island should
-      be right here. There is nothing but water, all the way to the horizon.
+      be right here. [[There is nothing but water, all the way to the horizon.]] High above,
+      seabirds wheel in the evening |wsky|n.
+    clue: C4
+    details:
+      sky:
+        aliases: [birds, seabirds, terns, evening, dusk]
+        clue: C6
+        desc: >
+          The sun is going down. The seabirds that fished around the ship all day are
+          leaving, in long lines low over the water, [[all flying the same way: west]].
     cabin: >
       The cabin creaks as the ship rolls on the open sea.
     routes:
