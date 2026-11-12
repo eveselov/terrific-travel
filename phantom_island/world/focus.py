@@ -13,7 +13,7 @@ def _placeholder_svg(title: str) -> str:
     """A parchment card with the title, standing in for a picture still to be made."""
     return (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" '
-        f'aria-label="{escape(title)}" style="width:100%;height:auto;display:block">'
+        f'aria-label="{escape(title)}" class="pi-picture">'
         '<rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" '
         'stroke="#7a4a21" stroke-width="6"/>'
         '<rect x="22" y="22" width="436" height="256" rx="8" fill="none" '
@@ -31,5 +31,5 @@ def render_focus_html(title: str, image_url: str | None) -> str:
     if image_url is None:
         picture: str = _placeholder_svg(title)
     else:
-        picture = f'<img class="pi-focus-image" src="{escape(image_url)}" alt="{escape(title)}">'
+        picture = f'<img class="pi-picture" src="{escape(image_url)}" alt="{escape(title)}">'
     return f'<div class="pi-focus"><div class="pi-pane-title">{escape(title)}</div>{picture}</div>'

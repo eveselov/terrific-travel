@@ -54,7 +54,7 @@ class Room(ObjectParent, DefaultRoom):
     - attribute `image`: URL of its picture for the Focus pane (optional).
     """
 
-    aboard: bool = False  # True for the ship's rooms
+    ship_kind: str | None = None  # "deck" or "cabin" for the ship's rooms
 
     @property
     def place_id(self) -> str | None:
@@ -76,7 +76,7 @@ class Room(ObjectParent, DefaultRoom):
         location: MapLocation | None = self.map_location()
         if location is None:
             return None
-        return build_map_view(self, location, aboard=self.aboard)
+        return build_map_view(self, location, ship_kind=self.ship_kind)
 
     def map_text(self) -> str:
         """The map seen from this room, in words."""
@@ -119,7 +119,7 @@ class ShipRoom(Room):
     which map they show, follow the ship's position (`world/content/ship.yaml`).
     """
 
-    aboard = True
+    ship_kind = "cabin"
 
     def position_text(self, position: PositionSpec) -> str:
         """What is noticed in this room at a position."""
@@ -135,6 +135,8 @@ class ShipRoom(Room):
 
 class Deck(ShipRoom):
     """The ship's Deck: the view of sea and sky, and where `sail` works."""
+
+    ship_kind = "deck"
 
     def at_object_creation(self) -> None:
         """Give the Deck its `sail` command (a cmdset on the room, for those in it)."""

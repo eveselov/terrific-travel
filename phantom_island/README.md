@@ -70,7 +70,10 @@ In stage A1 nothing is gated yet: you can sail straight to the island.
 | Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
 | Map and Focus panes, `map` command | `world/maps.py`, `world/focus.py`, `commands/explore.py` |
-| Web client | `web/static/webclient/`, `web/templates/webclient/`, `web/static/phantom_island/maps/` |
+| Web client | `web/templates/webclient/webclient.html`, `web/static/webclient/js/plugins/`, `web/static/phantom_island/` (pane styles, map pictures) |
+
+When you change `panes.css` or `panes.js`, bump `ASSET_VERSION` in `webclient.html`; otherwise
+browsers keep using their cached copy.
 
 The map code is copied from the playground (`game/world/maps.py`) and changed: maps come from
 YAML, the ship is drawn wherever she is, and the room picture goes to the Focus pane instead of

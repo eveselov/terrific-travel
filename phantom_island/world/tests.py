@@ -271,6 +271,28 @@ class TestMapsAndFocus(WorldTest):
         self.assertFalse(ship_on_quay[0].is_here)
         self.assertTrue(ship_aboard[0].is_here)
 
+    def test_aboard_the_map_shows_which_ship_room_you_are_in(self) -> None:
+        quay: MapView | None = self.rooms["quay"].map_view()
+        assert quay is not None
+        self.assertEqual(quay.aboard, [])
+        for place_id, here_label in (("deck", "Deck"), ("cabin", "Cabin")):
+            view: MapView | None = self.rooms[place_id].map_view()
+            assert view is not None
+            self.assertEqual([m.label for m in view.aboard if m.is_here], [here_label])
+            ship: list[MapPlace] = [p for p in view.places if p.is_ship]
+            self.assertEqual(ship[0].label, f"{SHIP_LABEL} ({here_label})")
+            self.assertIn(
+                f"You are here: {SHIP_LABEL} ({here_label})", self.rooms[place_id].map_text()
+            )
+
+    def test_going_below_updates_the_map(self) -> None:
+        self.char1.move_to(self.rooms["deck"], quiet=True)
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.go(self.char1, "down")
+        map_html: str = sent(mock_msg, "map")[0]
+        self.assertIn(f"{SHIP_LABEL} (Cabin)", map_html)
+        self.assertIn('font-weight="bold" fill="#1d2b36">Cabin', map_html)
+
     def test_at_sea_the_deck_shows_the_sea_chart_with_the_track(self) -> None:
         get_expedition().move_ship("charted")
         view: MapView | None = self.rooms["cabin"].map_view()

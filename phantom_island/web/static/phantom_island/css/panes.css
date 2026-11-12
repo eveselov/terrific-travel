@@ -1,0 +1,44 @@
+/*
+ * Phantom Island additions to the web client style: the Map and Focus panes.
+ *
+ * Linked from web/templates/webclient/webclient.html, after all of Evennia's own stylesheets
+ * and with a version number in its URL. Bump ASSET_VERSION there whenever this file changes,
+ * or browsers keep using their cached copy.
+ */
+
+/*
+ * Map and Focus pane content. The block fills the pane (Evennia's `.content` div, which has
+ * a fixed height); the title takes its own height and the picture gets the rest. The picture
+ * keeps its proportions and is centred, so it always fits whole, whatever the pane's shape.
+ */
+.pi-map,
+.pi-focus {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.pi-pane-title {
+    flex: 0 0 auto;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+/* An inline SVG (map, placeholder card) or an <img> (a real picture). */
+.pi-picture {
+    flex: 1 1 auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0; /* lets the flex item shrink below the picture's own size */
+    object-fit: contain; /* <img>; an SVG with a viewBox does the same by default */
+}
+
+/* The pane itself shouldn't scroll: the picture is already shrunk to fit. */
+.content:has(> .pi-map),
+.content:has(> .pi-focus) {
+    overflow: hidden;
+}

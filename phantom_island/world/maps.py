@@ -9,14 +9,15 @@ Copied from the playground (`game/world/maps.py`) and changed for this game:
   The world builder sets both from `places.yaml`.
 - **The ship** is drawn too, wherever she is: on the port plan when moored, on the sea chart
   at sea, on the island map at anchor. Her two rooms show the map she is on, with her marker
-  as "You are here". On the sea chart her track is drawn as a dashed line.
+  as "You are here", plus a small side view of the ship in a corner of the map showing which
+  of her rooms (Deck or Cabin) you are in. On the sea chart her track is a dashed line.
 
 The map is rendered on the server as an inline SVG string and sent to the web client as a
 `map` message (see `web/static/webclient/js/plugins/panes.js`). Telnet clients never see it;
 the `map` command (`text_map`) gives the same information in words.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from html import escape
 from typing import Any
 
@@ -49,6 +50,15 @@ class MapPlace:
 
 
 @dataclass(frozen=True)
+class ShipRoomMark:
+    """One of the ship's rooms in the "aboard" inset."""
+
+    label: str
+    kind: str  # "deck" or "cabin"
+    is_here: bool
+
+
+@dataclass(frozen=True)
 class MapView:
     """Everything one map shows to one viewer."""
 
@@ -56,6 +66,7 @@ class MapView:
     places: list[MapPlace]
     track: list[Point]
     track_names: list[str]
+    aboard: list[ShipRoomMark] = field(default_factory=list)  # empty unless aboard
 
 
 def room_map_location(room: Any) -> MapLocation | None:
@@ -88,11 +99,12 @@ def places_on_map(map_key: str, here: Any) -> list[MapPlace]:
     return places
 
 
-def build_map_view(here: Any, location: MapLocation, aboard: bool) -> MapView | None:
+def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> MapView | None:
     """
     The map a viewer sees from `here`, a room at `location`.
 
-    `aboard` is True in the ship's rooms: then the ship's marker is "You are here".
+    `ship_kind` is the kind of ship's room `here` is ("deck" or "cabin"), or None ashore.
+    Aboard, the ship's marker is "You are here" and the map gets the ship inset.
     """
     content: Content = load_content()
     picture_map: MapSpec | None = content.maps.get(location.map_key)
@@ -102,7 +114,18 @@ def build_map_view(here: Any, location: MapLocation, aboard: bool) -> MapView | 
     ship: MapLocation = ship_map_location(current_position(), content)
     if ship.map_key == picture_map.key:
         x, y = ship.pos
-        places.append(MapPlace(label=SHIP_LABEL, x=x, y=y, is_here=aboard, is_ship=True))
+        label: str = SHIP_LABEL
+        if ship_kind is not None:
+            label = f"{SHIP_LABEL} ({content.place_of_kind(ship_kind).name})"
+        places.append(MapPlace(label=label, x=x, y=y, is_here=ship_kind is not None, is_ship=True))
+    aboard: list[ShipRoomMark] = []
+    if ship_kind is not None:
+        aboard = [
+            ShipRoomMark(
+                label=content.place_of_kind(kind).name, kind=kind, is_here=kind == ship_kind
+            )
+            for kind in ("deck", "cabin")
+        ]
     track: list[Point] = []
     track_names: list[str] = []
     if picture_map.key == content.sea_chart:
@@ -111,7 +134,13 @@ def build_map_view(here: Any, location: MapLocation, aboard: bool) -> MapView | 
             if position is not None:
                 track.append(position.chart_pos)
                 track_names.append(position.name)
-    return MapView(picture_map=picture_map, places=places, track=track, track_names=track_names)
+    return MapView(
+        picture_map=picture_map,
+        places=places,
+        track=track,
+        track_names=track_names,
+        aboard=aboard,
+    )
 
 
 # --- Web client (SVG) -----------------------------------------------------------------
@@ -164,6 +193,48 @@ def _track_svg(track: list[Point]) -> str:
     )
 
 
+# Where each ship's room is in the inset's side view (inset units: 260 x 160).
+_INSET_ROOM_POS: dict[str, Point] = {"deck": (70, 62), "cabin": (95, 112)}
+
+
+def _aboard_inset_svg(view: MapView) -> str:
+    """A small side view of the ship in the bottom right corner, marking your room."""
+    if not view.aboard:
+        return ""
+    scale: float = view.picture_map.width / 1000
+    width: float = 260 * scale
+    height: float = 160 * scale
+    x: float = view.picture_map.width - width - 16 * scale
+    y: float = view.picture_map.height - height - 16 * scale
+    parts: list[str] = [
+        f'<g transform="translate({x:.0f},{y:.0f}) scale({scale:.3f})">',
+        '<rect width="260" height="160" rx="12" fill="#f3e6c4" fill-opacity="0.92" '
+        'stroke="#7a4a21" stroke-width="4"/>',
+        # Mast and sail, then the hull with the deck as its top edge.
+        '<path d="M 175 72 L 175 14" stroke="#3b2a14" stroke-width="4"/>',
+        '<path d="M 178 18 L 178 64 L 225 64 Z" fill="#fffbe8" stroke="#3b2a14" stroke-width="2"/>',
+        '<path d="M 20 72 L 240 72 L 212 144 L 48 144 Z" fill="#b98b5e" stroke="#3b2a14" '
+        'stroke-width="4"/>',
+    ]
+    for mark in view.aboard:
+        mx, my = _INSET_ROOM_POS.get(mark.kind, (130, 100))
+        if mark.is_here:
+            parts.append(
+                f'<circle cx="{mx}" cy="{my}" r="15" fill="none" stroke="#e63946" '
+                'stroke-width="4"/>'
+            )
+        parts.append(
+            f'<circle cx="{mx}" cy="{my}" r="7" fill="#e63946" stroke="#fffbe8" stroke-width="2"/>'
+        )
+        weight: str = "bold" if mark.is_here else "normal"
+        parts.append(
+            f'<text x="{mx + 24}" y="{my + 7}" font-family="Georgia, serif" font-size="22" '
+            f'font-weight="{weight}" fill="#1d2b36">{escape(mark.label)}</text>'
+        )
+    parts.append("</g>")
+    return "".join(parts)
+
+
 def render_map_html(view: MapView) -> str:
     """Render a map view as an inline SVG inside a small HTML block."""
     picture_map: MapSpec = view.picture_map
@@ -176,11 +247,12 @@ def render_map_html(view: MapView) -> str:
         f'<div class="pi-pane-title">{escape(picture_map.title)}</div>'
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
         f'role="img" aria-label="{escape(picture_map.title)}" '
-        'style="width:100%;height:auto;display:block">'
+        'class="pi-picture">'
         f'<image href="{escape(picture_map.image)}" x="0" y="0" '
         f'width="{width}" height="{height}"/>'
         f"{_track_svg(view.track)}"
         f"{''.join(_place_svg(place) for place in ordered)}"
+        f"{_aboard_inset_svg(view)}"
         "</svg></div>"
     )
 
