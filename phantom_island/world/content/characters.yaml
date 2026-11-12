@@ -7,6 +7,12 @@
 # A4 (conditions), and so the AI characters of phase B know what each character may reveal.
 #
 # Topic words in replies are marked |wlike this|n (white), so players see what else to ask.
+# A reply (or greeting, or fallback) that starts with a quote is shown as speech:
+# `Old Barnaby says: "..."`. One that starts otherwise is narration, shown as written.
+#
+# After editing, `reload` in the game (or `uv run evennia reload`) is enough for new
+# replies. Adding or removing characters, or changing names or `where`, also needs
+# `batchcode build`.
 #
 # topic_aliases: words that mean the same topic whoever you ask. They apply to every
 # character who has a topic with that id; a topic can add its own `aliases` too.
@@ -14,8 +20,9 @@
 # Each character has:
 #   name      shown to players
 #   aliases   other words players can use for them (`ask barnaby`, `ask sailor`)
-#   where     a place id from places.yaml, a list of them (the character moves between
-#             them, from A4), or `aboard` (the Deck and the Cabin)
+#   where     a place id from places.yaml, a list of them (the character will move
+#             between them from A4; until then they stand in the first), or `aboard`
+#             (the Deck and the Cabin)
 #   desc      what players read when they look at them
 #   greeting  the reply to `ask <character>` with no topic; the `suggest` topics follow it
 #   suggest   topics offered to players who don't know what to ask

@@ -4,7 +4,8 @@ The story content of Phantom Island, read from the YAML files in `world/content/
 The YAML files are meant to be edited without touching code (see the comments at the top of
 each file). This module turns them into typed, frozen dataclasses and checks that they fit
 together: every exit leads to a known place, every map exists, every route leads to a known
-position, and so on. A mistake raises `ContentError`, naming the file and the entry.
+position, every character stands in a known place, and so on. A mistake raises
+`ContentError`, naming the file and the entry.
 
 `load_content()` reads the files once and caches the result; `reload_content()` reads them
 again (the world builder does that, so `batchcode build` picks up edits without a reload).
@@ -21,9 +22,15 @@ CONTENT_DIR: Path = Path(__file__).parent / "content"
 PLACES_FILE: str = "places.yaml"
 SHIP_FILE: str = "ship.yaml"
 MAPS_FILE: str = "maps.yaml"
+CHARACTERS_FILE: str = "characters.yaml"
 
 LIMBO_ID: str = "limbo"
 ROOM_KINDS: tuple[str, ...] = ("room", "deck", "cabin")
+STANCES: tuple[str, ...] = ("truth", "mistaken", "hiding")
+ABOARD_WHERE: str = "aboard"  # a character's `where` for the Ship: the Deck and the Cabin
+
+# Words dropped from the front of what players type, so `about the storm` finds `storm`.
+_LEADING_WORDS: tuple[str, ...] = ("the", "a", "an", "her", "his", "your")
 
 # Short forms that compass-style exits get automatically.
 DIRECTION_ALIASES: dict[str, str] = {
@@ -122,6 +129,76 @@ class ExitName:
     aliases: tuple[str, ...]
 
 
+def normalise_words(text: str) -> str:
+    """`  The Storm? ` -> `storm`: lower case, no punctuation, no leading `the`."""
+    cleaned: str = "".join(ch if ch.isalnum() or ch.isspace() else " " for ch in text.lower())
+    words: list[str] = [w for w in cleaned.split() if w != "s"]  # `halcyon's` -> `halcyon`
+    while len(words) > 1 and words[0] in _LEADING_WORDS:
+        words.pop(0)
+    return " ".join(words)
+
+
+@dataclass(frozen=True)
+class TruthSpec:
+    """What a character says about a topic once they stop hiding it (used from stage A4)."""
+
+    needs: tuple[str, ...]
+    reply: str
+    clue: str | None
+
+
+@dataclass(frozen=True)
+class TopicSpec:
+    """One thing a character can be asked about."""
+
+    id: str
+    words: tuple[str, ...]  # the id, its shared aliases and its own aliases, normalised
+    reply: str
+    stance: str
+    clue: str | None
+    truth: TruthSpec | None
+
+
+@dataclass(frozen=True)
+class CharacterSpec:
+    """One of the people (or the Ship) players can talk to."""
+
+    id: str
+    name: str
+    aliases: tuple[str, ...]
+    places: tuple[str, ...]  # place ids; empty for a character who is aboard
+    aboard: bool
+    desc: str
+    greeting: str
+    suggest: tuple[str, ...]
+    fallback: str
+    topics: dict[str, TopicSpec]
+
+    @property
+    def words(self) -> tuple[str, ...]:
+        """Everything players can call this character, normalised."""
+        names: tuple[str, ...] = (self.id, self.name, *self.aliases)
+        return tuple(dict.fromkeys(normalise_words(name) for name in names))
+
+    def topic(self, text: str) -> TopicSpec | None:
+        """
+        The topic a player means, or None if this character doesn't know it.
+
+        First the whole text (`great storm`); if that finds nothing, any single word of it,
+        as long as only one topic matches (`weather and sailing` matches two, so it's None).
+        """
+        wanted: str = normalise_words(text)
+        for topic in self.topics.values():
+            if wanted in topic.words:
+                return topic
+        found: list[TopicSpec] = []
+        for word in wanted.split():
+            for topic in self.topics.values():
+                if word in topic.words and topic not in found:
+                    found.append(topic)
+        return found[0] if len(found) == 1 else None
+
+
 @dataclass(frozen=True)
 class Content:
     """All story content of the game."""
@@ -133,6 +210,7 @@ class Content:
     sea_chart: str
     ashore_exit: ExitName
     aboard_exit: ExitName
+    characters: dict[str, CharacterSpec]
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -186,12 +264,16 @@ def _point(data: dict[str, Any], field: str, where: str) -> Point | None:
     return int(value[0]), int(value[1])
 
 
-def _aliases(value: Any, where: str) -> tuple[str, ...]:
+def _words(value: Any, field: str, where: str) -> tuple[str, ...]:
     if value is None:
         return ()
     if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
-        raise ContentError(f"{where}: `aliases` must be a list of words.")
+        raise ContentError(f"{where}: `{field}` must be a list of words.")
     return tuple(v.strip() for v in value)
+
+
+def _aliases(value: Any, where: str) -> tuple[str, ...]:
+    return _words(value, "aliases", where)
 
 
 # --- Reading entries ------------------------------------------------------------------
@@ -279,6 +361,79 @@ def _exit_name(data: dict[str, Any], field: str) -> ExitName:
     )
 
 
+def _truth(value: Any, where: str) -> TruthSpec | None:
+    if value is None:
+        return None
+    data: dict[str, Any] = _mapping(value, where)
+    needs: tuple[str, ...] = _words(data.get("needs"), "needs", where)
+    if not needs:
+        raise ContentError(f"{where}: `needs` must name at least one clue or flag.")
+    return TruthSpec(
+        needs=needs, reply=_text(data, "reply", where), clue=_optional_text(data, "clue", where)
+    )
+
+
+def _topic(topic_id: str, value: Any, shared: dict[str, tuple[str, ...]], where: str) -> TopicSpec:
+    data: dict[str, Any] = _mapping(value, where)
+    stance: str = _text(data, "stance", where)
+    if stance not in STANCES:
+        raise ContentError(f"{where}: `stance` must be one of {', '.join(STANCES)}.")
+    words: list[str] = [topic_id, *shared.get(topic_id, ()), *_aliases(data.get("aliases"), where)]
+    return TopicSpec(
+        id=topic_id,
+        words=tuple(dict.fromkeys(normalise_words(word) for word in words)),
+        reply=_text(data, "reply", where),
+        stance=stance,
+        clue=_optional_text(data, "clue", where),
+        truth=_truth(data.get("truth"), f"{where}, truth"),
+    )
+
+
+def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]) -> CharacterSpec:
+    where: str = f"{CHARACTERS_FILE}, {character_id}"
+    data: dict[str, Any] = _mapping(value, where)
+    where_value: Any = data.get("where")
+    places: tuple[str, ...]
+    if isinstance(where_value, str):
+        places = () if where_value == ABOARD_WHERE else (where_value,)
+    else:
+        places = _words(where_value, "where", where)
+        if not places:
+            raise ContentError(
+                f"{where}: `where` must be a place id, a list of them, or {ABOARD_WHERE}."
+            )
+    topics_data: dict[str, Any] = _mapping(data.get("topics") or {}, f"{where}, topics")
+    return CharacterSpec(
+        id=character_id,
+        name=_text(data, "name", where),
+        aliases=_aliases(data.get("aliases"), where),
+        places=places,
+        aboard=where_value == ABOARD_WHERE,
+        desc=_text(data, "desc", where),
+        greeting=_text(data, "greeting", where),
+        suggest=_words(data.get("suggest"), "suggest", where),
+        fallback=_text(data, "fallback", where),
+        topics={
+            key: _topic(key, item, shared, f"{where}, topic {key}")
+            for key, item in topics_data.items()
+        },
+    )
+
+
+def _characters(data: dict[str, Any]) -> dict[str, CharacterSpec]:
+    shared_data: dict[str, Any] = _mapping(
+        data.get("topic_aliases") or {}, f"{CHARACTERS_FILE}, topic_aliases"
+    )
+    shared: dict[str, tuple[str, ...]] = {
+        key: _aliases(value, f"{CHARACTERS_FILE}, topic_aliases, {key}")
+        for key, value in shared_data.items()
+    }
+    characters_data: dict[str, Any] = _mapping(
+        data.get("characters") or {}, f"{CHARACTERS_FILE}, characters"
+    )
+    return {key: _character(key, value, shared) for key, value in characters_data.items()}
+
+
 # --- Checking that it all fits together -----------------------------------------------
 
 
@@ -341,6 +496,30 @@ def _check(content: Content) -> None:
                     f"{where}, route {route.direction}: unknown position {route.to!r}."
                 )
 
+    _check_characters(content)
+
+
+def _check_characters(content: Content) -> None:
+    for character in content.characters.values():
+        where: str = f"{CHARACTERS_FILE}, {character.id}"
+        for place_id in character.places:
+            place: PlaceSpec | None = content.places.get(place_id)
+            if place is None or place.kind != "room" or place.id == LIMBO_ID:
+                raise ContentError(
+                    f"{where}: `where` must be places on land or {ABOARD_WHERE}, not {place_id!r}."
+                )
+        for topic_id in character.suggest:
+            if topic_id not in character.topics:
+                raise ContentError(f"{where}: suggested topic {topic_id!r} isn't one of theirs.")
+        owner: dict[str, str] = {}
+        for topic in character.topics.values():
+            for word in topic.words:
+                if word in owner:
+                    raise ContentError(
+                        f"{where}: {word!r} means both topic {owner[word]!r} and {topic.id!r}."
+                    )
+                owner[word] = topic.id
+
 
 # --- Loading --------------------------------------------------------------------------
 
@@ -359,6 +538,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
     places_data: dict[str, Any] = _read_yaml(directory, PLACES_FILE)
     ship_data: dict[str, Any] = _read_yaml(directory, SHIP_FILE)
     maps_data: dict[str, Any] = _read_yaml(directory, MAPS_FILE)
+    characters_data: dict[str, Any] = _read_yaml(directory, CHARACTERS_FILE)
 
     places: dict[str, PlaceSpec] = {
         key: _place(key, value, PLACES_FILE) for key, value in places_data.items()
@@ -382,6 +562,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         sea_chart=_text(ship_data, "sea_chart", SHIP_FILE),
         ashore_exit=_exit_name(ship_data, "ashore_exit"),
         aboard_exit=_exit_name(ship_data, "aboard_exit"),
+        characters=_characters(characters_data),
     )
     _check(content)
     return content

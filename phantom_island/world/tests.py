@@ -1,5 +1,6 @@
 """
-Tests for the content files, the world builder, the ship, and the Map and Focus panes.
+Tests for the content files, the world builder, the ship, the Map and Focus panes, and
+talking to the characters.
 
 Run from the game directory with `uv run evennia test --settings settings.py .`
 """
@@ -15,23 +16,28 @@ from evennia.utils.test_resources import EvenniaTest
 
 from typeclasses.characters import Character
 from typeclasses.exits import Exit
+from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
 from world.builder import build_world
 from world.content import (
+    CHARACTERS_FILE,
     CONTENT_DIR,
     LIMBO_ID,
     MAPS_FILE,
     PLACES_FILE,
     SHIP_FILE,
+    CharacterSpec,
     Content,
     ContentError,
+    TopicSpec,
     load_content,
     read_content,
 )
+from world.conversation import ask, listeners
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
-from world.places import find_ship_exit
+from world.places import find_inhabitant, find_ship_exit
 from world.ship import ABOARD, ASHORE, moor_ship, normalise_direction, sail
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
@@ -78,7 +84,7 @@ class TestContent(TestCase):
     def _broken_copy(self, file: str, old: str, new: str) -> ContentError:
         """Copy the content files with one change, and return the error reading them gives."""
         with TemporaryDirectory() as tmp:
-            for name in (PLACES_FILE, SHIP_FILE, MAPS_FILE):
+            for name in (PLACES_FILE, SHIP_FILE, MAPS_FILE, CHARACTERS_FILE):
                 text: str = (CONTENT_DIR / name).read_text(encoding="utf-8")
                 if name == file:
                     self.assertIn(old, text)
@@ -99,6 +105,49 @@ class TestContent(TestCase):
     def test_position_off_the_map_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(PLACES_FILE, "[300, 230]", "[3000, 230]")
         self.assertIn("outside", str(error))
+
+    def test_character_in_unknown_place_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(CHARACTERS_FILE, "where: quay", "where: quai")
+        self.assertIn("quai", str(error))
+
+    def test_one_word_for_two_topics_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE, "aliases: [sky, wind]", "aliases: [sky, wind, storm]"
+        )
+        self.assertIn("storm", str(error))
+
+
+class TestCharacterContent(TestCase):
+    """The characters and their topics, without a database."""
+
+    def setUp(self) -> None:
+        self.characters: dict[str, CharacterSpec] = read_content().characters
+
+    def topic_id(self, character_id: str, text: str) -> str | None:
+        found: TopicSpec | None = self.characters[character_id].topic(text)
+        return found.id if found else None
+
+    def test_the_seven_characters(self) -> None:
+        self.assertEqual(
+            set(self.characters),
+            {"fairweather", "barnaby", "crane", "ama", "tui", "jonah", "ship"},
+        )
+        self.assertTrue(self.characters["ship"].aboard)
+        self.assertEqual(self.characters["ship"].places, ())
+        self.assertEqual(self.characters["tui"].places, ("village", "reef"))
+
+    def test_topics_are_found_by_id_alias_and_shared_alias(self) -> None:
+        for text in ("storm", "The Storm?", "great storm", "storm of '75"):
+            self.assertEqual(self.topic_id("barnaby", text), "storm", text)
+        self.assertEqual(self.topic_id("barnaby", "dead reckoning"), "sailing")
+
+    def test_unknown_or_ambiguous_topics_find_nothing(self) -> None:
+        self.assertIsNone(self.topic_id("barnaby", "pirates"))
+        self.assertIsNone(self.topic_id("barnaby", "weather and sailing"))
+
+    def test_the_same_word_means_the_same_topic_for_everyone(self) -> None:
+        for character_id in ("barnaby", "jonah", "ama", "crane", "fairweather"):
+            self.assertEqual(self.topic_id(character_id, "the Halcyon"), "halcyon", character_id)
 
 
 class WorldTest(EvenniaTest):
@@ -339,3 +388,106 @@ class TestMapsAndFocus(WorldTest):
         self.assertNotIn("<b>", render_focus_html("<b>Fort</b>", None))
         self.assertNotIn("<script>", render_focus_html("x", '"><script>'))
         self.assertIsNotNone(find_ship_exit(ABOARD))
+
+
+class TestInhabitants(WorldTest):
+    def test_each_inhabitant_stands_in_its_place(self) -> None:
+        for spec in load_content().characters.values():
+            inhabitant: Any = find_inhabitant(spec.id)
+            if spec.aboard:
+                self.assertIsNone(inhabitant, "the Ship has no object")
+                continue
+            self.assertIsInstance(inhabitant, Inhabitant)
+            self.assertEqual(inhabitant.location, self.rooms[spec.places[0]], spec.id)
+            self.assertEqual(inhabitant.key, spec.name)
+
+    def test_rooms_list_their_inhabitants(self) -> None:
+        self.char1.move_to(self.rooms["quay"], quiet=True)
+        self.assertIn("Old Barnaby", self.rooms["quay"].return_appearance(self.char1))
+
+    def test_rebuilding_keeps_the_inhabitants(self) -> None:
+        barnaby: Any = find_inhabitant("barnaby")
+        build_world(limbo=self.room1)
+        self.assertEqual(find_inhabitant("barnaby"), barnaby)
+        self.assertEqual(len(barnaby.location.contents_get(content_type="character")), 1)
+
+    def test_inhabitants_cannot_be_picked_up(self) -> None:
+        barnaby: Any = find_inhabitant("barnaby")
+        self.assertFalse(barnaby.access(self.char1, "get"))
+
+
+class TestAsk(WorldTest):
+    def at(self, place_id: str) -> None:
+        self.char1.move_to(self.rooms[place_id], quiet=True)
+        self.char2.move_to(self.rooms[place_id], quiet=True)
+
+    def ask(self, text: str) -> str:
+        """What char1 reads after `ask <text>`."""
+        with patch.object(self.char1, "msg") as mock_msg:
+            ask(self.char1, text)
+        return texts(mock_msg)
+
+    def test_a_topic_gives_its_reply(self) -> None:
+        self.at("quay")
+        heard: str = self.ask("barnaby about the storm")
+        self.assertIn("You ask Old Barnaby about the storm.", heard)
+        self.assertIn('Old Barnaby says: "Worst I ever saw.', heard)
+
+    def test_ask_without_about_works_too(self) -> None:
+        self.at("quay")
+        self.assertIn("Worst I ever saw", self.ask("old barnaby storm"))
+
+    def test_an_unknown_topic_gives_the_fallback_and_suggestions(self) -> None:
+        self.at("quay")
+        heard: str = self.ask("barnaby about pirates")
+        self.assertIn("Can't say I know aught", heard)
+        self.assertIn("You could ask Old Barnaby about", heard)
+
+    def test_asking_with_no_topic_greets_and_suggests(self) -> None:
+        self.at("market")
+        heard: str = self.ask("crane")
+        self.assertIn("honestly come by", heard)
+        self.assertIn("ask crane about compass", heard)
+
+    def test_with_one_person_here_the_name_can_be_left_out(self) -> None:
+        self.at("quay")
+        self.assertIn("Worst I ever saw", self.ask("about storm"))
+
+    def test_with_two_people_here_ask_who(self) -> None:
+        self.at("village")
+        heard: str = self.ask("about goats")
+        self.assertIn("Who do you want to ask?", heard)
+        self.assertIn("Elder Ama", heard)
+        self.assertIn("Tui", heard)
+
+    def test_hidden_truths_wait_for_stage_a4(self) -> None:
+        self.at("market")
+        self.assertIn("Found it on a", self.ask("crane about compass"))
+
+    def test_others_in_the_room_hear_the_conversation(self) -> None:
+        self.at("quay")
+        with patch.object(self.char2, "msg") as mock_msg:
+            ask(self.char1, "barnaby about weather")
+        heard: str = texts(mock_msg)
+        self.assertIn(f"{self.char1.key} asks Old Barnaby about weather.", heard)
+        self.assertIn("Red sky at night", heard)
+
+    def test_nobody_by_that_name(self) -> None:
+        self.at("quay")
+        self.assertIn("There's nobody called 'crane' here", self.ask("crane about compass"))
+
+    def test_the_ship_answers_on_deck_and_in_the_cabin(self) -> None:
+        for place_id in ("deck", "cabin"):
+            self.at(place_id)
+            self.assertIn("15 degrees every hour", self.ask("ship about longitude"), place_id)
+
+    def test_the_ship_is_silent_ashore(self) -> None:
+        self.at("quay")
+        self.assertIn("can only hear you when you're aboard", self.ask("ship about longitude"))
+        self.assertNotIn("the Ship", [listener.spec.name for listener in listeners(self.char1)])
+
+    def test_the_ask_command_is_available(self) -> None:
+        self.at("quay")
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("ask barnaby about compass")
+        self.assertIn("waving that compass", texts(mock_msg))

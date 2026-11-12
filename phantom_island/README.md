@@ -68,6 +68,28 @@ placeholder card for now). The map switches between the port plan, the *Halcyon*
 
 In stage A1 nothing is gated yet: you can sail straight to the island.
 
+## Playing stage A2
+
+The characters of the story stand in their places, and rooms list them under
+"Characters". Talk to them with `ask`:
+
+- `ask barnaby` greets Old Barnaby, who suggests a few topics;
+- `ask barnaby about the storm` asks about one (`ask barnaby storm` works too). Words in
+  white in an answer are worth asking about next; unknown topics get a polite "don't know";
+- with only one person in the room, the name can be left out: `ask about storm`;
+- aboard, on the Deck or in the Cabin, `ask ship about longitude` asks the Ship herself;
+- everyone in the room hears the conversation.
+
+Who is where (as admin, `teleport Village` and so on gets you there quickly): Mrs. Fairweather in
+the Society Office, Old Barnaby on the Quay, Silas Crane in the Market, Elder Ama and Tui
+in the Village, Jonah Pike at the Boat Cove.
+
+What they say is in [world/content/characters.yaml](world/content/characters.yaml)
+(spoilers!). After editing replies, `reload` is enough; after adding characters or
+changing where they stand, also `batchcode build`. In A2 everyone gives their first
+answer: Crane doesn't admit the truth yet, and Ama doesn't wait for respect. Those come
+with the clues and conditions in A3 and A4.
+
 ## How it fits together
 
 | Part | Files |
@@ -78,6 +100,7 @@ In stage A1 nothing is gated yet: you can sail straight to the island.
 | Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
 | Map and Focus panes, `map` command | `world/maps.py`, `world/focus.py`, `commands/explore.py` |
+| Characters and `ask` | `world/content/characters.yaml`, `typeclasses/inhabitants.py`, `world/conversation.py`, `commands/talk.py` |
 | Web client | `web/templates/webclient/webclient.html`, `web/static/webclient/js/plugins/`, `web/static/phantom_island/` (pane styles, map pictures) |
 
 When you change `panes.css` or `panes.js`, bump `ASSET_VERSION` in `webclient.html`; otherwise
@@ -102,4 +125,7 @@ Ruff runs from the repository root and covers all games.
 
 Stage A1 (island skeleton): 12 places plus the Limbo prologue, the ship with `sail`, and the
 Map and Focus panes with placeholder pictures. Tests check that every place can be reached and
-that two players aboard see each other. Next: A2, scripted inhabitants.
+that two players aboard see each other.
+
+Stage A2 (scripted inhabitants): six inhabitants and the Ship, 41 scripted topics, and the
+`ask` command. Next: A3, discovery and the shared journal.
