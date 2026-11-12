@@ -40,7 +40,7 @@ from world.content import (
     read_content,
 )
 from world.conversation import ask, listeners
-from world.discovery import return_things_home
+from world.discovery import return_stray_things, return_things_home
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
@@ -686,6 +686,33 @@ class TestThings(DiscoveryTest):
         self.at(self.char1, "hilltop")
         return_things_home(self.char1)
         self.assertEqual(self.thing("chart").location, self.rooms["cabin"])
+
+    def test_things_held_by_someone_nobody_plays_go_home(self) -> None:
+        # char1 has a session in EvenniaTest, char2 has none (as after a server restart).
+        self.assertTrue(self.char1.sessions.count())
+        self.assertFalse(self.char2.sessions.count())
+        self.thing("chart").move_to(self.char1, quiet=True)
+        self.thing("plant_guide").move_to(self.char2, quiet=True)
+        build_world(limbo=self.room1)
+        self.assertEqual(self.thing("chart").location, self.char1)
+        self.assertEqual(self.thing("plant_guide").location, self.rooms["cabin"])
+        self.thing("animal_guide").move_to(self.char2, quiet=True)
+        self.assertEqual(return_stray_things(), [self.thing("animal_guide")])
+        self.assertEqual(self.thing("animal_guide").location, self.rooms["cabin"])
+
+    def test_looking_at_a_thing_shows_its_card_until_looking_around(self) -> None:
+        self.at(self.char1, "market")
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("look compass")
+        focus: list[str] = [
+            c.kwargs["focus"] for c in mock_msg.call_args_list if "focus" in c.kwargs
+        ]
+        self.assertEqual(len(focus), 1)
+        self.assertIn("Brass compass", focus[0])
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("look")
+        focus = [c.kwargs["focus"] for c in mock_msg.call_args_list if "focus" in c.kwargs]
+        self.assertIn("Market", focus[-1])
 
 
 class TestLookingAndTheJournal(DiscoveryTest):

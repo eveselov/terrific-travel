@@ -24,7 +24,6 @@ from evennia.utils import logger
 from evennia.utils.create import create_object
 from evennia.utils.search import search_object, search_tag
 
-from typeclasses.characters import Character
 from typeclasses.exits import Exit
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
@@ -38,6 +37,7 @@ from world.content import (
     ThingSpec,
     reload_content,
 )
+from world.discovery import carried_by_a_player
 from world.expedition import current_position
 from world.maps import MAP_TAG_CATEGORY
 from world.places import (
@@ -157,7 +157,10 @@ def place_inhabitants(content: Content, rooms: dict[str, Room]) -> int:
 
 
 def _place_thing(spec: ThingSpec, rooms: dict[str, Room]) -> Thing:
-    """Make or update one thing. It goes back to its place unless a player is carrying it."""
+    """
+    Make or update one thing. It goes back to its place unless someone playing right now is
+    carrying it (a character whose player has left doesn't keep it).
+    """
     home: Room = rooms[spec.where]
     found: Any = find_thing(spec.id)
     thing: Thing
@@ -174,7 +177,7 @@ def _place_thing(spec: ThingSpec, rooms: dict[str, Room]) -> Thing:
     thing.home = home
     thing.locks.add("get:true()" if spec.portable else "get:false()")
     thing.db.get_err_msg = spec.stays or f"The {spec.name} stays where it is."
-    if not isinstance(thing.location, Character) and thing.location != home:
+    if thing.location != home and not carried_by_a_player(thing):
         thing.move_to(home, quiet=True, move_type="teleport")
     return thing
 

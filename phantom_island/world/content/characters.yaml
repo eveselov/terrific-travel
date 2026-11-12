@@ -89,7 +89,7 @@ characters:
         reply: >
           "This is the Halcyon's chart. The island is drawn here, with its latitude and
           longitude written beside it. Her master was a careful man; I have never had
-          reason to doubt it."
+          reason to doubt it. A fair copy is waiting for you in the ship's cabin."
       letter:
         aliases: [last letter]
         stance: truth
@@ -433,7 +433,7 @@ characters:
           When sailors trust their latitude but not their longitude, they sail along the
           latitude until they find land. It's called latitude sailing."
       birds:
-        aliases: [seabirds, terns, noddies]
+        aliases: [seabirds, terns, noddies, sky]
         stance: truth
         reply: >
           "Watch the sky at dusk. Terns and noddies fish at sea all day and fly home to land

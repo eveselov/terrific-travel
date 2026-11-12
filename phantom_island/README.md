@@ -114,7 +114,10 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
   sextant, the chronometer, the *Halcyon*'s chart and two guide books. `get` and `drop`
   the portable ones. Carrying a book or the chart shows more of what you look at: the plant
   guide in the Village and at the Spring, the animal guide on the Beach, the chart on the
-  Hilltop. Carried things go back to their place when their carrier leaves the game.
+  Hilltop. Carried things go back to their place when their carrier leaves the game, and
+  also when the server starts cold or on `batchcode build`, if their carrier isn't being played.
+- Looking at a thing or a detail shows a card with its name in the Focus pane; a plain
+  `look` or moving on brings back the room's picture.
 - `read <thing>` and `use <thing>` are heard by the whole room. The longitude puzzle: at sea,
   `use sextant` on the Deck (the noon sight), then `read chronometer` in the Cabin. One
   player can do each.

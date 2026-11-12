@@ -59,8 +59,14 @@ def at_server_cold_start() -> None:
     """
     This is called only when the server starts "cold", i.e. after a
     shutdown or a reset.
+
+    Nobody is connected yet, so things still carried by a character (whose player was in
+    the game when the server stopped) go back to their places. Not on a reload: players
+    stay connected through one.
     """
-    pass
+    from world.discovery import return_stray_things
+
+    return_stray_things()
 
 
 def at_server_cold_stop() -> None:

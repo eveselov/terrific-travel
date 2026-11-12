@@ -144,23 +144,25 @@ what gets revealed.
 
 ## Clues (the authoritative table)
 
-Any player can find any clue. The "Needs" column says what it takes.
+Any player can find any clue. The "Needs" column says what it takes. Where it is built
+(stage A3), each clue lives in the content files under `world/content/` (`clue: C<n>`); the
+journal lines are in `clues.yaml`. "(A4)" marks a condition that is designed but not built yet.
 
 | ID | Clue | Found by | Needs | Shows |
 |---|---|---|---|---|
-| C1 | Compass engraved HALCYON | Market | — | The ship didn't vanish without a trace |
-| C2 | Coral crust in the compass hinge | examine compass | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
-| C3 | "From fishermen who came from the west" | Crane | C2 | Direction to search |
-| C4 | Empty sea at the charted position | Deck, at sea | — | The chart is wrong |
-| C5 | Latitude right, longitude wrong | noon sight + chronometer | sextant, chronometer | *Why* the chart is wrong |
-| C6 | Birds flying west at dusk | Deck, at sea | evening | Land is to the west |
-| C7 | Ship's ribs and cannon on the reef | Western Reef | low tide | Where she wrecked |
-| C8 | Oak timbers in a village hut | Village | plant guide, or a close look | Ship wood was reused, so the crew survived to build |
-| C9 | Goats and onions | Beach, Spring | animal and plant guides | Europeans lived here for a while |
-| C10 | Coastline matches the chart's shape | Hilltop | the chart | This *is* the charted island, just misplaced |
-| C11 | Tui's song about the winged canoe | Tui | — | The crew built a boat and left |
-| C12 | Elder's account of the rescue | Elder Ama | showing respect | Nobody died; the crew lived here |
-| C13 | Jonah Pike's story | Boat Cove | C7 + C12 | Confirms everything; the boat sailed west |
+| C1 | Compass engraved HALCYON | `look compass`, Market | — | The ship didn't vanish without a trace |
+| C2 | Coral crust in the compass hinge | `examine compass`, Market | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
+| C3 | "From fishermen who came from the west" | `ask crane` about the compass (or the fishermen) | C2 in the journal (he lies until then) | Direction to search |
+| C4 | Empty sea at the charted position | Deck, on arriving at the charted position | — | The chart is wrong |
+| C5 | Latitude right, longitude wrong | `use sextant` on the Deck (the noon sight, a flag for the expedition), then `read chronometer` in the Cabin; at the charted position or at the island | the sight first; two players can share the steps. Noon (A4) | *Why* the chart is wrong |
+| C6 | Birds flying west at dusk | `look sky` on the Deck, charted position | dusk (A4) | Land is to the west |
+| C7 | Ship's ribs and cannon on the reef | `look bones` at the Western Reef | low tide (A4) | Where she wrecked |
+| C8 | Oak timbers in a village hut | `look beams` in the Village | carrying the plant guide, or `examine beams` | Ship wood was reused, so the crew survived to build |
+| C9 | Goats and onions | `look goats` on the Beach, or `look shoots` at the Spring | the animal guide (goats) or the plant guide (onions): either one is enough | Europeans lived here for a while |
+| C10 | Coastline matches the chart's shape | `look coastline` on the Hilltop | carrying the *Halcyon*'s chart (from the Cabin) | This *is* the charted island, just misplaced |
+| C11 | Tui's song about the winged canoe | `ask tui` about the song | — | The crew built a boat and left |
+| C12 | Elder's account of the rescue | `ask ama` | showing respect (A4: not findable in A3) | Nobody died; the crew lived here |
+| C13 | Jonah Pike's story | `ask jonah` at the Boat Cove (about the halcyon, the wreck, the boat or the crew) | C7 + C12 (A4: free in A3) | Confirms everything; the boat sailed west |
 
 **Report needs:** wreck site = C7; why not found = C4 + C5 (or C10); crew = C12 or C13, plus
 C11 or C8. Several paths reach each answer, so players can find things in different orders.

@@ -1,5 +1,6 @@
 """
-The web client's Focus pane: the current room's picture (later also things being examined).
+The web client's Focus pane: the current room's picture, or a card for the thing or detail
+being looked at (`look compass`) until the player looks around or moves on.
 
 A place with an `image` in the content files shows that picture. Without one, the pane shows
 a placeholder card with the place's name, so every place has something there in stage A1.

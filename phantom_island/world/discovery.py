@@ -30,6 +30,8 @@ from world.content import (
     match_words,
 )
 from world.expedition import current_position, get_expedition
+from world.focus import render_focus_html
+from world.places import all_things
 
 VERBS: tuple[str, ...] = ("read", "use")
 
@@ -73,13 +75,18 @@ def location_details(caller: Any) -> list[LookSpec]:
     return details
 
 
-def show_look(caller: Any, look: LookSpec, close: bool) -> None:
-    """Show a detail or thing to the caller, and write any clue it reveals into the journal."""
+def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:
+    """
+    Show a detail or thing to the caller, and write any clue it reveals into the journal.
+    The Focus pane shows a card with its `title` (DECISIONS.md, 16: whatever is being
+    examined) until the caller looks around or moves on.
+    """
     first: Reveal = look.close if close and look.close is not None else look.desc
     carried: set[str] = carried_ids(caller)
     reveals: list[Reveal] = [first]
     reveals.extend(extra for thing_id, extra in look.extras.items() if thing_id in carried)
     caller.msg("\n\n".join(show_marks(reveal.text) for reveal in reveals))
+    caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], None))
     discover_all([reveal.clue for reveal in reveals], caller)
 
 
@@ -92,11 +99,11 @@ def look_at(caller: Any, text: str, close: bool = False) -> bool:
     """
     thing: Thing | None = find_thing_at_hand(caller, text)
     if thing is not None and thing.spec is not None:
-        show_look(caller, thing.spec.look, close)
+        show_look(caller, thing.spec.look, close, thing.spec.name)
         return True
     detail: LookSpec | None = find_look(text, location_details(caller))
     if detail is not None:
-        show_look(caller, detail, close)
+        show_look(caller, detail, close, detail.id)
         return True
     return False
 
@@ -165,4 +172,29 @@ def return_things_home(character: Any) -> list[Thing]:
         if isinstance(obj, Thing) and obj.home is not None:
             obj.move_to(obj.home, quiet=True, move_type="teleport")
             returned.append(obj)
+    return returned
+
+
+def carried_by_a_player(thing: Thing) -> bool:
+    """True if the thing is in the hands of a character someone is playing right now."""
+    carrier: Any = thing.location
+    if carrier is None or isinstance(carrier, Room):
+        return False
+    return bool(carrier.sessions.count())
+
+
+def return_stray_things() -> list[Thing]:
+    """
+    Put back every thing carried by a character nobody is playing: one whose player left
+    while the server was down, or who never logged out properly (DECISIONS.md, 6b: no dead
+    ends). Returns the things moved.
+    """
+    returned: list[Thing] = []
+    for thing in all_things():
+        if not isinstance(thing, Thing) or thing.home is None:
+            continue
+        if isinstance(thing.location, Room) or carried_by_a_player(thing):
+            continue
+        thing.move_to(thing.home, quiet=True, move_type="teleport")
+        returned.append(thing)
     return returned

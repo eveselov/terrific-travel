@@ -1,7 +1,10 @@
 """Commands for discovering things: looking, examining, reading, using, and the journal."""
 
+from typing import Any
+
 from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
+from typeclasses.rooms import Room
 from world.clues import journal_text
 from world.discovery import act, look_at, notice_surroundings
 
@@ -32,6 +35,9 @@ class CmdLook(DefaultCmdLook):
             return
         super().func()
         if not self.args.strip():
+            location: Any = self.caller.location
+            if isinstance(location, Room):  # back from a thing's card to the room's picture
+                location.send_visuals(self.caller)
             notice_surroundings(self.caller)
 
 
