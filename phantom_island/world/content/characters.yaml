@@ -1,0 +1,443 @@
+# The characters of Phantom Island and what they say: `ask <character> about <topic>`.
+#
+# SPOILERS: this file holds the solution of the mystery. Don't show it to the players.
+#
+# Draft for stage A2. Only `reply` is used in A2. `stance`, `clue`, `needs` and the `truth`
+# variants are written down now so the format doesn't change in A3 (clues and journal) and
+# A4 (conditions), and so the AI characters of phase B know what each character may reveal.
+#
+# Topic words in replies are marked |wlike this|n (white), so players see what else to ask.
+#
+# topic_aliases: words that mean the same topic whoever you ask. They apply to every
+# character who has a topic with that id; a topic can add its own `aliases` too.
+#
+# Each character has:
+#   name      shown to players
+#   aliases   other words players can use for them (`ask barnaby`, `ask sailor`)
+#   where     a place id from places.yaml, a list of them (the character moves between
+#             them, from A4), or `aboard` (the Deck and the Cabin)
+#   desc      what players read when they look at them
+#   greeting  the reply to `ask <character>` with no topic; the `suggest` topics follow it
+#   suggest   topics offered to players who don't know what to ask
+#   fallback  the polite reply for any topic the character doesn't know
+#   topics    topic id: what they say about it
+#
+# Each topic has:
+#   reply     what the character says
+#   aliases   optional: other words for this topic, for this character only
+#   stance    truth (what they say is true), mistaken (they believe it, but it's wrong),
+#             hiding (they know better and don't say)
+#   clue      optional: the clue (C1..C13, see GAME_STORY.md) this reply reveals (A3)
+#   truth     optional, for what a character hides: the reply given once `needs` holds (A4)
+#     needs   clue ids, or flags such as `respect` (set by things players do)
+#     reply   what they say then
+#     clue    the clue that reply reveals
+
+topic_aliases:
+  halcyon: [the halcyon, ship halcyon, lost ship]
+  compass: [brass compass, halcyon compass]
+  island: [the island, phantom island]
+  storm: [great storm, the storm, storm of 75]
+  crew: [sailors, survivors, the crew]
+  chart: [map, old chart, the chart]
+  reef: [western reef, the reef]
+
+characters:
+  # --- The port -------------------------------------------------------------------------
+
+  fairweather:
+    name: Mrs. Fairweather
+    aliases: [fairweather, patron, mrs fairweather]
+    where: office
+    desc: >
+      The patron of the Society: a tall woman in a grey coat, with ink on her fingers and
+      a pile of papers she keeps straightening.
+    greeting: >
+      "Ah, you've come. Sit down. There is a great deal to tell, and very little of it is
+      certain."
+    suggest: [mission, halcyon, chart, letter]
+    fallback: >
+      Mrs. Fairweather frowns politely. "I'm afraid that is outside my knowledge. The
+      Society deals in charts and letters, not gossip."
+    topics:
+      mission:
+        aliases: [expedition, job, task]
+        stance: truth
+        reply: >
+          "The Society wants the truth about the |wHalcyon|n. Fifteen years of rumours, and
+          now a |wcompass|n with her name on it turns up in our own market. Look at it first.
+          Then sail to the island on her |wchart|n and see what is left to find."
+      halcyon:
+        stance: truth
+        reply: >
+          "She sailed from this harbour in 1775 to chart a small island far out in the
+          ocean. A sound ship with a careful master. Her last |wletter|n reached us, and then
+          nothing. Not a plank, not a word."
+      chart:
+        stance: mistaken
+        reply: >
+          "This is the Halcyon's chart. The island is drawn here, with its latitude and
+          longitude written beside it. Her master was a careful man; I have never had
+          reason to doubt it."
+      letter:
+        aliases: [last letter]
+        stance: truth
+        reply: >
+          She reads aloud: "'We have found the island and fixed its position. Good water,
+          fair weather, friendly people. We sail again soon.' That was the last word we
+          ever had."
+      society:
+        aliases: [the society]
+        stance: truth
+        reply: >
+          "Our members collect charts, journals and specimens from every voyage they can.
+          A map is only as good as the people who made it, so we like to check."
+
+  barnaby:
+    name: Old Barnaby
+    aliases: [barnaby, sailor, old sailor]
+    where: quay
+    desc: >
+      A retired sailor with a white beard and a pipe that has gone out, sitting on a coil
+      of rope as if he owns the quay.
+    greeting: >
+      Barnaby squints at you. "Sit down if you've a mind to. I've time, and stories."
+    suggest: [halcyon, storm, weather, sailing]
+    fallback: >
+      Barnaby scratches his beard. "Can't say I know aught about that. Ask me about wind
+      and water, though."
+    topics:
+      halcyon:
+        stance: mistaken
+        reply: >
+          "The Halcyon? Went down in |wthe great storm|n of '75, all hands. I was at sea
+          that season myself. No ship could have lived through that."
+      storm:
+        stance: truth
+        reply: >
+          "Worst I ever saw. Three days of wind out of the west, and seas like hills. If
+          the Halcyon was anywhere near that island, she's on the bottom, mark my words."
+      weather:
+        aliases: [sky, wind]
+        stance: truth
+        reply: >
+          "Red sky at night, sailor's delight. Red sky in the morning, sailor's warning.
+          And mackerel sky and mares' tails make tall ships carry low sails. Learn those
+          and you'll live long at sea."
+      sailing:
+        aliases: [navigation, ship, dead reckoning]
+        stance: truth
+        reply: >
+          "In my day we found our way with a compass, a log line and a good guess. Dead
+          reckoning, it's called. North and south you could trust from the noon sun. East
+          and west was guesswork. Your ship has one of those new sea clocks below, I hear.
+          Never trusted 'em myself."
+      compass:
+        stance: mistaken
+        reply: >
+          "Crane's been waving that compass at everyone. Washed out of the wreck, I'd say,
+          and up on some beach. Ask him where he got it, if you can get a straight answer."
+
+  crane:
+    name: Silas Crane
+    aliases: [crane, silas, trader]
+    where: market
+    desc: >
+      A trader in a coat too warm for the weather, standing behind a stall of pots, cloth,
+      knives and curiosities. His eyes follow your hands.
+    greeting: >
+      Crane spreads his arms over his stall. "Everything on this table is honestly come by.
+      What can I do for you?"
+    suggest: [compass, trade, halcyon]
+    fallback: >
+      Crane shrugs. "Not my line of business, friend."
+    topics:
+      compass:
+        stance: hiding
+        reply: >
+          "Found it on a |wbeach|n, I did, washed up after a storm. A lucky find. Lucky for
+          whoever buys it, too."
+        truth:
+          needs: [C2]
+          clue: C3
+          reply: >
+            Crane looks at the coral in the hinge and sighs. "All right. I didn't find it.
+            I traded for it with |wfishermen|n who sailed in from the west, a long way out.
+            I kept quiet because people would call me a wreck looter. I'm not. I paid fair."
+      beach:
+        stance: hiding
+        reply: >
+          "Which beach? Oh, one down the coast. Can't remember which. They all look the
+          same, beaches."
+      fishermen:
+        aliases: [fisherman, west]
+        stance: hiding
+        reply: >
+          "Fishermen? I deal with all sorts. Couldn't tell one from another."
+        truth:
+          needs: [C2]
+          clue: C3
+          reply: >
+            "They came in a big canoe with an outrigger, from many days' sailing to the
+            west. They didn't care for brass. They wanted iron nails, and they knew a good
+            trade when they saw one."
+      halcyon:
+        stance: truth
+        reply: >
+          "Never knew her. Before my time in this port. But a name like that on a compass
+          sells, I can tell you."
+      trade:
+        aliases: [stall, price, buy, sell]
+        stance: truth
+        reply: >
+          "Pots, cloth, knives, a bit of everything. Everything's for sale at the right
+          price. Well, nearly everything."
+
+  # --- The island -----------------------------------------------------------------------
+
+  ama:
+    name: Elder Ama
+    aliases: [ama, elder]
+    where: village
+    desc: >
+      An old woman sitting in the shade of a hut, weaving a fishing net with quick, sure
+      fingers. Everyone who passes greets her first.
+    greeting: >
+      The elder looks at you for a long moment. "Strangers from the sea, again. Sit with
+      me."
+    suggest: [village, island, reef, halcyon]
+    fallback: >
+      Elder Ama keeps weaving. "That is not something I can tell you about."
+    topics:
+      village:
+        aliases: [people, home]
+        stance: truth
+        reply: >
+          "Our people have lived here for more generations than I can count on my fingers
+          and toes. The lagoon gives us fish, the forest gives us wood, and the |wreef|n
+          keeps the big waves away."
+      island:
+        stance: truth
+        reply: >
+          "It is small, but it has all we need. Water at the spring, gardens, the forest.
+          Climb the hill and you will see all of it at once."
+      reef:
+        # A4 idea: asking about the reef before going there counts as respect.
+        stance: truth
+        reply: >
+          "The western reef keeps old things. Go only at low tide, and walk carefully.
+          It is good that you asked before going."
+      halcyon:
+        aliases: [ship, strangers, wreck]
+        stance: hiding
+        reply: >
+          "Many things come from the sea. Some are fish, some are stories. Not every story
+          is for the first day."
+        truth:
+          needs: [respect]
+          clue: C12
+          reply: >
+            "Fifteen winters ago a great storm threw a ship onto the western reef. Our
+            people paddled out into the storm and brought every one of them ashore, alive.
+            They lived with us for a season. They ate our food and learned our songs. Then
+            most of them went away again."
+      crew:
+        stance: hiding
+        reply: >
+          "Ask me again when we know each other better."
+        truth:
+          needs: [respect]
+          clue: C12
+          reply: >
+            "They built a boat at the |wcove|n, with wood from their broken ship and rope
+            from our trees. One of them stayed. He still lives among us."
+
+  tui:
+    name: Tui
+    aliases: [child, kid]
+    where: [village, reef]
+    desc: >
+      A child of about ten, barefoot, with a little bag on a string around the neck that
+      clinks when Tui moves.
+    greeting: >
+      "Hello! Are you from a ship? Do you want to see my |wbuttons|n?"
+    suggest: [buttons, bones, song]
+    fallback: >
+      Tui shrugs. "Don't know. Do you want to hear my |wsong|n instead?"
+    topics:
+      buttons:
+        aliases: [bag, shiny]
+        stance: truth
+        reply: >
+          Tui tips out a handful of brass buttons. "Shiny ones! I find them out by the
+          |wbig bones|n, and Grandmother has old ones in her basket. Look, this one has a
+          little anchor on it."
+      bones:
+        aliases: [big bones, monster, reef]
+        stance: truth
+        reply: >
+          "At low tide you can walk out to the big bones on the reef. They're huge, bigger
+          than a whale! My cousin says a sea monster died there. I don't think so. Monsters
+          don't have nails in them."
+      song:
+        stance: truth
+        clue: C11
+        reply: >
+          Tui sings:
+
+          "People came out of the sea,
+           their big canoe broke on the reef.
+           They made a new canoe with a white wing
+           and flew away to where the sun goes to sleep."
+      goats:
+        aliases: [goat]
+        stance: truth
+        reply: >
+          "The goats? They came with the sea people, Grandmother says. They eat
+          everything! Even my hat, once."
+      jonah:
+        aliases: [pike, carpenter, cove]
+        stance: truth
+        reply: >
+          "Old Jonah lives by the |wcove|n. He makes boats, and he talks funny, like you.
+          He's nice. He made me a whistle."
+
+  jonah:
+    name: Jonah Pike
+    aliases: [jonah, pike, carpenter]
+    where: cove
+    desc: >
+      A weathered man with grey hair tied back, shaping a plank with an adze. He dresses
+      like the islanders, but his face is sunburnt the way only a sailor's gets.
+    greeting: >
+      He puts down his adze. "Well. I wondered if anyone would ever come looking."
+    suggest: [halcyon, wreck, boat, crew]
+    fallback: >
+      Jonah rubs his chin. "Fifteen years here, and I've forgotten more about that than
+      I ever knew."
+    topics:
+      halcyon:
+        stance: truth
+        clue: C13
+        reply: >
+          "I was her carpenter. Jonah Pike. We found this island, fixed its place on the
+          |wchart|n, or thought we had, and anchored off the west side. Then the storm came."
+      wreck:
+        aliases: [reef, storm, great storm, sinking]
+        stance: truth
+        clue: C13
+        reply: >
+          "Wind out of the west, and the anchors dragged. She struck the reef in the night.
+          If the islanders hadn't come out in their canoes, we'd all have drowned. Not one
+          of us was lost."
+      boat:
+        aliases: [canoe, white wing]
+        stance: truth
+        clue: C13
+        reply: >
+          "We built her right here, from the Halcyon's own oak, with rope from island
+          fibre and a sail of patched canvas. A white wing, the children call it."
+      crew:
+        aliases: [west, the others]
+        stance: truth
+        clue: C13
+        reply: >
+          "Most of them sailed west in her, to reach the trading routes. I never heard
+          what became of them. I stayed. I'd married by then, and this was home."
+      chart:
+        aliases: [longitude, position]
+        stance: truth
+        reply: >
+          "Our master swore by his longitude. But we had no sea clock, only dead reckoning
+          and his moon tables, and we'd been months at sea. If anyone ever came looking,
+          I always thought they'd look in the wrong place."
+      compass:
+        stance: truth
+        reply: >
+          "We gave it to the fisherman's family who pulled us out of the water. A small
+          thanks for a big thing. Funny, the old compass finding its way home before me."
+
+  # --- The ship -------------------------------------------------------------------------
+
+  ship:
+    # The name is the kids' to choose (GAME_STORY.md, questions for the kids).
+    name: the Ship
+    aliases: [ship, boat]
+    where: aboard
+    desc: >
+      You can't look at the Ship: you're standing on her. But sometimes her timbers creak
+      in a way that sounds almost like a voice.
+    greeting: >
+      The timbers creak, and somehow it sounds like a voice. "You called? Ask me about
+      the sea, the sky, or the instruments below."
+    suggest: [sextant, chronometer, latitude, longitude, birds, help]
+    fallback: >
+      The Ship creaks thoughtfully. "That's beyond what a ship knows. Try me on
+      navigation, or on the sea and the sky."
+    topics:
+      sextant:
+        stance: truth
+        reply: >
+          "The sextant measures how high the sun stands above the horizon. At noon the sun
+          is at its highest. Measure it then, on the Deck, look the height up in the
+          tables, and you have your |wlatitude|n."
+      chronometer:
+        aliases: [clock, sea clock]
+        stance: truth
+        reply: >
+          "My chronometer keeps the time of our home port, all voyage long. Mr Harrison
+          proved that such clocks can work at sea, but they're new and costly, and few
+          ships carry one. Compare it with noon wherever we are, and you'll know your
+          |wlongitude|n."
+      latitude:
+        stance: truth
+        reply: >
+          "Latitude is how far north or south you are. The higher the noon sun stands, the
+          nearer you are to the equator. Sailors have measured it well for centuries."
+      longitude:
+        stance: truth
+        reply: >
+          "Longitude is how far east or west you are, and it's hard. The Earth turns a
+          full circle in a day, 15 degrees every hour. So every 4 minutes between noon at
+          home, on my chronometer, and noon here is one degree. Without a good clock,
+          longitude is a guess."
+      chart:
+        stance: truth
+        reply: >
+          "The Halcyon's chart marks the island here. If it isn't where the chart says,
+          ask yourself which part of the chart to trust: north and south, or east and west?
+          When sailors trust their latitude but not their longitude, they sail along the
+          latitude until they find land. It's called latitude sailing."
+      birds:
+        aliases: [seabirds, terns, noddies]
+        stance: truth
+        reply: >
+          "Watch the sky at dusk. Terns and noddies fish at sea all day and fly home to land
+          for the night. Follow them with your eyes, and you'll know where land is.
+          Island navigators have done it for a very long time."
+      tide:
+        aliases: [tides, low tide, high tide]
+        stance: truth
+        reply: >
+          "The sea rises and falls about twice a day, a little later each day. At low tide
+          a reef can stand clear of the water. At high tide it's hidden, and dangerous."
+      water:
+        aliases: [casks, drink]
+        stance: truth
+        reply: >
+          "Fresh water is life at sea. Every day at sea we drink from the casks in the
+          Cabin. Find a spring ashore and you can fill them again."
+      help:
+        # A4: hints that get more direct while the players are stuck (DECISIONS.md, 6b).
+        aliases: [hint, stuck]
+        stance: truth
+        reply: >
+          "Look closely at things, read what's in the Cabin, and ask people questions.
+          People don't always tell the truth, so compare what they say. And if something
+          puzzles you, ask me about it."
+      name:
+        aliases: [yourself, you]
+        stance: truth
+        reply: >
+          "My name? That's for my crew to decide. Choose well; I'll be wearing it for a
+          long time."
