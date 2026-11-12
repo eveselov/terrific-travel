@@ -63,7 +63,12 @@ Office. From there:
 - `map` describes the current map in words (for telnet) and redraws the Map pane.
 
 The web client has three panes: Main (the text), **Map** and **Focus** (the room's picture, a
-placeholder card for now). The map switches between the port plan, the *Halcyon*'s sea chart
+placeholder card for now). Main shows each command you type in light green after a divider
+line, so the log reads as one section per command (login lines with a password aren't shown;
+telnet clients show what you type themselves). Another player's turns (what they ask, say,
+read or do, their comings and goings) start with a fainter dotted line and a muted first
+line, so they sit between your own sections without looking like them. The server tags
+those messages (`Character.msg`, and a turn count in `server/conf/inputfuncs.py`). The map switches between the port plan, the *Halcyon*'s sea chart
 (with the ship's track) and the island map. Everything in Map and Focus is also in the text.
 
 In stage A1 nothing is gated yet: you can sail straight to the island.
@@ -76,7 +81,12 @@ The characters of the story stand in their places, and rooms list them under
 - `ask barnaby` greets Old Barnaby, who suggests a few topics;
 - `ask barnaby about the storm` asks about one (`ask barnaby storm` works too). Words in
   white in an answer are worth asking about next; unknown topics get a polite "don't know";
-- with only one person in the room, the name can be left out: `ask about storm`;
+- with only one person in the room, the name can be left out: `ask about storm`, or just
+  `ask storm`. With several, the game asks whom you mean;
+- one topic at a time: `ask fairweather about halcyon chart` answers *halcyon* and
+  suggests asking about *chart* next;
+- `ask` is for the story's characters. Another player gets a pointer to `say`, and
+  something to look at (`ask beams`) gets a pointer to `look beams`;
 - aboard, on the Deck or in the Cabin, `ask ship about longitude` asks the Ship herself;
 - everyone in the room hears the conversation.
 

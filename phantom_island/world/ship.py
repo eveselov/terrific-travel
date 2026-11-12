@@ -142,14 +142,14 @@ def sail(caller: Any, text: str) -> bool:
     new_shore: Any = find_place(new_position.ashore) if new_position.ashore else None
 
     if old_shore is not None:
-        old_shore.msg_contents(SHORE_DEPARTURE)
+        old_shore.msg_contents(SHORE_DEPARTURE, from_obj=caller)
     for room in ship_rooms():
-        room.msg_contents(route.text)
+        room.msg_contents(route.text, from_obj=caller)
         for character in room.contents_get(content_type="character"):
             room.send_visuals(character)
-            character.msg(room.return_appearance(character))
+            character.msg(room.return_appearance(character), from_obj=caller)
     if new_shore is not None:
-        new_shore.msg_contents(SHORE_ARRIVAL)
+        new_shore.msg_contents(SHORE_ARRIVAL, from_obj=caller)
     if new_position.clue is not None:  # what the Deck shows here (the empty sea, C4)
         discover(new_position.clue, caller)
     return True

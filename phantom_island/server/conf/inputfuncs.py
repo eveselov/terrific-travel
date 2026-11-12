@@ -50,3 +50,19 @@ as argument.
 #
 #     """
 #     pass
+
+from typing import Any
+
+from evennia.server import inputfuncs as _evennia_inputfuncs
+
+
+def text(session: Any, *args: Any, **kwargs: Any) -> None:
+    """
+    Evennia's own text input, after counting the line as a new turn of the player who typed
+    it. The count lets the other players' web clients start a new "their turn" block at
+    each command they type (see `Character.msg` in typeclasses/characters.py).
+    """
+    puppet: Any = session.puppet
+    if puppet is not None:
+        puppet.ndb.turn = (puppet.ndb.turn or 0) + 1
+    _evennia_inputfuncs.text(session, *args, **kwargs)

@@ -448,3 +448,33 @@ ask tui about song
 ```
 
 For two players, open a second browser at `http://127.0.0.1:4011`. The second player hears what the first one asks.
+
+## A3 Completed
+
+A3 is built. All 84 tests pass (51 old ones and 33 new), and ruff and strict mypy are clean. I tested it only through tests, not in a running server, so you'll be the first to see it in the web client. Nothing is staged or committed.
+
+**What's new**
+- **The clue table:** [clues.yaml](phantom_island/world/content/clues.yaml) holds C1–C13, each with a title and its journal line. The content check stops the build if a text with a `clue` has no `[[marked]]` part, if a marked part has no clue, or if a clue, thing or flag doesn't exist. One test checks that every clue can be found somewhere.
+- **Yellow and the journal:** marked text shows in yellow. A white topic word inside a clue, like *fishermen*, goes back to yellow after it. A "New in the journal:" line follows straight away. Players elsewhere hear who found it and where, and finding a clue a second time just says "Already in the journal". The journal is kept in the `Expedition` script, together with the flags. `help colours` explains the two colours.
+- **Things** ([things.yaml](phantom_island/world/content/things.yaml)):
+  - The compass stays on Crane's stall.
+  - The sextant, chronometer, chart and two guide books are in the Cabin.
+  - Carried books and the chart show more of what you look at.
+  - Carried things go back to their place when their carrier leaves the game.
+- **Details** in `places.yaml` and `ship.yaml`: the beams, goats, bones, shoots, coastline and so on. The empty sea (C4) is found when the ship arrives, and the birds (C6) with `look sky`.
+- **Commands:**
+  - `look`, now also for details and things, and `examine` or `x` for a closer look. Looking is private.
+  - `read` and `use`, heard by the whole room.
+  - `journal`.
+- **Longitude (C5):** `use sextant` on the Deck sets a flag for the whole expedition, then `read chronometer` in the Cabin gives the clue. One player can do each step. It works at the charted position and, more clearly, at the island ("10 degrees further west").
+- **Hidden truths:** Crane admits the truth (C3) once C2 is in the journal. Ama still waits for `respect`, which comes in A4.
+- **Late joiners (decision 18):** while the ship is away, `begin` leads to the Deck with the "seasick below" line.
+- **Docs:** I added a "Playing stage A3" section with a walkthrough to the [README](phantom_island/README.md). In [DECISIONS.md](phantom_island/docs/DECISIONS.md), decision 18 is marked built and there's a new decision 21 for the choices you approved.
+
+**Two choices I made that you should check**
+1. **I widened decision 20.** White now also marks words worth *looking at* (`look beams`) and commands to try, not only topics to ask about. Otherwise players would have to guess the details of a room. I've updated decision 20's text; say if you'd rather keep white for topics only.
+2. **`examine` is now ours for everyone, admins included.** Evennia's builder command still works as `@examine` or `ex`.
+
+In A3 nothing waits for time yet: the Reef is always open, the birds are always there, and noon is whenever you use the sextant. The tide, dusk and noon come in A4.
+
+**To try it:** run `uv run evennia reload`, since there's new code, then `batchcode build` as admin to place the things. The README walkthrough goes from `look compass` through `read chronometer`.

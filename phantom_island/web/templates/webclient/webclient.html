@@ -3,7 +3,8 @@
 <!--
 Phantom Island: replaces Evennia's evennia/web/templates/webclient/webclient.html.
 The "client" block is copied unchanged from Evennia 6.1. The only additions are in the
-"scripts" block: the Map and Focus panes' plugin and stylesheet.
+"scripts" block: the Map and Focus panes' plugin and stylesheet (which also echo the
+player's commands).
 
 The "?v=" in their URLs makes browsers fetch them again instead of using a cached copy.
 Bump it (ASSET_VERSION below) whenever panes.js or panes.css changes.
@@ -40,7 +41,7 @@ after all of Evennia's stylesheets, so its rules win without tricks.
 {% endblock %}
 
 {% block scripts %}
-{% with ASSET_VERSION="2" %}
+{% with ASSET_VERSION="4" %}
 <link rel="stylesheet" type="text/css" media="screen" href="{% static 'phantom_island/css/panes.css' %}?v={{ ASSET_VERSION }}">
 <script src="{% static 'webclient/js/plugins/panes.js' %}?v={{ ASSET_VERSION }}" type="text/javascript"></script>
 {% endwith %}

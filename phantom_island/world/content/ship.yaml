@@ -62,7 +62,7 @@ positions:
     cabin: >
       Through the small stern window you can see the harbour wall and the town behind it.
     shore: >
-      Your expedition's ship is moored at the end of the quay, her sails neatly furled.
+      The expedition's ship is moored at the end of the quay, her sails neatly furled.
     routes:
       west:
         to: charted

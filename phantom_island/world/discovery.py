@@ -147,8 +147,10 @@ def act(caller: Any, verb: str, text: str) -> bool:
     caller.msg(f"You {verb} the {spec.name}.")
     text_shown: str = show_marks(outcome.text)
     if location is not None:
-        location.msg_contents(f"{caller.key} {verb}s the {spec.name}.", exclude=[caller])
-        location.msg_contents(text_shown)
+        location.msg_contents(
+            f"{caller.key} {verb}s the {spec.name}.", exclude=[caller], from_obj=caller
+        )
+        location.msg_contents(text_shown, from_obj=caller)
     else:
         caller.msg(text_shown)
     if outcome.clue is not None:

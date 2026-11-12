@@ -12,6 +12,7 @@ from typing import Any
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from evennia.objects.objects import DefaultCharacter
 from evennia.utils.test_resources import EvenniaTest
 
 from typeclasses.characters import Character
@@ -507,9 +508,50 @@ class TestAsk(WorldTest):
     def test_with_two_people_here_ask_who(self) -> None:
         self.at("village")
         heard: str = self.ask("about goats")
-        self.assertIn("Who do you want to ask?", heard)
+        self.assertIn("Whom do you want to ask about goats?", heard)
         self.assertIn("Elder Ama", heard)
         self.assertIn("Tui", heard)
+
+    def test_with_one_person_here_the_topic_alone_is_enough(self) -> None:
+        self.at("office")
+        heard: str = self.ask("halcyon")
+        self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
+        self.assertIn("She sailed from this harbour", heard)
+
+    def test_the_ship_answers_a_topic_alone_on_deck(self) -> None:
+        self.at("deck")
+        self.assertIn("15 degrees every hour", self.ask("longitude"))
+
+    def test_a_player_is_not_a_character_to_ask(self) -> None:
+        self.at("office")
+        heard: str = self.ask(self.char2.key)
+        self.assertIn("is another player", heard)
+        self.assertIn("say", heard)
+        self.assertIn("That's you!", self.ask(f"{self.char1.key} about halcyon"))
+
+    def test_a_character_elsewhere_is_not_taken_for_a_topic(self) -> None:
+        self.at("quay")
+        self.assertIn("There's nobody called 'crane' here", self.ask("crane compass"))
+
+    def test_a_word_of_a_name_alone_is_still_a_topic(self) -> None:
+        self.at("office")  # `old` is part of Old Barnaby's name, but `old chart` is the chart
+        self.assertIn("This is the Halcyon's chart", self.ask("old chart"))
+
+    def test_several_topics_at_once_get_the_first_answered(self) -> None:
+        self.at("office")
+        heard: str = self.ask("fairweather about halcyon chart")
+        self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
+        self.assertIn("She sailed from this harbour", heard)
+        self.assertNotIn("This is the Halcyon's chart", heard)
+        self.assertIn("One thing at a time: you can ask about |wchart|n next.", heard)
+
+    def test_something_to_look_at_gets_a_hint(self) -> None:
+        self.at("spring")
+        heard: str = self.ask("shoots")
+        self.assertIn("There is nobody here to talk to.", heard)
+        self.assertIn("look shoots", heard)
+        self.at("village")
+        self.assertIn("look beams", self.ask("beams"))
 
     def test_crane_lies_until_the_coral_is_found(self) -> None:
         self.at("market")
@@ -533,6 +575,24 @@ class TestAsk(WorldTest):
         heard: str = texts(mock_msg)
         self.assertIn(f"{self.char1.key} asks Old Barnaby about weather.", heard)
         self.assertIn("Red sky at night", heard)
+
+    def test_another_players_turn_is_tagged_for_the_web_client(self) -> None:
+        self.at("quay")
+        # Patched on the class, so the calls don't record who received them; the class each
+        # message carries is enough to tell.
+        with patch.object(DefaultCharacter, "msg") as mock_msg:
+            for turn in (1, 2):
+                self.char1.ndb.turn = turn
+                ask(self.char1, "barnaby about weather")
+        classes: list[str | None] = []
+        for call in mock_msg.call_args_list:
+            text: Any = call.kwargs["text"]
+            classes.append(text[1].get("cls") if isinstance(text, tuple) else None)
+        # char1: "You ask..." and the reply, untagged. char2: "asks..." (a new turn), then
+        # the reply (the same turn). Barnaby hears both untagged too. Twice.
+        self.assertEqual(classes.count("pi-other pi-turn"), 2)
+        self.assertEqual(classes.count("pi-other"), 2)
+        self.assertEqual(classes.count(None), 8)
 
     def test_nobody_by_that_name(self) -> None:
         self.at("quay")

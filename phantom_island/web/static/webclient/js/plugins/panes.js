@@ -17,6 +17,11 @@
  *
  *     The HTML is built by the server from the game's own content files (world/maps.py,
  *     world/focus.py), which escape all text in it.
+ *
+ *     It also echoes each command the player sends into the Main pane, in its own colour
+ *     after a divider line (class "pi-echo", styled in panes.css), so the log shows what
+ *     was typed. Telnet clients show what was typed themselves, so the server doesn't echo.
+ *     Login lines (connect/create) aren't echoed: they hold a password.
  */
 let phantom_island_panes = (function () {
 
@@ -43,6 +48,21 @@ let phantom_island_panes = (function () {
         };
     };
 
+    var escapeHtml = function (text) {
+        return $("<div>").text(text).html();
+    };
+
+    var SECRET = /^\s*@?(connect|create|password)(\s|$)/i;
+
+    // Show the line the player sent in the Main pane. Returns nothing, so the command sent
+    // to the server is left unchanged.
+    var onSend = function (line) {
+        if (!line.trim() || SECRET.test(line)) {
+            return;
+        }
+        window.plugin_handler.onText([escapeHtml(line)], { cls: "pi-echo" });
+    };
+
     // Mandatory plugin init function
     var init = function () {
         window.Evennia.emitter.on("map", replaceIn("map"));
@@ -52,6 +72,7 @@ let phantom_island_panes = (function () {
 
     return {
         init: init,
+        onSend: onSend,
     };
 })();
 window.plugin_handler.add("phantom_island_panes", phantom_island_panes);

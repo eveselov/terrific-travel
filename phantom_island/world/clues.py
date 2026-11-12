@@ -65,10 +65,10 @@ def _tell_all(finder: Any, here: str, elsewhere: str) -> None:
     location: Any = finder.location
     told: list[Any] = [finder, *_room_characters(location)]
     for character in dict.fromkeys(told):
-        character.msg(here)
+        character.msg(here, from_obj=finder)
     for character in connected_characters():
         if character not in told:
-            character.msg(elsewhere)
+            character.msg(elsewhere, from_obj=finder)
 
 
 def discover_all(clue_ids: list[str | None], finder: Any) -> None:

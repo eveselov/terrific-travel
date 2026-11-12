@@ -1,5 +1,6 @@
 /*
- * Phantom Island additions to the web client style: the Map and Focus panes.
+ * Phantom Island additions to the web client style: the Map and Focus panes, and the echo of
+ * the player's own commands in the Main pane.
  *
  * Linked from web/templates/webclient/webclient.html, after all of Evennia's own stylesheets
  * and with a version number in its URL. Bump ASSET_VERSION there whenever this file changes,
@@ -41,4 +42,34 @@
 .content:has(> .pi-map),
 .content:has(> .pi-focus) {
     overflow: hidden;
+}
+
+/*
+ * The player's own command, echoed by panes.js: light green, after a divider line, so each
+ * command starts a new section of the log. Green means "you typed this"; white and yellow
+ * keep their meanings (follow this up, clue).
+ */
+.pi-echo {
+    color: #8fe08f;
+    border-top: 1px dashed #666;
+    margin-top: 0.6em;
+    padding-top: 0.3em;
+}
+
+.pi-echo::before {
+    content: "> ";
+    color: #5fa85f;
+}
+
+/*
+ * Another player's turn (the server tags it "pi-other", typeclasses/characters.py): a quiet
+ * dotted divider and a muted first line, so their turns sit between your own commands
+ * without looking like them. Only the first message of each of their turns ("pi-turn")
+ * gets the divider; the rest of it (an answer everyone hears) keeps the normal colours.
+ */
+.pi-other.pi-turn {
+    color: #8c9a8c;
+    border-top: 1px dotted #4a4a4a;
+    margin-top: 0.4em;
+    padding-top: 0.2em;
 }

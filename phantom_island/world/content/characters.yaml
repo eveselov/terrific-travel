@@ -63,7 +63,8 @@ characters:
       The patron of the Society: a tall woman in a grey coat, with ink on her fingers and
       a pile of papers she keeps straightening.
     greeting: >
-      "Ah, you've come. Sit down. There is a great deal to tell, and very little of it is
+      "Ah, you've come: the newest members of the Society's expedition. Welcome aboard,
+      or nearly. Sit down. There is a great deal to tell, and very little of it is
       certain."
     suggest: [mission, halcyon, chart, letter]
     fallback: >
@@ -76,11 +77,11 @@ characters:
         reply: >
           "The Society wants the truth about the |wHalcyon|n. Fifteen years of rumours, and
           now a |wcompass|n with her name on it turns up in our own market. Look at it first.
-          Then sail to the island on her |wchart|n and see what is left to find."
+          Then sail to the |wisland|n on her |wchart|n and see what is left to find."
       halcyon:
         stance: truth
         reply: >
-          "She sailed from this harbour in 1775 to chart a small island far out in the
+          "She sailed from this harbour in 1775 to chart a small |wisland|n far out in the
           ocean. A sound ship with a careful master. Her last |wletter|n reached us, and then
           nothing. Not a plank, not a word."
       chart:
@@ -96,6 +97,12 @@ characters:
           She reads aloud: "'We have found the island and fixed its position. Good water,
           fair weather, friendly people. We sail again soon.' That was the last word we
           ever had."
+      island:
+        stance: truth
+        reply: >
+          "A small island far out in the ocean, to the west. Sailors spoke of it for years,
+          but nobody had put it on a chart. That was the Halcyon's task. Her |wchart|n is
+          all we know of it; nobody from here has been there since."
       society:
         aliases: [the society]
         stance: truth
@@ -125,8 +132,15 @@ characters:
       storm:
         stance: truth
         reply: >
-          "Worst I ever saw. Three days of wind out of the west, and seas like hills. If
-          the Halcyon was anywhere near that island, she's on the bottom, mark my words."
+          "Worst I ever saw. Three days of wind out of the west, and seas like hills. Out
+          of the west, mind: a wind is named for where it comes from, so that one blew
+          towards us. If the Halcyon was anywhere near that |wisland|n, she's on the
+          bottom, mark my words."
+      island:
+        stance: truth
+        reply: >
+          "Never seen it myself. It's far out west, past where any sensible fisherman goes.
+          Some of the old hands call it a phantom: here one voyage, gone the next."
       weather:
         aliases: [sky, wind]
         stance: truth

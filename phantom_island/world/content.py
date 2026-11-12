@@ -309,6 +309,19 @@ class CharacterSpec:
                     found.append(topic)
         return found[0] if len(found) == 1 else None
 
+    def topics_in(self, text: str) -> list[TopicSpec]:
+        """
+        Every topic named by a single word of the text, in the order the words come:
+        `halcyon chart` -> [halcyon, chart]. Used when `topic` finds nothing because the
+        player asked about several things at once.
+        """
+        found: list[TopicSpec] = []
+        for word in normalise_words(text).split():
+            for topic in self.topics.values():
+                if word in topic.words and topic not in found:
+                    found.append(topic)
+        return found
+
 
 @dataclass(frozen=True)
 class Content:
