@@ -27,6 +27,14 @@ Connect with a browser at <http://localhost:4011>, or with telnet/a MUD client a
 `localhost:4010`. The ports are Evennia's defaults plus 10, so this game can run at the same
 time as `game/` (4000/4001).
 
+You were right that two tabs with two accounts is the way to do it. Tabs fail because they share the same browser session: you're logged in as Admin on the game's website, and every web client tab in that browser automatically logs in as Admin too. Each player needs a separate browser session.
+
+**To use a second account** on the same computer (for testing and demo) open the second player at `http://127.0.0.1:4011`. The browser treats them as two different sites, each with its own login.
+
+**Switching accounts:** In the web client: type quit. This back at the welcome screen, where connect <name> <password> logs in as someone else. (Logging into the same account twice kicks out the first connection.)
+
+**Using telnet:** Switch on Windows' own telnet (Start → type "Turn Windows features on or off" → check Telnet Client → OK. No restart is needed); Then `telnet localhost 4010` works from any command prompt. To leave, type `quit` in the game. If you get stuck, press `Ctrl+]` and type `quit` at the telnet> prompt.
+
 ## Building the world
 
 The world is built from the story content files in [world/content/](world/content/): places,
