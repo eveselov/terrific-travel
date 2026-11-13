@@ -740,6 +740,33 @@ class TestThings(DiscoveryTest):
 
 
 class TestLookingAndTheJournal(DiscoveryTest):
+    def test_the_journal_names_each_source_once(self) -> None:
+        expedition: Any = get_expedition()
+        self.assertTrue(expedition.add_clue("C3", "Test", "Market", "Silas Crane"))
+        # The same source again (his compass and fishermen topics) changes nothing...
+        self.assertFalse(expedition.add_clue("C3", "Admin", "Market", "Silas Crane"))
+        self.assertEqual(expedition.journal[0].also, ())
+        # ...a new source is noted.
+        self.assertFalse(expedition.add_clue("C3", "Admin", "Quay", "Old Barnaby"))
+        entry: JournalEntry = expedition.journal[0]
+        self.assertEqual(entry.source, "Silas Crane")
+        self.assertEqual([s.source for s in entry.also], ["Old Barnaby"])
+        listing: str = journal_text()
+        self.assertIn("found by Test, Market, from Silas Crane", listing)
+        self.assertIn("again by Admin, Quay, from Old Barnaby", listing)
+
+    def test_a_clue_from_two_places_lists_both(self) -> None:
+        self.thing("animal_guide").move_to(self.char1, quiet=True)
+        self.thing("plant_guide").move_to(self.char1, quiet=True)
+        self.at(self.char1, "beach")
+        self.do(self.char1, "look goats")
+        self.at(self.char1, "spring")
+        self.do(self.char1, "look shoots")
+        listing: str = journal_text()
+        self.assertIn("from the goats, with the animal guide", listing)
+        self.assertIn("again by", listing)
+        self.assertIn("from the shoots, with the plant guide", listing)
+
     def test_the_compass_reveals_a_clue_in_yellow(self) -> None:
         self.at(self.char1, "market")
         seen: str = self.do(self.char1, "look compass")
@@ -758,7 +785,9 @@ class TestLookingAndTheJournal(DiscoveryTest):
     def test_a_clue_is_written_down_once(self) -> None:
         self.at(self.char1, "market")
         self.do(self.char1, "look compass")
-        self.assertIn("Already in the journal", self.do(self.char1, "look compass"))
+        again: str = self.do(self.char1, "look compass")
+        self.assertIn("Already in the journal, 1. ", again)
+        self.assertIn(load_content().clues["C1"].journal, again)
         self.assertEqual(self.journal_ids(), ["C1"])
 
     def test_examine_looks_closer(self) -> None:

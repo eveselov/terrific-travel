@@ -13,6 +13,7 @@ just overloads its hooks to have it perform its function.
 """
 
 from dataclasses import dataclass
+from typing import Any
 
 from evennia.scripts.scripts import DefaultScript
 
@@ -110,12 +111,40 @@ class Script(DefaultScript):
 
 
 @dataclass(frozen=True)
+class Sighting:
+    """One time a clue was found: who found it, where, and from whom or what."""
+
+    finder: str
+    place: str
+    source: str | None = None  # "Silas Crane", "the brass compass"; None for a view
+
+
+@dataclass(frozen=True)
 class JournalEntry:
-    """One clue in the journal: which clue, who found it and where."""
+    """
+    One clue in the journal: which clue, who found it first, where and from what, and every
+    other source that confirmed it later (`also`). Comparing sources is the historian's
+    lesson (DECISIONS.md, 19).
+    """
 
     clue: str
     finder: str
     place: str
+    source: str | None = None
+    also: tuple[Sighting, ...] = ()
+
+
+def _sighting(data: Any) -> Sighting:
+    source: Any = data.get("source")
+    return Sighting(
+        finder=str(data["finder"]),
+        place=str(data["place"]),
+        source=str(source) if source is not None else None,
+    )
+
+
+def _sighting_data(sighting: Sighting) -> dict[str, str | None]:
+    return {"finder": sighting.finder, "place": sighting.place, "source": sighting.source}
 
 
 class Expedition(Script):
@@ -142,24 +171,48 @@ class Expedition(Script):
     @property
     def journal(self) -> list[JournalEntry]:
         """The clues found so far, the first found first."""
-        return [
-            JournalEntry(clue=str(e["clue"]), finder=str(e["finder"]), place=str(e["place"]))
-            for e in self.db.journal or []
-        ]
+        entries: list[JournalEntry] = []
+        for data in self.db.journal or []:
+            first: Sighting = _sighting(data)
+            entries.append(
+                JournalEntry(
+                    clue=str(data["clue"]),
+                    finder=first.finder,
+                    place=first.place,
+                    source=first.source,
+                    also=tuple(_sighting(item) for item in data.get("also") or []),
+                )
+            )
+        return entries
 
     def has_clue(self, clue_id: str) -> bool:
         """Whether this clue is in the journal."""
         return any(entry.clue == clue_id for entry in self.journal)
 
-    def add_clue(self, clue_id: str, finder: str, place: str) -> bool:
-        """Write a clue into the journal. Returns False if it was already there."""
-        if self.has_clue(clue_id):
-            return False
-        self.db.journal = [
-            *(self.db.journal or []),
-            {"clue": clue_id, "finder": finder, "place": place},
-        ]
-        return True
+    def add_clue(self, clue_id: str, finder: str, place: str, source: str | None = None) -> bool:
+        """
+        Write a clue into the journal. Returns False if it was already there; then a new
+        source (someone or something else confirming it, or the same one somewhere else) is
+        added to the entry's `also`, and a repeat of a known source changes nothing.
+        """
+        sighting: Sighting = Sighting(finder=finder, place=place, source=source)
+        if not self.has_clue(clue_id):
+            self.db.journal = [
+                *(self.db.journal or []),
+                {"clue": clue_id, **_sighting_data(sighting), "also": []},
+            ]
+            return True
+        updated: list[dict[str, Any]] = []
+        for data in self.db.journal or []:
+            item: dict[str, Any] = dict(data)
+            if item["clue"] == clue_id:
+                known: list[Sighting] = [_sighting(item)]
+                known.extend(_sighting(other) for other in item.get("also") or [])
+                if not any((k.source, k.place) == (source, place) for k in known):
+                    item["also"] = [*(item.get("also") or []), _sighting_data(sighting)]
+            updated.append(item)
+        self.db.journal = updated
+        return False
 
     @property
     def flags(self) -> list[str]:

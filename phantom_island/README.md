@@ -122,8 +122,9 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
 - `read <thing>` and `use <thing>` are heard by the whole room. The longitude puzzle: at sea,
   `use sextant` on the Deck (the noon sight), then `read chronometer` in the Cabin. One
   player can do each.
-- `journal` lists everything found, in the order it was found, with who found it and
-  where.
+- `journal` lists everything found, in the order it was found, with who found it, where
+  and from whom or what. A clue confirmed later by another source keeps one entry, and the
+  new source is added to it ("again by Admin, Quay, from Old Barnaby").
 - Crane tells the truth about the compass once the coral in its hinge (`examine compass`)
   is in the journal. Ama still waits for respect, which comes in A4.
 - **Late joiners**: while the ship is away, `begin` puts a new player on the Deck with a

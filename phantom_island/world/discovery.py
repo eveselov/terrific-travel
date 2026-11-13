@@ -18,7 +18,7 @@ from evennia.objects.objects import DefaultCharacter
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
 from typeclasses.things import Thing
-from world.clues import discover, discover_all, show_marks
+from world.clues import discover, show_marks
 from world.content import (
     ActionSpec,
     CharacterSpec,
@@ -87,11 +87,22 @@ def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:
     """
     first: Reveal = look.close if close and look.close is not None else look.desc
     carried: set[str] = carried_ids(caller)
-    reveals: list[Reveal] = [first]
-    reveals.extend(extra for thing_id, extra in look.extras.items() if thing_id in carried)
-    caller.msg("\n\n".join(show_marks(reveal.text) for reveal in reveals))
+    things: dict[str, ThingSpec] = load_content().things
+    # Each part shown, with what showed it, for the journal: "the beams", and "the beams,
+    # with the plant guide" for what a carried book adds.
+    shown: list[tuple[Reveal, str]] = [(first, f"the {title}")]
+    shown.extend(
+        (extra, f"the {title}, with the {things[thing_id].name}")
+        for thing_id, extra in look.extras.items()
+        if thing_id in carried
+    )
+    caller.msg("\n\n".join(show_marks(reveal.text) for reveal, _ in shown))
     caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], None))
-    discover_all([reveal.clue for reveal in reveals], caller)
+    found: set[str] = set()
+    for reveal, source in shown:
+        if reveal.clue is not None and reveal.clue not in found:
+            found.add(reveal.clue)
+            discover(reveal.clue, caller, source)
 
 
 def look_at(caller: Any, text: str, close: bool = False) -> bool:
@@ -165,7 +176,7 @@ def act(caller: Any, verb: str, text: str) -> bool:
     else:
         caller.msg(text_shown)
     if outcome.clue is not None:
-        discover(outcome.clue, caller)
+        discover(outcome.clue, caller, f"the {spec.name}")
     return True
 
 

@@ -297,5 +297,5 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
     if rest:
         caller.msg(_one_at_a_time(rest))
     if said.clue is not None:
-        discover(said.clue, caller)
+        discover(said.clue, caller, spec.name)
     return topic

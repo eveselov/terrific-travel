@@ -31,13 +31,13 @@ This is what makes Phantom Island different: its details are not random. Distanc
 
 - The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it.
 - A clue is a fact shown in **yellow**, in what someone says, in what you look at, or in what an instrument or book shows. Right after it comes a line starting "New in the journal:", so a clue is never missed, even without colours.
-- Entries are kept in the order they were found, each with who found it and where.
+- Entries are kept in the order they were found, each with who found it, where, and from whom or what. When another source confirms a clue later, it is added to the same entry, so you can see who agrees with whom.
 - There is one journal for the whole expedition: everyone sees the same entries, and every player hears of a new clue at once, wherever they are.
-- Finding a clue again changes nothing: you're told it is already in the journal.
+- The same clue can turn up in different words from different sources. Finding it again adds no new entry: you're shown the entry it matches, so you can see they're the same fact.
 - The journal matters to the story too: some people only tell the truth once the right clue is in it, so it pays to come back and ask again.
 
 ## General Tips
 
-- Don't trust everything the characters say. Sometimes they don't know thw truth, sometimes they lie, sometimes they are just mistaken - like in real life.
-- Conditions in the game change over time. What was impossible before might worth trying now, after previous interactions... DOn't hesitate re-trying.
+- Don't trust everything the characters say. Sometimes they don't know the truth, sometimes they lie, sometimes they are just mistaken - like in real life.
+- Conditions in the game change over time. What was impossible before might worth trying now, after previous interactions... Don't hesitate re-trying.
 
