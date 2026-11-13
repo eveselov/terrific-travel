@@ -502,3 +502,65 @@ It's a strong hint, the same concern as grouping the journal (decision 21). So i
 - the real history: Harrison's chronometer, Sandy Island removed from maps in 2012, La Pérouse.
 
 The kids would leave with the feeling you describe: what seemed random was solid all along. It fits A4, which already includes the report and the epilogue, plus the sources list from decision 9.
+
+## Richness: plot, not prose
+
+*2026-11-13.* Playing the Port, the replies started to feel like a novel: the more detail,
+the more enjoyable to sit and discuss, but a 12-year-old hurrying to the end doesn't want
+long texts. Two questions came out of it: how long should replies be, and what kind of
+richness does a game need?
+
+### Depth in layers, not long replies
+
+Every reply stays short, and the depth sits one question further down, behind the white
+words. A player in a hurry reads two or three sentences and gets the gist, one vivid detail
+and a next step. Players who want more (a grandparent and grandson sitting together) follow
+every white word and get the whole story, piece by piece. It's decision 22 (facts on
+request) applied to storytelling, and it's what an AI character will do naturally in phase
+C: brief by default, deeper when asked.
+
+### Two kinds of richness
+
+Richness can come from the **plot** (how many people, things and relationships there are,
+the twists) or from the **prose** (descriptions, metaphors). Authors differ; games prefer
+the first, for three reasons:
+
+- **Players act on what they read.** Every noun in a text is a silent promise: you can look
+  at this, ask about it, use it. Decoration makes promises the game can't keep (`ask masts`
+  on the Deck, expecting the chart in the Office). A child who tries three false leads stops
+  trying. Plot richness is the opposite: everything in it can be acted on.
+- **A mystery works like Chekhov's gun.** Every detail is evidence, a red herring or
+  atmosphere, and readers assume it's evidence. "Everything fits together" makes that
+  promise explicit; ornament for its own sake would break it.
+- **Prose still has two jobs, and both serve the plot.** *Details that do double duty*, vivid
+  and evidence at once ("an old iron nail, bent flat"; "built of good oak", which prepares
+  C8; "seas like hills"). And *voice*, which is characterisation: Crane's salesman evasions
+  signal a liar, Barnaby's sayings mark the old sailor who is sure and wrong, and Tui's
+  "canoe with a white wing" is a clue disguised as a child's poetry. Metaphor belongs in a
+  character's mouth when it shows who they are, not in the narration.
+
+One caution about plot richness: for a 30–60-minute session with kids, more elements isn't
+better (13 clues and 7 characters is about the limit). Richness should come from **more
+connections between the elements we have**: Barnaby and Crane disagree about the compass;
+Fairweather's "good oak" matters in the Village; Crane's "last winter's storm" clashes
+with Barnaby's storm of '75. Each cross-reference makes the world feel solid without adding
+anything to keep track of.
+
+### The rules
+
+Recorded as decision 23, with the rules at the top of `characters.yaml` and a written
+`voice` for each character:
+
+- replies of about 30–60 words, the answer first;
+- one concrete detail that is vivid *and* a fact that fits; a detail that is only pretty is
+  cut;
+- most replies end with a white word leading somewhere new;
+- the subject is named at its first mention in each reply;
+- figurative language only in a character's voice; narration stays plain;
+- prefer a connection to another person, thing or clue over a new detail;
+- every fact is in "The truth" or in the table of facts that depend on each other.
+
+The first pass applied them to Mrs. Fairweather and Old Barnaby. Her *halcyon* reply got
+shorter (the flags and white sails went, the oak stayed) and gained a new topic, the *crew*
+and their families waiting for news. His *halcyon* reply gained a connection rather than
+adjectives: he watched her sail, and is sure Crane's compass "came off the bottom".

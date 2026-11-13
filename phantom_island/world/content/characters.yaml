@@ -16,6 +16,28 @@
 # replies. Adding or removing characters, or changing names or `where`, also needs
 # `batchcode build`.
 #
+# How to write replies (DECISIONS.md, 23)
+#
+# Richness comes from the plot, not the prose: more connections between the people, things
+# and clues we already have, not more adjectives. Players act on what they read, so every
+# noun is a promise; decoration they can't act on is a false lead.
+#   - Short: about 30-60 words, two to four sentences; a greeting one or two. A longer
+#     reply is a sign it should be split into a short answer and a new topic. Depth is one
+#     question further down, behind a white word, never in one long reply.
+#   - The answer first, then one concrete detail that does double duty: vivid *and* a fact
+#     that fits the world ("built of good oak" prepares C8; "seas like hills"). A detail
+#     that is only pretty gets cut.
+#   - Most replies end with at least one white word leading somewhere new: no dead ends.
+#   - Name the subject at its first mention in each reply ("the Halcyon", not "she"):
+#     players read replies in any order.
+#   - Figurative language only in a character's own voice, where it shows who they are
+#     (Barnaby's sayings, Tui's song). Narration stays plain.
+#   - Prefer connections: a reply that points to another character, thing or clue
+#     (Barnaby on Crane's compass) is worth more than a new detail.
+#   - Every fact is in "The truth" in GAME_STORY.md, or goes into its table of facts that
+#     depend on each other (DECISIONS.md, 22).
+#   - Voice matters more than length: each character's `voice` says how they speak.
+#
 # topic_aliases: words that mean the same topic whoever you ask. They apply to every
 # character who has a topic with that id; a topic can add its own `aliases` too.
 #
@@ -26,6 +48,7 @@
 #             between them from A4; until then they stand in the first), or `aboard`
 #             (the Deck and the Cabin)
 #   desc      what players read when they look at them
+#   voice     how they speak: a note for the writer, and for the AI characters of phase B
 #   image     optional: URL of their picture, shown in the Focus pane when someone looks at
 #             them (without one, a card with their name)
 #   greeting  the reply to `ask <character>` with no topic; the `suggest` topics follow it
@@ -61,6 +84,10 @@ characters:
     name: Mrs. Fairweather
     aliases: [fairweather, patron, mrs fairweather]
     where: office
+    voice: >
+      Formal and precise, a little old-fashioned; full sentences, no slang. Kind but
+      businesslike: she chooses her words like someone used to writing letters. Honest
+      about how little she knows.
     desc: >
       The patron of the Society: a tall woman in a grey coat, with ink on her fingers and
       a pile of papers she keeps straightening.
@@ -84,17 +111,14 @@ characters:
       halcyon:
         stance: truth
         reply: >
-          Mrs. Fairweather's voice softens. "Ah, the Halcyon. She sailed from this harbour
-          in 1775 to chart a small |wisland|n far out in the ocean, one that sailors only
-          spoke of. A sound ship, built of good oak, with a careful master and a crew who
-          would have followed him anywhere. Half the town came down to the quay to see her
-          go, flags flying and her new sails white in the sun. Her last |wletter|n reached
-          us, and then nothing. Not a plank, not a word. Fifteen years, and people here
-          still look out to sea when her name comes up."
+          "The Halcyon sailed from this harbour in 1775 to chart a small |wisland|n far out
+          in the ocean. A sound ship, built of good oak, with a careful master. Her last
+          |wletter|n reached us, and then nothing. Not a plank, not a word. The families of
+          her |wcrew|n still ask me for news."
       chart:
         stance: mistaken
         reply: >
-          "The Halcyon's chart is the Society's most precious paper, so the original stays
+          "The Halcyon's chart is the |wSociety|n's most precious paper, so the original stays
           locked away here. A fair copy is waiting for you in your ship's cabin. The island
           is drawn on it, with its latitude and longitude written beside it. Her master was
           a careful man; I have never had reason to doubt it."
@@ -104,7 +128,7 @@ characters:
         reply: >
           Mrs. Fairweather takes a worn, much-folded letter from the top of her pile. "Her
           master's last letter, in his own hand. I know it by heart, but listen." She reads
-          aloud: "'We have found the island and fixed its position. Good water, fair
+          aloud: "'We have found the |wisland|n and fixed its position. Good water, fair
           weather, friendly people. We sail again soon.'" She folds it again. "That was the
           last word we ever had."
       island:
@@ -113,6 +137,12 @@ characters:
           "A small island far out in the ocean, to the west. Sailors spoke of it for years,
           but nobody had put it on a chart. That was the Halcyon's task. Her |wchart|n is
           all we know of it; nobody from here has been there since."
+      crew:
+        stance: truth
+        reply: >
+          "Good seamen, most of them from this port. Their families still come to my door
+          every spring, in case there is news of the |wHalcyon|n. That is why the Society
+          never let the matter rest: someone owes them the truth."
       society:
         aliases: [the society]
         stance: truth
@@ -124,21 +154,37 @@ characters:
     name: Old Barnaby
     aliases: [barnaby, sailor, old sailor]
     where: quay
+    voice: >
+      An old sailor's talk: short, salty sentences, sea sayings and rhymes, "mark my
+      words", "aught". Sure of himself, kindly, fond of a story. Says what he believes,
+      and believes the Halcyon sank.
     desc: >
       A retired sailor with a white beard and a pipe that has gone out, sitting on a coil
       of rope as if he owns the quay.
     greeting: >
-      Barnaby squints at you. "Sit down if you've a mind to. I've time, and stories."
-    suggest: [halcyon, storm, weather, sailing]
+      Barnaby squints at you. "You'll be one of the Society's lot, then, off after the
+      Halcyon at last. Your ship's waiting at the end of the quay; step |waboard|n when
+      you're ready. But sit down first, if you've a mind to. I've time, and stories."
+    suggest: [expedition, halcyon, storm, weather, sailing]
     fallback: >
       Barnaby scratches his beard. "Can't say I know aught about that. Ask me about wind
       and water, though."
     topics:
+      expedition:
+        aliases: [ship, society, voyage]
+        stance: truth
+        reply: >
+          "Whole port's talking of it. The Society's sending a ship to find the |wHalcyon|n,
+          fifteen years on, and you're to sail in her. Sound ship, well found. She lies at
+          the end of the quay: just step |waboard|n. Mind, I'd sooner you came back than
+          found anything."
       halcyon:
         stance: mistaken
         reply: >
-          "The Halcyon? Went down in |wthe great storm|n of '75, all hands. I was at sea
-          that season myself. No ship could have lived through that."
+          "The Halcyon? I watched her sail out of this harbour in '75, sound as a bell. She
+          went down in |wthe great storm|n that same season, all hands. I was at sea that
+          year myself: no ship could have lived through it. Whatever that |wcompass|n of
+          Crane's is, it came off the bottom."
       storm:
         stance: truth
         reply: >
@@ -159,7 +205,7 @@ characters:
           And mackerel sky and mares' tails make tall ships carry low sails. Learn those
           and you'll live long at sea."
       sailing:
-        aliases: [navigation, ship, dead reckoning]
+        aliases: [navigation, dead reckoning]
         stance: truth
         reply: >
           "In my day we found our way with a compass, a log line and a good guess. Dead
@@ -177,12 +223,16 @@ characters:
     aliases: [crane, silas, trader]
     where: market
     image: /static/phantom_island/pictures/crane.svg
+    voice: >
+      A salesman's patter: friendly, quick, too smooth, calls people "friend". Answers a
+      question with a shrug or a sales pitch, and goes vague whenever it gets close to
+      where the compass came from. Once caught out, grumbling and a little ashamed.
     desc: >
       A trader in a coat too warm for the weather, standing behind a stall of pots, cloth,
       knives and curiosities. His eyes follow your hands.
     greeting: >
       Crane spreads his arms over his stall. "Everything on this table is honestly come by.
-      What can I do for you?"
+      What can I do for you, friend?"
     suggest: [compass, trade, halcyon]
     fallback: >
       Crane shrugs. "Not my line of business, friend."
@@ -203,7 +253,7 @@ characters:
         stance: hiding
         reply: >
           "Which beach? Oh, one down the coast. Can't remember which. They all look the
-          same, beaches."
+          same, beaches. Ask old |wBarnaby|n on the quay, he's walked every one of them."
       storm:
         stance: hiding
         reply: >
@@ -218,7 +268,7 @@ characters:
         aliases: [fisherman, west]
         stance: hiding
         reply: >
-          "Fishermen? I deal with all sorts. Couldn't tell one from another."
+          "Fishermen? I deal with all sorts, friend. Couldn't tell one from another."
         truth:
           needs: [C2]
           clue: C3
@@ -229,14 +279,14 @@ characters:
       halcyon:
         stance: truth
         reply: >
-          "Never knew her. Before my time in this port. But a name like that on a compass
-          sells, I can tell you."
+          "The Halcyon? Never knew her. Before my time in this port. But a name like that on
+          a |wcompass|n sells, I can tell you."
       trade:
         aliases: [stall, price, buy, sell]
         stance: truth
         reply: >
           "Pots, cloth, knives, a bit of everything. Everything's for sale at the right
-          price. Well, nearly everything."
+          price. That |wcompass|n, now: that one's special."
 
   # --- The island -----------------------------------------------------------------------
 
@@ -244,6 +294,10 @@ characters:
     name: Elder Ama
     aliases: [ama, elder]
     where: village
+    voice: >
+      Slow, calm and proverbial; few words, each one weighed. Speaks in images from the
+      island's life (the lagoon, the reef, the generations). Courteous to strangers, and
+      waits to see whether they are courteous too.
     desc: >
       An old woman sitting in the shade of a hut, weaving a fishing net with quick, sure
       fingers. Everyone who passes greets her first.
@@ -284,8 +338,14 @@ characters:
           reply: >
             "Fifteen winters ago a great storm threw a ship onto the western reef. Our
             people paddled out into the storm and [[brought every one of them ashore,
-            alive]]. They lived with us for a season. They ate our food and learned our songs. Then
-            most of them went away again."
+            alive]]. They lived with us for a season and learned our songs. Then most of
+            them went away again, over the sea to the west."
+      tui:
+        aliases: [child, grandchild]
+        stance: truth
+        reply: >
+          "Tui is my grandchild. Tui talks to every stranger and keeps every shiny thing the
+          sea gives back. Ask for the song: children remember what the old ones forget."
       crew:
         stance: hiding
         reply: >
@@ -301,6 +361,10 @@ characters:
     name: Tui
     aliases: [child, kid]
     where: [village, reef]
+    voice: >
+      A child: excited, quick, jumps from one thing to the next. Short sentences,
+      exclamations, funny little details (the goat ate her hat). Repeats what the grown-ups
+      say, and sings.
     desc: >
       A child of about ten, barefoot, with a little bag on a string around the neck that
       clinks when Tui moves.
@@ -316,7 +380,7 @@ characters:
         reply: >
           Tui tips out a handful of brass buttons. "Shiny ones! I find them out by the
           |wbig bones|n, and Grandmother has old ones in her basket. Look, this one has a
-          little anchor on it."
+          little anchor on it. Old |wJonah|n says it's off a sailor's coat."
       bones:
         aliases: [big bones, monster, reef]
         stance: truth
@@ -351,6 +415,10 @@ characters:
     name: Jonah Pike
     aliases: [jonah, pike, carpenter]
     where: cove
+    voice: >
+      Plain and tired, a working man's English after fifteen years among islanders; short
+      sentences, no fuss. Honest, a little sad, glad to tell it at last. A carpenter's eye
+      for wood, boats and how things are made.
     desc: >
       A weathered man with grey hair tied back, shaping a plank with an adze. He dresses
       like the islanders, but his face is sunburnt the way only a sailor's gets.
@@ -365,8 +433,9 @@ characters:
         stance: truth
         clue: C13
         reply: >
-          "[[I was her carpenter.]] Jonah Pike. We found this island, fixed its place on the
-          |wchart|n, or thought we had, and anchored off the west side. Then the storm came."
+          "[[I was the Halcyon's carpenter.]] Jonah Pike. We found this island, fixed its
+          place on the |wchart|n, or thought we had, and anchored off the west side. Then
+          the |wstorm|n came."
       wreck:
         aliases: [reef, storm, great storm, sinking]
         stance: truth
@@ -399,8 +468,9 @@ characters:
       compass:
         stance: truth
         reply: >
-          "We gave it to the fisherman's family who pulled us out of the water. A small
-          thanks for a big thing. Funny, the old compass finding its way home before me."
+          "The compass? We gave it to the fisherman's family who pulled us out of the water.
+          A small thanks for a big thing. Funny: the old compass went home, and I never
+          did."
 
   # --- The ship -------------------------------------------------------------------------
 
@@ -409,6 +479,10 @@ characters:
     name: the Ship
     aliases: [ship, boat]
     where: aboard
+    voice: >
+      Warm, patient, a teacher: she explains how things work (the sun, clocks, birds,
+      tides) in clear steps, and asks questions back instead of giving answers. A ship's
+      pride and a little humour. Never tells the solution, only how to find it.
     desc: >
       You can't look at the Ship: you're standing on her. But sometimes her timbers creak
       in a way that sounds almost like a voice.
@@ -438,21 +512,22 @@ characters:
         stance: truth
         reply: >
           "Latitude is how far north or south you are. The higher the noon sun stands, the
-          nearer you are to the equator. Sailors have measured it well for centuries."
+          nearer you are to the equator. Sailors have measured it well for centuries: take
+          the |wsextant|n up on deck at noon."
       longitude:
         stance: truth
         reply: >
           "Longitude is how far east or west you are, and it's hard. The Earth turns a
           full circle in a day, 15 degrees every hour. So every 4 minutes between noon at
-          home, on my chronometer, and noon here is one degree. Without a good clock,
+          home, on my |wchronometer|n, and noon here is one degree. Without a good clock,
           longitude is a guess."
       chart:
         stance: truth
         reply: >
-          "The Halcyon's chart marks the island here. If it isn't where the chart says,
-          ask yourself which part of the chart to trust: north and south, or east and west?
-          When sailors trust their latitude but not their longitude, they sail along the
-          latitude until they find land. It's called latitude sailing."
+          "The Halcyon's chart gives the island's latitude and longitude. If we find empty
+          sea there, ask yourself which number to trust: north and south, or east and west?
+          Sailors who trust their |wlatitude|n but not their |wlongitude|n sail along the
+          latitude until they find land."
       birds:
         aliases: [seabirds, terns, noddies, sky]
         stance: truth

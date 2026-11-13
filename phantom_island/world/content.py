@@ -285,6 +285,7 @@ class CharacterSpec:
     fallback: str
     topics: dict[str, TopicSpec]
     image: str | None = None  # URL of their picture for the Focus pane, if there is one
+    voice: str | None = None  # how they speak: for the writer and the AI characters (phase B)
 
     @property
     def words(self) -> tuple[str, ...]:
@@ -575,6 +576,7 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
         suggest=_words(data.get("suggest"), "suggest", where),
         fallback=_text(data, "fallback", where),
         image=_optional_text(data, "image", where),
+        voice=_optional_text(data, "voice", where),
         topics={
             key: _topic(key, item, shared, f"{where}, topic {key}")
             for key, item in topics_data.items()

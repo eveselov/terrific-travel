@@ -88,7 +88,8 @@ quay:
   map_pos: [500, 450]
   desc: >
     A long stone quay where ships load and unload. Barrels and coils of rope are stacked
-    along the edge, and gulls argue over scraps of fish.
+    along the edge, and gulls argue over scraps of fish. On one of the coils sits an old
+    sailor with a white beard, watching the harbour as if he still had a ship out there.
   exits:
     northwest: office
     northeast: market

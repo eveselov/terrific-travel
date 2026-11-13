@@ -517,7 +517,7 @@ class TestAsk(WorldTest):
         self.at("office")
         heard: str = self.ask("halcyon")
         self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
-        self.assertIn("She sailed from this harbour", heard)
+        self.assertIn("sailed from this harbour", heard)
 
     def test_the_ship_answers_a_topic_alone_on_deck(self) -> None:
         self.at("deck")
@@ -536,14 +536,14 @@ class TestAsk(WorldTest):
 
     def test_a_word_of_a_name_alone_is_still_a_topic(self) -> None:
         self.at("office")  # `old` is part of Old Barnaby's name, but `old chart` is the chart
-        self.assertIn("the Society's most precious paper", self.ask("old chart"))
+        self.assertIn("most precious paper", self.ask("old chart"))
 
     def test_several_topics_at_once_get_the_first_answered(self) -> None:
         self.at("office")
         heard: str = self.ask("fairweather about halcyon chart")
         self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
-        self.assertIn("She sailed from this harbour", heard)
-        self.assertNotIn("the Society's most precious paper", heard)
+        self.assertIn("sailed from this harbour", heard)
+        self.assertNotIn("most precious paper", heard)
         self.assertIn("One thing at a time: you can ask about |wchart|n next.", heard)
 
     def test_something_to_look_at_gets_a_hint(self) -> None:
