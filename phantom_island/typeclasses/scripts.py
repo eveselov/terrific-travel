@@ -190,3 +190,13 @@ class Expedition(Script):
         """Record that the ship is now at this position."""
         self.db.ship_position = position_id
         self.db.track = [*self.track, position_id]
+
+    def start_over(self, track: list[str]) -> None:
+        """
+        Forget everything found and done, as for a new expedition. The ship has sailed
+        `track` (the start position first) and is at its last position.
+        """
+        self.db.ship_position = track[-1]
+        self.db.track = list(track)
+        self.db.journal = []
+        self.db.flags = []

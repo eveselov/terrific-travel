@@ -16,6 +16,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 
+from .admin import CmdStartOver
 from .discover import CmdExamine, CmdJournal, CmdLook, CmdRead, CmdUse
 from .explore import CmdMap
 from .talk import CmdAsk
@@ -45,6 +46,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdRead())
         self.add(CmdUse())
         self.add(CmdJournal())
+        self.add(CmdStartOver())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

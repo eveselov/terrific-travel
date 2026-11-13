@@ -158,7 +158,21 @@ What each clue is, and the line it writes in the journal, is in
 [world/content/things.yaml](world/content/things.yaml), and the details of each place in
 `places.yaml` and `ship.yaml`. The content check stops the build if a text with a `clue`
 has no `[[marked]]` part, if a marked part has no `clue`, or if a clue, thing or flag
-doesn't exist. To start the journal again, reset the database (see BUILD.md).
+doesn't exist.
+
+To start again without resetting the database, use `startover` (developers only):
+
+```
+startover                 (says what it would do)
+startover yes             (a new expedition: the ship in port)
+startover at sea yes      (the ship already at the charted position)
+startover island yes      (the ship already at the island)
+```
+
+It forgets the journal and the flags, puts the ship where asked, puts every thing back and
+sends every player character, online or not, to Limbo; `begin` then leads to the Society
+Office, or to the Deck if the ship is away. Accounts and characters are kept. (It isn't
+called `reset`: that is Evennia's own command, and it reboots the server.)
 
 ## How it fits together
 
@@ -170,6 +184,7 @@ doesn't exist. To start the journal again, reset the database (see BUILD.md).
 | Clues, yellow marks and the journal | `world/content/clues.yaml`, `world/clues.py`, `commands/discover.py` (`journal`) |
 | Things, details, `look`/`examine`/`read`/`use` | `world/content/things.yaml`, `typeclasses/things.py`, `world/discovery.py`, `commands/discover.py` |
 | Late joiners (`begin` while the ship is away) | `typeclasses/exits.py`, `world/ship.py` |
+| Starting over (`startover`, for developers) | `world/reset.py`, `commands/admin.py` |
 | Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
 | Map and Focus panes, `map` command | `world/maps.py`, `world/focus.py`, `commands/explore.py` |

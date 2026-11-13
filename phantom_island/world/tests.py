@@ -45,6 +45,7 @@ from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
 from world.places import find_inhabitant, find_ship_exit, find_thing
+from world.reset import route_to, shortcut_position
 from world.ship import ABOARD, ASHORE, LATE_JOINER, moor_ship, normalise_direction, sail
 
 CONTENT_FILES: tuple[str, ...] = (
@@ -846,3 +847,46 @@ class TestLateJoiners(DiscoveryTest):
         told: str = self.begin(self.char1)
         self.assertEqual(self.char1.location, self.rooms["deck"])
         self.assertIn(LATE_JOINER, told)
+
+
+class TestStartOver(DiscoveryTest):
+    def play_a_little(self) -> None:
+        """Find a clue, set a flag, carry a book away and sail to the island."""
+        get_expedition().add_clue("C1", "someone", "Market")
+        get_expedition().set_flag("sight_charted")
+        self.thing("plant_guide").move_to(self.char1, quiet=True)
+        self.ship_at("charted")
+        self.ship_at("anchorage")
+        self.at(self.char1, "village")
+        self.at(self.char2, "deck")
+
+    def test_without_yes_nothing_happens(self) -> None:
+        self.play_a_little()
+        heard: str = self.do(self.char1, "startover")
+        self.assertIn("startover yes", heard)
+        self.assertEqual(self.journal_ids(), ["C1"])
+        self.assertEqual(current_position().id, "anchorage")
+
+    def test_starting_over_forgets_everything(self) -> None:
+        self.play_a_little()
+        heard: str = self.do(self.char1, "startover yes")
+        self.assertIn("New expedition started", heard)
+        expedition: Any = get_expedition()
+        self.assertEqual(expedition.journal, [])
+        self.assertEqual(expedition.flags, [])
+        self.assertEqual(expedition.track, ["port"])
+        self.assertEqual(current_position().id, "port")
+        self.assertEqual(self.thing("plant_guide").location, self.rooms["cabin"])
+        for character in (self.char1, self.char2):
+            self.assertEqual(character.location, self.rooms["limbo"])
+        ashore: Any = find_ship_exit(ASHORE)
+        self.assertEqual(ashore.destination, self.rooms["quay"])
+
+    def test_starting_at_the_island(self) -> None:
+        self.do(self.char1, "startover island yes")
+        self.assertEqual(get_expedition().track, ["port", "charted", "anchorage"])
+        island_ashore: Any = find_ship_exit(ASHORE)
+        self.assertEqual(island_ashore.destination, self.rooms["beach"])
+        self.assertEqual(route_to(load_content(), "charted"), ["port", "charted"])
+        self.assertEqual(shortcut_position("at sea"), "charted")
+        self.assertIsNone(shortcut_position("the moon"))
