@@ -27,10 +27,17 @@ def _placeholder_svg(title: str) -> str:
     )
 
 
+FOCUS_LABEL: str = "You are looking at:"
+
+
 def render_focus_html(title: str, image_url: str | None) -> str:
-    """The Focus pane's content for a place with this title and (optional) picture."""
+    """
+    The Focus pane's content: what the player is looking at (a place, a thing, a detail or a
+    character), titled "You are looking at: <title>", with its picture or a placeholder card.
+    """
     if image_url is None:
         picture: str = _placeholder_svg(title)
     else:
         picture = f'<img class="pi-picture" src="{escape(image_url)}" alt="{escape(title)}">'
-    return f'<div class="pi-focus"><div class="pi-pane-title">{escape(title)}</div>{picture}</div>'
+    heading: str = f'<span class="pi-pane-label">{FOCUS_LABEL}</span> {escape(title)}'
+    return f'<div class="pi-focus"><div class="pi-pane-title">{heading}</div>{picture}</div>'

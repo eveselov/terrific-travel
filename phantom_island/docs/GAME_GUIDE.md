@@ -17,6 +17,14 @@ This is what makes Phantom Island different: its details are not random. Distanc
 - Things that look like scenery may matter: a word in a description, the direction of a wind, what a plant is doing on an island.
 - You don't have to dig deep to finish the adventure. But if you want to know *why* something is so, the knowledge is there: ask the Ship, read the books, use the instruments.
 
+## The screen
+
+The web client has three panes. Everything in Map and Focus is also told in the text, so the game can be played without them (over telnet, for example).
+
+- **Main**: the story as text: what you see, what people say, the journal. Your own commands are shown in green after a dashed line; other players' turns come after a fainter dotted line.
+- **Map**, titled "Your map": where you are. It changes with the part of the adventure: a plan of the port, the *Halcyon*'s chart at sea (with your ship's track), and a map of the island. `map` describes the current map in words.
+- **Focus**, titled "You are looking at": a picture of what's in front of you. That's the room when you arrive or type `look`, and whatever you last looked at with `look <something>` or `examine`: a thing, a part of the room, or a person. Talking to someone (`ask`) doesn't change it: the topic of a question is often far away, or not a thing at all.
+
 ## Playing together
 
 - Players in the same room see each other; players in different rooms don't.

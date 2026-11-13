@@ -41,7 +41,7 @@ after all of Evennia's stylesheets, so its rules win without tricks.
 {% endblock %}
 
 {% block scripts %}
-{% with ASSET_VERSION="4" %}
+{% with ASSET_VERSION="5" %}
 <link rel="stylesheet" type="text/css" media="screen" href="{% static 'phantom_island/css/panes.css' %}?v={{ ASSET_VERSION }}">
 <script src="{% static 'webclient/js/plugins/panes.js' %}?v={{ ASSET_VERSION }}" type="text/javascript"></script>
 {% endwith %}

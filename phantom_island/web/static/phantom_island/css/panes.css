@@ -28,6 +28,13 @@
     margin-bottom: 4px;
 }
 
+/* "You are looking at:" / "Your map:" before the title: quieter than the name itself. */
+.pi-pane-label {
+    font-weight: normal;
+    font-style: italic;
+    opacity: 0.75;
+}
+
 /* An inline SVG (map, placeholder card) or an <img> (a real picture). */
 .pi-picture {
     flex: 1 1 auto;

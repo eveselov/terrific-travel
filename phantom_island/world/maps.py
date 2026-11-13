@@ -28,6 +28,7 @@ from world.content import Content, MapSpec, Point, PositionSpec, load_content
 from world.expedition import current_position, get_expedition
 
 MAP_TAG_CATEGORY: str = "map"
+MAP_LABEL: str = "Your map:"  # before the map's title in the Map pane
 SHIP_LABEL: str = "Your ship"
 
 
@@ -289,7 +290,8 @@ def render_map_html(view: MapView) -> str:
     callout_line, callout = _ship_callout_svg(view)
     return (
         '<div class="pi-map">'
-        f'<div class="pi-pane-title">{escape(picture_map.title)}</div>'
+        f'<div class="pi-pane-title"><span class="pi-pane-label">{MAP_LABEL}</span> '
+        f"{escape(picture_map.title)}</div>"
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
         f'role="img" aria-label="{escape(picture_map.title)}" '
         'class="pi-picture">'
