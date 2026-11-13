@@ -11,7 +11,10 @@ rooms:
     kind: deck        # where `sail` works and the sea and sky are seen
     desc: >
       The deck of your expedition's ship: masts and rigging overhead, the wheel at the
-      stern, and a hatch leading down to the cabin.
+      stern, and a hatch leading down to the cabin. The crew stand ready at the ropes,
+      waiting for the expedition's orders: |wsail|n shows where she can go. Now and then
+      her timbers creak almost like a voice. The ship herself listens: |wask ship|n
+      anything about the sea and the sky.
     exits:
       down: {to: cabin, aliases: [below, cabin]}
   cabin:
@@ -20,7 +23,8 @@ rooms:
     desc: >
       A low wooden cabin under the deck. A chart table fills the middle, with a brass
       clock fixed beside it. Books are wedged onto a shelf so they can't slide off when
-      the ship rolls.
+      the ship rolls. The timbers creak here too, as if she were listening: |wask ship|n
+      about the instruments.
     exits:
       up: {to: deck, aliases: [deck]}
 

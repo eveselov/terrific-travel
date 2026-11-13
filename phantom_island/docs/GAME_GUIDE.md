@@ -6,6 +6,7 @@
 
 - The expedition is all the players together: one team, sent out by the Society to find out what happened to the lost ship *Halcyon*.
 - You join it by typing `begin` on the title page (Limbo). Mrs. Fairweather, in the Society Office, explains the task.
+- You lead the expedition and command its ship: the crew follow your orders, and the ship goes where you decide (`sail` on the Deck). The ship herself has a voice and gives advice: `ask ship`.
 - The expedition has its own ship and one shared journal. Where the ship is, and what has been found, is the same for every player.
 - One player alone is a whole expedition; more players simply share the work.
 

@@ -106,8 +106,8 @@ characters:
         reply: >
           "The Society wants the truth about the |wHalcyon|n. Fifteen years of rumours, and
           now a |wcompass|n with her name on it turns up in our own market. Silas Crane has
-          it on his stall, just east of here. Go and look at it first. Then sail to the
-          |wisland|n on her |wchart|n and see what is left to find."
+          it on his stall, just east of here. Go and look at it first. Then take your
+          |wship|n to the |wisland|n on her |wchart|n and see what is left to find."
       halcyon:
         stance: truth
         reply: >
@@ -137,6 +137,13 @@ characters:
           "A small island far out in the ocean, to the west. Sailors spoke of it for years,
           but nobody had put it on a chart. That was the Halcyon's task. Her |wchart|n is
           all we know of it; nobody from here has been there since."
+      ship:
+        aliases: [captain, command, orders]
+        stance: truth
+        reply: >
+          "The Society has hired a sound ship and a good crew. Where she sails is for you to
+          decide: you lead this expedition, and the crew will follow your orders. She lies
+          at the quay, south-east of here."
       crew:
         stance: truth
         reply: >
@@ -555,6 +562,13 @@ characters:
           "Look closely at things, read what's in the Cabin, and ask people questions.
           People don't always tell the truth, so compare what they say. And if something
           puzzles you, ask me about it."
+      captain:
+        aliases: [command, orders, crew, sailors]
+        stance: truth
+        reply: >
+          "The captain? You are, all of you together: the Society put the expedition in your
+          hands. I'll tell you what I know of the sea, but where we go is your choice. Give
+          the word on deck: |wsail|n."
       name:
         aliases: [yourself, you]
         stance: truth
