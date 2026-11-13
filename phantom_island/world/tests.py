@@ -844,6 +844,13 @@ class TestAtSea(DiscoveryTest):
             sail(self.char1, "west")
         self.assertEqual(self.journal_ids(), ["C4"])
 
+    def test_the_empty_sea_shows_in_yellow(self) -> None:
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+        seen: str = self.do(self.char1, "look")
+        self.assertIn("|yThere is nothing but water", seen)
+        self.assertNotIn("[[", seen)
+
     def test_the_birds_at_dusk(self) -> None:
         self.ship_at("charted")
         self.at(self.char1, "deck")

@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 from evennia.objects.objects import DefaultRoom
 
+from world.clues import show_marks
 from world.content import PositionSpec, load_content
 from world.expedition import current_position
 from world.focus import render_focus_html
@@ -144,4 +145,5 @@ class Deck(ShipRoom):
         self.cmdset.add("commands.ship.DeckCmdSet", persistent=True)
 
     def position_text(self, position: PositionSpec) -> str:
-        return position.deck
+        """What is seen from the Deck here; its clue (the empty sea, C4) shows in yellow."""
+        return show_marks(position.deck)
