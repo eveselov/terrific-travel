@@ -116,8 +116,9 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
   guide in the Village and at the Spring, the animal guide on the Beach, the chart on the
   Hilltop. Carried things go back to their place when their carrier leaves the game, and
   also when the server starts cold or on `batchcode build`, if their carrier isn't being played.
-- Looking at a thing or a detail shows a card with its name in the Focus pane; a plain
-  `look` or moving on brings back the room's picture.
+- Looking at a thing, a detail or a character shows its picture in the Focus pane, or a
+  card with its name (only Crane has a picture so far, `image:` in characters.yaml);
+  looking at anything else, a plain `look` or moving on brings back the room's picture.
 - `read <thing>` and `use <thing>` are heard by the whole room. The longitude puzzle: at sea,
   `use sextant` on the Deck (the noon sight), then `read chronometer` in the Cabin. One
   player can do each.
@@ -216,4 +217,24 @@ Map and Focus panes with placeholder pictures. Tests check that every place can 
 that two players aboard see each other.
 
 Stage A2 (scripted inhabitants): six inhabitants and the Ship, 41 scripted topics, and the
-`ask` command. Next: A3, discovery and the shared journal.
+`ask` command.
+
+Stage A3 (discovery and the shared journal): 13 clues as data, each written into the one
+shared journal with who found it and where, and announced to every connected player. Details
+and things to `look` at and `examine`, and things to `read`, `use` and carry: the compass, the
+sextant and chronometer (the longitude puzzle, which two players can share), the *Halcyon*'s
+chart and two guide books. White marks words to follow up, yellow marks clues. Crane admits
+the truth once the coral is found. Late joiners start on the Deck while the ship is away.
+Carried things go home when their carrier isn't being played. The Focus pane shows a card for
+whatever is being looked at.
+Playing it also changed how conversation reads:
+- `ask` with only one person around needs no name (`ask halcyon`).
+- Several topics at once get one answer and a nudge to ask about the next.
+- Players and things to look at get a pointer to `say` or `look`.
+- The web client's log now shows turns: each command you type in green after a dashed line,
+  and another player's turns after a fainter dotted line.
+
+`startover` (developers only) starts a new expedition without resetting the database,
+optionally with the ship already at sea or at the island. Ama's respect, the time gates
+(tide, dusk, noon), `show` and `report` wait for A4; C12 can't be found yet, and C13 is still
+given freely. Next: A4, the mystery and the ending.

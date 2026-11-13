@@ -182,7 +182,7 @@ The draft only needs to be small: 6–10 places, 3 characters, about 8 clues and
 1. **The game holds the truth.** Clues are stored data with IDs. Each one says where it is found and what it shows. Nothing important exists only in a sentence of text.
 2. **Characters talk by topic.** `ask fisherman about temple` returns a scripted line that depends on what that character knows, gets wrong or is hiding. Later the AI rewrites the wording, but the game still decides which clue gets revealed.
 3. **A shared expedition journal.** Whenever either player discovers something, it goes into a journal both can read with a `journal` command. This is the simplest way to make cooperation visible.
-4. **Each role sees different things.** One room description changes with the role, which Evennia can do when it builds a room's text. For example, the navigator notices the stars and the coastline, and the naturalist notices the plants and the tracks.
+4. **Each role sees different things.** One room description changes with the role, which Evennia can do when it builds a room's text. For example, the navigator notices the stars and the coastline, and the naturalist notices the plants and the tracks. *(Later replaced: there are no roles. Every player can find every clue, and the navigator's and naturalist's knowledge lives in instruments, books and the Ship, so the game is the same alone or together. See [DECISIONS.md](DECISIONS.md), 6a.)*
 5. **A way to finish.** Players `report` their explanation, and the game checks it against the clues needed. Saying "I think X happened" is more fun than ticking off a quiz.
 6. **One event that happens without the players.** For example, a timed Evennia script makes the tide go out and opens a path, so the world feels alive.
 7. **Text first, map on top.** Every location, exit and clue works over telnet, with the web map as an extra.
@@ -267,7 +267,7 @@ Starting from 4 the stages are not very clear tome
 
 These are the practices that make stages 5–9 less of a mystery:
 
-- **Keep it playable at every stage.** Each stage ends with something two people can play from start to finish, even if it's crude. Never finish a stage with only a part that can't be played yet.
+- **Keep it playable at every stage.** Each stage ends with something one player alone, or two together, can play from start to finish, even if it's crude. Never finish a stage with only a part that can't be played yet.
 - **Plain placeholders first** (game designers call this "greyboxing"). Rooms and characters with plain placeholder text come first, polished writing and pictures later. You find out whether the structure works before spending effort on decoration.
 - **The core loop.** This is what players do minute to minute: move → look → notice something → ask someone → note it in the journal → think → move on. If this loop is fun with dull text, it will be great with good text. If it isn't fun, AI won't save it.
 - **Playtests: watch, don't help.** Let the kids play while you watch silently. Note where they get stuck, bored or excited, then ask them afterwards. This is the main tool of game design, and kids are very honest testers.
@@ -279,15 +279,17 @@ One more trick suits your situation well: **you play the character yourself**. E
 
 Times are in **working sessions** (about 2–3 hours with me). They're rough and could easily be off by 1.5–2×.
 
+*Updated 2026-11-12 for the game as it is now played: no roles, the same game for one player or several (DECISIONS.md, 6a and 6b). The settled version of these stages is the table in DECISIONS.md.*
+
 ### Phase A: The complete game without AI (this is what gets "customer approval")
 
 | Stage | What gets built | Done when | Time |
 |---|---|---|---|
-| **A1. Island skeleton** | 12 rooms with exits, short placeholder texts, the map pane, the ship and the sea room | Two players can walk everywhere and see each other | 2–3 |
+| **A1. Island skeleton** | 12 rooms with exits, short placeholder texts, the map pane, the ship and the sea room | A player can walk everywhere; two players see each other | 2–3 |
 | **A2. Scripted inhabitants** | 7 characters, `ask <char> about <topic>` with scripted replies, characters placed in rooms | Every character answers its topics; unknown topics get a polite in-character reply | 2–3 |
-| **A3. Discovery and shared journal** | Clue table as data, role-based descriptions (navigator/naturalist), the `journal` command | A clue found by one player appears in both players' journals | 2–3 |
-| **A4. The mystery and the ending** | Gates (leaving port, meeting Jonah), tide and evening scripts, the `report` command, the epilogue | The adventure can be played from start to finish and reach every ending | 3–4 |
-| **A5. Polish for the kids** | Better texts, a few pictures, a `help`/hint path through the Ship | You'd be happy to show it | 2–3 |
+| **A3. Discovery and shared journal** | Clue table as data; details and things to look at and examine; instruments and books that anyone can use or carry and that show more (sextant and chronometer, the guides, the *Halcyon*'s chart); the shared `journal` command; late joiners | One player alone can find every clue not waiting for A4; a clue found by any player goes into the one shared journal, and every connected player hears of it | 2–3 |
+| **A4. The mystery and the ending** | Gates (leaving port, meeting Jonah), each with at least two ways through and a hint path; tide, dusk and noon scripts; Ama's respect; the `report` command, the epilogue | The adventure can be played from start to finish, alone or together, and reach every ending | 3–4 |
+| **A5. Polish for the kids** | Better texts, a few pictures, escalating hints from the Ship, the journal grouped under the report's questions (if the playtest asks for it) | You'd be happy to show it | 2–3 |
 | **Playtest 1** | Kids play; you watch, possibly playing a character live | You have notes and transcripts | 1 visit |
 | **Fixes** | Changes from what you saw | Kids want to play it again | 1–3 |
 
@@ -478,3 +480,25 @@ A3 is built. All 84 tests pass (51 old ones and 33 new), and ruff and strict myp
 In A3 nothing waits for time yet: the Reef is always open, the birds are always there, and noon is whenever you use the sextant. The tide, dusk and noon come in A4.
 
 **To try it:** run `uv run evennia reload`, since there's new code, then `batchcode build` as admin to place the things. The README walkthrough goes from `look compass` through `read chronometer`.
+### A New Principle Realized - Three Layers
+
+**1. During play: facts, not conclusions, always on request.** For every clue there should be background knowledge somewhere in the world that makes it solid:
+- how far seabirds fly from land;
+- why oak doesn't grow on a tropical island;
+- why goats and onions point to Europeans;
+- four minutes of time per degree.
+
+This knowledge lives with the Ship or in the books, and players who want to dig can ask. The connection itself, "so land is within a day's sail", stays the player's to make.
+
+To make this systematic rather than accidental, each clue in clues.yaml could list the topics or books that hold its background, and the content check would fail if one is missing. That turns "every clue is backed by real knowledge" into a rule the build enforces, like the yellow-mark rule.
+
+**2. Optional reflection: questions, not answers.** A quiet place to think, such as the chart table in the Cabin with a `think` command, or a note under the journal. Once two related clues are both found, it offers a question that links them, for example: "The birds fly home at dusk. How far can a tern fly in a day? Perhaps the Ship knows." Players who don't care never see it. Players who do get pointed to the right question without being given the answer.
+
+It's a strong hint, the same concern as grouping the journal (decision 21). So it belongs in A5, after a playtest shows whether the kids need it.
+
+**3. After the report: "How it all fits."** This is the right place for the full analysis we did today, because there's nothing left to spoil. The epilogue would cover:
+- the chain from each clue to each answer;
+- the numbers: 14° S, 40° and 42° W, 160 and 168 minutes, a day's sail, how far the birds fly;
+- the real history: Harrison's chronometer, Sandy Island removed from maps in 2012, La Pérouse.
+
+The kids would leave with the feeling you describe: what seemed random was solid all along. It fits A4, which already includes the report and the epilogue, plus the sources list from decision 9.

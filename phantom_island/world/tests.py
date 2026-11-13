@@ -536,14 +536,14 @@ class TestAsk(WorldTest):
 
     def test_a_word_of_a_name_alone_is_still_a_topic(self) -> None:
         self.at("office")  # `old` is part of Old Barnaby's name, but `old chart` is the chart
-        self.assertIn("This is the Halcyon's chart", self.ask("old chart"))
+        self.assertIn("the Society's most precious paper", self.ask("old chart"))
 
     def test_several_topics_at_once_get_the_first_answered(self) -> None:
         self.at("office")
         heard: str = self.ask("fairweather about halcyon chart")
         self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
         self.assertIn("She sailed from this harbour", heard)
-        self.assertNotIn("This is the Halcyon's chart", heard)
+        self.assertNotIn("the Society's most precious paper", heard)
         self.assertIn("One thing at a time: you can ask about |wchart|n next.", heard)
 
     def test_something_to_look_at_gets_a_hint(self) -> None:
@@ -701,6 +701,29 @@ class TestThings(DiscoveryTest):
         self.assertEqual(return_stray_things(), [self.thing("animal_guide")])
         self.assertEqual(self.thing("animal_guide").location, self.rooms["cabin"])
 
+    def focus_after(self, command: str) -> str:
+        """The last Focus pane content char1's client gets after a command."""
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd(command)
+        focus: list[str] = [
+            c.kwargs["focus"] for c in mock_msg.call_args_list if "focus" in c.kwargs
+        ]
+        self.assertTrue(focus, f"no Focus update after {command!r}")
+        return focus[-1]
+
+    def test_looking_at_a_character_shows_their_picture_or_card(self) -> None:
+        self.at(self.char1, "market")
+        self.assertIn("pictures/crane.svg", self.focus_after("look crane"))
+        self.at(self.char1, "quay")
+        self.assertIn("Old Barnaby", self.focus_after("look barnaby"))  # no picture yet: a card
+        self.at(self.char2, "quay")
+        self.assertIn(self.char2.key, self.focus_after(f"look {self.char2.key}"))
+
+    def test_looking_at_anything_else_brings_back_the_room(self) -> None:
+        self.at(self.char1, "market")
+        self.focus_after("look crane")
+        self.assertIn("Market", self.focus_after("look west"))  # the exit to the Office
+
     def test_looking_at_a_thing_shows_its_card_until_looking_around(self) -> None:
         self.at(self.char1, "market")
         with patch.object(self.char1, "msg") as mock_msg:
@@ -819,7 +842,7 @@ class TestAtSea(DiscoveryTest):
         self.at(self.char1, "deck")
         self.do(self.char1, "use sextant")
         self.at(self.char1, "cabin")
-        self.assertIn("10 degrees further west", self.do(self.char1, "read chronometer"))
+        self.assertIn("2 degrees further west", self.do(self.char1, "read chronometer"))
 
     def test_others_in_the_room_hear_what_is_read(self) -> None:
         self.at(self.char1, "cabin")
@@ -877,8 +900,11 @@ class TestStartOver(DiscoveryTest):
         self.assertEqual(expedition.track, ["port"])
         self.assertEqual(current_position().id, "port")
         self.assertEqual(self.thing("plant_guide").location, self.rooms["cabin"])
-        for character in (self.char1, self.char2):
-            self.assertEqual(character.location, self.rooms["limbo"])
+        # char1 is being played and is moved; char2 (no session) is kept nowhere, as Evennia
+        # keeps offline characters, and comes back in Limbo at its next login.
+        self.assertEqual(self.char1.location, self.rooms["limbo"])
+        self.assertIsNone(self.char2.location)
+        self.assertEqual(self.char2.db.prelogout_location, self.rooms["limbo"])
         ashore: Any = find_ship_exit(ASHORE)
         self.assertEqual(ashore.destination, self.rooms["quay"])
 

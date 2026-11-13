@@ -44,6 +44,10 @@ limbo:
     happened to the Halcyon and her crew.
 
 
+    Look carefully, and trust nothing until it fits: in this story, every detail has a
+    reason.
+
+
     Type |wbegin|n to start.
   exits:
     begin: {to: office, aliases: [start]}

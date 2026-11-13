@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Silas Crane behind his market stall">
+  <!-- Silas Crane, the trader in the Market: a first simple drawing in the style of the
+       placeholder cards (parchment and brown ink). Real art can replace it in A5. -->
+  <title>Silas Crane behind his market stall</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- Awning, striped -->
+  <g stroke="#7a4a21" stroke-width="2">
+    <path d="M40 40 H440 L428 78 H52 Z" fill="#c9a96e"/>
+    <path d="M90 40 L84 78 M140 40 L136 78 M190 40 L188 78 M240 40 V78 M290 40 L292 78 M340 40 L344 78 M390 40 L396 78" fill="none"/>
+    <path d="M65 40 L59 78 H84 L90 40 Z M115 40 L110 78 H136 L140 40 Z M165 40 L162 78 H188 L190 40 Z M215 40 L214 78 H240 V40 Z M265 40 L266 78 H292 L290 40 Z M315 40 L318 78 H344 L340 40 Z M365 40 L370 78 H396 L390 40 Z M415 40 L422 78 H428 L440 40 Z" fill="#a8452e" opacity="0.75"/>
+    <path d="M52 78 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0 q12 12 24 0" fill="#c9a96e"/>
+  </g>
+  <!-- Poles -->
+  <rect x="48" y="78" width="8" height="196" fill="#7a4a21"/>
+  <rect x="424" y="78" width="8" height="196" fill="#7a4a21"/>
+
+  <!-- Crane: hat, face, heavy coat -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M160 214 C160 168 184 150 240 150 C296 150 320 168 320 214 Z" fill="#5b4632"/>
+    <path d="M226 150 L240 186 L254 150" fill="#e8dcc0"/>
+    <path d="M206 154 L222 200 M274 154 L258 200" fill="none"/>
+    <ellipse cx="240" cy="122" rx="26" ry="30" fill="#e2b98f"/>
+    <path d="M214 98 H266 L262 72 H218 Z" fill="#3b2a14"/>
+    <path d="M196 100 H284" stroke-width="6" stroke-linecap="round"/>
+    <path d="M226 118 q4 -4 8 0 M246 118 q4 -4 8 0" fill="none" stroke-width="2"/>
+    <circle cx="230" cy="121" r="2" fill="#3b2a14"/>
+    <circle cx="250" cy="121" r="2" fill="#3b2a14"/>
+    <path d="M230 138 q10 6 20 -2" fill="none" stroke-width="2"/>
+  </g>
+
+  <!-- The table and its wares -->
+  <rect x="70" y="210" width="340" height="18" fill="#8b5a2b" stroke="#3b2a14" stroke-width="2.5"/>
+  <rect x="84" y="228" width="12" height="46" fill="#7a4a21"/>
+  <rect x="384" y="228" width="12" height="46" fill="#7a4a21"/>
+  <g stroke="#3b2a14" stroke-width="2">
+    <path d="M100 210 C96 186 132 186 128 210 Z" fill="#b5651d"/>
+    <path d="M108 190 h12" fill="none"/>
+    <path d="M138 210 C134 194 160 194 156 210 Z" fill="#9c7a54"/>
+    <path d="M330 210 l10 -26 h40 l10 26 Z" fill="#6f8f9f"/>
+    <path d="M336 196 h48" fill="none"/>
+    <path d="M176 208 l30 -10 M180 210 l30 -10" fill="none" stroke="#7d7d7d" stroke-width="3"/>
+  </g>
+  <!-- The brass compass, glinting -->
+  <g>
+    <circle cx="282" cy="200" r="11" fill="#d4a017" stroke="#3b2a14" stroke-width="2"/>
+    <circle cx="282" cy="200" r="6" fill="#f3e6c4" stroke="#7a4a21" stroke-width="1"/>
+    <path d="M282 195 L284 200 L282 205 L280 200 Z" fill="#a8452e"/>
+    <path d="M296 186 l4 -4 M300 194 h6 M292 182 v-6" stroke="#d4a017" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

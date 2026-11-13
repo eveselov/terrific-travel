@@ -4,8 +4,8 @@ Starting a new expedition without resetting the database: the `startover` comman
 Everything the adventure remembers is in one place (DECISIONS.md, 7): the `Expedition`
 script (journal, flags, where the ship is and where she has been), where the things are, and
 where the players are. Starting over clears the script, sails the ship to the chosen
-position, puts every thing back and sends every player character, online or not, to Limbo,
-the title page, so each one begins again with `begin`.
+position, puts every thing back and sends every player character to Limbo, the title page
+(an offline one comes back there at its next login), so each one begins again with `begin`.
 
 For testing the later acts, a new expedition can start with the ship already at sea or at
 the island. `begin` then leads to the Deck, as for a late joiner (DECISIONS.md, 18).
@@ -21,7 +21,7 @@ from typeclasses.characters import Character
 from typeclasses.things import Thing
 from world.builder import default_home
 from world.content import LIMBO_ID, Content, load_content
-from world.expedition import connected_characters, get_expedition
+from world.expedition import get_expedition
 from world.places import all_things, find_place
 from world.ship import moor_ship
 
@@ -97,10 +97,25 @@ def start_over(position_id: str) -> list[str]:
             thing.move_to(thing.home, quiet=True, move_type="teleport")
 
     limbo: Any = find_place(LIMBO_ID) or default_home()
-    online: list[Any] = connected_characters()
     for character in player_characters():
-        if character.location != limbo:
-            character.move_to(limbo, quiet=True, move_type="teleport")
-        if character in online:
+        if character.sessions.count():
+            if character.location != limbo:
+                character.move_to(limbo, quiet=True, move_type="teleport")
             character.msg(NEW_EXPEDITION)
+        else:
+            send_offline_to(character, limbo)
     return track
+
+
+def send_offline_to(character: Character, room: Any) -> None:
+    """
+    Make a character nobody is playing come back in `room` at their next login.
+
+    Evennia keeps such characters nowhere (location None) and remembers where they logged
+    out (`prelogout_location`); logging in puts them back there. So only the memory is
+    changed, and the character is taken out of any room it was left in, so nobody sees it
+    standing there.
+    """
+    character.db.prelogout_location = room
+    if character.location is not None:
+        character.location = None

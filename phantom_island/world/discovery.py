@@ -13,11 +13,15 @@ together share a noon sight.
 
 from typing import Any
 
+from evennia.objects.objects import DefaultCharacter
+
+from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
 from typeclasses.things import Thing
 from world.clues import discover, discover_all, show_marks
 from world.content import (
     ActionSpec,
+    CharacterSpec,
     Content,
     LookSpec,
     PlaceSpec,
@@ -198,3 +202,23 @@ def return_stray_things() -> list[Thing]:
         thing.move_to(thing.home, quiet=True, move_type="teleport")
         returned.append(thing)
     return returned
+
+
+def show_focus_for(caller: Any, target: Any) -> None:
+    """
+    After `look <target>` at something that isn't a thing or a detail: a character gets
+    their picture (or a card with their name) in the Focus pane; anything else (an exit,
+    the room itself) brings back the room's picture, so the pane never shows something the
+    player has stopped looking at.
+    """
+    if isinstance(target, Inhabitant):
+        spec: CharacterSpec | None = target.spec
+        image: str | None = spec.image if spec is not None else None
+        caller.msg(focus=render_focus_html(str(target.key), image))
+        return
+    if isinstance(target, DefaultCharacter):  # another player
+        caller.msg(focus=render_focus_html(str(target.key), None))
+        return
+    location: Any = caller.location
+    if isinstance(location, Room):
+        location.send_visuals(caller)

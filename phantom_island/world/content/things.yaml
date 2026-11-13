@@ -130,10 +130,10 @@ things:
           needs: [sight_island]
           clue: C5
           text: >
-            Noon on deck came when the chronometer showed twenty past three, home time: 200
-            minutes after noon at home. Four minutes for every degree makes 50 degrees
-            West. [[The island lies at exactly the chart's latitude, but 10 degrees further
-            west than the chart's longitude.]]
+            Noon on deck came when the chronometer showed twelve minutes to three, home
+            time: 168 minutes after noon at home. Four minutes for every degree makes 42
+            degrees West. [[The island lies at exactly the chart's latitude, but 2 degrees
+            further west than the chart's longitude.]]
           otherwise: >
             The chronometer ticks steadily, keeping home time. On its own it can't say
             where you are: you also need the moment of noon out here. Take a noon sight

@@ -26,6 +26,8 @@
 #             between them from A4; until then they stand in the first), or `aboard`
 #             (the Deck and the Cabin)
 #   desc      what players read when they look at them
+#   image     optional: URL of their picture, shown in the Focus pane when someone looks at
+#             them (without one, a card with their name)
 #   greeting  the reply to `ask <character>` with no topic; the `suggest` topics follow it
 #   suggest   topics offered to players who don't know what to ask
 #   fallback  the polite reply for any topic the character doesn't know
@@ -76,27 +78,35 @@ characters:
         stance: truth
         reply: >
           "The Society wants the truth about the |wHalcyon|n. Fifteen years of rumours, and
-          now a |wcompass|n with her name on it turns up in our own market. Look at it first.
-          Then sail to the |wisland|n on her |wchart|n and see what is left to find."
+          now a |wcompass|n with her name on it turns up in our own market. Silas Crane has
+          it on his stall, just east of here. Go and look at it first. Then sail to the
+          |wisland|n on her |wchart|n and see what is left to find."
       halcyon:
         stance: truth
         reply: >
-          "She sailed from this harbour in 1775 to chart a small |wisland|n far out in the
-          ocean. A sound ship with a careful master. Her last |wletter|n reached us, and then
-          nothing. Not a plank, not a word."
+          Mrs. Fairweather's voice softens. "Ah, the Halcyon. She sailed from this harbour
+          in 1775 to chart a small |wisland|n far out in the ocean, one that sailors only
+          spoke of. A sound ship, built of good oak, with a careful master and a crew who
+          would have followed him anywhere. Half the town came down to the quay to see her
+          go, flags flying and her new sails white in the sun. Her last |wletter|n reached
+          us, and then nothing. Not a plank, not a word. Fifteen years, and people here
+          still look out to sea when her name comes up."
       chart:
         stance: mistaken
         reply: >
-          "This is the Halcyon's chart. The island is drawn here, with its latitude and
-          longitude written beside it. Her master was a careful man; I have never had
-          reason to doubt it. A fair copy is waiting for you in the ship's cabin."
+          "The Halcyon's chart is the Society's most precious paper, so the original stays
+          locked away here. A fair copy is waiting for you in your ship's cabin. The island
+          is drawn on it, with its latitude and longitude written beside it. Her master was
+          a careful man; I have never had reason to doubt it."
       letter:
         aliases: [last letter]
         stance: truth
         reply: >
-          She reads aloud: "'We have found the island and fixed its position. Good water,
-          fair weather, friendly people. We sail again soon.' That was the last word we
-          ever had."
+          Mrs. Fairweather takes a worn, much-folded letter from the top of her pile. "Her
+          master's last letter, in his own hand. I know it by heart, but listen." She reads
+          aloud: "'We have found the island and fixed its position. Good water, fair
+          weather, friendly people. We sail again soon.'" She folds it again. "That was the
+          last word we ever had."
       island:
         stance: truth
         reply: >
@@ -166,6 +176,7 @@ characters:
     name: Silas Crane
     aliases: [crane, silas, trader]
     where: market
+    image: /static/phantom_island/pictures/crane.svg
     desc: >
       A trader in a coat too warm for the weather, standing behind a stall of pots, cloth,
       knives and curiosities. His eyes follow your hands.
@@ -179,8 +190,8 @@ characters:
       compass:
         stance: hiding
         reply: >
-          "Found it on a |wbeach|n, I did, washed up after a storm. A lucky find. Lucky for
-          whoever buys it, too."
+          "Found it on a |wbeach|n, I did, washed up after a |wstorm|n. A lucky find. Lucky
+          for whoever buys it, too."
         truth:
           needs: [C2]
           clue: C3
@@ -193,6 +204,16 @@ characters:
         reply: >
           "Which beach? Oh, one down the coast. Can't remember which. They all look the
           same, beaches."
+      storm:
+        stance: hiding
+        reply: >
+          "Last winter's, the big blow just after the new year. Next morning, there it was
+          on the sand, shining. Fresh out of the sea, you might say."
+        truth:
+          needs: [C2]
+          reply: >
+            Crane spreads his hands. "Storm? There's always a storm, in a port like this.
+            It made a better story than 'bought it off strangers', that's all."
       fishermen:
         aliases: [fisherman, west]
         stance: hiding

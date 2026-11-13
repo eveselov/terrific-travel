@@ -6,7 +6,7 @@ from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
 from typeclasses.rooms import Room
 from world.clues import journal_text
-from world.discovery import act, look_at, notice_surroundings
+from world.discovery import act, look_at, notice_surroundings, show_focus_for
 
 from .command import Command
 
@@ -31,14 +31,24 @@ class CmdLook(DefaultCmdLook):
     help_category = "General"
 
     def func(self) -> None:
-        if self.args.strip() and look_at(self.caller, self.args.strip()):
-            return
-        super().func()
-        if not self.args.strip():
-            location: Any = self.caller.location
+        caller: Any = self.caller
+        text: str = self.args.strip()
+        if not text:
+            super().func()
+            location: Any = caller.location
             if isinstance(location, Room):  # back from a thing's card to the room's picture
-                location.send_visuals(self.caller)
-            notice_surroundings(self.caller)
+                location.send_visuals(caller)
+            notice_surroundings(caller)
+            return
+        if look_at(caller, text):  # a thing or a detail of the room
+            return
+        # Anything else (a character, an exit...): as Evennia's own look does, then the
+        # Focus pane follows what was looked at.
+        target: Any = caller.search(text)
+        if not target:
+            return
+        self.msg(text=(caller.at_look(target), {"type": "look"}), options=None)
+        show_focus_for(caller, target)
 
 
 class CmdExamine(Command):

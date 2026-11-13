@@ -15,6 +15,8 @@ don't show it to the players.
 > sextant, clock and charts, which read the sun, the stars and the sea, and the naturalist's
 > books, which read plants, animals, birds and the land. Your job: find out what really
 > happened to the *Halcyon* and her crew.
+>
+> Look carefully, and trust nothing until it fits: in this story, every detail has a reason.
 
 The game is played alone or together (see DECISIONS.md, 6a and 6b). There are no exclusive
 roles: anyone can use any instrument and find any clue. Two players who split up just get
@@ -29,8 +31,12 @@ first good sea clocks (chronometers) were new and rare. Older charts often put i
 the wrong east-west position, and some "phantom islands" stayed on maps for centuries.
 One of them, Sandy Island, was removed from maps only in 2012.
 
-The *Halcyon*'s chart has the island at the right latitude but about one degree too far east
-(roughly 110 km). That one mistake is why nobody found the wreck.
+The *Halcyon*'s chart has the island at the right latitude (14° S) but 2 degrees too far
+east: 40° W on the chart, 42° W in truth, about 215 km at that latitude, a day's sail. That
+one mistake is why nobody found the wreck. It is small enough that seabirds fishing at the
+charted position still fly home to the island at dusk (C6), and the arithmetic stays easy:
+4 minutes of time per degree, so noon comes 160 minutes after home noon at the charted
+position and 168 minutes after at the island.
 
 ## The truth (fixed, stored in the game)
 
@@ -48,6 +54,75 @@ The game keeps this as data. Characters reveal parts of it; they never make up n
 6. As a gift, the crew left the ship's compass with a fisherman's family. Years later it
    was traded from island to island and reached the port. That's the hook.
 7. Goats and a patch of European onions are still on the island, left by the crew.
+
+## Facts that depend on each other
+
+The game's details are meant to hold together (DECISIONS.md, 22). Each chain below lists
+facts that rely on each other, and where each one is written. **Whenever one of them
+changes, check the rest of its chain.** "Holds" says whether the chain is consistent and
+plausible as it stands.
+
+### Longitude: why nobody found her
+
+| Fact | Depends on | Where it's written |
+|---|---|---|
+| The island is at 14° S, 42° W | — (the truth) | `things.yaml` (sextant, chronometer) |
+| The *Halcyon*'s chart says 14° S, 40° W: latitude right, longitude 2° too far east | Latitude from the noon sun was easy in 1775; longitude needed a sea clock, which she didn't have | `things.yaml` (chart), Jonah's *chart*, the Ship's *latitude* and *longitude* |
+| Noon comes 160 minutes after home noon at the charted position, 168 at the island | 4 minutes of time per degree (the Earth turns 15° an hour) | `things.yaml` (chronometer), the Ship's *longitude* |
+| 2° at 14° S is about 215 km, a long day's sail | 1° of longitude ≈ 111 km × cos(latitude) | `ship.yaml` (the route west: "After a long day") |
+| The charted position shows empty sea (C4) | The island is 215 km away, below the horizon even from the masthead | `ship.yaml` (charted position) |
+| The Society trusted the chart; Barnaby thinks she sank | Nobody could check the longitude | Fairweather's *chart*, Barnaby's *halcyon* |
+
+Holds, except the birds (next chain).
+
+### Birds: which way is land (C6)
+
+| Fact | Depends on | Where it's written |
+|---|---|---|
+| At dusk at the charted position, seabirds all fly west | They fish at sea by day and fly home to land at night; land is to the west | `ship.yaml` (the *sky* detail), the Ship's *birds* |
+
+**Doesn't hold yet.** Terns and noddies, the birds island navigators watched, are usually
+taken as a sign of land within roughly 20–50 km. The island is about 215 km from the charted
+position. To check against sources (DECISIONS.md, 9) and then fix: either birds that range
+further and still roost on land (boobies, frigatebirds: check), or the birds seen on the
+voyage west, nearer the island, or a smaller error. A smaller error is limited by C4: a
+hilly island can be seen from a masthead at about 50–70 km.
+
+### The wreck: where she was lost
+
+| Fact | Depends on | Where it's written |
+|---|---|---|
+| The great storm of '75: three days of wind out of the west | Winds are named for where they come from: it blew towards the east | Barnaby's *storm* |
+| The *Halcyon* anchored off the island's west side | She had come from the east and charted the island | Jonah's *halcyon* |
+| The anchors dragged and she struck the Western Reef at night (C7, C13) | A west wind drives a ship anchored off the west side onto that shore | Jonah's *wreck*, the *bones* on the Western Reef |
+| The reef can be walked only at low tide | The ribs stand in the shallows | Ama's *reef*, the Ship's *tide* (A4: the tide gate) |
+
+Holds.
+
+### The compass: Crane's lie (meant not to hold)
+
+| Fact | Depends on | Where it's written |
+|---|---|---|
+| Crane says it washed up on a beach after last winter's storm | His lie | Crane's *compass*, *beach*, *storm* |
+| A coral crust has grown in its hinge (C2) | Coral takes years under water, not one winter on a beach | `things.yaml` (compass, `examine`) |
+| The *Halcyon* was lost fifteen years ago, in the great storm of '75 | — (the truth) | Barnaby's *storm*, Fairweather's *halcyon* |
+| Once C2 is found he admits fishermen from the west traded it to him (C3) | It came from island to island, eastward | Crane's *compass* and *fishermen* (truth) |
+
+Holds as a lie: the dates and the coral contradict him, which is the point.
+
+### Survival: what became of the crew
+
+| Fact | Depends on | Where it's written |
+|---|---|---|
+| Nobody died: the islanders rescued the crew in their canoes | — (the truth) | Jonah's *wreck*, Tui's song, Ama (A4) |
+| Oak beams hold up a village hut (C8) | No oak grows on a tropical island: it's the *Halcyon*'s timber, cut by shipwrights (nail, peg holes) | `places.yaml` (the *beams*), Fairweather's *halcyon* ("built of good oak") |
+| Goats and onions on the island (C9) | Ships carried live goats and onions for long voyages; neither is native here | `places.yaml` (*goats*, *shoots*), the guides |
+| A boat was built at the cove from the ship's oak, with island rope and a canvas sail | The slipway and old wood chips at the Boat Cove | Jonah's *boat*, `places.yaml` (*slipway*) |
+| "A new canoe with a white wing flew away to where the sun goes to sleep" (C11) | A sailing boat, seen by children: the white sail is the wing; the sun sets in the west | Tui's *song* |
+| Most of the crew sailed west, Jonah stayed | West led to the trading routes; he had married into the village | Jonah's *crew* |
+| The compass reached the port through fishermen from the west (C3) | The crew left it as a gift; it was traded from island to island, eastward to the port | Crane's *compass* (truth), *fishermen* |
+
+Holds.
 
 ## Structure: three acts, one session (30–60 minutes)
 
