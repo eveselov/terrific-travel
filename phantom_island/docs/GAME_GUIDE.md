@@ -36,6 +36,13 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - Splitting up is faster: some tasks have two halves, such as the noon sight on the Deck and the chronometer in the Cabin. Something you carry (a book, the chart) is with you, not with the others, until you drop it or log out.
 - Nobody gets left behind: the ship won't sail while someone is still ashore. Someone joining late, while the ship is away, starts on the Deck and catches up with `journal`.
 
+## Talking and moving
+
+- `ask <someone>` greets them, and they suggest things to ask about. `ask <someone> about <something>` asks. `about` is always needed for a topic, so `ask ship` always means the Ship, never a question about ships.
+- After that, `ask about <something>` (or `ask him`, `her`, `them about …`) goes on talking to the same person, as long as they're still there. With only one person around, `ask about …` is enough from the start.
+- The start of a long name is enough: `ask fair about the chart`.
+- Walk with the exit's name (`east`, `aboard`) or with `go`: `go east`, `go to the market`.
+
 ## Sailing
 
 - Orders are given on the Deck with `sail`. On its own, `sail` tells you where the ship is and what you can order there.

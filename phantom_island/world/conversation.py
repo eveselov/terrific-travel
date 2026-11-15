@@ -34,6 +34,9 @@ from world.expedition import get_expedition
 
 ABOUT: str = "about"
 USAGE: str = "Usage: |wask <someone> about <something>|n, or just |wask <someone>|n."
+# `ask him about the storm`: whoever the asker last spoke to.
+LAST_PERSON: tuple[str, ...] = ("him", "her", "them")
+MIN_NAME_START: int = 3  # `ask fai` is too short to mean Mrs. Fairweather
 
 
 @dataclass(frozen=True)
@@ -74,7 +77,17 @@ def _match(name: str, candidates: list[CharacterSpec]) -> CharacterSpec | None:
     partial: list[CharacterSpec] = [
         spec for spec in candidates if any(wanted in word.split() for word in spec.words)
     ]
-    return partial[0] if len(partial) == 1 else None
+    if partial:
+        return partial[0] if len(partial) == 1 else None
+    # The start of a name is enough, if only one fits: `ask fair about the chart`.
+    if len(wanted) < MIN_NAME_START or " " in wanted:
+        return None
+    starts: list[CharacterSpec] = [
+        spec
+        for spec in candidates
+        if any(part.startswith(wanted) for word in spec.words for part in word.split())
+    ]
+    return starts[0] if len(starts) == 1 else None
 
 
 def find_listener(caller: Any, name: str) -> Listener | None:
@@ -84,24 +97,24 @@ def find_listener(caller: Any, name: str) -> Listener | None:
     return next((listener for listener in here if listener.spec is spec), None)
 
 
-def split_request(caller: Any, text: str) -> tuple[str, str]:
+def split_request(text: str) -> tuple[str, str] | None:
     """
-    Split what follows `ask` into (who, what).
-
-    `barnaby about the storm` -> (`barnaby`, `the storm`); `about the storm` -> (``, `the
-    storm`). Without `about`, the longest start that names someone here is the who:
-    `old barnaby storm` -> (`old barnaby`, `storm`). If no start names anyone here, it's
-    all the what: `halcyon` -> (``, `halcyon`), for whoever is here to answer.
+    Split what follows `ask` at `about` into (who, what): `barnaby about the storm` ->
+    (`barnaby`, `the storm`), `about the storm` -> (``, `the storm`). None without `about`:
+    then all of it names whom to greet.
     """
     words: list[str] = text.split()
     lowered: list[str] = [word.lower() for word in words]
-    if ABOUT in lowered:
-        at: int = lowered.index(ABOUT)
-        return " ".join(words[:at]), " ".join(words[at + 1 :])
-    for end in range(len(words), 0, -1):
-        if find_listener(caller, " ".join(words[:end])) is not None:
-            return " ".join(words[:end]), " ".join(words[end:])
-    return "", text.strip()
+    if ABOUT not in lowered:
+        return None
+    at: int = lowered.index(ABOUT)
+    return " ".join(words[:at]), " ".join(words[at + 1 :])
+
+
+def last_listener(caller: Any) -> Listener | None:
+    """Whoever the caller spoke to last, if they can still hear the caller here."""
+    last: Any = caller.ndb.last_asked
+    return next((item for item in listeners(caller) if item.spec.id == last), None)
 
 
 def speech(spec: CharacterSpec, text: str) -> str:
@@ -229,46 +242,92 @@ def _say_to_room(caller: Any, mine: str, theirs: str, reply: str) -> None:
         caller.msg(reply)
 
 
+def _lines(*lines: str) -> str:
+    return "\n".join(line for line in lines if line)
+
+
+def _without_about(caller: Any, text: str) -> str:
+    """
+    What to say to `ask <text>` when `text` names nobody here to greet: how to put it
+    with `about` (`ask barnaby storm`), why someone named doesn't answer (`ask ship` ashore,
+    `ask crane` on the Quay), or that a topic needs someone to ask (`ask halcyon`).
+    """
+    words: list[str] = text.split()
+    for end in range(len(words) - 1, 0, -1):
+        name: str = " ".join(words[:end])
+        listener: Listener | None = find_listener(caller, name)
+        if listener is not None:
+            rest: str = " ".join(words[end:])
+            return f"To ask {listener.spec.name} about {rest}: |wask {name} about {rest}|n"
+    elsewhere: str | None = _someone_else(caller, text)
+    if elsewhere is not None:
+        return elsewhere
+    hint: str = _look_hint(caller, text)
+    if not listeners(caller):
+        return _lines("There is nobody here to talk to.", hint)
+    return _lines(
+        f"To ask about {text}, say whom you're asking: |wask <someone> about {text}|n. "
+        + _who_is_here(caller),
+        hint,
+    )
+
+
+def _addressee(caller: Any, who: str, what: str) -> Listener | str:
+    """
+    Whom `ask <who> about <what>` is for, or what to tell the caller instead. Without a
+    name, or with `him`, `her` or `them`: whoever the caller spoke to last, if they're
+    still here, else the only person here.
+    """
+    if who and normalise_words(who) not in LAST_PERSON:
+        return find_listener(caller, who) or _not_here(caller, who)
+    last: Listener | None = last_listener(caller)
+    if last is not None:
+        return last
+    here: list[Listener] = listeners(caller)
+    if len(here) == 1:
+        return here[0]
+    hint: str = _look_hint(caller, what)
+    if not here:
+        return _lines("There is nobody here to talk to.", hint)
+    return _lines(f"Whom do you want to ask about {what}? {_who_is_here(caller)}", hint)
+
+
 def ask(caller: Any, text: str) -> TopicSpec | None:
     """
     Handle `ask <text>`. Returns the topic that was answered, or None (a greeting, a
     fallback, or nobody to ask).
 
-    Without `about`, text that names nobody here is the topic, for the one person here
-    (`ask halcyon` in the Society Office). Several topics at once get the first answered.
+    `ask <someone>` greets them; `ask <someone> about <topic>` asks; `ask about <topic>`
+    (or `ask him about <topic>`) asks whoever the asker last spoke to, or the only person
+    here. Several topics at once get the first answered.
     """
     text = text.strip()
-    who, what = split_request(caller, text)
-    if not who and not what:
+    if not text:
         caller.msg(f"{USAGE}\n{_who_is_here(caller)}")
         return None
-
-    listener: Listener | None
-    if who:
-        listener = find_listener(caller, who)
-        if listener is None:
-            caller.msg(_not_here(caller, who))
+    split: tuple[str, str] | None = split_request(text)
+    what: str
+    if split is None:
+        greeted: Listener | None = find_listener(caller, text)
+        if greeted is None:
+            caller.msg(_without_about(caller, text))
             return None
+        listener: Listener = greeted
+        what = ""
     else:
-        if ABOUT not in text.lower().split():
-            elsewhere: str | None = _someone_else(caller, what)
-            if elsewhere is not None:
-                caller.msg(elsewhere)
-                return None
-        here: list[Listener] = listeners(caller)
-        if len(here) != 1:
-            hint: str = _look_hint(caller, what)
-            if not here:
-                caller.msg(
-                    "\n".join(line for line in ("There is nobody here to talk to.", hint) if line)
-                )
-            else:
-                whom: str = f"Whom do you want to ask about {what}? {_who_is_here(caller)}"
-                caller.msg("\n".join(line for line in (whom, hint) if line))
+        who: str
+        who, what = split
+        if not what:
+            caller.msg(f"Ask about what? {USAGE}")
             return None
-        listener = here[0]
+        found: Listener | str = _addressee(caller, who, what)
+        if isinstance(found, str):
+            caller.msg(found)
+            return None
+        listener = found
 
     spec: CharacterSpec = listener.spec
+    caller.ndb.last_asked = spec.id
     asker: str = caller.get_display_name(caller)
     if not what:
         lines: str = "\n".join(

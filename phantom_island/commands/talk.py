@@ -10,17 +10,23 @@ class CmdAsk(Command):
     Ask someone about something.
 
     Usage:
-      ask <someone> about <something>
       ask <someone>
+      ask <someone> about <something>
+      ask about <something>
 
     Asking someone without a topic greets them, and they suggest a few things to ask about.
     Words shown in white in their answers are often worth asking about too. Aboard the
     ship, on the Deck or in the Cabin, you can always ask the Ship herself.
 
+    ask about <something> (or ask him, her or them about ...) asks the person you spoke
+    to last, if they're still here, or the only person here. The start of a long name is
+    enough: ask fair about the chart.
+
     Examples:
-      ask barnaby about the storm
-      ask ship about longitude
       ask tui
+      ask barnaby about the storm
+      ask about the halcyon
+      ask ship about longitude
     """
 
     key = "ask"

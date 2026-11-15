@@ -18,7 +18,7 @@ from evennia import default_cmds
 
 from .admin import CmdStartOver
 from .discover import CmdExamine, CmdGet, CmdJournal, CmdLook, CmdRead, CmdUse
-from .explore import CmdMap
+from .explore import CmdGo, CmdMap
 from .talk import CmdAsk
 
 
@@ -40,6 +40,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         # any commands you add below will overload the default ones.
         #
         self.add(CmdMap())
+        self.add(CmdGo())
         self.add(CmdAsk())
         self.add(CmdLook())
         self.add(CmdGet())

@@ -479,6 +479,27 @@ class TestVoyage(WorldTest):
         self.assertEqual(self.clock.call_args.args[1], sail_on)
 
 
+class TestGo(WorldTest):
+    def test_go_is_the_same_as_the_exit(self) -> None:
+        self.char1.move_to(self.rooms["office"], quiet=True)
+        self.char1.execute_cmd("go southeast")
+        self.assertEqual(self.char1.location, self.rooms["quay"])
+        self.char1.execute_cmd("go aboard")
+        self.assertEqual(self.char1.location, self.rooms["deck"])
+
+    def test_go_to_a_place_by_its_name(self) -> None:
+        self.char1.move_to(self.rooms["office"], quiet=True)
+        self.char1.execute_cmd("go to the market")
+        self.assertEqual(self.char1.location, self.rooms["market"])
+
+    def test_go_nowhere_lists_the_exits(self) -> None:
+        self.char1.move_to(self.rooms["office"], quiet=True)
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("go north")
+        self.assertIn("Exits:", texts(mock_msg))
+        self.assertEqual(self.char1.location, self.rooms["office"])
+
+
 class TestMapsAndFocus(WorldTest):
     def test_moving_sends_map_and_focus(self) -> None:
         with patch.object(self.char1, "msg") as mock_msg:
@@ -617,9 +638,30 @@ class TestAsk(WorldTest):
         self.assertIn("You ask Old Barnaby about the storm.", heard)
         self.assertIn('Old Barnaby says: "Worst I ever saw.', heard)
 
-    def test_ask_without_about_works_too(self) -> None:
+    def test_without_about_the_game_shows_how_to_ask(self) -> None:
         self.at("quay")
-        self.assertIn("Worst I ever saw", self.ask("old barnaby storm"))
+        heard: str = self.ask("old barnaby storm")
+        self.assertNotIn("Worst I ever saw", heard)
+        self.assertIn("ask old barnaby about storm", heard)
+
+    def test_the_ship_is_not_a_topic_ashore(self) -> None:
+        self.at("quay")  # Barnaby is here, but `ask ship` means the Ship
+        heard: str = self.ask("ship")
+        self.assertIn("can only hear you when you're aboard", heard)
+        self.assertNotIn("Old Barnaby says", heard)
+
+    def test_the_start_of_a_name_is_enough(self) -> None:
+        self.at("office")
+        self.assertIn("sailed from this harbour", self.ask("fair about halcyon"))
+        self.assertIn("nobody called", self.ask("fa about halcyon"))  # too short
+
+    def test_about_alone_goes_to_whoever_you_spoke_to_last(self) -> None:
+        self.at("village")
+        self.ask("tui")
+        self.assertIn("Tui", self.ask("about song").split("\n")[0])
+        self.assertIn("Tui", self.ask("her about song").split("\n")[0])
+        self.ask("ama")
+        self.assertIn("Elder Ama", self.ask("them about halcyon").split("\n")[0])
 
     def test_an_unknown_topic_gives_the_fallback_and_suggestions(self) -> None:
         self.at("quay")
@@ -644,15 +686,15 @@ class TestAsk(WorldTest):
         self.assertIn("Elder Ama", heard)
         self.assertIn("Tui", heard)
 
-    def test_with_one_person_here_the_topic_alone_is_enough(self) -> None:
+    def test_a_topic_alone_needs_someone_to_ask(self) -> None:
         self.at("office")
         heard: str = self.ask("halcyon")
-        self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
-        self.assertIn("sailed from this harbour", heard)
+        self.assertIn("ask <someone> about halcyon", heard)
+        self.assertIn("Mrs. Fairweather", heard)
 
-    def test_the_ship_answers_a_topic_alone_on_deck(self) -> None:
+    def test_the_ship_answers_about_alone_on_deck(self) -> None:
         self.at("deck")
-        self.assertIn("15 degrees every hour", self.ask("longitude"))
+        self.assertIn("15 degrees every hour", self.ask("about longitude"))
 
     def test_a_player_is_not_a_character_to_ask(self) -> None:
         self.at("office")
@@ -667,7 +709,7 @@ class TestAsk(WorldTest):
 
     def test_a_word_of_a_name_alone_is_still_a_topic(self) -> None:
         self.at("office")  # `old` is part of Old Barnaby's name, but `old chart` is the chart
-        self.assertIn("most precious paper", self.ask("old chart"))
+        self.assertIn("most precious paper", self.ask("about old chart"))
 
     def test_several_topics_at_once_get_the_first_answered(self) -> None:
         self.at("office")
@@ -679,7 +721,7 @@ class TestAsk(WorldTest):
 
     def test_something_to_look_at_gets_a_hint(self) -> None:
         self.at("spring")
-        heard: str = self.ask("shoots")
+        heard: str = self.ask("about shoots")
         self.assertIn("There is nobody here to talk to.", heard)
         self.assertIn("look shoots", heard)
         self.at("village")
