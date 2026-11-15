@@ -1292,7 +1292,7 @@ class TestNotebook(DiscoveryTest):
         self.at(self.char2, "quay")
         with patch.object(self.char2, "msg") as heard:
             told: str = self.do(self.char1, "ask barnaby about sailing")
-        self.assertIn("New in your notebook: |wLatitude|n (Navigation)", told)
+        self.assertIn("New in your notebook: |wLatitude|n. Type |wnotebook|n to read it.", told)
         self.assertIn("New in your notebook", texts(heard))
         page: str = self.notebook(self.char2)
         self.assertIn("|wNavigation|n: 1 of 2", page)
@@ -1331,6 +1331,13 @@ class TestNotebook(DiscoveryTest):
         page: str = self.do(self.char1, "notebook sources")
         self.assertIn("heard: Old Barnaby; understood: the Ship", page)
         self.assertIn(f"Also in the notebook of {self.char2.key}", page)
+
+    def test_how_to_read_it_is_said_until_it_is_opened(self) -> None:
+        self.at(self.char1, "quay")
+        self.notebook(self.char1)
+        told: str = self.do(self.char1, "ask barnaby about sailing")
+        self.assertIn("New in your notebook: |wLatitude|n.", told)
+        self.assertNotIn("Type", told)
 
     def test_a_new_expedition_starts_with_empty_notebooks(self) -> None:
         self.at(self.char1, "quay")

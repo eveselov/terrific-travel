@@ -8,7 +8,7 @@ from evennia.commands.default.general import CmdLook as DefaultCmdLook
 from typeclasses.rooms import Room
 from world.clues import journal_text
 from world.discovery import act, look_at, notice_surroundings, show_focus_for
-from world.notebook import notebook_text, sources_text
+from world.notebook import READ_IT, notebook_text, sources_text
 
 from .command import Command
 
@@ -185,6 +185,7 @@ class CmdNotebook(Command):
     help_category = "General"
 
     def func(self) -> None:
+        self.caller.attributes.add(READ_IT, True)  # no more "Type notebook" hints
         if self.args.strip().lower() in ("sources", "source", "who"):
             self.caller.msg(sources_text(self.caller))
         else:

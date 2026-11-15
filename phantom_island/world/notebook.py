@@ -20,6 +20,8 @@ from world.content import LEVELS, Content, IdeaSpec, Teaching, load_content
 from world.expedition import get_expedition
 
 NOTEBOOK: str = "|wnotebook|n"
+# Set on a character once they have opened their notebook: the "Type notebook" hint stops.
+READ_IT: str = "has_read_notebook"
 USED: str = "used"
 
 
@@ -27,7 +29,8 @@ def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None 
     """
     `doer` (and `hearers`, who heard or watched it) learned what a text teaches, from
     `source` ("Old Barnaby", "the sextant"). Each learner gets one line naming the new ideas,
-    and one for entries that grew; nothing is said when they knew it this well already.
+    and one for entries that grew; nothing is said when they knew it this well already. How
+    to read the notebook is said only until they have opened it.
     """
     if not teaching:
         return
@@ -42,16 +45,18 @@ def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None 
             if learner is not doer and level_name == USED:
                 level_name = LEVELS[LEVELS.index(USED) - 1]  # watching isn't doing
             change: str | None = _note(learner, idea, level_name, source)
-            area: str = content.areas[idea.area].title
             if change == "new":
-                new.append(f"|w{idea.title}|n ({area})")
+                new.append(f"|w{idea.title}|n")
             elif change == "grew":
                 grew.append(f"|w{idea.title}|n")
+        read_it: bool = bool(learner.attributes.get(READ_IT, False))
         if new:
-            learner.msg(f"New in your notebook: {', '.join(new)}. Type {NOTEBOOK} to read it.")
+            hint: str = "" if read_it else f" Type {NOTEBOOK} to read it."
+            learner.msg(f"New in your notebook: {', '.join(new)}.{hint}")
         if grew:
             entries: str = "entry" if len(grew) == 1 else "entries"
-            learner.msg(f"Your notebook {entries} on {', '.join(grew)} grew. ({NOTEBOOK})")
+            hint = "" if read_it else f" ({NOTEBOOK})"
+            learner.msg(f"Your notebook {entries} on {', '.join(grew)} grew.{hint}")
 
 
 def _note(learner: Any, idea: IdeaSpec, level_name: str, source: str) -> str | None:
