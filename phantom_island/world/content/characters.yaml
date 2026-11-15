@@ -30,6 +30,10 @@
 #   - Most replies end with at least one white word leading somewhere new: no dead ends.
 #   - Name the subject at its first mention in each reply ("the Halcyon", not "she"):
 #     players read replies in any order.
+#   - There are three ships in this story: the Halcyon, your ship and the boat built on
+#     the island. Say "she" or "her" for a ship only right after naming that ship in the
+#     same reply, and never when another ship was mentioned in between. Charts, islands
+#     and positions are "it".
 #   - Figurative language only in a character's own voice, where it shows who they are
 #     (Barnaby's sayings, Tui's song). Narration stays plain.
 #   - Prefer connections: a reply that points to another character, thing or clue
@@ -107,7 +111,7 @@ characters:
           "The Society wants the truth about the |wHalcyon|n. Fifteen years of rumours, and
           now a |wcompass|n with her name on it turns up in our own market. Silas Crane has
           it on his stall, just east of here. Go and look at it first. Then take your
-          |wship|n to the |wisland|n on her |wchart|n and see what is left to find."
+          |wship|n to the |wisland|n on the Halcyon's |wchart|n and see what is left to find."
       halcyon:
         stance: truth
         teaches: {oak: heard}
@@ -121,8 +125,8 @@ characters:
         reply: >
           "The Halcyon's chart is the |wSociety|n's most precious paper, so the original stays
           locked away here. A fair copy is waiting for you in your ship's cabin. The island
-          is drawn on it, with its latitude and longitude written beside it. Her master was
-          a careful man; I have never had reason to doubt it."
+          is drawn on it, with its latitude and longitude written beside it. The Halcyon's
+          master was a careful man; I have never had reason to doubt it."
       letter:
         aliases: [last letter]
         stance: truth
@@ -142,9 +146,9 @@ characters:
         aliases: [captain, command, orders]
         stance: truth
         reply: >
-          "The Society has hired a sound ship and a good crew. Where she sails is for you to
-          decide: you lead this expedition, and the crew will follow your orders. She lies
-          at the quay, south-east of here."
+          "The Society has hired a sound ship and a good crew. Where your ship sails is for
+          you to decide: you lead this expedition, and the crew will follow your orders. Your
+          ship lies at the quay, south-east of here."
       crew:
         stance: truth
         reply: >
@@ -183,8 +187,8 @@ characters:
         stance: truth
         reply: >
           "Whole port's talking of it. The Society's sending a ship to find the |wHalcyon|n,
-          fifteen years on, and you're to sail in her. Sound ship, well found. She lies at
-          the end of the quay: just step |waboard|n. Mind, I'd sooner you came back than
+          fifteen years on, and you're to sail in that ship. Sound ship, well found. Your
+          ship lies at the end of the quay: just step |waboard|n. Mind, I'd sooner you came back than
           found anything."
       halcyon:
         stance: mistaken
@@ -461,22 +465,22 @@ characters:
         stance: truth
         clue: C13
         reply: >
-          "Wind out of the west, and the anchors dragged. [[She struck the reef in the
-          night.]] If the islanders hadn't come out in their canoes, we'd all have drowned.
+          "Wind out of the west, and the anchors dragged. [[The Halcyon struck the reef in
+          the night.]] If the islanders hadn't come out in their canoes, we'd all have drowned.
           [[Not one of us was lost.]]"
       boat:
         aliases: [canoe, white wing]
         stance: truth
         clue: C13
         reply: >
-          "[[We built her right here, from the Halcyon's own oak]], with rope from island
+          "[[We built the boat right here, from the Halcyon's own oak]], with rope from island
           fibre and a sail of patched canvas. A white wing, the children call it."
       crew:
         aliases: [west, the others]
         stance: truth
         clue: C13
         reply: >
-          "[[Most of them sailed west in her]], to reach the trading routes. I never heard
+          "[[Most of them sailed west in the boat]], to reach the trading routes. I never heard
           what became of them. I stayed. I'd married by then, and this was home."
       chart:
         aliases: [longitude, position]

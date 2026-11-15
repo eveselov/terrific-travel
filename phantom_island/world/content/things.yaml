@@ -158,9 +158,9 @@ things:
           text: >
             Noon on deck came when the chronometer showed twenty to three in the afternoon,
             home time: 160 minutes after noon at home. Four minutes for every degree makes
-            [[40 degrees West: the longitude on the Halcyon's chart. Both of her numbers
-            check out. You are exactly where her chart puts the island, and there is no
-            island.]] So one of her two numbers must be wrong. Which one would you trust?
+            [[40 degrees West: the longitude on the Halcyon's chart. Both of the chart's
+            numbers check out. You are exactly where the chart puts the island, and there is
+            no island.]] So one of the chart's two numbers must be wrong. Which one would you trust?
             The Ship knows how each is measured: |wask ship about latitude|n, |wask ship
             about longitude|n.
           otherwise: &no_sight >
@@ -189,7 +189,7 @@ things:
           text: >
             Noon on deck came at twenty-eight minutes to three, home time: 152 minutes after
             noon at home, so 38 degrees West. Two degrees back towards home, on waters the
-            ship already crossed on her way out.
+            ship already crossed on the way out.
           otherwise: *no_sight
         anchorage:
           teaches: {longitude: used}

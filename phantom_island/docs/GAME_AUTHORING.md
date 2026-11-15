@@ -159,6 +159,10 @@ The full rules are at the top of `characters.yaml` (DECISIONS.md, 23). In short:
   is checked against sources (DECISIONS.md, 9).
 - **Name the subject** at its first mention in each reply ("the Halcyon", not "she"):
   players read replies in any order.
+- **Three ships, one "she".** The story has the *Halcyon*, your ship and the boat built on
+  the island. Say "she" or "her" for a ship only right after naming that ship in the same
+  text, never when another ship came up in between. Charts, islands and positions are "it".
+  ("Take your ship to the island on *her* chart": whose? Write "on the Halcyon's chart".)
 - **No dead ends:** every obstacle has at least two ways through and a hint path
   (DECISIONS.md, 6b).
 

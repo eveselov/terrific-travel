@@ -178,7 +178,7 @@ positions:
           - >
             Evening, and still nothing in sight. The water casks in the Cabin are a day
             lighter. The Ship creaks: "A day north of the chart's position. The |wsextant|n
-            will tell you how far we've come from her latitude."
+            will tell you how far we've come from the chart's latitude."
       south:
         to: south_of_chart
         order: >
@@ -191,7 +191,7 @@ positions:
           - >
             Evening, and still nothing in sight. The water casks in the Cabin are a day
             lighter. The Ship creaks: "A day south of the chart's position. The |wsextant|n
-            will tell you how far we've come from her latitude."
+            will tell you how far we've come from the chart's latitude."
       east:
         to: east_of_chart
         order: >
