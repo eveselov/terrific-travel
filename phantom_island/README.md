@@ -11,6 +11,8 @@ the playground in `../game/`. It has its own database, `secret_settings.py` and 
 |---|---|
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Settled decisions and development stages. Start here. |
 | [docs/GAME_STORY.md](docs/GAME_STORY.md) | The story, structure, characters and clue table (draft). |
+| [docs/GAME_AUTHORING.md](docs/GAME_AUTHORING.md) | How to write the story in the YAML files: what goes where, recipes, rules. Spoilers. |
+| [docs/GAME_GUIDE.md](docs/GAME_GUIDE.md) | The game from the players' side: how to play. |
 | [docs/GAME_INCEPTION.md](docs/GAME_INCEPTION.md) | The design conversation, kept for history. |
 
 ## Running

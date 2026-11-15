@@ -1,0 +1,177 @@
+# Phantom Island Authoring Guide
+
+*How to write the game's story: places, people, clues, things, the voyage and the notebook,
+all in YAML files, without touching Python. For the players' view, see
+[GAME_GUIDE.md](GAME_GUIDE.md); for the code, the README's "How it fits together".*
+
+**SPOILERS.** This guide and every content file it describes give the mystery away. Don't
+show them to the players (DECISIONS.md, 11).
+
+## What goes where
+
+Story lives in YAML, in `world/content/`; mechanics live in Python. Each file starts with a
+comment listing its fields: that list is the reference, and this guide doesn't repeat it.
+
+| File | Holds |
+|---|---|
+| `places.yaml` | Limbo (the title page), the port and the island: names, descriptions, exits, details to look at |
+| `ship.yaml` | The ship's two rooms (Deck, Cabin), and the positions she can sail to: what is seen from them, routes, orders, voyage passages |
+| `maps.yaml` | The map pictures for the Map pane: one per act (port, sea chart, island) |
+| `characters.yaml` | The people and the Ship: where they stand, how they speak, what they answer (`ask`) |
+| `clues.yaml` | The clues: a title and the line written into the shared journal |
+| `things.yaml` | Objects: to look at, examine, read, use, and sometimes carry |
+| `ideas.yaml` | The notebook: areas and ideas about how the world works (optional) |
+
+The design behind the content (the truth of the mystery, the clue table, the facts that
+depend on each other) is in [GAME_STORY.md](GAME_STORY.md). The reasons for the rules below
+are in [DECISIONS.md](DECISIONS.md).
+
+## How the files refer to each other
+
+Entries are named by ids, and other files use those ids. A typo isn't silently ignored: the
+content check runs whenever the files are read, and stops with the file and entry at fault
+(`ship.yaml, position charted, route west: unknown position 'anchorag'`).
+
+| Id | Defined in | Used in |
+|---|---|---|
+| Place id (`quay`, `deck`) | `places.yaml`, `ship.yaml` (`rooms`) | exits; a character's `where`; a thing's `where`; a position's `ashore`; an action's `only_in` |
+| Map key (`port`, `island`) | `maps.yaml` | a place's `map`; a position's `map`; `sea_chart` in `ship.yaml` |
+| Position id (`charted`) | `ship.yaml` (`positions`) | routes' `to`; `start`; a thing's `at:` (what it does at that position) |
+| Clue id (`C4`) | `clues.yaml` | `clue:` beside any text that reveals it; `needs:` |
+| Flag (`sight_charted`) | `sets:` on a thing's `at:` step | `needs:` elsewhere |
+| Thing id (`chart`) | `things.yaml` | `with:` on details (more to see when carrying it) |
+| Area id, idea id | `ideas.yaml` | an idea's `area`; `teaches:` beside any text that teaches it |
+| Topic id (`storm`) | a character's `topics` | `suggest`; `topic_aliases` (words shared by all characters) |
+
+## The marks in the texts
+
+Two colours carry meaning (DECISIONS.md, 20). Never use them for decoration.
+
+- **White, `|wlike this|n`:** something worth following up: a topic to ask about, a detail to
+  look at, a command to try. Mark only words the game understands: a white word that leads
+  nowhere is a broken promise.
+- **Yellow, `[[like this]]`:** a clue's fact. The text needs a `clue:` beside it, and only
+  the fact itself is marked, never a whole reply. Only true facts: a mistaken or lying
+  reply stays plain, so spotting it is the player's job. The check fails on a `clue:`
+  without marks, and on marks without a `clue:`.
+- **A paragraph break** in descriptions and thing texts: `|/`.
+
+## Recipes
+
+### A place or an exit
+
+Add the place to `places.yaml` with a `name`, `desc`, `map` and `map_pos`, and give it exits.
+Exits go one way: add the way back from the other place too. Compass directions get their
+short forms (`se`) automatically. Then `batchcode build`.
+
+### A character, or a topic
+
+In `characters.yaml`: `where` they stand, a `voice` (how they speak), a `greeting`, a few
+topics to `suggest`, and a polite `fallback`. Each topic needs a `stance` (truth, mistaken,
+hiding). A reply that starts with a quote is shown as speech (`Old Barnaby says: "..."`).
+
+- Words every character should understand the same way (`the storm`, `old chart`) go in
+  `topic_aliases` at the top of the file; asking several witnesses about the same word and
+  comparing is the historian's lesson.
+- Mark the topic words in a reply in white, so players see what else to ask. Most replies
+  should lead somewhere.
+- Something a character **hides** gets a `truth:` with `needs:` (clue ids or flags) and
+  its own reply: they say it once the expedition has found what it needs (Crane admits the
+  truth once the coral, C2, is in the journal).
+
+New topics or replies need only a `reload`; a new character, or a changed `where`, needs
+`batchcode build`.
+
+### A clue
+
+1. Add it to `clues.yaml`: a short `title` and the `journal` line. The journal line says
+   what was found and a little of why it matters, never the big conclusion.
+2. Reveal it: put `clue: C<n>` beside the text that shows it (a topic reply, a detail, a
+   thing's look or action, a position's Deck view) and mark the fact in it `[[...]]`.
+3. Add it to the clue table in GAME_STORY.md: where it's found, what gates it, and what it
+   proves for the `report`.
+
+The same clue can be revealed in several places, in different words. Finding it again adds
+the new source to the journal entry instead of a new entry, so players can compare sources.
+
+### A thing, something to read, something to use
+
+In `things.yaml`: `where` it starts, a `desc` for `look`, optionally `close` for
+`examine`, `read` and `use` actions. Set `portable: true` if it can be carried, and say so
+in its `desc` (`You can |wget|n it`): players won't guess. A thing that isn't portable can
+have a `stays:` line for when someone tries.
+
+- `only_in` with `elsewhere`: it works only in one place (the sextant needs the Deck).
+- `at:`, aboard only: what it does instead at each ship position. A position without an
+  `at:` entry gets the plain `text`, so check every position where the thing can be used
+  (the sextant has a reading at each).
+- `sets:` and `needs:` on an `at:` step: the first step remembers a flag for the whole
+  expedition, and a later one waits for it, with an `otherwise` text until then. That is how
+  the noon sight on the Deck and the chronometer in the Cabin make one measurement that two
+  players can share.
+
+### A ship position, a route, a voyage
+
+In `ship.yaml`, under `positions`:
+
+- `deck` and `cabin`: what is seen from each room there. `clue:` on the Deck view reveals
+  a clue on arrival (the empty sea, C4).
+- `coords` (`14 S, 40 W`): lets players sail there by naming the position. `orders`: what
+  `sail` alone says there, in words (leave out a ready-made menu where the choice should be
+  the players' own).
+- `routes`, by direction: `to`, optional `names` (`sail home`), the Ship's `order` reply,
+  the `text` as she sets off, and the `passage`: lines shown a few seconds apart while her
+  marker moves on the sea chart, the last one the arrival.
+- `under_way` is the ship between positions; it has no routes.
+
+Distances and days must agree with GAME_STORY.md's facts table (about 200 km, 2 degrees of
+longitude here, a day).
+
+### An area or an idea for the notebook
+
+In `ideas.yaml`: areas first (a `title` each), then ideas, each with an `area`, a `title`
+and up to three texts, `heard`, `understood`, `used`, written to read as one paragraph:
+the entry shows the texts up to the level a player reached.
+
+Then tag what teaches it, beside where a `clue:` would go: `teaches: {latitude: understood}`.
+Conversations, reading and using teach everyone who hears them, up to `understood`; `used`
+is only for whoever did it (put it on actions); looking teaches only the looker.
+
+**The rule:** an idea states how the world works, never what it means for the mystery.
+"Coral grows only under the sea" is an idea; "so the compass lay in the sea" is a clue's
+journal line; "so she wrecked on a reef" is the player's own conclusion. Keep the notebook
+small: ideas the game actually uses.
+
+## How to write
+
+The full rules are at the top of `characters.yaml` (DECISIONS.md, 23). In short:
+
+- **Short:** about 30–60 words, the answer first, then one concrete detail that is both
+  vivid and a fact that fits the world. Depth is one question further down, behind a white
+  word.
+- **Plot, not prose:** richness comes from connections between people, things and clues
+  (Barnaby on Crane's compass), not adjectives. Every noun is a promise players act on.
+- **Facts not conclusions:** the game gives the facts and the knowledge behind them; the
+  connection is the players' to make (DECISIONS.md, 22).
+- **Every fact fits:** a number, distance, direction or date goes into GAME_STORY.md's
+  "Facts that depend on each other", and is checked there whenever it changes. Real history
+  is checked against sources (DECISIONS.md, 9).
+- **Name the subject** at its first mention in each reply ("the Halcyon", not "she"):
+  players read replies in any order.
+- **No dead ends:** every obstacle has at least two ways through and a hint path
+  (DECISIONS.md, 6b).
+
+## Trying a change
+
+| Changed | Then, in the game as a builder |
+|---|---|
+| Texts of replies, clues, ideas, details, things | `reload` |
+| Places, exits, maps; characters' or things' names or `where`; new characters or things; `ship.yaml` | `batchcode build` (rooms are updated in place; players stay where they are) |
+| A map picture or other file in `web/static/` | `reload`, then a hard refresh in the browser |
+
+- `startover`, `startover at sea`, `startover island` start a new expedition with the ship in
+  port, at the charted position or at the island, for testing a later act without sailing
+  there.
+- The content check runs on every `reload` and `batchcode build`, and the tests run it too:
+  `uv run evennia test --settings settings.py .` from this folder. A content mistake shows
+  up as a `ContentError` naming the file and entry.
