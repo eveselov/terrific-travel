@@ -26,32 +26,43 @@ USED: str = "used"
 def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None = None) -> None:
     """
     `doer` (and `hearers`, who heard or watched it) learned what a text teaches, from
-    `source` ("Old Barnaby", "the sextant"). Each learner is told about a new idea, or an
-    entry that grew; nothing is said when they knew it this well already.
+    `source` ("Old Barnaby", "the sextant"). Each learner gets one line naming the new ideas,
+    and one for entries that grew; nothing is said when they knew it this well already.
     """
     if not teaching:
         return
-    learners: list[Any] = list(dict.fromkeys([doer, *(hearers or [])]))
     content: Content = load_content()
-    for idea_id, level_name in teaching:
-        idea: IdeaSpec | None = content.ideas.get(idea_id)
-        if idea is None:
-            continue
-        for learner in learners:
-            heard: str = level_name
+    ideas: list[tuple[IdeaSpec, str]] = [
+        (content.ideas[idea_id], level) for idea_id, level in teaching if idea_id in content.ideas
+    ]
+    for learner in dict.fromkeys([doer, *(hearers or [])]):
+        new: list[str] = []
+        grew: list[str] = []
+        for idea, level_name in ideas:
             if learner is not doer and level_name == USED:
-                heard = LEVELS[LEVELS.index(USED) - 1]  # watching isn't doing
-            _note(learner, idea, heard, source, content)
+                level_name = LEVELS[LEVELS.index(USED) - 1]  # watching isn't doing
+            change: str | None = _note(learner, idea, level_name, source)
+            area: str = content.areas[idea.area].title
+            if change == "new":
+                new.append(f"|w{idea.title}|n ({area})")
+            elif change == "grew":
+                grew.append(f"|w{idea.title}|n")
+        if new:
+            learner.msg(f"New in your notebook: {', '.join(new)}. Type {NOTEBOOK} to read it.")
+        if grew:
+            entries: str = "entry" if len(grew) == 1 else "entries"
+            learner.msg(f"Your notebook {entries} on {', '.join(grew)} grew. ({NOTEBOOK})")
 
 
-def _note(learner: Any, idea: IdeaSpec, level_name: str, source: str, content: Content) -> None:
+def _note(learner: Any, idea: IdeaSpec, level_name: str, source: str) -> str | None:
+    """Note what the learner learned. Returns "new", "grew", or None if nothing showed."""
     level: int = LEVELS.index(level_name)
     before: int = get_expedition().note(learner.id, idea.id, level, level_name, source)
     if before < 0:
-        area: str = content.areas[idea.area].title
-        learner.msg(f"New in your notebook: |w{idea.title}|n ({area}). Type {NOTEBOOK} to read it.")
-    elif level > before and idea.entry(level_name) != idea.entry(LEVELS[before]):
-        learner.msg(f"Your notebook entry on |w{idea.title}|n grew. ({NOTEBOOK})")
+        return "new"
+    if level > before and idea.entry(level_name) != idea.entry(LEVELS[before]):
+        return "grew"
+    return None
 
 
 def _entries(owner: Any) -> dict[str, NoteEntry]:

@@ -113,6 +113,7 @@ beach:
         you while it chews. Nobody seems to look after them.
       with:
         animal_guide:
+          teaches: {island_animals: used}
           clue: C9
           text: >
             You look them up in the animal guide. Goats never reach islands like this on
@@ -147,6 +148,7 @@ village:
           hut]].
       with:
         plant_guide:
+          teaches: {oak: used}
           clue: C8
           text: >
             You compare the beams with the plant guide. Heavy, dark and hard: [[this is
@@ -165,6 +167,7 @@ reef:
     southeast: cove
   details:
     bones:
+      teaches: {coral: used}
       aliases: [big bones, shapes, ribs, wreck, cannon]
       clue: C7
       desc: >
@@ -191,6 +194,7 @@ forest:
         Tall smooth trunks, broad shiny leaves, and big green fruit hanging high up.
       with:
         plant_guide:
+          teaches: {oak: used}
           text: >
             The plant guide names them: breadfruit, pandanus and coconut palms, the trees
             of warm islands. Nothing like the oaks of home.
@@ -212,6 +216,7 @@ spring:
         a small white bulb, with a sharp smell that makes your eyes water.
       with:
         plant_guide:
+          teaches: {onions: used}
           clue: C9
           text: >
             The plant guide has a drawing of exactly this: [[onions, which sailors carry on

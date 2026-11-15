@@ -28,6 +28,7 @@ from world.content import (
     CHARACTERS_FILE,
     CLUES_FILE,
     CONTENT_DIR,
+    IDEAS_FILE,
     LIMBO_ID,
     MAPS_FILE,
     PLACES_FILE,
@@ -40,6 +41,7 @@ from world.content import (
     ContentError,
     IdeaSpec,
     TopicSpec,
+    all_teachings,
     all_texts,
     load_content,
     parse_coords,
@@ -71,6 +73,7 @@ CONTENT_FILES: tuple[str, ...] = (
     CHARACTERS_FILE,
     CLUES_FILE,
     THINGS_FILE,
+    IDEAS_FILE,
 )
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
@@ -141,14 +144,33 @@ class TestContent(TestCase):
 
     def test_teaching_an_unknown_idea_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
-            CHARACTERS_FILE,
-            "        aliases: [navigation, dead reckoning]\n",
-            "        aliases: [navigation, dead reckoning]\n        teaches: {nowhere: heard}\n",
+            CHARACTERS_FILE, "teaches: {oak: heard}", "teaches: {nowhere: heard}"
         )
         self.assertIn("unknown idea 'nowhere'", str(error))
 
+    def test_teaching_a_level_without_text_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE, "teaches: {oak: heard}", "teaches: {horizon: heard}"
+        )
+        self.assertIn("which has no text", str(error))
+
     def test_the_notebook_is_optional(self) -> None:
-        self.assertEqual(read_content().ideas, {})  # no ideas written yet: nothing breaks
+        """Without ideas.yaml and without any `teaches`, the game's content still works."""
+        with TemporaryDirectory() as tmp:
+            for name in CONTENT_FILES:
+                if name == IDEAS_FILE:
+                    continue
+                text: str = (CONTENT_DIR / name).read_text(encoding="utf-8")
+                kept: list[str] = [
+                    line for line in text.split("\n") if not line.strip().startswith("teaches:")
+                ]
+                (Path(tmp) / name).write_text("\n".join(kept), encoding="utf-8")
+            self.assertEqual(read_content(Path(tmp)).ideas, {})
+
+    def test_every_idea_is_taught_somewhere(self) -> None:
+        content: Content = read_content()
+        taught: set[str] = {idea for _, teaching in all_teachings(content) for idea, _ in teaching}
+        self.assertEqual(set(content.ideas) - taught, set())
 
     def test_route_without_passage_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(SHIP_FILE, "passage:", "voyage:")
@@ -1297,3 +1319,26 @@ class TestNotebook(DiscoveryTest):
         self.do(self.char1, "ask barnaby about sailing")
         start_over("port")
         self.assertIn("still empty", self.notebook(self.char1))
+
+
+class TestNotebookContent(DiscoveryTest):
+    """The real ideas, taught by the real content."""
+
+    def test_one_reply_can_teach_several_ideas_in_one_line(self) -> None:
+        self.at(self.char1, "quay")
+        told: str = self.do(self.char1, "ask barnaby about sailing")
+        new_lines: list[str] = [line for line in told.split("\n") if "New in your notebook" in line]
+        self.assertEqual(len(new_lines), 1)
+        for title in ("Latitude", "Longitude", "Dead reckoning", "Sea clocks"):
+            self.assertIn(title, new_lines[0])
+
+    def test_giving_the_order_is_using_it(self) -> None:
+        self.at(self.char1, "deck")
+        self.at(self.char2, "deck")
+        with patch("world.ship.crew_ashore", return_value=[]):
+            sail(self.char1, "to 14 south 40 west")
+        mine: str = self.do(self.char1, "notebook")
+        theirs: str = self.do(self.char2, "notebook")
+        self.assertIn("You have given the ship an order", mine)
+        self.assertNotIn("You have given the ship an order", theirs)
+        self.assertIn("lines of latitude", theirs)

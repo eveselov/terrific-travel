@@ -75,6 +75,7 @@ plausible as it stands.
 | The wind out is steady from the southeast, and going home is slower | The southeast trade winds blow at 14° S; the great storm of '75 from the west was unusual (Barnaby's *storm*) | `ship.yaml` (the passages out and home, the Ship's "trade wind behind us") |
 | Noon comes later by the home clock as the ship sails west | 4 minutes per degree, as above | `ship.yaml` (passage, Day 17), `things.yaml` (chronometer under way) |
 | The charted position shows empty sea (C4) | The island is 215 km away, below the horizon even from the masthead | `ship.yaml` (charted position) |
+| From a masthead a lookout sees about 20 km of open sea, a hilly island 50–70 km away | The Earth's curve: horizon ≈ 3.6 km × √(height in m); a masthead of about 30 m sees a hill of 100–200 m from 55–70 km | the Ship's *horizon*, `ideas.yaml` (*The horizon*) |
 | The Society trusted the chart; Barnaby thinks she sank | Nobody could check the longitude | Fairweather's *chart*, Barnaby's *halcyon* |
 
 Holds, except the birds (next chain).
@@ -96,7 +97,7 @@ hilly island can be seen from a masthead at about 50–70 km.
 
 | Fact | Depends on | Where it's written |
 |---|---|---|
-| The great storm of '75: three days of wind out of the west | Winds are named for where they come from: it blew towards the east | Barnaby's *storm* |
+| The great storm of '75: three days of wind out of the west | Winds are named for where they come from: it blew towards the east | Barnaby's *storm*, the Ship's *wind*, `ideas.yaml` (*Names of winds*) |
 | The *Halcyon* anchored off the island's west side | She had come from the east and charted the island | Jonah's *halcyon* |
 | The anchors dragged and she struck the Western Reef at night (C7, C13) | A west wind drives a ship anchored off the west side onto that shore | Jonah's *wreck*, the *bones* on the Western Reef |
 | The reef can be walked only at low tide | The ribs stand in the shallows | Ama's *reef*, the Ship's *tide* (A4: the tide gate) |
@@ -108,7 +109,7 @@ Holds.
 | Fact | Depends on | Where it's written |
 |---|---|---|
 | Crane says it washed up on a beach after last winter's storm | His lie | Crane's *compass*, *beach*, *storm* |
-| A coral crust has grown in its hinge (C2) | Coral takes years under water, not one winter on a beach | `things.yaml` (compass, `examine`) |
+| A coral crust has grown in its hinge (C2) | Coral takes years under water, not one winter on a beach; it is built by tiny sea animals in warm, clear, shallow water, and grows over anything lying on a reef | `things.yaml` (compass, `examine`; the animal guide), `ideas.yaml` (*Coral*) |
 | The *Halcyon* was lost fifteen years ago, in the great storm of '75 | — (the truth) | Barnaby's *storm*, Fairweather's *halcyon* |
 | Once C2 is found he admits fishermen from the west traded it to him (C3) | It came from island to island, eastward | Crane's *compass* and *fishermen* (truth) |
 

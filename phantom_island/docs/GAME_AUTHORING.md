@@ -134,6 +134,7 @@ and up to three texts, `heard`, `understood`, `used`, written to read as one par
 the entry shows the texts up to the level a player reached.
 
 Then tag what teaches it, beside where a `clue:` would go: `teaches: {latitude: understood}`.
+A ship's route can teach too (on the route, next to `to:`): giving the order is `used`.
 Conversations, reading and using teach everyone who hears them, up to `understood`; `used`
 is only for whoever did it (put it on actions); looking teaches only the looker.
 

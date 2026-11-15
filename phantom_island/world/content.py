@@ -173,6 +173,7 @@ class RouteSpec:
     order: str | None  # what the Ship says when she is given this order
     text: str  # shown at once, as she sets off
     passage: tuple[str, ...]  # shown one after another while she sails; the last one arrives
+    teaches: Teaching = ()  # for the notebook: `used` for whoever gave the order
 
 
 @dataclass(frozen=True)
@@ -599,6 +600,7 @@ def _route(direction: str, value: Any, where: str) -> RouteSpec:
         order=_optional_text(data, "order", where),
         text=_text(data, "text", where),
         passage=tuple(line.strip() for line in passage),
+        teaches=_teaches(data, where),
     )
 
 
@@ -1012,6 +1014,11 @@ def all_teachings(content: Content) -> list[tuple[str, Teaching]]:
             found.extend(
                 (f"{where}, {verb}, at {key}", step.teaches) for key, step in action.at.items()
             )
+    for position in content.positions.values():
+        found.extend(
+            (f"{SHIP_FILE}, position {position.id}, route {route.direction}", route.teaches)
+            for route in position.routes
+        )
     for character in content.characters.values():
         for topic in character.topics.values():
             where = f"{CHARACTERS_FILE}, {character.id}, topic {topic.id}"

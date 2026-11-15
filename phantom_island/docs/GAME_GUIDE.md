@@ -1,6 +1,15 @@
 # Phantom Island Game Guide
 
-*Presents observations about different aspects of the game. It is supposed to contain most essential recommendations, not a full verbose manual.*
+**It is 1790. Fifteen years ago the ship *Halcyon* sailed to chart a small island far out in the ocean, and was never heard of again. Now her compass has turned up in your own harbour. You lead the expedition that goes to find out what really happened.**
+
+Phantom Island is a mystery to solve together, in words and pictures:
+
+- **A real detective story.** Nobody hands you the answer. People tell you what they believe, and not all of them are right; things you can see for yourself don't lie. Collect the facts in the expedition's journal, compare the witnesses, and work out the truth.
+- **Every detail has a reason.** Distances, dates, the wind, the birds, the plants: nothing is random, and it all fits together the way the real world does. When two things don't fit, you've found something.
+- **Real skills of the age of sail.** Find your latitude from the noon sun with a sextant, your longitude with a ship's clock, and your way across an ocean the way explorers did. What you learn goes into your own notebook, and it grows as you understand more.
+- **Better together.** Play alone, or with friends and family as one crew: split up, share what you find, explain to each other what you've learned. No fast reflexes needed, only curiosity.
+
+*The rest of this guide is the essentials of how to play, not a full manual.*
 
 ## Expedition
 

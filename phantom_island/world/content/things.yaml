@@ -62,6 +62,7 @@ things:
         something hard, pale and rough. Not sand, not rust: [[coral, grown right into the
         brass]]. Coral only grows under the sea.
       clue: C2
+      teaches: {coral: heard}
 
   # --- Aboard -------------------------------------------------------------------------------
 
@@ -76,6 +77,7 @@ things:
       where they can see the sun and the horizon. You can |wget|n it and carry it up there.
       Ask the Ship about the |wsextant|n to learn more.
     use:
+      teaches: {latitude: used}
       only_in: deck
       elsewhere: >
         You need the sun and a clear horizon for that. Carry the sextant up on the Deck
@@ -86,10 +88,12 @@ things:
         home, of course. This is home.
       at:
         under_way:
+          teaches: {latitude: used}
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 14
             degrees South, the same as home: the ship is holding her latitude, as ordered.
         charted:
+          teaches: {latitude: used}
           sets: sight_charted
           clue: C4
           text: >
@@ -98,24 +102,28 @@ things:
             chart.]] Now the longitude: someone should read the time of noon on the
             |wchronometer|n in the Cabin.
         north_of_chart:
+          teaches: {latitude: used}
           sets: sight_north
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 12
             degrees South. The chart's latitude is 14: the ship has sailed off the island's
             line of latitude.
         south_of_chart:
+          teaches: {latitude: used}
           sets: sight_south
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 16
             degrees South. The chart's latitude is 14: the ship has sailed off the island's
             line of latitude.
         east_of_chart:
+          teaches: {latitude: used}
           sets: sight_east
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 14
             degrees South: still the latitude on the Halcyon's chart. The |wchronometer|n
             in the Cabin will tell how far east you have come.
         anchorage:
+          teaches: {latitude: used}
           sets: sight_island
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 14
@@ -138,11 +146,13 @@ things:
         simply the time.
       at:
         under_way:
+          teaches: {longitude: understood}
           text: >
             The chronometer ticks steadily, keeping home time. Out here the sun reaches
             its noon later than it does at home, and the further west the ship sails, the
             later it gets.
         charted:
+          teaches: {longitude: used}
           needs: [sight_charted]
           clue: C4
           text: >
@@ -158,6 +168,7 @@ things:
             where you are: you also need the moment of noon out here. Take a noon sight
             with the sextant on the Deck first.
         north_of_chart:
+          teaches: {longitude: used}
           needs: [sight_north]
           text: >
             Noon on deck came at twenty to three, home time, the same as at the chart's
@@ -165,6 +176,7 @@ things:
             longitude.
           otherwise: *no_sight
         south_of_chart:
+          teaches: {longitude: used}
           needs: [sight_south]
           text: >
             Noon on deck came at twenty to three, home time, the same as at the chart's
@@ -172,6 +184,7 @@ things:
             longitude.
           otherwise: *no_sight
         east_of_chart:
+          teaches: {longitude: used}
           needs: [sight_east]
           text: >
             Noon on deck came at twenty-eight minutes to three, home time: 152 minutes after
@@ -179,6 +192,7 @@ things:
             ship already crossed on her way out.
           otherwise: *no_sight
         anchorage:
+          teaches: {longitude: used}
           needs: [sight_island]
           clue: C5
           text: >
@@ -198,6 +212,7 @@ things:
       careful ink, with its position written beside it. You can |wread|n it, or
       |wexamine|n it for a closer look, and |wget|n it to take it with you.
     close:
+      teaches: {positions: understood, dead_reckoning: heard}
       text: >
         You spread the chart out flat. Our own coast runs down its right-hand edge. Thin
         ruled lines cross the paper: the ones from side to side are lines of latitude, and
@@ -205,6 +220,7 @@ things:
         exactly as far south as home, only far to the west. Beside the island, in small
         writing: "Position fixed by our |wreckoning|n."
     read:
+      teaches: {positions: heard}
       text: >
         In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
         large figures: Latitude 14 degrees South, longitude 40 degrees West of
@@ -222,6 +238,7 @@ things:
       it, and you'll know more about the plants you look at: |wget|n it to take it
       with you. You can also |wread|n it.
     read:
+      teaches: {oak: understood, onions: understood}
       text: >
         You leaf through it. Breadfruit, coconut and pandanus grow on warm islands. Oak is
         heavy, dark and hard, and grows only in cool lands far from here: ships are built
@@ -238,7 +255,10 @@ things:
       and you'll know more about the animals you look at: |wget|n it to take it
       with you. You can also |wread|n it.
     read:
+      teaches: {island_animals: understood, coral: understood}
       text: >
         You leaf through it. Few land animals ever reach islands far out in the ocean on
         their own: birds fly there, lizards drift on logs. Goats never do. Sailors carry
-        goats on ships for milk and meat, and sometimes leave a few ashore.
+        goats on ships for milk and meat, and sometimes leave a few ashore. Coral is built by
+        tiny sea animals, in warm, clear, shallow water; over the years it grows into reefs,
+        and over anything that lies on them.

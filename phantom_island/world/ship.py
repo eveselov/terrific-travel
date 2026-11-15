@@ -34,6 +34,7 @@ from world.content import (
     parse_coords,
 )
 from world.expedition import connected_characters, current_position, get_expedition
+from world.notebook import learn
 from world.places import find_place, find_ship_exit
 
 ASHORE: str = "ashore"
@@ -229,8 +230,10 @@ def set_off(caller: Any, position: PositionSpec, route: RouteSpec) -> None:
         if route.order:
             room.msg_contents(show_marks(route.order), from_obj=caller)
         room.msg_contents(route.text, from_obj=caller)
-    for room, character in _aboard():
+    aboard: list[tuple[ShipRoom, Any]] = _aboard()
+    for room, character in aboard:
         room.send_visuals(character)
+    learn(caller, route.teaches, "an order to sail", [character for _, character in aboard])
     later(STEP_SECONDS, sail_on, voyage.number)
 
 

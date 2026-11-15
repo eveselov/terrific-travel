@@ -33,6 +33,213 @@
 #
 # After editing, `reload` in the game is enough.
 
-areas: {}
+# The ideas are listed here in the order the notebook shows them. Where each one is taught
+# is noted above it: H heard, U understood, D used (done or seen yourself).
 
-ideas: {}
+areas:
+  navigation:
+    title: Navigation
+  sea_and_sky:
+    title: Sea and sky
+  nature:
+    title: Nature
+  people:
+    title: People and the past
+
+ideas:
+  # --- Navigation ---------------------------------------------------------------------------
+
+  # H Barnaby's sailing · U the Ship's latitude, sextant · D the sextant on deck
+  latitude:
+    area: navigation
+    title: Latitude
+    heard: >
+      How far north or south you are. The noon sun tells it.
+    understood: >
+      The higher the sun stands at noon, the nearer you are to the equator. Measure its
+      height with a sextant, look it up in the tables, and you have your latitude. Sailors
+      have measured it well for centuries.
+    used: >
+      You have taken a noon sight yourself, on deck.
+
+  # H Barnaby's sailing · U the Ship's longitude · D the chronometer after a noon sight
+  longitude:
+    area: navigation
+    title: Longitude
+    heard: >
+      How far east or west you are. Old sailors could only guess it.
+    understood: >
+      The Earth turns a full circle in a day, 15 degrees every hour. So noon comes 4
+      minutes later for every degree you go west. Compare the moment of noon where you are
+      with the time at home, and the difference gives your longitude.
+    used: >
+      You have worked out a longitude yourself, from a noon sight and the chronometer.
+
+  # H Barnaby's sailing, Jonah's chart · U the Ship's chronometer
+  sea_clocks:
+    area: navigation
+    title: Sea clocks
+    heard: >
+      Some ships now carry a clock that keeps the time of home all voyage long. Not every
+      old sailor trusts one.
+    understood: >
+      A sea clock, or chronometer, must keep time to a few seconds for months on end,
+      through heat, cold and rolling seas. Mr Harrison proved it could be done, but such
+      clocks are new and costly, and few ships carry one.
+
+  # H Barnaby's sailing, Jonah's chart, the chart examined · U the Ship's reckoning
+  dead_reckoning:
+    area: navigation
+    title: Dead reckoning
+    heard: >
+      Working out where you are from your heading, your speed and how long you have
+      sailed.
+    understood: >
+      North and south, the noon sun checks your reckoning every day. East and west, nothing
+      can check it without a sea clock, so small errors add up, day after day.
+
+  # H the chart read · U the Ship's course, the chart examined · D an order to sail
+  positions:
+    area: navigation
+    title: Positions and charts
+    heard: >
+      A place at sea is written as two numbers: its latitude and its longitude.
+    understood: >
+      On a chart, the lines from side to side are lines of latitude, and the lines from top
+      to bottom are lines of longitude. Two places on the same line from side to side lie
+      exactly as far north or south as each other.
+    used: >
+      You have given the ship an order to sail to a position.
+
+  # H the Ship's chart · U the order to sail out of port · D sailing on from the chart's position
+  latitude_sailing:
+    area: navigation
+    title: Sailing along a latitude
+    heard: >
+      If you trust your latitude but not your longitude, sail along the latitude until you
+      find land.
+    understood: >
+      Measure your latitude by the noon sun every day and keep it the same: then you sail
+      due east or due west along one line, and sooner or later anything on that line comes
+      into sight.
+    used: >
+      You have sailed along a latitude yourself, searching for land.
+
+  # --- Sea and sky --------------------------------------------------------------------------
+
+  # U the Ship's birds · D the sky at dusk, at the chart's position
+  seabirds:
+    area: sea_and_sky
+    title: Seabirds at dusk
+    understood: >
+      Terns and noddies fish at sea all day and fly home to land to sleep. At dusk, the way
+      they fly shows where land is. Island navigators have used them for a very long time.
+    used: >
+      You have watched the seabirds leave at dusk yourself.
+
+  # H Ama's reef · U the Ship's tide
+  tides:
+    area: sea_and_sky
+    title: Tides
+    heard: >
+      A reef can be walked only at low tide.
+    understood: >
+      The sea rises and falls about twice a day, a little later each day. At low tide a
+      reef can stand clear of the water; at high tide it is hidden, and dangerous.
+
+  # H Barnaby's storm · U the Ship's wind
+  winds:
+    area: sea_and_sky
+    title: Names of winds
+    heard: >
+      A wind is named for where it comes from.
+    understood: >
+      A west wind blows out of the west, towards the east, and pushes anything afloat
+      eastwards. An east wind pushes it west.
+
+  # U the Ship's horizon
+  horizon:
+    area: sea_and_sky
+    title: The horizon
+    understood: >
+      The Earth is round, so the sea curves away out of sight. From a masthead a lookout
+      sees about 20 kilometres of open sea, and a hilly island perhaps 50 to 70 kilometres
+      away. Anything further is hidden below the horizon, however clear the day.
+
+  # U the Ship's water
+  fresh_water:
+    area: sea_and_sky
+    title: Fresh water at sea
+    understood: >
+      Sea water can't be drunk. A ship carries fresh water in casks, the crew drink from them
+      every day, and they must be filled again at a spring ashore.
+
+  # --- Nature -------------------------------------------------------------------------------
+
+  # H the compass examined · U the animal guide · D the reef, waded over
+  coral:
+    area: nature
+    title: Coral
+    heard: >
+      Coral grows only under the sea.
+    understood: >
+      Coral is built by tiny sea animals, in warm, clear, shallow water. Over the years it
+      grows into reefs, and over anything that lies on them: rocks, anchors, even ships.
+    used: >
+      You have waded out over a coral reef yourself.
+
+  # H Fairweather's halcyon · U the plant guide · D wood or trees looked at with the plant guide
+  oak:
+    area: nature
+    title: Oak and island trees
+    heard: >
+      Good ships are built of oak.
+    understood: >
+      Oak is heavy, dark and hard, and grows only in cool lands far from here. Warm islands
+      grow breadfruit, pandanus and coconut palms instead.
+    used: >
+      You have told oak from island trees yourself, with the plant guide in your hands.
+
+  # U the plant guide · D the shoots by the spring, with the plant guide
+  onions:
+    area: nature
+    title: Onions on ships
+    understood: >
+      Onions keep for months, so ships carry them, and sailors plant them wherever they stay
+      a while.
+    used: >
+      You have found onions growing, and known them with the plant guide.
+
+  # U the animal guide · D the goats, with the animal guide
+  island_animals:
+    area: nature
+    title: How animals reach islands
+    understood: >
+      Few land animals ever reach islands far out in the ocean on their own: birds fly
+      there, and lizards drift there on logs. Goats never do. Sailors carry goats for milk
+      and meat, and sometimes leave a few ashore.
+    used: >
+      You have checked animals against the animal guide yourself.
+
+  # --- People and the past ------------------------------------------------------------------
+
+  # H the Ship's help · U the Ship's witnesses
+  witnesses:
+    area: people
+    title: Comparing witnesses
+    heard: >
+      People don't always tell the truth, so compare what they say.
+    understood: >
+      Some people tell what they believe, and some tell what suits them. Ask several people
+      about the same thing and compare. Where they agree, it is likely true; where they
+      differ, look for something you can see for yourself.
+
+  # H Tui's song · U Ama's song
+  songs:
+    area: people
+    title: Songs remember
+    heard: >
+      Some songs tell of things that really happened.
+    understood: >
+      People who don't write things down keep their history in songs, and teach them to
+      the children. A song can be older than anyone living, and still tell what happened.

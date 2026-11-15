@@ -93,6 +93,7 @@ positions:
       The expedition's ship is moored at the end of the quay, her sails neatly furled.
     routes:
       west:
+        teaches: {positions: used, latitude_sailing: understood}
         to: charted
         names: [island, chart, chart position, charted position, halcyon island]
         order: >
@@ -101,7 +102,7 @@ positions:
           harbour lies at fourteen South too, on the same line of latitude. So the course
           is due west. We check our latitude by the sun every noon, and sail on until my
           |wchronometer|n says we've come forty degrees. About three weeks, with the trade
-          wind behind us. Cast off!"
+          |wwind|n behind us. Cast off!"
         text: >
           The ropes are cast off and the sails fill. The port grows small behind you, and
           the coast sinks below the horizon. (The voyage takes a few moments. The crew
@@ -133,11 +134,12 @@ positions:
     chart_pos: [560, 290]
     deck: >
       Open sea in every direction. According to the Halcyon's old chart, the island should
-      be right here. [[There is nothing but water, all the way to the horizon.]] High above,
+      be right here. [[There is nothing but water, all the way to the |whorizon|n.]] High above,
       seabirds wheel in the evening |wsky|n.
     clue: C4
     details:
       sky:
+        teaches: {seabirds: used}
         aliases: [birds, seabirds, terns, evening, dusk]
         clue: C6
         desc: >
@@ -147,6 +149,7 @@ positions:
       The cabin creaks as the ship rolls on the open sea.
     routes:
       west:
+        teaches: {latitude_sailing: used}
         to: anchorage
         order: >
           "West it is," the Ship creaks. "On past the end of the chart, along the same

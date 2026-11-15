@@ -110,6 +110,7 @@ characters:
           |wship|n to the |wisland|n on her |wchart|n and see what is left to find."
       halcyon:
         stance: truth
+        teaches: {oak: heard}
         reply: >
           "The Halcyon sailed from this harbour in 1775 to chart a small |wisland|n far out
           in the ocean. A sound ship, built of good oak, with a careful master. Her last
@@ -194,6 +195,7 @@ characters:
           Crane's is, it came off the bottom."
       storm:
         stance: truth
+        teaches: {winds: heard}
         reply: >
           "Worst I ever saw. Three days of wind out of the west, and seas like hills. Out
           of the west, mind: a wind is named for where it comes from, so that one blew
@@ -214,6 +216,7 @@ characters:
       sailing:
         aliases: [navigation, dead reckoning]
         stance: truth
+        teaches: {latitude: heard, longitude: heard, dead_reckoning: heard, sea_clocks: heard}
         reply: >
           "In my day we found our way with a compass, a log line and a good guess. Dead
           reckoning, it's called. North and south you could trust from the noon sun. East
@@ -330,6 +333,7 @@ characters:
       reef:
         # A4 idea: asking about the reef before going there counts as respect.
         stance: truth
+        teaches: {tides: heard}
         reply: >
           "The western reef keeps old things. Go only at low tide, and walk carefully.
           It is good that you asked before going."
@@ -352,7 +356,15 @@ characters:
         stance: truth
         reply: >
           "Tui is my grandchild. Tui talks to every stranger and keeps every shiny thing the
-          sea gives back. Ask for the song: children remember what the old ones forget."
+          sea gives back. Ask for the |wsong|n: children remember what the old ones forget."
+      song:
+        aliases: [songs, singing, tui song]
+        stance: truth
+        teaches: {songs: understood}
+        reply: >
+          "We do not write on paper. What must not be forgotten, we put into songs, and
+          the children learn them before they can count. A song can be older than anyone
+          living. Listen to what it says, not only to the tune."
       crew:
         stance: hiding
         reply: >
@@ -397,6 +409,7 @@ characters:
           don't have nails in them."
       song:
         stance: truth
+        teaches: {songs: heard}
         clue: C11
         reply: >
           Tui sings:
@@ -468,6 +481,7 @@ characters:
       chart:
         aliases: [longitude, position]
         stance: truth
+        teaches: {sea_clocks: heard, dead_reckoning: heard}
         reply: >
           "Our master swore by his longitude. But we had no sea clock, only dead reckoning
           and his moon tables, and we'd been months at sea. If anyone ever came looking,
@@ -503,6 +517,7 @@ characters:
     topics:
       sextant:
         stance: truth
+        teaches: {latitude: understood}
         reply: >
           "The sextant measures how high the sun stands above the horizon. It lives in the
           Cabin: carry it up to the Deck and measure the sun at noon, when it's highest.
@@ -510,6 +525,7 @@ characters:
       chronometer:
         aliases: [clock, sea clock]
         stance: truth
+        teaches: {sea_clocks: understood}
         reply: >
           "My chronometer keeps the time of our home port, all voyage long. Mr Harrison
           proved that such clocks can work at sea, but they're new and costly, and few
@@ -517,12 +533,14 @@ characters:
           |wlongitude|n."
       latitude:
         stance: truth
+        teaches: {latitude: understood}
         reply: >
           "Latitude is how far north or south you are. The higher the noon sun stands, the
           nearer you are to the equator. Sailors have measured it well for centuries: take
           the |wsextant|n up on deck at noon."
       longitude:
         stance: truth
+        teaches: {longitude: understood}
         reply: >
           "Longitude is how far east or west you are, and it's hard. The Earth turns a
           full circle in a day, 15 degrees every hour. So every 4 minutes between noon at
@@ -530,6 +548,7 @@ characters:
           longitude is a guess."
       chart:
         stance: truth
+        teaches: {latitude_sailing: heard}
         reply: >
           "The Halcyon's chart gives the island's latitude and longitude. If we find empty
           sea there, ask yourself which number to trust: north and south, or east and west?
@@ -538,6 +557,7 @@ characters:
       course:
         aliases: [position, voyage, destination, heading, where to, coordinates]
         stance: truth
+        teaches: {positions: understood}
         reply: >
           "Tell me where to go, and I'll take you there. A place at sea is two numbers:
           its |wlatitude|n, north or south, and its |wlongitude|n, east or west. The
@@ -546,14 +566,42 @@ characters:
       reckoning:
         aliases: [dead reckoning, reckon]
         stance: truth
+        teaches: {dead_reckoning: understood}
         reply: >
           "Reckoning is working out where you are without seeing land: how fast you
           sailed, which way, and for how long. North and south, the noon sun checks it
           every day. East and west, only a good |wchronometer|n can. Without one, small
           errors add up, day after day. What would that do to a position on a chart?"
+      wind:
+        aliases: [winds, west wind, east wind, trade wind]
+        stance: truth
+        teaches: {winds: understood}
+        reply: >
+          "A wind is named for where it comes from, not where it goes. A west wind blows
+          out of the west, towards the east, and pushes anything afloat eastwards. So when
+          someone tells you of a wind, ask yourself: which way did it push?"
+      horizon:
+        aliases: [masthead, lookout, how far]
+        stance: truth
+        teaches: {horizon: understood}
+        reply: >
+          "The world is round, so the sea curves away out of sight. From my masthead a
+          lookout sees about 20 kilometres of open sea, and a hilly island perhaps 50 to
+          70 away. Anything further hides below the horizon, however clear the day. So
+          empty sea only tells you there's nothing near."
+      witnesses:
+        aliases: [witness, truth, lies, liars, stories]
+        stance: truth
+        teaches: {witnesses: understood}
+        reply: >
+          "People tell you what they believe, and some tell you what suits them. So ask
+          several about the same thing, and compare. Where they agree, it's likely true.
+          Where they differ, look for something you can see for yourself: a thing can't
+          lie."
       birds:
         aliases: [seabirds, terns, noddies, sky]
         stance: truth
+        teaches: {seabirds: understood}
         reply: >
           "Watch the sky at dusk. Terns and noddies fish at sea all day and fly home to land
           for the night. Follow them with your eyes, and you'll know where land is.
@@ -561,12 +609,14 @@ characters:
       tide:
         aliases: [tides, low tide, high tide]
         stance: truth
+        teaches: {tides: understood}
         reply: >
           "The sea rises and falls about twice a day, a little later each day. At low tide
           a reef can stand clear of the water. At high tide it's hidden, and dangerous."
       water:
         aliases: [casks, drink]
         stance: truth
+        teaches: {fresh_water: understood}
         reply: >
           "Fresh water is life at sea. Every day at sea we drink from the casks in the
           Cabin. Find a spring ashore and you can fill them again."
@@ -574,9 +624,10 @@ characters:
         # A4: hints that get more direct while the players are stuck (DECISIONS.md, 6b).
         aliases: [hint, stuck]
         stance: truth
+        teaches: {witnesses: heard}
         reply: >
           "Look closely at things, read what's in the Cabin, and ask people questions.
-          People don't always tell the truth, so compare what they say. And if something
+          People don't always tell the truth, so compare what |wwitnesses|n say. And if something
           puzzles you, ask me about it."
       captain:
         aliases: [command, orders, crew, sailors]
