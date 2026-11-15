@@ -36,6 +36,14 @@ LEVELS: tuple[str, ...] = ("heard", "understood", "used")
 # A clue's fact inside a text: `[[coral, grown into the brass]]` (DECISIONS.md, 20).
 CLUE_MARK: re.Pattern[str] = re.compile(r"\[\[(.+?)\]\]", re.DOTALL)
 CLUE_ID: re.Pattern[str] = re.compile(r"C\d+")
+# A white word: `|wcompass|n` (DECISIONS.md, 20).
+WHITE_WORD: re.Pattern[str] = re.compile(r"\|w(.+?)\|n")
+# In a character's reply, a white word is one of their topics, or a command to try, written
+# out (`|waboard|n`, `|wexamine compass|n`): these are the words a command can start with.
+COMMAND_WORDS: frozenset[str] = frozenset(
+    "aboard ashore sail look examine x read use get take drop go map journal notebook ask "
+    "up down begin help".split()
+)
 
 LIMBO_ID: str = "limbo"
 # The ship's position while she sails between two others (ship.yaml, `under_way`).
@@ -362,6 +370,7 @@ class TopicSpec:
     clue: str | None
     truth: TruthSpec | None
     teaches: Teaching = ()
+    hidden: bool = False  # found only by asking: never suggested, needs no white word
 
 
 @dataclass(frozen=True)
@@ -692,7 +701,15 @@ def _topic(topic_id: str, value: Any, shared: dict[str, tuple[str, ...]], where:
         clue=_optional_text(data, "clue", where),
         truth=_truth(data.get("truth"), f"{where}, truth"),
         teaches=_teaches(data, where),
+        hidden=_flag(data, "hidden", where),
     )
+
+
+def _flag(data: dict[str, Any], name: str, where: str) -> bool:
+    value: Any = data.get(name, False)
+    if not isinstance(value, bool):
+        raise ContentError(f"{where}: `{name}` must be true or false.")
+    return value
 
 
 def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]) -> CharacterSpec:
@@ -1131,6 +1148,49 @@ def _check_characters(content: Content) -> None:
                         f"{where}: {word!r} means both topic {owner[word]!r} and {topic.id!r}."
                     )
                 owner[word] = topic.id
+        _check_white_words(character)
+
+
+def _character_texts(character: CharacterSpec) -> list[tuple[str, str]]:
+    """Everything a character says, as (which text, the text)."""
+    texts: list[tuple[str, str]] = [
+        ("greeting", character.greeting),
+        ("fallback", character.fallback),
+    ]
+    for topic in character.topics.values():
+        texts.append((f"topic {topic.id}", topic.reply))
+        if topic.truth is not None:
+            texts.append((f"topic {topic.id}, truth", topic.truth.reply))
+    return texts
+
+
+def _check_white_words(character: CharacterSpec) -> None:
+    """
+    In what a character says, a white word is one of their own topics or a command, never a
+    word they can't be asked about. And every topic can be found: suggested, white in one of
+    their texts, or deliberately `hidden`.
+    """
+    where: str = f"{CHARACTERS_FILE}, {character.id}"
+    reachable: set[str] = set(character.suggest)
+    for which, text in _character_texts(character):
+        for word in WHITE_WORD.findall(text):
+            topic: TopicSpec | None = character.topic(word)
+            if topic is not None:
+                reachable.add(topic.id)
+                continue
+            first: str = word.split()[0].lower() if word.split() else ""
+            if first not in COMMAND_WORDS:
+                raise ContentError(
+                    f"{where}, {which}: |w{word}|n is white, but it isn't one of "
+                    f"{character.name}'s topics or a command. Make it plain, add the topic, "
+                    "or write the whole command."
+                )
+    for topic in character.topics.values():
+        if topic.id not in reachable and not topic.hidden:
+            raise ContentError(
+                f"{where}, topic {topic.id}: players can't find it. Suggest it, mark it white "
+                "in one of their replies, or set `hidden: true`."
+            )
 
 
 # --- Loading --------------------------------------------------------------------------

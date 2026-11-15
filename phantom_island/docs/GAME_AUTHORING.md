@@ -49,7 +49,12 @@ Two colours carry meaning (DECISIONS.md, 20). Never use them for decoration.
 
 - **White, `|wlike this|n`:** something worth following up: a topic to ask about, a detail to
   look at, a command to try. Mark only words the game understands: a white word that leads
-  nowhere is a broken promise.
+  nowhere is a broken promise. In what a character says, a white word is always one of
+  *that character's* topics (players read it as "ask me about this"), or a whole command
+  (`|waboard|n`, `|wexamine compass|n`); a person or a place elsewhere stays plain. The
+  content check enforces it, and also that every topic can be found: in `suggest`, white in
+  one of the character's own texts, or marked `hidden: true` (a surprise for whoever thinks
+  of asking, like the Ship's name).
 - **Yellow, `[[like this]]`:** a clue's fact. The text needs a `clue:` beside it, and only
   the fact itself is marked, never a whole reply. Only true facts: a mistaken or lying
   reply stays plain, so spotting it is the player's job. The check fails on a `clue:`

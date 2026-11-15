@@ -6,6 +6,9 @@
 # of phase B, who need to know what each character may reveal.
 #
 # Topic words in replies are marked |wlike this|n (white), so players see what else to ask.
+# In a character's text, a white word is always one of *their* topics (players read it as
+# "ask me about this"), or a whole command (|waboard|n, |wexamine compass|n). A person or a
+# place elsewhere stays plain. The content check enforces it.
 # A reply with a `clue` marks the fact itself [[like this]]: the game shows it in yellow and
 # writes the clue into the journal (see clues.yaml). Only true clues are marked, never a
 # mistaken or lying reply (DECISIONS.md, 20).
@@ -66,6 +69,9 @@
 #   stance    truth (what they say is true), mistaken (they believe it, but it's wrong),
 #             hiding (they know better and don't say)
 #   clue      optional: the clue (C1..C13, see GAME_STORY.md) this reply reveals (A3)
+#   hidden    optional: true for a topic players find only by thinking of it (the Ship's
+#             name). Every other topic must be in `suggest` or white in one of the
+#             character's own texts; the content check makes sure of it.
 #   truth     optional, for what a character hides: the reply given once `needs` holds
 #     needs   clue ids already in the journal, or flags such as `respect` (set by things
 #             players do; the flags come in A4)
@@ -136,6 +142,12 @@ characters:
           aloud: "'We have found the |wisland|n and fixed its position. Good water, fair
           weather, friendly people. We sail again soon.'" She folds it again. "That was the
           last word we ever had."
+      compass:
+        stance: truth
+        reply: >
+          "I have not held it myself: Mr Crane will not let it out of his hands. He says he
+          found it on a beach. I should like to know how a compass comes to lie on a beach
+          for fifteen years. Do look at it closely."
       island:
         stance: truth
         reply: >
@@ -267,7 +279,7 @@ characters:
         stance: hiding
         reply: >
           "Which beach? Oh, one down the coast. Can't remember which. They all look the
-          same, beaches. Ask old |wBarnaby|n on the quay, he's walked every one of them."
+          same, beaches. Ask old Barnaby on the quay, he's walked every one of them."
       storm:
         stance: hiding
         reply: >
@@ -318,7 +330,7 @@ characters:
     greeting: >
       The elder looks at you for a long moment. "Strangers from the sea, again. Sit with
       me."
-    suggest: [village, island, reef, halcyon]
+    suggest: [village, island, reef, halcyon, tui]
     fallback: >
       Elder Ama keeps weaving. "That is not something I can tell you about."
     topics:
@@ -352,7 +364,7 @@ characters:
           clue: C12
           reply: >
             "Fifteen winters ago a great storm threw a ship onto the western reef. Our
-            people paddled out into the storm and [[brought every one of them ashore,
+            people paddled out into the storm and [[brought the whole |wcrew|n ashore,
             alive]]. They lived with us for a season and learned our songs. Then most of
             them went away again, over the sea to the west."
       tui:
@@ -377,7 +389,7 @@ characters:
           needs: [respect]
           clue: C12
           reply: >
-            "[[They built a boat at the |wcove|n, with wood from their broken ship]] and rope
+            "[[They built a boat at the cove, with wood from their broken ship]] and rope
             from our trees. One of them stayed. He still lives among us."
 
   tui:
@@ -393,7 +405,7 @@ characters:
       clinks when Tui moves.
     greeting: >
       "Hello! Are you from a ship? Do you want to see my |wbuttons|n?"
-    suggest: [buttons, bones, song]
+    suggest: [buttons, bones, song, goats]
     fallback: >
       Tui shrugs. "Don't know. Do you want to hear my |wsong|n instead?"
     topics:
@@ -448,7 +460,7 @@ characters:
       like the islanders, but his face is sunburnt the way only a sailor's gets.
     greeting: >
       He puts down his adze. "Well. I wondered if anyone would ever come looking."
-    suggest: [halcyon, wreck, boat, crew]
+    suggest: [halcyon, wreck, boat, crew, compass]
     fallback: >
       Jonah rubs his chin. "Fifteen years here, and I've forgotten more about that than
       I ever knew."
@@ -513,7 +525,8 @@ characters:
       in a way that sounds almost like a voice.
     greeting: >
       The timbers creak, and somehow it sounds like a voice. "You called? Ask me about
-      the sea, the sky, or the instruments below."
+      the sea and the sky, the |wwind|n, the |wtide|n, the |whorizon|n. Or about the
+      instruments below, and the |wwater|n casks."
     suggest: [course, sextant, chronometer, latitude, longitude, birds, help]
     fallback: >
       The Ship creaks thoughtfully. "That's beyond what a ship knows. Try me on
@@ -549,7 +562,7 @@ characters:
           "Longitude is how far east or west you are, and it's hard. The Earth turns a
           full circle in a day, 15 degrees every hour. So every 4 minutes between noon at
           home, on my |wchronometer|n, and noon here is one degree. Without a good clock,
-          longitude is a guess."
+          longitude is only |wreckoning|n: a guess."
       chart:
         stance: truth
         teaches: {latitude_sailing: heard}
@@ -563,7 +576,8 @@ characters:
         stance: truth
         teaches: {positions: understood}
         reply: >
-          "Tell me where to go, and I'll take you there. A place at sea is two numbers:
+          "You're the |wcaptain|n: tell me where to go, and I'll take you there. A place at
+          sea is two numbers:
           its |wlatitude|n, north or south, and its |wlongitude|n, east or west. The
           Halcyon's |wchart|n in the Cabin gives the island's. Then say on deck, for
           example: sail to 10 north 25 east."
@@ -642,6 +656,7 @@ characters:
           the word on deck: |wsail|n."
       name:
         aliases: [yourself, you]
+        hidden: true  # a surprise for whoever thinks of asking
         stance: truth
         reply: >
           "My name? That's for my crew to decide. Choose well; I'll be wearing it for a

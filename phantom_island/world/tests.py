@@ -142,6 +142,20 @@ class TestContent(TestCase):
         self.assertIsNone(parse_coords("14 40"))
         self.assertIsNone(parse_coords("14 south 15 south"))
 
+    def test_a_white_word_must_be_the_speakers_topic(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE, "Ask old Barnaby on the quay", "Ask old |wBarnaby|n on the quay"
+        )
+        self.assertIn("isn't one of Silas Crane's topics", str(error))
+
+    def test_every_topic_can_be_found(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE,
+            "        hidden: true  # a surprise",
+            "        hidden: false  # a surprise",
+        )
+        self.assertIn("topic name: players can't find it", str(error))
+
     def test_teaching_an_unknown_idea_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
             CHARACTERS_FILE, "teaches: {oak: heard}", "teaches: {nowhere: heard}"
@@ -715,6 +729,10 @@ class TestAsk(WorldTest):
     def test_with_one_person_here_the_name_can_be_left_out(self) -> None:
         self.at("quay")
         self.assertIn("Worst I ever saw", self.ask("about storm"))
+
+    def test_fairweather_can_be_asked_about_the_compass(self) -> None:
+        self.at("office")
+        self.assertIn("lie on a beach", self.ask("fairweather about compass"))
 
     def test_with_two_people_here_ask_who(self) -> None:
         self.at("village")
