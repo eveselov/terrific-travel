@@ -182,8 +182,11 @@ def find_route(position: PositionSpec, text: str) -> RouteSpec | str:
     return found
 
 
-def sail(caller: Any, text: str) -> bool:
-    """Give the ship an order. Returns True if she set off."""
+def sail(caller: Any, text: str, now: bool = False) -> bool:
+    """
+    Give the ship an order. Returns True if she set off. With `now`, the whole passage is
+    told at once and the ship has arrived when this returns (`sail/now`, for scenarios).
+    """
     if get_expedition().voyage is not None:
         caller.msg(STILL_SAILING)
         return False
@@ -200,7 +203,7 @@ def sail(caller: Any, text: str) -> bool:
         names: str = ", ".join(character.get_display_name(caller) for character in left_behind)
         caller.msg(f"Not without {names}! Wait until everyone is aboard.")
         return False
-    set_off(caller, position, found)
+    set_off(caller, position, found, now)
     return True
 
 
@@ -218,8 +221,11 @@ def _aboard() -> list[tuple[ShipRoom, Any]]:
     ]
 
 
-def set_off(caller: Any, position: PositionSpec, route: RouteSpec) -> None:
-    """The ship leaves `position` along `route`: the Ship answers, and the passage begins."""
+def set_off(caller: Any, position: PositionSpec, route: RouteSpec, now: bool = False) -> None:
+    """
+    The ship leaves `position` along `route`: the Ship answers, and the passage begins (all
+    at once, with `now`).
+    """
     content: Content = load_content()
     old_shore: Any = find_place(position.ashore) if position.ashore else None
     voyage: Voyage = get_expedition().set_off(UNDER_WAY, route.to, route.direction, caller.id)
@@ -234,10 +240,18 @@ def set_off(caller: Any, position: PositionSpec, route: RouteSpec) -> None:
     for room, character in aboard:
         room.send_visuals(character)
     learn(caller, route.teaches, "an order to sail", [character for _, character in aboard])
-    later(STEP_SECONDS, sail_on, voyage.number)
+    _next_step(voyage.number, now)
 
 
-def sail_on(number: int) -> None:
+def _next_step(number: int, now: bool) -> None:
+    """The passage's next line: in a few seconds, or at once with `now`."""
+    if now:
+        sail_on(number, now=True)
+    else:
+        later(STEP_SECONDS, sail_on, number)
+
+
+def sail_on(number: int, now: bool = False) -> None:
     """
     The next line of the passage, with the ship's marker moved on; the last line arrives.
     Does nothing if voyage `number` is over (or a new expedition began meanwhile).
@@ -257,7 +271,7 @@ def sail_on(number: int) -> None:
     get_expedition().sail_on(step)
     for room, character in _aboard():
         room.send_visuals(character)
-    later(STEP_SECONDS, sail_on, number)
+    _next_step(number, now)
 
 
 def arrive() -> None:

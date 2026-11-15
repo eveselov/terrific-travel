@@ -182,6 +182,13 @@ The full rules are at the top of `characters.yaml` (DECISIONS.md, 23). In short:
 - `startover`, `startover at sea`, `startover island` start a new expedition with the ship in
   port, at the charted position or at the island, for testing a later act without sailing
   there.
+- `batchcommand/interactive scenarios.island` plays the normal scenario
+  ([world/scenarios/island.ev](../world/scenarios/island.ev)): a typical way from Limbo to
+  the island, with why each step is taken and what players know after it. `ss` runs the
+  next command (`ss 5` the next five), `qq` stops, and you can play normally in between. It
+  reaches a point in the story with a real journal and notebook, and shows the story as
+  players meet it. It uses `sail/now` (builders only: the whole voyage at once). After a
+  content change that touches its path, update its commands and comments.
 - The content check runs on every `reload` and `batchcode build`, and the tests run it too:
   `uv run evennia test --settings settings.py .` from this folder. A content mistake shows
   up as a `ContentError` naming the file and entry.

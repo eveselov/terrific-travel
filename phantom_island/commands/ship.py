@@ -9,6 +9,10 @@ from world.ship import sail
 
 from .command import Command
 
+# `sail/now ...`: the whole voyage at once, for builders playing a scenario
+# (`batchcommand scenarios.island`). Players who type it sail as usual.
+NOW_SWITCH: str = "/now"
+
 
 class CmdSail(Command):
     """
@@ -34,7 +38,13 @@ class CmdSail(Command):
     help_category = "Ship"
 
     def func(self) -> None:
-        sail(self.caller, self.args.strip())
+        text: str = self.args.strip()
+        now: bool = False
+        first, _, rest = text.partition(" ")
+        if first.lower() == NOW_SWITCH:  # `sail/now to ...`: builders, for scenarios
+            text = rest.strip()
+            now = bool(self.caller.check_permstring("Builder"))
+        sail(self.caller, text, now)
 
 
 class DeckCmdSet(CmdSet):

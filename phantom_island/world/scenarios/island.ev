@@ -1,0 +1,125 @@
+# SPOILERS. Phantom Island: the normal scenario, from Limbo to the island.
+#
+# A typical way through the port and the voyage, with why each step is taken and what
+# the players know after it. For developers: to see the game as a player would without
+# replaying it all by hand, and to reach a point in the story with a real journal and
+# notebook (unlike `startover`, which jumps there with both empty).
+#
+# Run it in the game as a builder (Developer), with nobody else playing:
+#
+#   batchcommand/interactive scenarios.island   one step at a time: `ss` runs the next
+#                                               command, `ss 5` the next five, `ll` shows
+#                                               it, `jj <n>` jumps, `qq` stops; you can
+#                                               play normally in between
+#   batchcommand scenarios.island               the whole of it at once
+#
+# It starts a new expedition, so the journal and the flags are lost.
+#
+# Evennia reads every `#` line as a comment that ends the command before it: keep one
+# after each command. The comments here aren't shown in the game, only in this file.
+#
+# ---------------------------------------------------------------------------------------
+# PROLOGUE AND ACT 1: THE PORT
+# ---------------------------------------------------------------------------------------
+startover yes
+# A new expedition: the ship in port, the journal and notebooks empty, and you in Limbo.
+begin
+# The Society Office, with Mrs. Fairweather.
+ask fairweather
+# Her greeting, and what to ask her: mission, halcyon, chart, letter.
+ask fairweather about mission
+# Why: the first thing anyone wants to know is what they're here for.
+# Now you know: the Halcyon is lost, a compass with her name turned up in the market,
+# east of here, and the island is on the Halcyon's chart. The plan: look at the compass
+# first, then sail to the island.
+ask her about chart
+# Why: the chart is where the island is.
+# Now you know: a copy is in your ship's cabin, with the island's latitude and longitude.
+# Mrs. Fairweather has never doubted it (she is mistaken; nothing says so yet).
+east
+# The Market: Silas Crane and his stall.
+look compass
+# Why: Mrs. Fairweather said to look at it first.
+# Now you know (C1): HALCYON on the lid. The ship didn't vanish without a trace.
+examine compass
+# Why: the description invites a closer look.
+# Now you know (C2): coral grown into the hinge. Coral grows only under the sea, so the
+# compass lay in the sea for a long time. Notebook: coral.
+ask crane about compass
+# Why: he claims he found it on a beach. With the coral in the journal, he can't keep
+# that up.
+# Now you know (C3): he traded for it with fishermen who came from the west. The island
+# is somewhere west, far out.
+southwest
+# The Quay, with Old Barnaby.
+ask barnaby about sailing
+# Why: before a long voyage, ask an old sailor.
+# Now you know: latitude from the noon sun was reliable, east and west were guesswork.
+# Your ship has a sea clock. Notebook: latitude, longitude, dead reckoning, sea clocks.
+aboard
+# The Deck. The ship is moored at the quay.
+down
+# The Cabin: the chart, the sextant, the chronometer, the guide books.
+read chart
+# Why: the island's position is on it.
+# Now you know: the island at 14 degrees South, 40 degrees West.
+get sextant
+# Why: the Ship will ask for a noon sight, and the sextant only works on deck.
+up
+# The Deck.
+sail
+# Why: what can I order? The crew want a position, latitude and longitude.
+#
+# ---------------------------------------------------------------------------------------
+# ACT 2: AT SEA
+# ---------------------------------------------------------------------------------------
+sail/now to 14 south 40 west
+# Why: the chart's position, as the Ship asked for it.
+# The voyage, all at once (/now): three weeks due west along 14 degrees South.
+# Now you know (C4): the sea is empty where the chart puts the island.
+# Notebook: positions (used), latitude sailing.
+use sextant
+# Why: the Ship asks you to check the chart's two numbers.
+# Now you know (C4 again): 14 degrees South, exactly the chart's latitude.
+down
+# The Cabin.
+read chronometer
+# Why: the sextant gave noon here; the chronometer gives the time at home.
+# Now you know (C4 again): 40 degrees West, the chart's longitude too. You are exactly
+# where the chart says, and there is no island. One of the chart's numbers is wrong.
+up
+# The Deck.
+ask ship about latitude
+# Why: which of the two numbers to trust?
+# Now you know: latitude has been measured well for centuries.
+ask ship about longitude
+# Now you know: longitude needs a good clock; without one it is only reckoning, a guess.
+# So the Halcyon's latitude is probably right and the longitude probably wrong: search
+# east or west along 14 degrees South.
+look sky
+# Why: the Deck view mentions seabirds in the evening sky.
+# Now you know (C6): at dusk the seabirds all fly west. Seabirds fly home to land at
+# night. With C3 (fishermen from the west): the island is to the west.
+sail/now west
+# Why: west, along the same latitude, as C3 and C6 both say.
+# A day's sail. Late in the day: land!
+#
+# ---------------------------------------------------------------------------------------
+# AT THE ISLAND
+# ---------------------------------------------------------------------------------------
+use sextant
+# Why: to check where the island really is.
+# Now you know: 14 degrees South, the chart's latitude to the minute.
+down
+# The Cabin.
+read chronometer
+# Now you know (C5): 42 degrees West. The latitude was right, the longitude 2 degrees out:
+# the chart put the island in the wrong place. That is why nobody found the Halcyon.
+up
+# The Deck.
+ashore
+# Lagoon Beach. Act 3 begins here.
+journal
+# The journal so far: C1, C2, C3, C4, C6, C5, in the order found.
+notebook
+# The notebook so far.

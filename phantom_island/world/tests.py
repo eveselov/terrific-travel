@@ -480,6 +480,23 @@ class TestVoyage(WorldTest):
         self.assertEqual(view.picture_map.key, "sea_chart")
         return view.ship_pos
 
+    def test_a_builder_can_sail_now(self) -> None:
+        told: str = self.do(self.char1, "sail/now to 14 south 40 west")
+        self.assertEqual(current_position().id, "charted")  # arrived, without waiting
+        self.clock.assert_not_called()
+        self.assertIn("Day 21", told)
+
+    def test_a_player_who_types_sail_now_sails_as_usual(self) -> None:
+        self.char2.move_to(self.rooms["deck"], quiet=True)
+        self.do(self.char2, "sail/now west")
+        self.assertEqual(current_position().id, UNDER_WAY)
+        self.assertEqual(self.clock.call_args.args[0], STEP_SECONDS)
+
+    def do(self, character: Character, command: str) -> str:
+        with patch.object(character, "msg") as mock_msg:
+            character.execute_cmd(command)
+        return texts(mock_msg)
+
     def test_the_ship_sails_on_line_by_line(self) -> None:
         self.assertTrue(sail(self.char1, "west"))
         self.assertEqual(current_position().id, UNDER_WAY)
