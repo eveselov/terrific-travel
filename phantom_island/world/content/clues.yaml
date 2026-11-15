@@ -41,13 +41,13 @@ clues:
   C4:
     title: Nothing at the charted position
     journal: >
-      At the position written on the Halcyon's chart there is only open sea. The chart is
-      wrong.
+      At the position written on the Halcyon's chart there is only open sea, and the
+      sextant and the chronometer can confirm the ship is really there. The chart is wrong.
   C5:
     title: Latitude right, longitude wrong
     journal: >
-      With sextant and chronometer: the island's latitude on the chart is right, but its
-      longitude is wrong. The Halcyon carried no sea clock, so her longitude was a guess.
+      Measured at the island with sextant and chronometer: it lies at exactly the latitude
+      on the Halcyon's chart, but 2 degrees further west than the chart's longitude.
   C6:
     title: Birds flying west at dusk
     journal: >

@@ -15,6 +15,13 @@
   <path d="M 520 300 C 510 260 560 245 590 265 C 625 285 610 330 575 335
            C 545 340 525 330 520 300 Z" fill="#dccb98" stroke="#7a4a21" stroke-width="4"
         stroke-dasharray="10 7"/>
+  <!-- What the Halcyon's master wrote: the line of latitude through home and the island,
+       and the island's position (the same numbers as `read chart`) -->
+  <g font-family="Georgia, serif" fill="#7a4a21" font-style="italic">
+    <text x="30" y="282" font-size="22">14° S</text>
+    <text x="568" y="228" font-size="22" text-anchor="middle">Island, 1775</text>
+    <text x="568" y="372" font-size="20" text-anchor="middle">14° S, 40° W</text>
+  </g>
   <!-- Compass rose -->
   <g transform="translate(120,480)" stroke="#7a4a21" stroke-width="3" fill="#efe1bb">
     <circle r="55"/>

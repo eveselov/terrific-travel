@@ -29,8 +29,13 @@ def at_server_start() -> None:
     """
     This is called every time the server starts up, regardless of
     how it was shut down.
+
+    A voyage that was under way when the server stopped carries on (its scheduled steps
+    don't survive a restart).
     """
-    pass
+    from world.ship import resume_voyage
+
+    resume_voyage()
 
 
 def at_server_stop() -> None:

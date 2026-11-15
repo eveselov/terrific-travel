@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from evennia.commands.default.general import CmdGet as DefaultCmdGet
 from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
 from typeclasses.rooms import Room
@@ -9,6 +10,27 @@ from world.clues import journal_text
 from world.discovery import act, look_at, notice_surroundings, show_focus_for
 
 from .command import Command
+
+
+class CmdGet(DefaultCmdGet):
+    """
+    Pick something up and carry it with you.
+
+    Usage:
+      get <thing>
+      take <thing>
+      pick up <thing>
+
+    Some things can be carried: the sextant up to the Deck, a book or the chart ashore.
+    Put them down again with drop. inventory (or i) shows what you carry.
+
+    Examples:
+      get sextant
+      take chart
+    """
+
+    aliases = ["grab", "take", "pick up"]
+    help_category = "General"
 
 
 class CmdLook(DefaultCmdLook):

@@ -31,12 +31,14 @@ from world.content import (
     PLACES_FILE,
     SHIP_FILE,
     THINGS_FILE,
+    UNDER_WAY,
     CharacterSpec,
     Content,
     ContentError,
     TopicSpec,
     all_texts,
     load_content,
+    parse_coords,
     read_content,
 )
 from world.conversation import ask, listeners
@@ -45,8 +47,18 @@ from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
 from world.places import find_inhabitant, find_ship_exit, find_thing
-from world.reset import route_to, shortcut_position
-from world.ship import ABOARD, ASHORE, LATE_JOINER, moor_ship, normalise_direction, sail
+from world.reset import route_to, shortcut_position, start_over
+from world.ship import (
+    ABOARD,
+    ASHORE,
+    LATE_JOINER,
+    STEP_SECONDS,
+    moor_ship,
+    normalise_direction,
+    resume_voyage,
+    sail,
+    sail_on,
+)
 
 CONTENT_FILES: tuple[str, ...] = (
     PLACES_FILE,
@@ -114,6 +126,18 @@ class TestContent(TestCase):
     def test_exit_to_unknown_place_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(PLACES_FILE, "east: market", "east: markt")
         self.assertIn("markt", str(error))
+
+    def test_positions_as_players_write_them(self) -> None:
+        for text in ("14 south 40 west", "14S, 40W", "latitude 14 degrees S, longitude 40 W"):
+            self.assertEqual(parse_coords(text), (-14, -40), text)
+        self.assertEqual(parse_coords("40 west 14 south"), (-14, -40))
+        self.assertEqual(parse_coords("10 north 25 east"), (10, 25))
+        self.assertIsNone(parse_coords("14 40"))
+        self.assertIsNone(parse_coords("14 south 15 south"))
+
+    def test_route_without_passage_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(SHIP_FILE, "passage:", "voyage:")
+        self.assertIn("passage", str(error))
 
     def test_route_to_unknown_position_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(SHIP_FILE, "to: anchorage", "to: nowhere")
@@ -215,6 +239,10 @@ class WorldTest(EvenniaTest):
         self.rooms: dict[str, Room] = build_world(limbo=self.room1)
         self.char1.move_to(self.room1, quiet=True)
         self.char2.move_to(self.room1, quiet=True)
+        # Voyages happen at once in tests, instead of a line every few seconds.
+        clock: Any = patch("world.ship.later", side_effect=lambda _s, step, *args: step(*args))
+        clock.start()
+        self.addCleanup(clock.stop)
 
     def exits_from(self, place_id: str) -> dict[str, Any]:
         return {exit_obj.key: exit_obj for exit_obj in self.rooms[place_id].exits}
@@ -321,10 +349,44 @@ class TestSail(WorldTest):
         self.assertEqual(self.exits_from("beach")["aboard"].destination, self.rooms["deck"])
         self.assertEqual(get_expedition().track, ["port", "charted", "anchorage"])
 
-    def test_wrong_direction_says_where_you_can_sail(self) -> None:
+    def test_wrong_direction_says_how_to_give_an_order(self) -> None:
         with patch.object(self.char1, "msg") as mock_msg:
             self.assertFalse(sail(self.char1, "north"))
-        self.assertIn("You can sail: west", texts(mock_msg))
+        self.assertIn("sail to 10 north 25", texts(mock_msg))
+        self.assertIn("read chart", texts(mock_msg))
+        self.assertEqual(current_position().id, "port")
+
+    def test_sailing_to_the_position_on_the_chart(self) -> None:
+        with patch.object(self.char2, "msg") as mock_msg:
+            self.assertTrue(sail(self.char1, "to 14 south 40 west"))
+        self.assertEqual(current_position().id, "charted")
+        self.assertIn("Fourteen degrees South, forty", texts(mock_msg))  # the Ship's answer
+
+    def test_sailing_to_the_island_by_name(self) -> None:
+        self.assertTrue(sail(self.char1, "to the island"))
+        self.assertEqual(current_position().id, "charted")
+
+    def test_a_position_nobody_knows(self) -> None:
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.assertFalse(sail(self.char1, "to 14 north 40 west"))
+        self.assertIn("14 degrees North, 40 degrees West?", texts(mock_msg))
+        self.assertIn("read chart", texts(mock_msg))
+        self.assertEqual(current_position().id, "port")
+
+    def test_a_position_needs_its_sides_of_the_world(self) -> None:
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.assertFalse(sail(self.char1, "to 14 40"))
+        self.assertIn("north or south", texts(mock_msg))
+
+    def test_at_the_position_already(self) -> None:
+        sail(self.char1, "west")
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.assertFalse(sail(self.char1, "to 14S 40W"))
+        self.assertIn("there already", texts(mock_msg))
+
+    def test_going_home_by_name(self) -> None:
+        sail(self.char1, "west")
+        self.assertTrue(sail(self.char1, "home"))
         self.assertEqual(current_position().id, "port")
 
     def test_does_not_leave_anyone_ashore(self) -> None:
@@ -339,13 +401,82 @@ class TestSail(WorldTest):
         self.char2.move_to(self.rooms["cabin"], quiet=True)
         with patch.object(self.char2, "msg") as mock_msg:
             sail(self.char1, "west")
-        self.assertIn("many days", texts(mock_msg))
+        self.assertIn("Day 21", texts(mock_msg))
         self.assertIn("open sea", texts(mock_msg))
         self.assertIn("sea_chart.svg", sent(mock_msg, "map")[0])
 
     def test_sail_command(self) -> None:
         self.char1.execute_cmd("sail west")
         self.assertEqual(current_position().id, "charted")
+
+
+class TestVoyage(WorldTest):
+    """A voyage step by step, as the real clock would run it."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.char1.move_to(self.rooms["deck"], quiet=True)
+        crew_patch: Any = patch("world.ship.crew_ashore", return_value=[])
+        crew_patch.start()
+        self.addCleanup(crew_patch.stop)
+        clock: Any = patch("world.ship.later")
+        self.clock: MagicMock = clock.start()
+        self.addCleanup(clock.stop)
+
+    def ship_pos(self) -> tuple[int, int]:
+        view: MapView | None = self.rooms["deck"].map_view()
+        assert view is not None and view.ship_pos is not None
+        self.assertEqual(view.picture_map.key, "sea_chart")
+        return view.ship_pos
+
+    def test_the_ship_sails_on_line_by_line(self) -> None:
+        self.assertTrue(sail(self.char1, "west"))
+        self.assertEqual(current_position().id, UNDER_WAY)
+        ashore_exit: Any = find_ship_exit(ASHORE)
+        self.assertIsNone(ashore_exit.location)
+        self.assertIn("under way", self.rooms["deck"].return_appearance(self.char1))
+        self.assertEqual(self.clock.call_args.args[0], STEP_SECONDS)
+        number: int = self.clock.call_args.args[2]
+        start_x: int = self.ship_pos()[0]
+
+        with patch.object(self.char1, "msg") as mock_msg:
+            sail_on(number)
+        self.assertIn("Day 4", texts(mock_msg))
+        self.assertLess(self.ship_pos()[0], start_x)  # westward, to the left of the chart
+        self.assertEqual(current_position().id, UNDER_WAY)
+
+        for _ in range(3):
+            sail_on(number)
+        self.assertEqual(current_position().id, "charted")
+        self.assertIsNone(get_expedition().voyage)
+        self.assertEqual(get_expedition().track, ["port", "charted"])
+
+    def test_no_new_order_while_under_way(self) -> None:
+        sail(self.char1, "west")
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.assertFalse(sail(self.char1, "east"))
+        self.assertIn("under way", texts(mock_msg))
+
+    def test_the_sextant_under_way(self) -> None:
+        sail(self.char1, "west")
+        sextant: Any = find_thing("sextant")
+        sextant.move_to(self.char1, quiet=True)
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("use sextant")
+        self.assertIn("holding her latitude", texts(mock_msg))
+
+    def test_a_new_expedition_ends_the_voyage(self) -> None:
+        sail(self.char1, "west")
+        number: int = self.clock.call_args.args[2]
+        start_over("port")
+        sail_on(number)  # the step scheduled before starting over
+        self.assertEqual(current_position().id, "port")
+
+    def test_a_restart_carries_on(self) -> None:
+        sail(self.char1, "west")
+        self.clock.reset_mock()
+        resume_voyage()
+        self.assertEqual(self.clock.call_args.args[1], sail_on)
 
 
 class TestMapsAndFocus(WorldTest):
@@ -859,18 +990,61 @@ class TestAtSea(DiscoveryTest):
 
     def test_the_sextant_needs_the_deck(self) -> None:
         self.at(self.char1, "cabin")
-        self.assertIn("Take the sextant up", self.do(self.char1, "use sextant"))
+        self.assertIn("get sextant", self.do(self.char1, "use sextant"))
 
-    def test_noon_sight_and_chronometer_find_the_longitude_clue(self) -> None:
+    def test_take_and_pick_up_work_like_get(self) -> None:
+        self.at(self.char1, "cabin")
+        self.do(self.char1, "take sextant")
+        self.assertEqual(self.thing("sextant").location, self.char1)
+        self.do(self.char1, "drop sextant")
+        self.do(self.char1, "pick up sextant")
+        self.assertEqual(self.thing("sextant").location, self.char1)
+
+    def test_at_the_charted_position_the_measurements_confirm_the_empty_sea(self) -> None:
         self.ship_at("charted")
         self.at(self.char2, "cabin")
         self.assertIn("Take a noon sight", self.do(self.char2, "read chronometer"))
         self.at(self.char1, "cabin")
         self.do(self.char1, "get sextant")
         self.at(self.char1, "deck")
-        self.assertIn("Latitude 14 degrees South", self.do(self.char1, "use sextant"))
-        self.assertIn("|ylatitude is easy", self.do(self.char2, "read chronometer"))
-        self.assertIn("C5", self.journal_ids())
+        self.do(self.char1, "look")  # the empty sea: C4
+        self.assertIn("|yLatitude 14 degrees South", self.do(self.char1, "use sextant"))
+        read: str = self.do(self.char2, "read chronometer")
+        self.assertIn("|y40 degrees West", read)
+        self.assertIn("Which one would you trust?", read)
+        self.assertNotIn("C5", self.journal_ids())  # the why is the players' to work out
+        sources: list[str | None] = [s.source for s in get_expedition().journal[0].also]
+        self.assertEqual(sources, ["the sextant", "the chronometer"])
+
+    def test_a_day_north_the_sextant_shows_the_latitude_changed(self) -> None:
+        self.ship_at("charted")
+        self.thing("sextant").move_to(self.char1, quiet=True)
+        self.at(self.char1, "deck")
+        with patch("world.ship.crew_ashore", return_value=[]):
+            self.assertTrue(sail(self.char1, "north"))
+        self.assertEqual(current_position().id, "north_of_chart")
+        self.assertIn("Latitude 12 degrees South", self.do(self.char1, "use sextant"))
+        with patch("world.ship.crew_ashore", return_value=[]):
+            self.assertFalse(sail(self.char1, "west"))  # only back from here
+            self.assertTrue(sail(self.char1, "south"))
+        self.assertEqual(current_position().id, "charted")
+
+    def test_a_day_east_the_chronometer_shows_the_way_back(self) -> None:
+        self.ship_at("charted")
+        self.thing("sextant").move_to(self.char1, quiet=True)
+        self.at(self.char1, "deck")
+        with patch("world.ship.crew_ashore", return_value=[]):
+            sail(self.char1, "east")
+        self.do(self.char1, "use sextant")
+        self.at(self.char1, "cabin")
+        self.assertIn("38 degrees West", self.do(self.char1, "read chronometer"))
+
+    def test_no_list_of_directions_at_the_charted_position(self) -> None:
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+        options: str = self.do(self.char1, "sail")
+        self.assertIn("sail north", options)
+        self.assertIn("which one to trust", options)
 
     def test_at_the_island_the_longitude_is_ten_degrees_out(self) -> None:
         self.ship_at("anchorage")

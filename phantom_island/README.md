@@ -57,7 +57,9 @@ Office. From there:
 
 - walk with compass directions (`se`, `east`...); `look` lists a room's exits;
 - on the Quay, `aboard` takes you onto the ship's Deck; `down` goes to the Cabin;
-- on the Deck, `sail` shows where the ship can go, and `sail west` sails. The ship won't leave
+- on the Deck, `sail` says what you can order. From port, give the island's position from the
+  chart (`read chart` in the Cabin): `sail to 14 south 40 west`; at sea, `sail west` or
+  `sail home`. The voyage is told in a few lines, one every few seconds. The ship won't leave
   while another connected player is still ashore (players in Limbo don't count);
 - at the island, `ashore` lands you on Lagoon Beach;
 - `map` describes the current map in words (for telnet) and redraws the Map pane.
@@ -147,11 +149,11 @@ ask crane about compass      → now he admits the truth, C3
 teleport Cabin
 get sextant
 up
-sail west                    → the empty sea, C4
+sail to 14 south 40 west     → after the passage, the empty sea, C4
 look sky                     → the birds, C6
 use sextant
 down
-read chronometer             → C5
+read chronometer             → 40 W: C4 again, confirmed (C5 is measured at the island)
 journal
 ```
 

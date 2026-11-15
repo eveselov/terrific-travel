@@ -33,6 +33,8 @@ CLUE_MARK: re.Pattern[str] = re.compile(r"\[\[(.+?)\]\]", re.DOTALL)
 CLUE_ID: re.Pattern[str] = re.compile(r"C\d+")
 
 LIMBO_ID: str = "limbo"
+# The ship's position while she sails between two others (ship.yaml, `under_way`).
+UNDER_WAY: str = "under_way"
 ROOM_KINDS: tuple[str, ...] = ("room", "deck", "cabin")
 STANCES: tuple[str, ...] = ("truth", "mistaken", "hiding")
 ABOARD_WHERE: str = "aboard"  # a character's `where` for the Ship: the Deck and the Cabin
@@ -57,6 +59,41 @@ DIRECTION_ALIASES: dict[str, str] = {
 }
 
 Point = tuple[int, int]
+# A position on the globe in whole degrees: (latitude, longitude), north and east positive.
+# Longitude is counted from home, as on the Halcyon's chart.
+Coords = tuple[int, int]
+
+# `14 south`, `40 degrees W`, `14°S`: one number and the side of the world it lies on.
+_COORD_PART: re.Pattern[str] = re.compile(
+    r"(\d+)\s*(?:degrees?|deg|°)?\s*(north|south|east|west|n|s|e|w)\b"
+)
+
+
+def parse_coords(text: str) -> Coords | None:
+    """
+    `14 south 40 west`, `14S, 40W`, `latitude 14 degrees south, longitude 40 west`:
+    the position it names, or None if it doesn't name exactly one latitude and one
+    longitude. The order doesn't matter: north and south mark the latitude.
+    """
+    latitudes: list[int] = []
+    longitudes: list[int] = []
+    for number, side in _COORD_PART.findall(text.lower().replace("°", " ")):
+        degrees: int = int(number)
+        if side[0] in "ns":
+            latitudes.append(degrees if side[0] == "n" else -degrees)
+        else:
+            longitudes.append(degrees if side[0] == "e" else -degrees)
+    if len(latitudes) != 1 or len(longitudes) != 1:
+        return None
+    return latitudes[0], longitudes[0]
+
+
+def coords_text(coords: Coords) -> str:
+    """(-14, -40) -> `14 degrees South, 40 degrees West`."""
+    latitude, longitude = coords
+    north_south: str = "North" if latitude > 0 else "South"
+    east_west: str = "East" if longitude > 0 else "West"
+    return f"{abs(latitude)} degrees {north_south}, {abs(longitude)} degrees {east_west}"
 
 
 class ContentError(ValueError):
@@ -114,11 +151,17 @@ class PlaceSpec:
 
 @dataclass(frozen=True)
 class RouteSpec:
-    """A way the ship can sail from a position."""
+    """
+    A way the ship can sail from a position: `sail <direction>`, `sail to <one of names>`,
+    or `sail to <latitude> <longitude>` when the destination has `coords`.
+    """
 
     direction: str
     to: str
-    text: str
+    names: tuple[str, ...]  # normalised: `sail to the island` finds `island`
+    order: str | None  # what the Ship says when she is given this order
+    text: str  # shown at once, as she sets off
+    passage: tuple[str, ...]  # shown one after another while she sails; the last one arrives
 
 
 @dataclass(frozen=True)
@@ -127,6 +170,8 @@ class PositionSpec:
 
     id: str
     name: str
+    coords: Coords | None  # where it is on the globe, if anyone aboard can know
+    orders: str | None  # what `sail` alone says here: the choices, in words
     chart_pos: Point
     map: str | None
     map_pos: Point | None
@@ -142,6 +187,14 @@ class PositionSpec:
         """The route in this direction, or None if the ship can't sail that way from here."""
         for route in self.routes:
             if route.direction == direction:
+                return route
+        return None
+
+    def route_named(self, name: str) -> RouteSpec | None:
+        """The route `sail to <name>` means (`the island`, `home`), or None."""
+        word: str = normalise_words(name)
+        for route in self.routes:
+            if word in route.names:
                 return route
         return None
 
@@ -471,9 +524,33 @@ def _place(place_id: str, value: Any, file: str) -> PlaceSpec:
 
 def _route(direction: str, value: Any, where: str) -> RouteSpec:
     data: dict[str, Any] = _mapping(value, where)
+    passage: Any = data.get("passage") or []
+    if not isinstance(passage, list) or not all(
+        isinstance(line, str) and line.strip() for line in passage
+    ):
+        raise ContentError(f"{where}: `passage` must be a list of texts.")
     return RouteSpec(
-        direction=direction, to=_text(data, "to", where), text=_text(data, "text", where)
+        direction=direction,
+        to=_text(data, "to", where),
+        names=tuple(
+            dict.fromkeys(
+                normalise_words(name) for name in _words(data.get("names"), "names", where)
+            )
+        ),
+        order=_optional_text(data, "order", where),
+        text=_text(data, "text", where),
+        passage=tuple(line.strip() for line in passage),
     )
+
+
+def _coords(data: dict[str, Any], where: str) -> Coords | None:
+    text: str | None = _optional_text(data, "coords", where)
+    if text is None:
+        return None
+    coords: Coords | None = parse_coords(text)
+    if coords is None:
+        raise ContentError(f"{where}: `coords` must be like `14 S, 40 W`, not {text!r}.")
+    return coords
 
 
 def _position(position_id: str, value: Any) -> PositionSpec:
@@ -487,6 +564,8 @@ def _position(position_id: str, value: Any) -> PositionSpec:
     return PositionSpec(
         id=position_id,
         name=_text(data, "name", where),
+        coords=_coords(data, where),
+        orders=_optional_text(data, "orders", where),
         chart_pos=chart_pos,
         map=_optional_text(data, "map", where),
         map_pos=_point(data, "map_pos", where),
@@ -725,10 +804,18 @@ def _check(content: Content) -> None:
                     f"{where}: `ashore` must be a place on land, not {position.ashore!r}."
                 )
         for route in position.routes:
-            if route.to not in positions:
+            if route.to not in positions or route.to == UNDER_WAY:
                 raise ContentError(
                     f"{where}, route {route.direction}: unknown position {route.to!r}."
                 )
+            if not route.passage:
+                raise ContentError(f"{where}, route {route.direction}: `passage` is missing.")
+    under_way: PositionSpec | None = positions.get(UNDER_WAY)
+    if under_way is None or under_way.routes or under_way.ashore:
+        raise ContentError(
+            f"{SHIP_FILE}: the position {UNDER_WAY!r} (the ship between two positions) is "
+            "missing, or has routes or `ashore`."
+        )
 
     _check_characters(content)
     _check_things(content)
@@ -770,8 +857,15 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
         texts.append((f"{where}, cabin", position.cabin, None))
         if position.shore:
             texts.append((f"{where}, shore", position.shore, None))
+        if position.orders:
+            texts.append((f"{where}, orders", position.orders, None))
         for route in position.routes:
-            texts.append((f"{where}, route {route.direction}", route.text, None))
+            route_where: str = f"{where}, route {route.direction}"
+            texts.append((route_where, route.text, None))
+            if route.order:
+                texts.append((f"{route_where}, order", route.order, None))
+            for number, line in enumerate(route.passage, start=1):
+                texts.append((f"{route_where}, passage {number}", line, None))
         for detail in position.details.values():
             texts.extend(_look_texts(f"{where}, detail {detail.id}", detail))
     for character in content.characters.values():

@@ -496,7 +496,7 @@ characters:
     greeting: >
       The timbers creak, and somehow it sounds like a voice. "You called? Ask me about
       the sea, the sky, or the instruments below."
-    suggest: [sextant, chronometer, latitude, longitude, birds, help]
+    suggest: [course, sextant, chronometer, latitude, longitude, birds, help]
     fallback: >
       The Ship creaks thoughtfully. "That's beyond what a ship knows. Try me on
       navigation, or on the sea and the sky."
@@ -504,9 +504,9 @@ characters:
       sextant:
         stance: truth
         reply: >
-          "The sextant measures how high the sun stands above the horizon. At noon the sun
-          is at its highest. Measure it then, on the Deck, look the height up in the
-          tables, and you have your |wlatitude|n."
+          "The sextant measures how high the sun stands above the horizon. It lives in the
+          Cabin: carry it up to the Deck and measure the sun at noon, when it's highest.
+          Look the height up in the tables, and you have your |wlatitude|n."
       chronometer:
         aliases: [clock, sea clock]
         stance: truth
@@ -535,6 +535,22 @@ characters:
           sea there, ask yourself which number to trust: north and south, or east and west?
           Sailors who trust their |wlatitude|n but not their |wlongitude|n sail along the
           latitude until they find land."
+      course:
+        aliases: [position, voyage, destination, heading, where to, coordinates]
+        stance: truth
+        reply: >
+          "Tell me where to go, and I'll take you there. A place at sea is two numbers:
+          its |wlatitude|n, north or south, and its |wlongitude|n, east or west. The
+          Halcyon's |wchart|n in the Cabin gives the island's. Then say on deck, for
+          example: sail to 10 north 25 east."
+      reckoning:
+        aliases: [dead reckoning, reckon]
+        stance: truth
+        reply: >
+          "Reckoning is working out where you are without seeing land: how fast you
+          sailed, which way, and for how long. North and south, the noon sun checks it
+          every day. East and west, only a good |wchronometer|n can. Without one, small
+          errors add up, day after day. What would that do to a position on a chart?"
       birds:
         aliases: [seabirds, terns, noddies, sky]
         stance: truth

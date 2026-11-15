@@ -134,6 +134,23 @@ class JournalEntry:
     also: tuple[Sighting, ...] = ()
 
 
+@dataclass(frozen=True)
+class Voyage:
+    """
+    The ship sailing between two positions: where from and where to, which way, how many
+    lines of the passage have been shown (`step`), and who gave the order (a dbref, or
+    None). `number` tells this voyage from any later one, so a step scheduled for an old
+    voyage does nothing.
+    """
+
+    origin: str
+    to: str
+    direction: str
+    step: int
+    finder: int | None
+    number: int
+
+
 def _sighting(data: Any) -> Sighting:
     source: Any = data.get("source")
     return Sighting(
@@ -167,6 +184,7 @@ class Expedition(Script):
         self.db.track = [start]
         self.db.journal = []
         self.db.flags = []
+        self.db.voyage = None
 
     @property
     def journal(self) -> list[JournalEntry]:
@@ -244,6 +262,54 @@ class Expedition(Script):
         self.db.ship_position = position_id
         self.db.track = [*self.track, position_id]
 
+    @property
+    def voyage(self) -> Voyage | None:
+        """The voyage under way, or None while the ship is at a position."""
+        data: Any = self.db.voyage
+        if not data:
+            return None
+        finder: Any = data.get("finder")
+        return Voyage(
+            origin=str(data["origin"]),
+            to=str(data["to"]),
+            direction=str(data["direction"]),
+            step=int(data["step"]),
+            finder=int(finder) if finder is not None else None,
+            number=int(data["number"]),
+        )
+
+    def set_off(self, under_way: str, to: str, direction: str, finder: int | None) -> Voyage:
+        """
+        The ship leaves her position for `to`. Until she arrives her position is
+        `under_way`; her track still ends where she came from.
+        """
+        number: int = int(self.db.voyages or 0) + 1
+        self.db.voyages = number
+        self.db.voyage = {
+            "origin": self.ship_position,
+            "to": to,
+            "direction": direction,
+            "step": 0,
+            "finder": finder,
+            "number": number,
+        }
+        self.db.ship_position = under_way
+        voyage: Voyage | None = self.voyage
+        assert voyage is not None
+        return voyage
+
+    def sail_on(self, step: int) -> None:
+        """Record how many lines of the passage have been shown."""
+        if self.db.voyage:
+            self.db.voyage = {**dict(self.db.voyage), "step": step}
+
+    def arrive(self) -> None:
+        """The voyage is over: the ship is at its destination."""
+        voyage: Voyage | None = self.voyage
+        self.db.voyage = None
+        if voyage is not None:
+            self.move_ship(voyage.to)
+
     def start_over(self, track: list[str]) -> None:
         """
         Forget everything found and done, as for a new expedition. The ship has sailed
@@ -253,3 +319,4 @@ class Expedition(Script):
         self.db.track = list(track)
         self.db.journal = []
         self.db.flags = []
+        self.db.voyage = None

@@ -72,23 +72,49 @@ things:
     portable: true
     desc: >
       A brass instrument shaped like a slice of pie, with a small telescope, mirrors and a
-      curved scale. Navigators |wuse|n it to measure how high the sun stands. Ask the Ship
-      about the |wsextant|n to learn how.
+      curved scale. Navigators |wuse|n it to measure how high the sun stands, out on deck
+      where they can see the sun and the horizon. You can |wget|n it and carry it up there.
+      Ask the Ship about the |wsextant|n to learn more.
     use:
       only_in: deck
       elsewhere: >
-        You need the sun and a clear horizon for that. Take the sextant up on the Deck.
+        You need the sun and a clear horizon for that. Carry the sextant up on the Deck
+        (|wget sextant|n, then |wup|n).
       text: >
         You wait for noon, when the sun stands highest, and measure it. Latitude 14 degrees
         South: the harbour's own latitude, as every chart of it says. Noon here is noon at
         home, of course. This is home.
       at:
-        charted:
-          sets: sight_charted
+        under_way:
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 14
+            degrees South, the same as home: the ship is holding her latitude, as ordered.
+        charted:
+          sets: sight_charted
+          clue: C4
+          text: >
+            You wait for noon, when the sun stands highest, and measure it. [[Latitude 14
             degrees South: exactly the latitude written beside the island on the Halcyon's
-            chart. Someone should note the time of noon on the chronometer in the Cabin.
+            chart.]] Now the longitude: someone should read the time of noon on the
+            |wchronometer|n in the Cabin.
+        north_of_chart:
+          sets: sight_north
+          text: >
+            You wait for noon, when the sun stands highest, and measure it. Latitude 12
+            degrees South. The chart's latitude is 14: the ship has sailed off the island's
+            line of latitude.
+        south_of_chart:
+          sets: sight_south
+          text: >
+            You wait for noon, when the sun stands highest, and measure it. Latitude 16
+            degrees South. The chart's latitude is 14: the ship has sailed off the island's
+            line of latitude.
+        east_of_chart:
+          sets: sight_east
+          text: >
+            You wait for noon, when the sun stands highest, and measure it. Latitude 14
+            degrees South: still the latitude on the Halcyon's chart. The |wchronometer|n
+            in the Cabin will tell how far east you have come.
         anchorage:
           sets: sight_island
           text: >
@@ -111,21 +137,47 @@ things:
         The chronometer ticks steadily. It shows the time at home, which here in port is
         simply the time.
       at:
+        under_way:
+          text: >
+            The chronometer ticks steadily, keeping home time. Out here the sun reaches
+            its noon later than it does at home, and the further west the ship sails, the
+            later it gets.
         charted:
           needs: [sight_charted]
-          clue: C5
+          clue: C4
           text: >
             Noon on deck came when the chronometer showed twenty to three in the afternoon,
             home time: 160 minutes after noon at home. Four minutes for every degree makes
-            40 degrees West. That is the longitude on the Halcyon's chart, and the noon
-            sight gave her latitude too. You are exactly where her numbers point, and there
-            is no island. So one of her numbers is wrong, and it isn't hard to guess which:
-            [[latitude is easy to measure from the noon sun, but longitude needs a clock
-            like this one, and the Halcyon had none]].
-          otherwise: >
+            [[40 degrees West: the longitude on the Halcyon's chart. Both of her numbers
+            check out. You are exactly where her chart puts the island, and there is no
+            island.]] So one of her two numbers must be wrong. Which one would you trust?
+            The Ship knows how each is measured: |wask ship about latitude|n, |wask ship
+            about longitude|n.
+          otherwise: &no_sight >
             The chronometer ticks steadily, keeping home time. On its own it can't say
             where you are: you also need the moment of noon out here. Take a noon sight
             with the sextant on the Deck first.
+        north_of_chart:
+          needs: [sight_north]
+          text: >
+            Noon on deck came at twenty to three, home time, the same as at the chart's
+            position: still 40 degrees West. Sailing north changed the latitude, not the
+            longitude.
+          otherwise: *no_sight
+        south_of_chart:
+          needs: [sight_south]
+          text: >
+            Noon on deck came at twenty to three, home time, the same as at the chart's
+            position: still 40 degrees West. Sailing south changed the latitude, not the
+            longitude.
+          otherwise: *no_sight
+        east_of_chart:
+          needs: [sight_east]
+          text: >
+            Noon on deck came at twenty-eight minutes to three, home time: 152 minutes after
+            noon at home, so 38 degrees West. Two degrees back towards home, on waters the
+            ship already crossed on her way out.
+          otherwise: *no_sight
         anchorage:
           needs: [sight_island]
           clue: C5
@@ -134,10 +186,7 @@ things:
             time: 168 minutes after noon at home. Four minutes for every degree makes 42
             degrees West. [[The island lies at exactly the chart's latitude, but 2 degrees
             further west than the chart's longitude.]]
-          otherwise: >
-            The chronometer ticks steadily, keeping home time. On its own it can't say
-            where you are: you also need the moment of noon out here. Take a noon sight
-            with the sextant on the Deck first.
+          otherwise: *no_sight
 
   chart:
     name: Halcyon's chart
@@ -146,13 +195,22 @@ things:
     portable: true
     desc: >
       A fair copy of the Halcyon's chart, lent by the Society. It shows an island drawn in
-      careful ink, with its latitude and longitude written beside it. You can |wread|n it.
+      careful ink, with its position written beside it. You can |wread|n it, or
+      |wexamine|n it for a closer look, and |wget|n it to take it with you.
+    close:
+      text: >
+        You spread the chart out flat. Our own coast runs down its right-hand edge. Thin
+        ruled lines cross the paper: the ones from side to side are lines of latitude, and
+        one of them runs straight from our harbour to the island. So the island lies
+        exactly as far south as home, only far to the west. Beside the island, in small
+        writing: "Position fixed by our |wreckoning|n."
     read:
       text: >
-        "Island, found by the Halcyon, 1775. Latitude 14 degrees South, longitude 40
-        degrees West of home." The coastline is drawn with care: round in the east with a
-        lagoon, a hill in the middle, a long reef down the west side, and a little cove in
-        the south, like a hook.
+        In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
+        large figures: Latitude 14 degrees South, longitude 40 degrees West of
+        home.|/That's the position to give as your order on the Deck. The coastline is
+        drawn with care: round in the east with a lagoon, a hill in the middle, a long reef
+        down the west side, and a little cove in the south, like a hook.
 
   plant_guide:
     name: plant guide
@@ -161,7 +219,8 @@ things:
     portable: true
     desc: >
       "A Naturalist's Guide to Useful Plants", a thick book full of careful drawings. Carry
-      it, and you'll know more about the plants you look at. You can also |wread|n it.
+      it, and you'll know more about the plants you look at: |wget|n it to take it
+      with you. You can also |wread|n it.
     read:
       text: >
         You leaf through it. Breadfruit, coconut and pandanus grow on warm islands. Oak is
@@ -176,7 +235,8 @@ things:
     portable: true
     desc: >
       "A Naturalist's Guide to Animals", with drawings of beasts, birds and fish. Carry it,
-      and you'll know more about the animals you look at. You can also |wread|n it.
+      and you'll know more about the animals you look at: |wget|n it to take it
+      with you. You can also |wread|n it.
     read:
       text: >
         You leaf through it. Few land animals ever reach islands far out in the ocean on

@@ -41,6 +41,11 @@ sea_chart: sea_chart
 
 # Each position has:
 #   name       a short name for where the ship is
+#   coords     optional: where it is on the globe, like `14 S, 40 W` (longitude counted from
+#              home, as on the Halcyon's chart). Players can sail to it by naming it:
+#              `sail to 14 south 40 west`.
+#   orders     optional: what `sail` alone says here, the choices in words. Without it,
+#              `sail` lists the directions.
 #   chart_pos  where it is on the sea chart, [x, y]
 #   map        optional: a closer map to show aboard instead of the sea chart, and
 #   map_pos    the ship's place on it
@@ -52,10 +57,29 @@ sea_chart: sea_chart
 #              like the details in places.yaml
 #   cabin      what is noticed in the Cabin here
 #   shore      what players on the shore see of the ship (only with `ashore`)
-#   routes     direction: {to: position id, text: what players aboard read while sailing}
+#   routes     the ways she can sail from here, by direction (`sail west`). Each has:
+#     to         the position she sails to
+#     names      optional: other words for the order (`sail to the island`, `sail home`)
+#     order      optional: what the Ship says when given this order, heard aboard
+#     text       what players aboard read as she sets off
+#     passage    the voyage, line by line: one line every few seconds while the ship's
+#                marker moves along the sea chart. The last line is the arrival.
+#
+# The position `under_way` is where the ship is between two others, while a passage is
+# told: what the Deck and the Cabin show meanwhile. It has no routes and no `ashore`.
+#
+# Distances and days go together (GAME_STORY.md, "Facts that depend on each other"):
+# about 200 km a day, so the 40 degrees out to the chart's position take three weeks and
+# the 2 degrees on to the island a long day.
 positions:
   port:
     name: Moored at the Quay
+    coords: 14 S, 0 W
+    orders: >
+      The crew stand ready at the ropes, waiting for your order. Where to? Give the place
+      as a position, its latitude and its longitude, like this: |wsail to 10 north 25
+      east|n. The island's position is written on the Halcyon's chart, in the Cabin below
+      (|wread chart|n).
     chart_pos: [880, 290]
     map: port
     map_pos: [520, 610]
@@ -70,12 +94,42 @@ positions:
     routes:
       west:
         to: charted
+        names: [island, chart, chart position, charted position, halcyon island]
+        order: >
+          The Ship's timbers creak, almost like a voice. "Fourteen degrees South, forty
+          degrees West: the island on the Halcyon's chart. Look at the chart: our own
+          harbour lies at fourteen South too, on the same line of latitude. So the course
+          is due west. We check our latitude by the sun every noon, and sail on until my
+          |wchronometer|n says we've come forty degrees. About three weeks, with the trade
+          wind behind us. Cast off!"
         text: >
           The ropes are cast off and the sails fill. The port grows small behind you, and
-          for many days there is nothing but ocean.
+          the coast sinks below the horizon. (The voyage takes a few moments. The crew
+          sail her: there's nothing you need to do but watch.)
+        passage:
+          - >
+            Day 4. A steady wind from the southeast fills the sails, day after day. At
+            noon the crew measure the sun: fourteen degrees South, the same as home.
+          - >
+            Day 11. Flying fish skim beside the bow. The water casks in the Cabin are a
+            little lighter every day.
+          - >
+            Day 17. Each day, noon out here comes a little later by the home clock in the
+            Cabin: four minutes later for every degree the ship has sailed west.
+          - >
+            Day 21. The Ship's timbers creak: "This is the place on the chart, by my
+            reckoning. But don't take my word for it: check it yourselves. Take a noon sight
+            with the |wsextant|n on deck, then read my |wchronometer|n below."
 
   charted:
     name: The charted position
+    coords: 14 S, 40 W
+    # No list of directions here: which way to search is the players' own choice (DECISIONS.md, 25).
+    orders: >
+      Open sea all round, where the chart put the island, and no island. Where now? Name
+      a direction (|wsail north|n, |wsail south|n, |wsail east|n, |wsail west|n), or
+      |wsail home|n. The Ship creaks: "Before you choose, check the chart's two numbers
+      with the |wsextant|n and my |wchronometer|n. Then ask yourselves which one to trust."
     chart_pos: [560, 290]
     deck: >
       Open sea in every direction. According to the Halcyon's old chart, the island should
@@ -94,16 +148,143 @@ positions:
     routes:
       west:
         to: anchorage
+        order: >
+          "West it is," the Ship creaks. "On past the end of the chart, along the same
+          latitude."
         text: >
-          The ship turns west and sails on. After a long day a lookout shouts from the
-          masthead: land!
+          The ship turns west and sails on, beyond the place where the chart put the
+          island.
+        passage:
+          - >
+            Morning. Nothing but sea ahead. A lookout climbs to the masthead.
+          - >
+            Afternoon. There are more seabirds now, fishing ahead of the bow.
+          - >
+            Late in the day the lookout shouts from the masthead: land!
+      # A day's search north, south or east finds nothing, and the instruments say why
+      # (things.yaml): it costs time and water, and teaches. About 200 km a day: 2 degrees.
+      north:
+        to: north_of_chart
+        order: >
+          "North it is," the Ship creaks. "A day's sail, and we'll see."
+        text: >
+          The ship turns north and sails on.
+        passage:
+          - >
+            Morning. Nothing ahead but sea. A lookout climbs to the masthead.
+          - >
+            Evening, and still nothing in sight. The water casks in the Cabin are a day
+            lighter. The Ship creaks: "A day north of the chart's position. The |wsextant|n
+            will tell you how far we've come from her latitude."
+      south:
+        to: south_of_chart
+        order: >
+          "South it is," the Ship creaks. "A day's sail, and we'll see."
+        text: >
+          The ship turns south and sails on.
+        passage:
+          - >
+            Morning. Nothing ahead but sea. A lookout climbs to the masthead.
+          - >
+            Evening, and still nothing in sight. The water casks in the Cabin are a day
+            lighter. The Ship creaks: "A day south of the chart's position. The |wsextant|n
+            will tell you how far we've come from her latitude."
       east:
-        to: port
+        to: east_of_chart
+        order: >
+          "East it is," the Ship creaks. "Back the way we came, for a day."
         text: >
-          The ship turns for home. Days later, the familiar harbour comes into view.
+          The ship turns east and sails back along her own wake.
+        passage:
+          - >
+            Morning. Nothing ahead but sea. A lookout climbs to the masthead.
+          - >
+            Evening, and still nothing in sight. The water casks in the Cabin are a day
+            lighter. The Ship creaks: "A day east of the chart's position. We sailed
+            through these very waters on our way out, remember?"
+      home:
+        to: port
+        names: [port, harbour, harbor]
+        order: >
+          "Home it is," the Ship creaks. "It will be slower going back: the wind is
+          against us."
+        text: >
+          The ship turns for home.
+        passage:
+          - >
+            Day after day the ship beats back and forth against the wind. Going home is
+            slower than coming out.
+          - >
+            At last the familiar harbour comes into view.
+
+  north_of_chart:
+    name: A day north of the chart's position
+    coords: 12 S, 40 W
+    orders: >
+      Open sea, a day's sail north of the chart's position. You can |wsail south|n, back
+      to it.
+    chart_pos: [560, 200]
+    deck: >
+      Open sea in every direction, and no island anywhere. The wind hums in the rigging.
+    cabin: >
+      The cabin creaks as the ship rolls on the open sea.
+    routes:
+      south: &back_to_chart
+        to: charted
+        names: [chart position, charted position]
+        text: >
+          The ship turns back towards the chart's position.
+        passage:
+          - >
+            A day's sail over an empty sea.
+          - >
+            The Ship creaks: "Back at the chart's position: fourteen South, forty West."
+
+  south_of_chart:
+    name: A day south of the chart's position
+    coords: 16 S, 40 W
+    orders: >
+      Open sea, a day's sail south of the chart's position. You can |wsail north|n, back
+      to it.
+    chart_pos: [560, 380]
+    deck: >
+      Open sea in every direction, and no island anywhere. The wind hums in the rigging.
+    cabin: >
+      The cabin creaks as the ship rolls on the open sea.
+    routes:
+      north: *back_to_chart
+
+  east_of_chart:
+    name: A day east of the chart's position
+    coords: 14 S, 38 W
+    orders: >
+      Open sea, a day's sail east of the chart's position. You can |wsail west|n, back to
+      it, or |wsail home|n.
+    chart_pos: [660, 290]
+    deck: >
+      Open sea in every direction, and no island anywhere. The wind hums in the rigging.
+    cabin: >
+      The cabin creaks as the ship rolls on the open sea.
+    routes:
+      west: *back_to_chart
+      home:
+        to: port
+        names: [port, harbour, harbor]
+        order: >
+          "Home it is," the Ship creaks. "It will be slower going back: the wind is
+          against us."
+        text: >
+          The ship turns for home.
+        passage:
+          - >
+            Day after day the ship beats back and forth against the wind. Going home is
+            slower than coming out.
+          - >
+            At last the familiar harbour comes into view.
 
   anchorage:
     name: Anchored off the island
+    coords: 14 S, 42 W
     chart_pos: [230, 290]
     map: island
     map_pos: [875, 545]
@@ -118,5 +299,21 @@ positions:
     routes:
       east:
         to: charted
+        names: [chart position, charted position]
         text: >
           The anchor comes up and the island falls behind you as the ship sails east.
+        passage:
+          - >
+            The island sinks below the horizon behind you.
+          - >
+            By evening there is only sea again, where the chart put the island.
+
+  under_way:
+    name: Under way
+    chart_pos: [720, 290]
+    deck: >
+      The ship is under way, leaning a little in the wind. Spray comes over the bow, and
+      the crew are busy at the ropes. All around, the sea stretches to the horizon.
+    cabin: >
+      The cabin rolls gently with the waves. Everything that could slide has been wedged
+      in place.

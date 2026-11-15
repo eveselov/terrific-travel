@@ -12,6 +12,8 @@ Copied from the playground (`game/world/maps.py`) and changed for this game:
   and Cabin) sits in a free corner, joined to her marker by a callout line; on a map she isn't
   on, neither appears. Her own rooms show the map she is on, with her marker as "You are
   here" and your room ringed in the side view. On the sea chart her track is a dashed line.
+  Under way she is on the sea chart, moved a step along her route with each line of the
+  passage (`world/ship.py`).
 
 The map is rendered on the server as an inline SVG string and sent to the web client as a
 `map` message (see `web/static/webclient/js/plugins/panes.js`). Telnet clients never see it;
@@ -24,7 +26,8 @@ from typing import Any
 
 from evennia.utils.search import search_tag
 
-from world.content import Content, MapSpec, Point, PositionSpec, load_content
+from typeclasses.scripts import Voyage
+from world.content import UNDER_WAY, Content, MapSpec, Point, PositionSpec, RouteSpec, load_content
 from world.expedition import current_position, get_expedition
 
 MAP_TAG_CATEGORY: str = "map"
@@ -83,8 +86,29 @@ def room_map_location(room: Any) -> MapLocation | None:
     return MapLocation(map_key=keys[0], pos=(int(x), int(y)))
 
 
+def voyage_chart_pos(content: Content, voyage: Voyage) -> Point:
+    """
+    Where the ship is on the sea chart under way: as far along the line from where she came
+    from to where she's going as she is through the passage.
+    """
+    origin: PositionSpec = content.positions[voyage.origin]
+    to: PositionSpec = content.positions[voyage.to]
+    route: RouteSpec | None = origin.route(voyage.direction)
+    steps: int = len(route.passage) if route is not None else 1
+    share: float = min(max(voyage.step / steps, 0.0), 1.0)
+    (x0, y0), (x1, y1) = origin.chart_pos, to.chart_pos
+    return round(x0 + (x1 - x0) * share), round(y0 + (y1 - y0) * share)
+
+
 def ship_map_location(position: PositionSpec, content: Content) -> MapLocation:
-    """Where the ship is drawn: on the position's own map if it has one, else the sea chart."""
+    """
+    Where the ship is drawn: on the position's own map if it has one, else the sea chart.
+    Under way, on the sea chart, part of the way along her route.
+    """
+    if position.id == UNDER_WAY:
+        voyage: Voyage | None = get_expedition().voyage
+        if voyage is not None:
+            return MapLocation(map_key=content.sea_chart, pos=voyage_chart_pos(content, voyage))
     if position.map is not None and position.map_pos is not None:
         return MapLocation(map_key=position.map, pos=position.map_pos)
     return MapLocation(map_key=content.sea_chart, pos=position.chart_pos)
@@ -139,6 +163,9 @@ def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> M
             if position is not None:
                 track.append(position.chart_pos)
                 track_names.append(position.name)
+        if current_position().id == UNDER_WAY:
+            track.append(ship.pos)
+            track_names.append(current_position().name)
     return MapView(
         picture_map=picture_map,
         places=places,

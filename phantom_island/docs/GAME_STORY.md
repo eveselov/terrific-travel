@@ -69,7 +69,11 @@ plausible as it stands.
 | The island is at 14° S, 42° W | — (the truth) | `things.yaml` (sextant, chronometer) |
 | The *Halcyon*'s chart says 14° S, 40° W: latitude right, longitude 2° too far east | Latitude from the noon sun was easy in 1775; longitude needed a sea clock, which she didn't have | `things.yaml` (chart), Jonah's *chart*, the Ship's *latitude* and *longitude* |
 | Noon comes 160 minutes after home noon at the charted position, 168 at the island | 4 minutes of time per degree (the Earth turns 15° an hour) | `things.yaml` (chronometer), the Ship's *longitude* |
-| 2° at 14° S is about 215 km, a long day's sail | 1° of longitude ≈ 111 km × cos(latitude) | `ship.yaml` (the route west: "After a long day") |
+| 2° at 14° S is about 215 km, a long day's sail | 1° of longitude ≈ 111 km × cos(latitude) | `ship.yaml` (the route west from the charted position: morning to "late in the day") |
+| Home and the island lie on the same latitude, 14° S, so the course out is due west | Latitude sailing: keep the noon sun's latitude, sail east or west | `ship.yaml` (the Ship's answer to the order), `things.yaml` (chart, examined: the ruled line), the sea chart picture |
+| The voyage out takes 21 days | 40° at 14° S ≈ 4,300 km, at about 200 km (110 nautical miles) a day | `ship.yaml` (the passage out, Day 4 to Day 21) |
+| The wind out is steady from the southeast, and going home is slower | The southeast trade winds blow at 14° S; the great storm of '75 from the west was unusual (Barnaby's *storm*) | `ship.yaml` (the passages out and home, the Ship's "trade wind behind us") |
+| Noon comes later by the home clock as the ship sails west | 4 minutes per degree, as above | `ship.yaml` (passage, Day 17), `things.yaml` (chronometer under way) |
 | The charted position shows empty sea (C4) | The island is 215 km away, below the horizon even from the masthead | `ship.yaml` (charted position) |
 | The Society trusted the chart; Barnaby thinks she sank | Nobody could check the longitude | Fairweather's *chart*, Barnaby's *halcyon* |
 
@@ -177,7 +181,9 @@ This is the main puzzle.
   more direct until they all but say "west". Reaching the island is guaranteed; *why* the
   chart was wrong is asked again in the report.
 - Sailing the wrong way costs a day and some water. That's the only resource pressure in
-  the draft.
+  the draft. Built (2026-11-14): a day north, south or east of the charted position, where
+  the instruments show what changed (latitude 12° or 16° S; longitude 38° W, on waters the
+  ship crossed on her way out), and the only way on is back. The water isn't counted yet.
 
 ### Act 3: The Island
 
@@ -230,8 +236,8 @@ journal lines are in `clues.yaml`. "(A4)" marks a condition that is designed but
 | C1 | Compass engraved HALCYON | `look compass`, Market | — | The ship didn't vanish without a trace |
 | C2 | Coral crust in the compass hinge | `examine compass`, Market | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
 | C3 | "From fishermen who came from the west" | `ask crane` about the compass (or the fishermen) | C2 in the journal (he lies until then) | Direction to search |
-| C4 | Empty sea at the charted position | Deck, on arriving at the charted position | — | The chart is wrong |
-| C5 | Latitude right, longitude wrong | `use sextant` on the Deck (the noon sight, a flag for the expedition), then `read chronometer` in the Cabin; at the charted position or at the island | the sight first; two players can share the steps. Noon (A4) | *Why* the chart is wrong |
+| C4 | Empty sea at the charted position | Deck, on arriving at the charted position; confirmed there by the noon sight (latitude 14° S) and the chronometer (40° W), each in yellow | — | The chart is wrong, not the ship's navigation |
+| C5 | Latitude right, longitude wrong | `use sextant` on the Deck (the noon sight, a flag for the expedition), then `read chronometer` in the Cabin, at the island | the sight first; two players can share the steps. Noon (A4) | *Which* of the chart's numbers is wrong; *why* is the players' to work out (the Ship's *latitude*, *longitude*, *reckoning*) |
 | C6 | Birds flying west at dusk | `look sky` on the Deck, charted position | dusk (A4) | Land is to the west |
 | C7 | Ship's ribs and cannon on the reef | `look bones` at the Western Reef | low tide (A4) | Where she wrecked |
 | C8 | Oak timbers in a village hut | `look beams` in the Village | carrying the plant guide, or `examine beams` | Ship wood was reused, so the crew survived to build |

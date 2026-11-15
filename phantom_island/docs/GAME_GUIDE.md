@@ -36,6 +36,15 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - Splitting up is faster: some tasks have two halves, such as the noon sight on the Deck and the chronometer in the Cabin. Something you carry (a book, the chart) is with you, not with the others, until you drop it or log out.
 - Nobody gets left behind: the ship won't sail while someone is still ashore. Someone joining late, while the ship is away, starts on the Deck and catches up with `journal`.
 
+## Sailing
+
+- Orders are given on the Deck with `sail`. On its own, `sail` tells you where the ship is and what you can order there.
+- A place at sea is a position: two numbers, the **latitude** (how far north or south) and the **longitude** (how far east or west). The island's position is written on the *Halcyon*'s chart in the Cabin: `read chart`, and `examine chart` for a closer look.
+- Give the position as your order: `sail to <latitude> <longitude>`, for example `sail to 10 north 25 east`. The Ship repeats the order and explains the course before she sets off.
+- Out at sea, where no chart helps, you can also sail by direction (`sail west`), or simply `sail home`.
+- A voyage takes a few moments of real time: a few lines tell the days at sea while the ship moves along the chart in the Map pane. Nothing needs doing meanwhile: the crew sail her.
+- Not sure where to go? `ask ship about course`.
+
 ## Journal
 
 - The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it.
