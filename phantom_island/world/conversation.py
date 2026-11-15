@@ -31,6 +31,7 @@ from world.content import (
 )
 from world.discovery import find_thing_at_hand, location_details
 from world.expedition import get_expedition
+from world.notebook import learn
 
 ABOUT: str = "about"
 USAGE: str = "Usage: |wask <someone> about <something>|n, or just |wask <someone>|n."
@@ -131,8 +132,8 @@ def answer(topic: TopicSpec) -> Reveal:
     """What a character says about a topic now: the truth, once its `needs` are met."""
     truth: TruthSpec | None = topic.truth
     if truth is not None and get_expedition().met(truth.needs):
-        return Reveal(text=truth.reply, clue=truth.clue)
-    return Reveal(text=topic.reply, clue=topic.clue)
+        return Reveal(text=truth.reply, clue=truth.clue, teaches=truth.teaches)
+    return Reveal(text=topic.reply, clue=topic.clue, teaches=topic.teaches)
 
 
 def suggestions(spec: CharacterSpec) -> str:
@@ -357,4 +358,5 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
         caller.msg(_one_at_a_time(rest))
     if said.clue is not None:
         discover(said.clue, caller, spec.name)
+    learn(caller, said.teaches, spec.name, _players_here(caller))
     return topic

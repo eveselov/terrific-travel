@@ -52,6 +52,12 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - A voyage takes a few moments of real time: a few lines tell the days at sea while the ship moves along the chart in the Map pane. Nothing needs doing meanwhile: the crew sail her.
 - Not sure where to go? `ask ship about course`.
 
+## Notebook
+
+- Your `notebook` is your own: the ideas you've learned about how the world works, such as how latitude is measured. The journal is for the expedition's clues; the notebook is for understanding.
+- An entry grows as you learn more: first you hear of something, then someone explains it, and at last you do it yourself.
+- It shows the areas you've started ("Navigation: 2 of 9"). `notebook sources` shows who taught you what, and who else knows it: ask them to explain!
+
 ## Journal
 
 - The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it.

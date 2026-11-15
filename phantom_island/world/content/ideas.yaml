@@ -1,0 +1,38 @@
+# The ideas of Phantom Island: what goes into each player's notebook (DECISIONS.md, 27).
+#
+# The journal holds facts about this mystery, shared by the expedition. The notebook holds
+# ideas about how the world works (latitude, why coral grows only under the sea), and each
+# player has their own. A notebook entry states the idea, never what it means for the
+# mystery: "coral grows only under the sea" is an idea; "so the compass lay in the sea" is a
+# clue's journal line; "so she wrecked on a reef" is the players' own conclusion.
+#
+# An idea has up to three texts, one per level, written so that they read as one paragraph:
+#   heard       a first mention (Barnaby says the noon sun gives north and south)
+#   understood  explained properly (the Ship's latitude, step by step)
+#   used        done yourself (a noon sight with the sextant)
+# The entry shows the texts up to the level reached, so it grows as the player learns more.
+# Not every idea needs every level; most will never be "used".
+#
+# A text teaches ideas with `teaches`, next to where `clue` would go, in characters.yaml
+# (a topic or its truth), things.yaml (a thing, its close look, a read or use, or one of
+# its `at` steps) and the details in places.yaml and ship.yaml:
+#   teaches: {latitude: understood}
+# Conversations and reading or using a thing teach everyone in the room who hears them, up
+# to `understood`; `used` is for whoever did it. Looking is private and teaches the looker.
+#
+# Each area has:
+#   title    shown as the heading in the notebook
+# Each idea has:
+#   area     the area it belongs to
+#   title    its name in the notebook (Latitude)
+#   heard, understood, used   its texts, at least one
+#
+# The notebook shows only areas the player has started, with how many of their ideas they
+# know ("Navigation: 2 of 9"). Keep it small: ideas the game actually uses, not an
+# encyclopedia.
+#
+# After editing, `reload` in the game is enough.
+
+areas: {}
+
+ideas: {}

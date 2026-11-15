@@ -151,6 +151,18 @@ class Voyage:
     number: int
 
 
+@dataclass(frozen=True)
+class NoteEntry:
+    """
+    One idea in a player's notebook: the level reached (an index into LEVELS) and every
+    source that taught it, as (level, source) pairs, in the order they were met.
+    """
+
+    idea: str
+    level: int
+    sources: tuple[tuple[str, str], ...]
+
+
 def _sighting(data: Any) -> Sighting:
     source: Any = data.get("source")
     return Sighting(
@@ -185,6 +197,7 @@ class Expedition(Script):
         self.db.journal = []
         self.db.flags = []
         self.db.voyage = None
+        self.db.notebooks = {}
 
     @property
     def journal(self) -> list[JournalEntry]:
@@ -246,6 +259,37 @@ class Expedition(Script):
         """Whether every clue id or flag in `needs` has been found or set."""
         found: set[str] = {entry.clue for entry in self.journal} | set(self.flags)
         return all(need in found for need in needs)
+
+    def notebook(self, owner: int) -> list[NoteEntry]:
+        """The ideas in one player's notebook (by character id), the first learned first."""
+        book: Any = (self.db.notebooks or {}).get(str(owner)) or {}
+        return [
+            NoteEntry(
+                idea=str(idea),
+                level=int(data["level"]),
+                sources=tuple((str(level), str(source)) for level, source in data["sources"]),
+            )
+            for idea, data in book.items()
+        ]
+
+    def note(self, owner: int, idea: str, level: int, level_name: str, source: str) -> int:
+        """
+        Write what a player learned into their notebook. Returns the level the idea had
+        before (-1 if it's new); a source already noted at that level isn't noted again.
+        """
+        notebooks: dict[str, Any] = {
+            key: {k: dict(v) for k, v in book.items()}
+            for key, book in (self.db.notebooks or {}).items()
+        }
+        book: dict[str, Any] = notebooks.setdefault(str(owner), {})
+        entry: dict[str, Any] = book.get(idea) or {"level": -1, "sources": []}
+        before: int = int(entry["level"])
+        sources: list[list[str]] = [list(pair) for pair in entry["sources"]]
+        if [level_name, source] not in sources:
+            sources.append([level_name, source])
+        book[idea] = {"level": max(before, level), "sources": sources}
+        self.db.notebooks = notebooks
+        return before
 
     @property
     def ship_position(self) -> str:
@@ -320,3 +364,4 @@ class Expedition(Script):
         self.db.journal = []
         self.db.flags = []
         self.db.voyage = None
+        self.db.notebooks = {}

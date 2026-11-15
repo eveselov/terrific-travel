@@ -1,0 +1,121 @@
+"""
+Each player's notebook: the ideas they have learned about how the world works (DECISIONS.md,
+27). The journal (`world/clues.py`) holds the expedition's facts; the notebook holds one
+player's growing understanding.
+
+An idea is learned at a level (heard, understood, used: `LEVELS`), and its entry shows the
+texts up to the level reached, so it grows as the player learns more. Ideas live in
+`world/content/ideas.yaml`; texts teach them with `teaches` in the other content files.
+Conversations and reading or using a thing teach everyone in the room who hears them, up to
+`understood`; `used` is for whoever did it. Looking is private and teaches only the looker.
+
+The notebooks are kept in the `Expedition` script, by character id, so starting over clears
+them with everything else.
+"""
+
+from typing import Any
+
+from typeclasses.scripts import NoteEntry
+from world.content import LEVELS, Content, IdeaSpec, Teaching, load_content
+from world.expedition import get_expedition
+
+NOTEBOOK: str = "|wnotebook|n"
+USED: str = "used"
+
+
+def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None = None) -> None:
+    """
+    `doer` (and `hearers`, who heard or watched it) learned what a text teaches, from
+    `source` ("Old Barnaby", "the sextant"). Each learner is told about a new idea, or an
+    entry that grew; nothing is said when they knew it this well already.
+    """
+    if not teaching:
+        return
+    learners: list[Any] = list(dict.fromkeys([doer, *(hearers or [])]))
+    content: Content = load_content()
+    for idea_id, level_name in teaching:
+        idea: IdeaSpec | None = content.ideas.get(idea_id)
+        if idea is None:
+            continue
+        for learner in learners:
+            heard: str = level_name
+            if learner is not doer and level_name == USED:
+                heard = LEVELS[LEVELS.index(USED) - 1]  # watching isn't doing
+            _note(learner, idea, heard, source, content)
+
+
+def _note(learner: Any, idea: IdeaSpec, level_name: str, source: str, content: Content) -> None:
+    level: int = LEVELS.index(level_name)
+    before: int = get_expedition().note(learner.id, idea.id, level, level_name, source)
+    if before < 0:
+        area: str = content.areas[idea.area].title
+        learner.msg(f"New in your notebook: |w{idea.title}|n ({area}). Type {NOTEBOOK} to read it.")
+    elif level > before and idea.entry(level_name) != idea.entry(LEVELS[before]):
+        learner.msg(f"Your notebook entry on |w{idea.title}|n grew. ({NOTEBOOK})")
+
+
+def _entries(owner: Any) -> dict[str, NoteEntry]:
+    """The owner's notebook entries for ideas still in the content, by idea id."""
+    ideas: dict[str, IdeaSpec] = load_content().ideas
+    return {
+        entry.idea: entry for entry in get_expedition().notebook(owner.id) if entry.idea in ideas
+    }
+
+
+def notebook_text(owner: Any) -> str:
+    """The notebook as `notebook` shows it: the areas started, each with its ideas."""
+    content: Content = load_content()
+    known: dict[str, NoteEntry] = _entries(owner)
+    if not known:
+        return (
+            "Your notebook is still empty. When you learn how something works, from people, "
+            "books or instruments, it's written here."
+        )
+    lines: list[str] = ["|wYour notebook|n"]
+    unstarted: bool = False
+    for area in content.areas.values():
+        ideas: list[IdeaSpec] = [i for i in content.ideas.values() if i.area == area.id]
+        mine: list[IdeaSpec] = [i for i in ideas if i.id in known]
+        if not mine:
+            unstarted = unstarted or bool(ideas)
+            continue
+        lines.append(f"\n|w{area.title}|n: {len(mine)} of {len(ideas)}")
+        for idea in mine:
+            lines.append(f"  |w{idea.title}.|n {idea.entry(LEVELS[known[idea.id].level])}")
+    if unstarted:
+        lines.append("\nThere is more to discover.")
+    lines.append("\n(Who taught you what: |wnotebook sources|n)")
+    return "\n".join(lines)
+
+
+def sources_text(owner: Any) -> str:
+    """Where each idea in the notebook came from, and who else in the expedition knows it."""
+    content: Content = load_content()
+    known: dict[str, NoteEntry] = _entries(owner)
+    if not known:
+        return notebook_text(owner)
+    lines: list[str] = ["|wWho taught you what|n"]
+    for idea in content.ideas.values():
+        entry: NoteEntry | None = known.get(idea.id)
+        if entry is None:
+            continue
+        taught: str = "; ".join(f"{level}: {source}" for level, source in entry.sources)
+        line: str = f"  |w{idea.title}|n: {taught}."
+        others: list[str] = _others_who_know(owner, idea.id)
+        if others:
+            line += f" Also in the notebook of {', '.join(others)}."
+        lines.append(line)
+    return "\n".join(lines)
+
+
+def _others_who_know(owner: Any, idea_id: str) -> list[str]:
+    from evennia.utils.search import search_object
+
+    names: list[str] = []
+    for key, book in (get_expedition().db.notebooks or {}).items():
+        if key == str(owner.id) or idea_id not in book:
+            continue
+        found: list[Any] = list(search_object(f"#{key}"))
+        if found:
+            names.append(str(found[0].key))
+    return names

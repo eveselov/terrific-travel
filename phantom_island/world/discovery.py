@@ -35,6 +35,7 @@ from world.content import (
 )
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
+from world.notebook import learn
 from world.places import all_things
 
 VERBS: tuple[str, ...] = ("read", "use")
@@ -103,6 +104,8 @@ def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:
         if reveal.clue is not None and reveal.clue not in found:
             found.add(reveal.clue)
             discover(reveal.clue, caller, source)
+    for reveal, source in shown:
+        learn(caller, reveal.teaches, source)  # looking is private: only the looker learns
 
 
 def look_at(caller: Any, text: str, close: bool = False) -> bool:
@@ -177,6 +180,14 @@ def act(caller: Any, verb: str, text: str) -> bool:
         caller.msg(text_shown)
     if outcome.clue is not None:
         discover(outcome.clue, caller, f"the {spec.name}")
+    watching: list[Any] = []
+    if location is not None:
+        watching = [
+            c
+            for c in location.contents_get(content_type="character")
+            if c is not caller and not isinstance(c, Inhabitant)
+        ]
+    learn(caller, outcome.teaches, f"the {spec.name}", watching)
     return True
 
 

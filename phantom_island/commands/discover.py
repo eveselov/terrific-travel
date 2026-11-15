@@ -8,6 +8,7 @@ from evennia.commands.default.general import CmdLook as DefaultCmdLook
 from typeclasses.rooms import Room
 from world.clues import journal_text
 from world.discovery import act, look_at, notice_surroundings, show_focus_for
+from world.notebook import notebook_text, sources_text
 
 from .command import Command
 
@@ -162,3 +163,29 @@ class CmdJournal(Command):
 
     def func(self) -> None:
         self.caller.msg(journal_text())
+
+
+class CmdNotebook(Command):
+    """
+    Read your notebook: the ideas you've learned about how the world works.
+
+    Usage:
+      notebook
+      notebook sources
+
+    The journal holds the expedition's clues, shared by everyone. Your notebook is
+    your own: how latitude works, why coral grows only under the sea... An entry
+    grows as you learn more about it, from people, books, and doing things yourself.
+    notebook sources shows who taught you what, and who else knows it.
+    """
+
+    key = "notebook"
+    aliases = ["knowledge", "ideas"]
+    locks = "cmd:all()"
+    help_category = "General"
+
+    def func(self) -> None:
+        if self.args.strip().lower() in ("sources", "source", "who"):
+            self.caller.msg(sources_text(self.caller))
+        else:
+            self.caller.msg(notebook_text(self.caller))

@@ -6,6 +6,7 @@ Run from the game directory with `uv run evennia test --settings settings.py .`
 """
 
 from collections import deque
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -15,6 +16,7 @@ from unittest.mock import MagicMock, patch
 from evennia.objects.objects import DefaultCharacter
 from evennia.utils.test_resources import EvenniaTest
 
+import world.content
 from typeclasses.characters import Character
 from typeclasses.exits import Exit
 from typeclasses.inhabitants import Inhabitant
@@ -32,9 +34,11 @@ from world.content import (
     SHIP_FILE,
     THINGS_FILE,
     UNDER_WAY,
+    AreaSpec,
     CharacterSpec,
     Content,
     ContentError,
+    IdeaSpec,
     TopicSpec,
     all_texts,
     load_content,
@@ -134,6 +138,17 @@ class TestContent(TestCase):
         self.assertEqual(parse_coords("10 north 25 east"), (10, 25))
         self.assertIsNone(parse_coords("14 40"))
         self.assertIsNone(parse_coords("14 south 15 south"))
+
+    def test_teaching_an_unknown_idea_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE,
+            "        aliases: [navigation, dead reckoning]\n",
+            "        aliases: [navigation, dead reckoning]\n        teaches: {nowhere: heard}\n",
+        )
+        self.assertIn("unknown idea 'nowhere'", str(error))
+
+    def test_the_notebook_is_optional(self) -> None:
+        self.assertEqual(read_content().ideas, {})  # no ideas written yet: nothing breaks
 
     def test_route_without_passage_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(SHIP_FILE, "passage:", "voyage:")
@@ -1168,3 +1183,117 @@ class TestStartOver(DiscoveryTest):
         self.assertEqual(route_to(load_content(), "charted"), ["port", "charted"])
         self.assertEqual(shortcut_position("at sea"), "charted")
         self.assertIsNone(shortcut_position("the moon"))
+
+
+def content_with_ideas() -> Content:
+    """The real content, plus a few ideas taught by Barnaby, the Ship and the sextant."""
+    content: Content = read_content()
+    latitude: IdeaSpec = IdeaSpec(
+        id="latitude",
+        area="navigation",
+        title="Latitude",
+        texts={
+            "heard": "How far north or south you are.",
+            "understood": "The higher the noon sun, the nearer the equator.",
+            "used": "You've measured it yourself.",
+        },
+    )
+    longitude: IdeaSpec = IdeaSpec(
+        id="longitude", area="navigation", title="Longitude", texts={"understood": "East-west."}
+    )
+    coral: IdeaSpec = IdeaSpec(
+        id="coral", area="nature", title="Coral", texts={"heard": "Grows under the sea."}
+    )
+    characters: dict[str, CharacterSpec] = dict(content.characters)
+    for character_id, topic_id, level in (
+        ("barnaby", "sailing", "heard"),
+        ("ship", "latitude", "understood"),
+    ):
+        spec: CharacterSpec = characters[character_id]
+        topics: dict[str, TopicSpec] = dict(spec.topics)
+        topics[topic_id] = replace(topics[topic_id], teaches=(("latitude", level),))
+        characters[character_id] = replace(spec, topics=topics)
+    sextant = content.things["sextant"]
+    assert sextant.use is not None
+    at = dict(sextant.use.at)
+    at["charted"] = replace(at["charted"], teaches=(("latitude", "used"),))
+    things = dict(content.things)
+    things["sextant"] = replace(sextant, use=replace(sextant.use, at=at))
+    return replace(
+        content,
+        characters=characters,
+        things=things,
+        areas={
+            "navigation": AreaSpec(id="navigation", title="Navigation"),
+            "nature": AreaSpec(id="nature", title="Nature"),
+        },
+        ideas={"latitude": latitude, "longitude": longitude, "coral": coral},
+    )
+
+
+class TestNotebook(DiscoveryTest):
+    def setUp(self) -> None:
+        load_content.cache_clear()
+        with_ideas: Content = content_with_ideas()
+        reading: Any = patch.object(world.content, "read_content", return_value=with_ideas)
+        reading.start()
+        self.addCleanup(reading.stop)
+        self.addCleanup(load_content.cache_clear)
+        super().setUp()
+
+    def notebook(self, character: Character) -> str:
+        return self.do(character, "notebook")
+
+    def test_an_empty_notebook(self) -> None:
+        self.assertIn("still empty", self.notebook(self.char1))
+
+    def test_everyone_who_hears_learns(self) -> None:
+        self.at(self.char1, "quay")
+        self.at(self.char2, "quay")
+        with patch.object(self.char2, "msg") as heard:
+            told: str = self.do(self.char1, "ask barnaby about sailing")
+        self.assertIn("New in your notebook: |wLatitude|n (Navigation)", told)
+        self.assertIn("New in your notebook", texts(heard))
+        page: str = self.notebook(self.char2)
+        self.assertIn("|wNavigation|n: 1 of 2", page)
+        self.assertIn("How far north or south you are.", page)
+        self.assertNotIn("noon sun", page)
+        self.assertNotIn("Nature", page)  # not started yet
+        self.assertIn("There is more to discover.", page)
+
+    def test_an_entry_grows_and_counts_once(self) -> None:
+        self.at(self.char1, "quay")
+        self.do(self.char1, "ask barnaby about sailing")
+        self.at(self.char1, "deck")
+        self.assertIn("entry on |wLatitude|n grew", self.do(self.char1, "ask ship about latitude"))
+        page: str = self.notebook(self.char1)
+        self.assertIn("How far north or south you are. The higher the noon sun", page)
+        self.assertIn("1 of 2", page)
+        self.assertNotIn("grew", self.do(self.char1, "ask ship about latitude"))  # nothing new
+
+    def test_only_the_one_who_does_it_has_used_it(self) -> None:
+        self.ship_at("charted")
+        self.thing("sextant").move_to(self.char1, quiet=True)
+        self.at(self.char1, "deck")
+        self.at(self.char2, "deck")
+        self.do(self.char1, "use sextant")
+        self.assertIn("measured it yourself", self.notebook(self.char1))
+        watcher: str = self.notebook(self.char2)
+        self.assertIn("noon sun", watcher)
+        self.assertNotIn("measured it yourself", watcher)
+
+    def test_sources_show_who_taught_what_and_who_else_knows(self) -> None:
+        self.at(self.char1, "quay")
+        self.at(self.char2, "quay")
+        self.do(self.char1, "ask barnaby about sailing")
+        self.at(self.char1, "deck")
+        self.do(self.char1, "ask ship about latitude")
+        page: str = self.do(self.char1, "notebook sources")
+        self.assertIn("heard: Old Barnaby; understood: the Ship", page)
+        self.assertIn(f"Also in the notebook of {self.char2.key}", page)
+
+    def test_a_new_expedition_starts_with_empty_notebooks(self) -> None:
+        self.at(self.char1, "quay")
+        self.do(self.char1, "ask barnaby about sailing")
+        start_over("port")
+        self.assertIn("still empty", self.notebook(self.char1))

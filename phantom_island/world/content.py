@@ -14,6 +14,7 @@ again (the world builder does that, so `batchcode build` picks up edits without 
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,10 @@ MAPS_FILE: str = "maps.yaml"
 CHARACTERS_FILE: str = "characters.yaml"
 CLUES_FILE: str = "clues.yaml"
 THINGS_FILE: str = "things.yaml"
+IDEAS_FILE: str = "ideas.yaml"  # optional: without it, the notebook stays empty
+
+# How well a player knows an idea, from the first mention to having done it themselves.
+LEVELS: tuple[str, ...] = ("heard", "understood", "used")
 
 # A clue's fact inside a text: `[[coral, grown into the brass]]` (DECISIONS.md, 20).
 CLUE_MARK: re.Pattern[str] = re.compile(r"\[\[(.+?)\]\]", re.DOTALL)
@@ -59,6 +64,8 @@ DIRECTION_ALIASES: dict[str, str] = {
 }
 
 Point = tuple[int, int]
+# What a text teaches, for the players' notebooks: (idea id, level) pairs.
+Teaching = tuple[tuple[str, str], ...]
 # A position on the globe in whole degrees: (latitude, longitude), north and east positive.
 # Longitude is counted from home, as on the Halcyon's chart.
 Coords = tuple[int, int]
@@ -111,10 +118,14 @@ class ExitSpec:
 
 @dataclass(frozen=True)
 class Reveal:
-    """A text that may reveal a clue; the clue's fact is marked `[[...]]` in it."""
+    """
+    A text that may reveal a clue (its fact marked `[[...]]` in it) and may teach ideas for
+    the notebook.
+    """
 
     text: str
     clue: str | None
+    teaches: Teaching = ()
 
 
 @dataclass(frozen=True)
@@ -263,6 +274,32 @@ class ClueSpec:
 
 
 @dataclass(frozen=True)
+class AreaSpec:
+    """A part of the notebook: Navigation, Nature..."""
+
+    id: str
+    title: str
+
+
+@dataclass(frozen=True)
+class IdeaSpec:
+    """
+    One idea for the notebook: how something in the world works. Its entry grows with each
+    level the player reaches (`texts`, by level; a level may have none).
+    """
+
+    id: str
+    area: str
+    title: str
+    texts: dict[str, str]
+
+    def entry(self, level: str) -> str:
+        """The notebook text up to this level: the texts of it and the levels before."""
+        reached: tuple[str, ...] = LEVELS[: LEVELS.index(level) + 1]
+        return " ".join(self.texts[name] for name in reached if name in self.texts)
+
+
+@dataclass(frozen=True)
 class StepSpec:
     """What reading or using a thing does at one ship position."""
 
@@ -271,10 +308,11 @@ class StepSpec:
     needs: tuple[str, ...]  # flags or clue ids that must already be found
     sets: str | None  # a flag to remember for the expedition
     otherwise: str | None  # shown while `needs` isn't met
+    teaches: Teaching = ()
 
     @property
     def reveal(self) -> Reveal:
-        return Reveal(text=self.text, clue=self.clue)
+        return Reveal(text=self.text, clue=self.clue, teaches=self.teaches)
 
 
 @dataclass(frozen=True)
@@ -309,6 +347,7 @@ class TruthSpec:
     needs: tuple[str, ...]
     reply: str
     clue: str | None
+    teaches: Teaching = ()
 
 
 @dataclass(frozen=True)
@@ -321,6 +360,7 @@ class TopicSpec:
     stance: str
     clue: str | None
     truth: TruthSpec | None
+    teaches: Teaching = ()
 
 
 @dataclass(frozen=True)
@@ -392,6 +432,8 @@ class Content:
     characters: dict[str, CharacterSpec]
     clues: dict[str, ClueSpec]
     things: dict[str, ThingSpec]
+    areas: dict[str, AreaSpec] = dataclass_field(default_factory=dict)
+    ideas: dict[str, IdeaSpec] = dataclass_field(default_factory=dict)
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -471,9 +513,26 @@ def _exit(key: str, value: Any, where: str) -> ExitSpec:
     return ExitSpec(key=key, aliases=tuple(aliases), to=_text(data, "to", where))
 
 
-def _reveal(data: dict[str, Any], field: str, where: str) -> Reveal:
-    """A text (in `field`) and the clue it may reveal (in `clue`)."""
-    return Reveal(text=_text(data, field, where), clue=_optional_text(data, "clue", where))
+def _teaches(data: dict[str, Any], where: str) -> Teaching:
+    """`teaches: {latitude: understood}`: the ideas a text teaches, and how far."""
+    found: dict[str, Any] = _mapping(data.get("teaches") or {}, f"{where}, teaches")
+    teaching: list[tuple[str, str]] = []
+    for idea_id, level in found.items():
+        if level not in LEVELS:
+            raise ContentError(
+                f"{where}, teaches {idea_id}: the level must be one of {', '.join(LEVELS)}."
+            )
+        teaching.append((idea_id, str(level)))
+    return tuple(teaching)
+
+
+def _reveal(data: dict[str, Any], name: str, where: str) -> Reveal:
+    """A text (in `name`), the clue it may reveal (in `clue`) and what it teaches."""
+    return Reveal(
+        text=_text(data, name, where),
+        clue=_optional_text(data, "clue", where),
+        teaches=_teaches(data, where),
+    )
 
 
 def _look(look_id: str, data: dict[str, Any], aliases: tuple[str, ...], where: str) -> LookSpec:
@@ -610,7 +669,10 @@ def _truth(value: Any, where: str) -> TruthSpec | None:
     if not needs:
         raise ContentError(f"{where}: `needs` must name at least one clue or flag.")
     return TruthSpec(
-        needs=needs, reply=_text(data, "reply", where), clue=_optional_text(data, "clue", where)
+        needs=needs,
+        reply=_text(data, "reply", where),
+        clue=_optional_text(data, "clue", where),
+        teaches=_teaches(data, where),
     )
 
 
@@ -627,6 +689,7 @@ def _topic(topic_id: str, value: Any, shared: dict[str, tuple[str, ...]], where:
         stance=stance,
         clue=_optional_text(data, "clue", where),
         truth=_truth(data.get("truth"), f"{where}, truth"),
+        teaches=_teaches(data, where),
     )
 
 
@@ -677,6 +740,31 @@ def _clues(data: dict[str, Any]) -> dict[str, ClueSpec]:
     return clues
 
 
+def _ideas(data: dict[str, Any]) -> tuple[dict[str, AreaSpec], dict[str, IdeaSpec]]:
+    areas_data: dict[str, Any] = _mapping(data.get("areas") or {}, f"{IDEAS_FILE}, areas")
+    areas: dict[str, AreaSpec] = {}
+    for area_id, value in areas_data.items():
+        where: str = f"{IDEAS_FILE}, area {area_id}"
+        areas[area_id] = AreaSpec(id=area_id, title=_text(_mapping(value, where), "title", where))
+    ideas_data: dict[str, Any] = _mapping(data.get("ideas") or {}, f"{IDEAS_FILE}, ideas")
+    ideas: dict[str, IdeaSpec] = {}
+    for idea_id, value in ideas_data.items():
+        where = f"{IDEAS_FILE}, idea {idea_id}"
+        item: dict[str, Any] = _mapping(value, where)
+        area: str = _text(item, "area", where)
+        if area not in areas:
+            raise ContentError(f"{where}: unknown area {area!r}.")
+        texts: dict[str, str] = {
+            level: _text(item, level, where) for level in LEVELS if item.get(level) is not None
+        }
+        if not texts:
+            raise ContentError(f"{where}: needs a text for at least one of {', '.join(LEVELS)}.")
+        ideas[idea_id] = IdeaSpec(
+            id=idea_id, area=area, title=_text(item, "title", where), texts=texts
+        )
+    return areas, ideas
+
+
 def _step(value: Any, where: str) -> StepSpec:
     data: dict[str, Any] = _mapping(value, where)
     needs: tuple[str, ...] = _words(data.get("needs"), "needs", where)
@@ -689,6 +777,7 @@ def _step(value: Any, where: str) -> StepSpec:
         needs=needs,
         sets=_optional_text(data, "sets", where),
         otherwise=otherwise,
+        teaches=_teaches(data, where),
     )
 
 
@@ -820,6 +909,7 @@ def _check(content: Content) -> None:
     _check_characters(content)
     _check_things(content)
     _check_clue_marks(content)
+    _check_teachings(content)
 
 
 def _look_texts(where: str, look: LookSpec) -> list[tuple[str, str, str | None]]:
@@ -868,6 +958,9 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
                 texts.append((f"{route_where}, passage {number}", line, None))
         for detail in position.details.values():
             texts.extend(_look_texts(f"{where}, detail {detail.id}", detail))
+    for idea in content.ideas.values():
+        for level, text in idea.texts.items():
+            texts.append((f"{IDEAS_FILE}, idea {idea.id}, {level}", text, None))
     for character in content.characters.values():
         where = f"{CHARACTERS_FILE}, {character.id}"
         for field, text in (
@@ -890,6 +983,55 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
         texts.extend(_action_texts(f"{where}, read", thing.read))
         texts.extend(_action_texts(f"{where}, use", thing.use))
     return texts
+
+
+def _look_teachings(where: str, look: LookSpec) -> list[tuple[str, Teaching]]:
+    found: list[tuple[str, Teaching]] = [(where, look.desc.teaches)]
+    if look.close is not None:
+        found.append((f"{where}, close", look.close.teaches))
+    found.extend((f"{where}, with {key}", extra.teaches) for key, extra in look.extras.items())
+    return found
+
+
+def all_teachings(content: Content) -> list[tuple[str, Teaching]]:
+    """Every text that may teach ideas, as (where it is, what it teaches)."""
+    found: list[tuple[str, Teaching]] = []
+    for place in content.places.values():
+        for detail in place.details.values():
+            found.extend(_look_teachings(f"place {place.id}, detail {detail.id}", detail))
+    for position in content.positions.values():
+        for detail in position.details.values():
+            found.extend(_look_teachings(f"position {position.id}, detail {detail.id}", detail))
+    for thing in content.things.values():
+        where: str = f"{THINGS_FILE}, {thing.id}"
+        found.extend(_look_teachings(where, thing.look))
+        for verb, action in (("read", thing.read), ("use", thing.use)):
+            if action is None:
+                continue
+            found.append((f"{where}, {verb}", action.default.teaches))
+            found.extend(
+                (f"{where}, {verb}, at {key}", step.teaches) for key, step in action.at.items()
+            )
+    for character in content.characters.values():
+        for topic in character.topics.values():
+            where = f"{CHARACTERS_FILE}, {character.id}, topic {topic.id}"
+            found.append((where, topic.teaches))
+            if topic.truth is not None:
+                found.append((f"{where}, truth", topic.truth.teaches))
+    return found
+
+
+def _check_teachings(content: Content) -> None:
+    """Every `teaches` names a known idea, at a level the idea has a text for."""
+    for where, teaching in all_teachings(content):
+        for idea_id, level in teaching:
+            idea: IdeaSpec | None = content.ideas.get(idea_id)
+            if idea is None:
+                raise ContentError(f"{where}: teaches unknown idea {idea_id!r} ({IDEAS_FILE}).")
+            if level not in idea.texts:
+                raise ContentError(
+                    f"{where}: teaches {idea_id} at level {level!r}, which has no text."
+                )
 
 
 def _check_clue_marks(content: Content) -> None:
@@ -1004,6 +1146,10 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
     characters_data: dict[str, Any] = _read_yaml(directory, CHARACTERS_FILE)
     clues_data: dict[str, Any] = _read_yaml(directory, CLUES_FILE)
     things_data: dict[str, Any] = _read_yaml(directory, THINGS_FILE)
+    ideas_data: dict[str, Any] = (
+        _read_yaml(directory, IDEAS_FILE) if (directory / IDEAS_FILE).exists() else {}
+    )
+    areas, ideas = _ideas(ideas_data)
 
     places: dict[str, PlaceSpec] = {
         key: _place(key, value, PLACES_FILE) for key, value in places_data.items()
@@ -1030,6 +1176,8 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         characters=_characters(characters_data),
         clues=_clues(clues_data),
         things=_things(things_data),
+        areas=areas,
+        ideas=ideas,
     )
     _check(content)
     return content
