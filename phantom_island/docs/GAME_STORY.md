@@ -77,6 +77,7 @@ plausible as it stands.
 | The charted position shows empty sea (C4) | The island is 215 km away, below the horizon even from the masthead | `ship.yaml` (charted position) |
 | From a masthead a lookout sees about 20 km of open sea, a hilly island 50–70 km away | The Earth's curve: horizon ≈ 3.6 km × √(height in m); a masthead of about 30 m sees a hill of 100–200 m from 55–70 km | the Ship's *horizon*, `ideas.yaml` (*The horizon*) |
 | The Society trusted the chart; Barnaby thinks she sank | Nobody could check the longitude | Fairweather's *chart*, Barnaby's *halcyon* |
+| Barnaby found latitude with a quadrant; your ship carries a sextant and a chronometer | Hadley's "quadrant" (really an octant, 1731) was the old sailor's instrument; the sextant (1757) measures wider angles and was newer and dearer. Either gives latitude from the noon sun; only a sea clock gives longitude, so Barnaby's generation guessed it | Barnaby's *sailing* and *quadrant* (the old way), the Ship's *sextant*, *chronometer*, *longitude* (the new way) |
 
 Holds, except the birds (next chain).
 

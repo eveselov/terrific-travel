@@ -193,8 +193,8 @@ characters:
       you're ready. But sit down first, if you've a mind to. I've time, and stories."
     suggest: [expedition, halcyon, storm, weather, sailing]
     fallback: >
-      Barnaby scratches his beard. "Can't say I know aught about that. Ask me about wind
-      and water, though."
+      Barnaby scratches his beard. "Can't say I know aught about that. Ask me about the
+      |wweather|n, though."
     topics:
       expedition:
         aliases: [ship, society, voyage]
@@ -237,9 +237,17 @@ characters:
         teaches: {latitude: heard, longitude: heard, dead_reckoning: heard, sea_clocks: heard}
         reply: >
           "In my day we found our way with a compass, a log line and a good guess. Dead
-          reckoning, it's called. North and south you could trust from the noon sun. East
-          and west was guesswork. Your ship has one of those new sea clocks below, I hear.
-          Never trusted 'em myself."
+          reckoning, it's called. North and south you could trust, from the noon sun and a
+          |wquadrant|n. East and west was guesswork. Your ship has one of those new sea
+          clocks below, I hear. Never trusted 'em myself."
+      quadrant:
+        # The old way; the Ship explains the new one (her sextant and chronometer).
+        aliases: [latitude, longitude, sea clock, sea clocks, noon sun]
+        stance: truth
+        reply: >
+          "Latitude? Noon sun, a quadrant and a steady hand: any old salt can do that.
+          Longitude's another matter. In my day it was guesswork. Ask that ship of yours:
+          she's got the clever clock."
       compass:
         stance: mistaken
         reply: >
