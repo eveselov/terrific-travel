@@ -168,6 +168,12 @@ class TestContent(TestCase):
         )
         self.assertIn("which has no text", str(error))
 
+    def test_the_task_must_be_a_list_of_questions(self) -> None:
+        error: ContentError = self._broken_copy(
+            CLUES_FILE, "  questions:\n", "  questions: Where is she?\n  old:\n"
+        )
+        self.assertIn("task: `questions` must be a list of texts", str(error))
+
     def test_the_notebook_is_optional(self) -> None:
         """Without ideas.yaml and without any `teaches`, the game's content still works."""
         with TemporaryDirectory() as tmp:
@@ -1072,13 +1078,23 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.assertEqual(self.journal_ids(), ["C11"])
 
     def test_the_journal_command(self) -> None:
-        self.assertIn("still empty", self.do(self.char1, "journal"))
+        empty: str = self.do(self.char1, "journal")
+        self.assertIn("No clues yet", empty)
+        # The task is there from the start, and stays at the top.
+        self.assertIn("  - What became of the Halcyon's crew?", empty)
         self.at(self.char1, "reef")
         self.do(self.char1, "look bones")
         listed: str = self.do(self.char2, "journal")
         self.assertIn("1. |yA wreck on the Western Reef|n", listed)
         self.assertIn(f"found by {self.char1.key}, Western Reef", listed)
         self.assertEqual(listed, journal_text())
+        self.assertLess(listed.index("Why did nobody"), listed.index("1. "))
+
+    def test_the_ship_points_to_the_task(self) -> None:
+        self.at(self.char1, "deck")
+        told: str = self.do(self.char1, "ask ship about task")
+        self.assertIn("three questions", told)
+        self.assertIn("|wjournal|n", told)
 
 
 class TestAtSea(DiscoveryTest):

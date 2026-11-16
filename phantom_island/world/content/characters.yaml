@@ -114,10 +114,12 @@ characters:
         aliases: [expedition, job, task]
         stance: truth
         reply: >
-          "The Society wants the truth about the |wHalcyon|n. Fifteen years of rumours, and
-          now a |wcompass|n with her name on it turns up in our own market. Silas Crane has
-          it on his stall, just east of here. Go and look at it first. Then take your
-          |wship|n to the |wisland|n on the Halcyon's |wchart|n and see what is left to find."
+          "The Society wants the truth about the |wHalcyon|n: what happened to her, why
+          nobody ever found her, and what became of her |wcrew|n. I have written the three
+          questions at the top of the expedition's |wjournal|n. Now a |wcompass|n with her
+          name on it has turned up in our own market, on Silas Crane's stall, just east of
+          here. Look at it first. Then take your |wship|n to the |wisland|n on the
+          Halcyon's |wchart|n."
       halcyon:
         stance: truth
         teaches: {oak: heard}
@@ -646,7 +648,15 @@ characters:
         reply: >
           "Look closely at things, read what's in the Cabin, and ask people questions.
           People don't always tell the truth, so compare what |wwitnesses|n say. And if something
-          puzzles you, ask me about it."
+          puzzles you, ask me about it. Lost your way? Ask me about the |wexpedition|n."
+      expedition:
+        aliases: [task, mission, purpose, questions, job]
+        stance: truth
+        reply: >
+          "You lead this expedition, and the Society gave you three questions: what
+          happened to the Halcyon, why nobody ever found her, and what became of her crew.
+          They're at the top of the |wjournal|n, with everything found so far. Which of
+          them could you answer today?"
       captain:
         aliases: [command, orders, crew, sailors]
         stance: truth

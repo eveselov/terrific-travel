@@ -201,10 +201,12 @@ Explore, talk, collect clues, then make the report.
 | Boat Cove | Old wood chips, a slipway, a carved board. Jonah Pike is often here. |
 
 **Ending:** back in the ship's Cabin, the players `report` what happened. The game checks three
-questions against the journal:
-- Where did the *Halcyon* wreck?
-- Why was she never found?
-- What became of the crew?
+questions against the journal, the same ones that stand at the top of the journal from the
+start (`task` in clues.yaml; DECISIONS.md, 28):
+- What happened to the *Halcyon*, and where? (The answer it checks: where she wrecked. The
+  question doesn't say "wreck", which the Society doesn't know at the start.)
+- Why did nobody ever find the *Halcyon*?
+- What became of the *Halcyon*'s crew?
 
 A full answer gets the full epilogue. A partial answer gets a partial one, plus a hint of
 what they missed. They can go back and look again, so it doesn't feel like failing a quiz.

@@ -20,7 +20,21 @@
 #   title    a few words, shown in the journal and when the clue is found again
 #   journal  the line written into the journal
 #
+# The task (optional) stands at the top of the journal from the very beginning, so players
+# can always look up what the expedition is for (DECISIONS.md, 28). Its questions are the
+# ones the report asks at the end. It only states them: which clue answers which question
+# is for the players to work out (DECISIONS.md, 21).
+#   title      one line: what the expedition is for
+#   questions  the questions to answer
+#
 # After editing, `reload` in the game is enough.
+
+task:
+  title: The Society's task is to find out the truth about the Halcyon.
+  questions:
+    - What happened to the Halcyon, and where?
+    - Why did nobody ever find the Halcyon?
+    - What became of the Halcyon's crew?
 
 clues:
   C1:

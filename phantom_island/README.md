@@ -143,7 +143,7 @@ To try it (spoilers):
 ```
 uv run evennia reload        (new code: a reload is needed, then)
 batchcode build              (as admin: places the things)
-journal                      → still empty
+journal                      → the task, no clues yet
 teleport Market
 look compass                 → C1
 examine compass              → C2

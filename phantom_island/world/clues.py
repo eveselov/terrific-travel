@@ -104,15 +104,23 @@ def entry_number(clue_id: str) -> int | None:
 
 
 def journal_text() -> str:
-    """The journal, as shown by the `journal` command."""
+    """
+    The journal, as shown by the `journal` command: the expedition's task first (always
+    there, so players can look up what they are here for), then the clues found.
+    """
     content: Content = load_content()
     entries: list[JournalEntry] = _listed_entries()
+    lines: list[str] = ["|wThe expedition's journal|n"]
+    if content.task is not None:
+        lines.append(f"\n{content.task.title}")
+        lines.extend(f"  - {question}" for question in content.task.questions)
+        lines.append("")
     if not entries:
-        return (
-            "The expedition's journal is still empty. When you find a clue (shown in "
+        lines.append(
+            "No clues yet. When you find a clue (shown in "
             f"{CLUE_COLOUR}yellow|n), it is written here, for the whole expedition."
         )
-    lines: list[str] = ["|wThe expedition's journal|n"]
+        return "\n".join(lines)
     for number, entry in enumerate(entries, start=1):
         clue: ClueSpec = content.clues[entry.clue]
         found: str = f"found by {_where_from(entry.finder, entry.place, entry.source)}"

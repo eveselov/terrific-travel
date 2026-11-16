@@ -29,9 +29,10 @@ ask fairweather
 # Her greeting, and what to ask her: mission, halcyon, chart, letter.
 ask fairweather about mission
 # Why: the first thing anyone wants to know is what they're here for.
-# Now you know: the Halcyon is lost, a compass with her name turned up in the market,
-# east of here, and the island is on the Halcyon's chart. The plan: look at the compass
-# first, then sail to the island.
+# Now you know: the three questions (what happened to the Halcyon, why nobody found her,
+# what became of her crew), also at the top of the journal. A compass with her name
+# turned up in the market, east of here, and the island is on the Halcyon's chart. The
+# plan: look at the compass first, then sail to the island.
 ask her about chart
 # Why: the chart is where the island is.
 # Now you know: a copy is in your ship's cabin, with the island's latitude and longitude.

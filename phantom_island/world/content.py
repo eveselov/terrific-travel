@@ -283,6 +283,14 @@ class ClueSpec:
 
 
 @dataclass(frozen=True)
+class TaskSpec:
+    """What the expedition is for: the top of the journal, from the very beginning."""
+
+    title: str
+    questions: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class AreaSpec:
     """A part of the notebook: Navigation, Nature..."""
 
@@ -444,6 +452,7 @@ class Content:
     things: dict[str, ThingSpec]
     areas: dict[str, AreaSpec] = dataclass_field(default_factory=dict)
     ideas: dict[str, IdeaSpec] = dataclass_field(default_factory=dict)
+    task: TaskSpec | None = None
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -759,6 +768,21 @@ def _clues(data: dict[str, Any]) -> dict[str, ClueSpec]:
     return clues
 
 
+def _task(data: dict[str, Any]) -> TaskSpec | None:
+    if data.get("task") is None:
+        return None
+    where: str = f"{CLUES_FILE}, task"
+    item: dict[str, Any] = _mapping(data["task"], where)
+    questions: Any = item.get("questions") or []
+    if not isinstance(questions, list) or not all(
+        isinstance(q, str) and q.strip() for q in questions
+    ):
+        raise ContentError(f"{where}: `questions` must be a list of texts.")
+    return TaskSpec(
+        title=_text(item, "title", where), questions=tuple(q.strip() for q in questions)
+    )
+
+
 def _ideas(data: dict[str, Any]) -> tuple[dict[str, AreaSpec], dict[str, IdeaSpec]]:
     areas_data: dict[str, Any] = _mapping(data.get("areas") or {}, f"{IDEAS_FILE}, areas")
     areas: dict[str, AreaSpec] = {}
@@ -977,6 +1001,10 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
                 texts.append((f"{route_where}, passage {number}", line, None))
         for detail in position.details.values():
             texts.extend(_look_texts(f"{where}, detail {detail.id}", detail))
+    if content.task is not None:
+        texts.append((f"{CLUES_FILE}, task", content.task.title, None))
+        for number, question in enumerate(content.task.questions, start=1):
+            texts.append((f"{CLUES_FILE}, task, question {number}", question, None))
     for idea in content.ideas.values():
         for level, text in idea.texts.items():
             texts.append((f"{IDEAS_FILE}, idea {idea.id}, {level}", text, None))
@@ -1245,6 +1273,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         things=_things(things_data),
         areas=areas,
         ideas=ideas,
+        task=_task(clues_data),
     )
     _check(content)
     return content

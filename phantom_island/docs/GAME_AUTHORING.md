@@ -18,7 +18,7 @@ comment listing its fields: that list is the reference, and this guide doesn't r
 | `ship.yaml` | The ship's two rooms (Deck, Cabin), and the positions she can sail to: what is seen from them, routes, orders, voyage passages |
 | `maps.yaml` | The map pictures for the Map pane: one per act (port, sea chart, island) |
 | `characters.yaml` | The people and the Ship: where they stand, how they speak, what they answer (`ask`) |
-| `clues.yaml` | The clues: a title and the line written into the shared journal |
+| `clues.yaml` | The task at the top of the journal (what the expedition is for), and the clues: a title and the line written into the shared journal |
 | `things.yaml` | Objects: to look at, examine, read, use, and sometimes carry |
 | `ideas.yaml` | The notebook: areas and ideas about how the world works (optional) |
 
