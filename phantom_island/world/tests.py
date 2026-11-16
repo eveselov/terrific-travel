@@ -23,7 +23,7 @@ from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
 from typeclasses.scripts import JournalEntry
 from world.builder import build_world
-from world.clues import journal_text, show_marks
+from world.clues import journal_sources_text, journal_text, show_marks
 from world.content import (
     CHARACTERS_FILE,
     CLUES_FILE,
@@ -1002,7 +1002,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
         entry: JournalEntry = expedition.journal[0]
         self.assertEqual(entry.source, "Silas Crane")
         self.assertEqual([s.source for s in entry.also], ["Old Barnaby"])
-        listing: str = journal_text()
+        listing: str = journal_sources_text()
         self.assertIn("found by Test, Market, from Silas Crane", listing)
         self.assertIn("again by Admin, Quay, from Old Barnaby", listing)
 
@@ -1013,7 +1013,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.do(self.char1, "look goats")
         self.at(self.char1, "spring")
         self.do(self.char1, "look shoots")
-        listing: str = journal_text()
+        listing: str = journal_sources_text()
         self.assertIn("from the goats, with the animal guide", listing)
         self.assertIn("again by", listing)
         self.assertIn("from the shoots, with the plant guide", listing)
@@ -1086,8 +1086,11 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.do(self.char1, "look bones")
         listed: str = self.do(self.char2, "journal")
         self.assertIn("1. |yA wreck on the Western Reef|n", listed)
-        self.assertIn(f"found by {self.char1.key}, Western Reef", listed)
+        self.assertNotIn("found by", listed)  # the sources are kept apart
+        self.assertIn("|wjournal sources|n", listed)
         self.assertEqual(listed, journal_text())
+        sources: str = self.do(self.char2, "journal sources")
+        self.assertIn(f"1. |yA wreck on the Western Reef|n: found by {self.char1.key}", sources)
         self.assertLess(listed.index("Why did nobody"), listed.index("1. "))
 
     def test_the_ship_points_to_the_task(self) -> None:

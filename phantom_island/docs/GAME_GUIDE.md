@@ -69,9 +69,9 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 ## Journal
 
-- The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it.
+- The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it. At the top is the expedition's task: the three questions the Society wants answered. If you lose track of what you're here for, look there.
 - A clue is a fact shown in **yellow**, in what someone says, in what you look at, or in what an instrument or book shows. Right after it comes a line starting "New in the journal:", so a clue is never missed, even without colours.
-- Entries are kept in the order they were found, each with who found it, where, and from whom or what. When another source confirms a clue later, it is added to the same entry, so you can see who agrees with whom.
+- Entries are kept in the order they were found, one line each. `journal sources` shows who found each one, where, and from whom or what. When another source confirms a clue later, it is added to the same entry, so you can see who agrees with whom.
 - There is one journal for the whole expedition: everyone sees the same entries, and every player hears of a new clue at once, wherever they are.
 - The same clue can turn up in different words from different sources. Finding it again adds no new entry: you're shown the entry it matches, so you can see they're the same fact.
 - The journal matters to the story too: some people only tell the truth once the right clue is in it, so it pays to come back and ask again.

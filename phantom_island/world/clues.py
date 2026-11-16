@@ -16,6 +16,7 @@ from world.expedition import connected_characters, get_expedition
 
 CLUE_COLOUR: str = "|y"
 NEW_IN_JOURNAL: str = f"{CLUE_COLOUR}New in the journal:|n"
+JOURNAL_SOURCES: str = "journal sources"
 
 
 def _yellow(found: Any) -> str:
@@ -123,9 +124,27 @@ def journal_text() -> str:
         return "\n".join(lines)
     for number, entry in enumerate(entries, start=1):
         clue: ClueSpec = content.clues[entry.clue]
+        lines.append(f"{number}. {CLUE_COLOUR}{clue.title}|n: {clue.journal}")
+    lines.append(f"\n(Who found what, and from whom: |w{JOURNAL_SOURCES}|n)")
+    return "\n".join(lines)
+
+
+def journal_sources_text() -> str:
+    """
+    Who found each clue, where and from whom or what, and every later source that
+    confirmed it (`journal sources`): for comparing sources, kept out of the plain journal
+    so that it stays short.
+    """
+    content: Content = load_content()
+    entries: list[JournalEntry] = _listed_entries()
+    if not entries:
+        return journal_text()
+    lines: list[str] = ["|wWho found what|n"]
+    for number, entry in enumerate(entries, start=1):
+        clue: ClueSpec = content.clues[entry.clue]
         found: str = f"found by {_where_from(entry.finder, entry.place, entry.source)}"
         again: list[str] = [_where_from(s.finder, s.place, s.source) for s in entry.also]
         if again:
             found += "; again by " + "; ".join(again)
-        lines.append(f"{number}. {CLUE_COLOUR}{clue.title}|n: {clue.journal} ({found})")
+        lines.append(f"{number}. {CLUE_COLOUR}{clue.title}|n: {found}.")
     return "\n".join(lines)

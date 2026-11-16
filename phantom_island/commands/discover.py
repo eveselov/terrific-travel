@@ -6,7 +6,7 @@ from evennia.commands.default.general import CmdGet as DefaultCmdGet
 from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
 from typeclasses.rooms import Room
-from world.clues import journal_text
+from world.clues import journal_sources_text, journal_text
 from world.discovery import act, look_at, notice_surroundings, show_focus_for
 from world.notebook import READ_IT, notebook_text, sources_text
 
@@ -151,9 +151,12 @@ class CmdJournal(Command):
 
     Usage:
       journal
+      journal sources
 
-    Every clue anyone in the expedition finds is written here, with who found it and
-    where. Clues are shown in yellow when you find them.
+    The journal starts with the expedition's task. Every clue anyone in the
+    expedition finds is written below it. Clues are shown in yellow when you find
+    them. journal sources shows who found each clue, where, and from whom or what,
+    so you can compare what different sources said.
     """
 
     key = "journal"
@@ -162,7 +165,10 @@ class CmdJournal(Command):
     help_category = "General"
 
     def func(self) -> None:
-        self.caller.msg(journal_text())
+        if self.args.strip().lower() in ("sources", "source", "who"):
+            self.caller.msg(journal_sources_text())
+        else:
+            self.caller.msg(journal_text())
 
 
 class CmdNotebook(Command):
