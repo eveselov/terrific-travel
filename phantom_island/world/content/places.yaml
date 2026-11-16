@@ -111,7 +111,8 @@ beach:
       aliases: [goat, bushes]
       desc: >
         Three brown goats with clever yellow eyes. One is chewing a palm leaf and watches
-        you while it chews. Nobody seems to look after them.
+        you while it chews. Nobody seems to look after them. How did goats get to an island
+        so far out? The naturalist's books in the ship's Cabin might know.
       with:
         animal_guide:
           teaches: {island_animals: used}
@@ -192,7 +193,8 @@ forest:
     trees:
       aliases: [tree, leaves, fruit]
       desc: >
-        Tall smooth trunks, broad shiny leaves, and big green fruit hanging high up.
+        Tall smooth trunks, broad shiny leaves, and big green fruit hanging high up. The
+        plant guide in the ship's Cabin would name them.
       with:
         plant_guide:
           teaches: {oak: used}
@@ -214,7 +216,8 @@ spring:
       aliases: [shoot, patch, rows, garden]
       desc: >
         Thin green shoots, planted in straight rows like a garden at home. You pull one up:
-        a small white bulb, with a sharp smell that makes your eyes water.
+        a small white bulb, with a sharp smell that makes your eyes water. Somebody planted
+        these. The naturalist's books in the ship's Cabin might name the plant.
       with:
         plant_guide:
           teaches: {onions: used}
@@ -238,7 +241,8 @@ hilltop:
       aliases: [coast, shape, view, shore]
       desc: >
         Round in the east, with the lagoon. A long reef down the west side. A little cove in
-        the south, curled like a hook. You feel you've seen this shape before.
+        the south, curled like a hook. You feel you've seen this shape before, drawn on
+        paper. On a chart, perhaps?
       with:
         chart:
           clue: C10

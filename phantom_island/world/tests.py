@@ -1093,6 +1093,12 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.assertIn(f"1. |yA wreck on the Western Reef|n: found by {self.char1.key}", sources)
         self.assertLess(listed.index("Why did nobody"), listed.index("1. "))
 
+    def test_jonah_explains_why_the_crew_sailed_west(self) -> None:
+        self.at(self.char1, "cove")
+        told: str = self.do(self.char1, "ask jonah about east")
+        self.assertIn("trade wind blows from the east", told)
+        self.assertIn("Names of winds", told)  # the notebook
+
     def test_the_ship_points_to_the_task(self) -> None:
         self.at(self.char1, "deck")
         told: str = self.do(self.char1, "ask ship about task")

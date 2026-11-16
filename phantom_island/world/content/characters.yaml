@@ -494,8 +494,17 @@ characters:
         stance: truth
         clue: C13
         reply: >
-          "[[Most of them sailed west in the boat]], to reach the trading routes. I never heard
-          what became of them. I stayed. I'd married by then, and this was home."
+          "[[Most of them sailed west in the boat]], to reach the trading routes, not |whome|n.
+          I never heard what became of them. I stayed. I'd married by then, and this was
+          home now."
+      home:
+        aliases: [east, going home, why west, wind, trade wind]
+        stance: truth
+        teaches: {winds: understood}
+        reply: >
+          "Home lies east, and out here the trade wind blows from the east, day after day.
+          Beat against it for weeks in a little boat we built ourselves? We'd have run out of
+          water first. Going west, the wind was behind us all the way."
       chart:
         aliases: [longitude, position]
         stance: truth

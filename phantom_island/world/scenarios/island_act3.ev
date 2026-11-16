@@ -1,0 +1,235 @@
+# SPOILERS. Phantom Island scenario 'island_act3', recorded by Admin on 2026-11-16.
+#
+# Play it as a builder, with nobody else playing:
+#   batchcommand/interactive scenarios.island_act3   (ss: next command, qq: stop)
+# The notes after each command are what the game recorded. Fill in the reasons
+# after 'Why:' if you want this to be an annotated scenario, like island.ev.
+# Keep a '#' line after every command: it ends the command.
+#
+startover yes
+# A new expedition: the ship in port, the journal and notebooks empty, you in Limbo.
+begin
+#   Now in: Society Office
+#   Why:
+ask fairweather
+#   Why:
+ask fairweather about mission
+#   Why:
+ask her about chart
+#   Why:
+east
+#   Now in: Market
+#   Why:
+look compass
+#   Journal: new C1, The Halcyon's compass
+#   Why:
+examine compass
+#   Journal: new C2, Coral in the hinge
+#   Notebook: new Coral
+#   Why:
+ask crane about compass
+#   Journal: new C3, Fishermen from the west
+#   Why:
+southwest
+#   Now in: Quay
+#   Why:
+ask barnaby about sailing
+#   Notebook: new Latitude, Longitude, Dead reckoning, Sea clocks
+#   Why:
+aboard
+#   Now in: Deck
+#   Why:
+down
+#   Now in: Cabin
+#   Why:
+read chart
+#   Notebook: new Positions and charts
+#   Why:
+get sextant
+#   Why:
+up
+#   Now in: Deck
+#   Why:
+sail
+#   Why:
+sail/now to 14 south 40 west
+#   Notebook: new Sailing along a latitude; grew Positions and charts
+#   Journal: new C4, Nothing at the charted position
+#   Why:
+use sextant
+#   Journal: again C4, Nothing at the charted position
+#   Notebook: grew Latitude
+#   Why:
+down
+#   Now in: Cabin
+#   Why:
+read chronometer
+#   Journal: again C4, Nothing at the charted position
+#   Notebook: grew Longitude
+#   Why:
+up
+#   Now in: Deck
+#   Journal: again C4, Nothing at the charted position
+#   Why:
+ask ship about latitude
+#   Why:
+ask ship about longitude
+#   Why:
+look sky
+#   Journal: new C6, Birds flying west at dusk
+#   Notebook: new Seabirds at dusk
+#   Why:
+sail/now west
+#   Notebook: grew Sailing along a latitude
+#   Why:
+use sextant
+#   Why:
+down
+#   Now in: Cabin
+#   Why:
+read chronometer
+#   Journal: new C5, Latitude right, longitude wrong
+#   Why:
+up
+#   Now in: Deck
+#   Why:
+ashore
+#   Now in: Lagoon Beach
+#   Why:
+journal
+#   Why:
+notebook
+#   Why:
+notebook
+#   Why:
+notebook
+#   Why:
+notebook
+#   Why:
+l
+#   Why:
+look goats
+#   Why:
+go west
+#   Why:
+west
+#   Now in: Village
+#   Why:
+look beams
+#   Why:
+examine beams
+#   Journal: new C8, Oak timbers in the village
+#   Why:
+ask ama
+#   Why:
+ask ama village
+#   Why:
+ask ama about village
+#   Why:
+ask ama about island
+#   Why:
+ask ama about reef
+#   Notebook: new Tides
+#   Why:
+ask ama about halcyon
+#   Why:
+ask ama about tui
+#   Why:
+ask tui
+#   Why:
+ask tui about buttons
+#   Why:
+ask tui about bones
+#   Why:
+ask tui about goats
+#   Why:
+ask tui about song
+#   Journal: new C11, Tui's song
+#   Notebook: new Songs remember
+#   Why:
+l
+#   Why:
+go sw
+#   Why:
+southwest
+#   Now in: Boat Cove
+#   Why:
+ask pike
+#   Why:
+ask about halcyon
+#   Journal: new C13, Jonah Pike's story
+#   Why:
+ask about storm
+#   Journal: again C13, Jonah Pike's story
+#   Why:
+ask about wreck
+#   Journal: again C13, Jonah Pike's story
+#   Why:
+ask about boat
+#   Journal: again C13, Jonah Pike's story
+#   Why:
+ask about crew
+#   Journal: again C13, Jonah Pike's story
+#   Why:
+ask about compass
+#   Why:
+l
+#   Why:
+go nw
+#   Why:
+northwest
+#   Now in: Western Reef
+#   Why:
+look bones
+#   Journal: new C7, A wreck on the Western Reef
+#   Notebook: grew Coral
+#   Why:
+go east
+#   Why:
+east
+#   Now in: Village
+#   Why:
+go n
+#   Why:
+north
+#   Now in: Forest Path
+#   Why:
+look trees
+#   Why:
+go w
+#   Why:
+west
+#   Now in: Spring
+#   Why:
+look shoots
+#   Why:
+go e
+#   Why:
+east
+#   Now in: Forest Path
+#   Why:
+go n
+#   Why:
+north
+#   Now in: Hilltop
+#   Why:
+look coastline
+#   Why:
+go s
+#   Why:
+south
+#   Now in: Forest Path
+#   Why:
+go s
+#   Why:
+south
+#   Now in: Village
+#   Why:
+go e
+#   Why:
+east
+#   Now in: Lagoon Beach
+#   Why:
+aboard
+#   Now in: Deck
+#   Why:

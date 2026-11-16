@@ -293,3 +293,50 @@ Ashore on the island, the list would show the exits, the people here (`ask ama`)
 One caution: the list should name things to try, not the solution. "look sky" here works the same way as the white word in the deck description, so it gives nothing away. But the list should never point at something the room's own text doesn't already mark.
 
 If you want it, it fits naturally in A5 (polish), or earlier if your grandson's first playtest shows him getting lost.
+
+## Idea 14. Sailing Directions Interpretatoions
+
+**The current interpetation**
+
+Yes, it does, but a direction isn't a distance. A direction picks one of the routes from where the ship is now, and each route leads to a fixed position. So how far the ship goes depends on the route:
+
+| From | `sail …` | To | How far |
+|---|---|---|---|
+| Port (14° S, 0° W) | `west` (or `sail to 14 south 40 west`, or by name: `sail to island`) | The chart's position, 14° S, 40° W | 40 degrees, about three weeks |
+| Chart's position | `north` / `south` / `east` | 12° S / 16° S / 38° W | 2 degrees, about 200 km, a day |
+| Chart's position | `west` | The island's anchorage, 14° S, 42° W | 2 degrees, a day |
+| Chart's position | `home` | Port | the whole way back, slower against the wind |
+| One day north, south or east | the way back | The chart's position | a day |
+| East of the chart | `home` | Port | the whole way back |
+| The island | `east` | The chart's position | a day |
+
+So the same command can mean different things in different places:
+- At the chart's position, `sail west` is a day's search.
+- In port, `sail west` is the whole three-week voyage.
+- Anywhere else, a direction with no route just gets the answer that there's no such route.
+
+All this is in [world/content/ship.yaml](world/content/ship.yaml), under each position's `routes`. Each route has its own Ship's reply and passage text.
+
+One thing to watch when the kids play: someone might expect `sail west` to be a step of a fixed size, the way walking `west` moves you one room. At sea, the steps are the day-long searches, and the passage text says so ("A day north of the chart's position…"). The one big exception is `sail west` from port, which takes you all the way to the chart's position.
+
+**TODO: Possible refinement**
+
+**Q:** *Oh, that explains my confusion first time when I sailed. I said "sail west" assuming a fixed duration (how long?) of saililn in the west position. Similar for all other directions. Turns out that the game has a very specific semantically predefined meanings, hasn't it? I am afraid that this might be misleading... Probably the simplest way to avoid this confusion is to restrict the "sail" command to only "to x south y west" format (with a clear explanation that it has not a directional but location meaning). Am I misinterpreting your definitions? (No need to change anything in code or tests yet).*
+
+You're reading it right. Each `sail <direction>` is a predefined route, and its meaning depends on where the ship is. That's where your first confusion came from: in port, `sail west` isn't "sail west for a while", it's the whole three-week voyage to the chart's position.
+
+I wouldn't go as far as positions only, though. I'd remove the case that misled you and keep the case that works.
+
+**Why not positions only:** at the chart's position, the players' question really is a direction: *which way do we search?* With positions only, they'd have to give a number they can't know: how far west, 41, 45, 50? The game has only a few fixed places, so most numbers would get "nothing there". That turns the search into guessing coordinates, which is the guess-and-try navigation we worked to remove. To avoid it, the sea would need a position at every degree, which is a much bigger change.
+
+**What I'd suggest: two meanings, each only where it fits:**
+- **In port, a position (or a name), never a direction.** `sail west` in port would get the Ship asking where to: *"West to where? Give me a position: the island's is on the Halcyon's chart."* That's the confusing case, so it goes. `sail to 14 south 40 west` and `sail to island` stay.
+- **At sea, a direction always means one day's search,** and the game says so every time:
+  - in the orders text at the chart's position: "Each order is a day's sail, about 200 km";
+  - in the Ship's reply: "West it is: a day's sail, two degrees."
+
+  Some replies already say "a day's sail"; the west route to the island doesn't yet.
+
+With that, every `sail` means one of two clear things: *go to that place*, or *search a day that way*. The ship never goes further than the player expects.
+
+This is a small change: one rule in the `sail` code for the port, and a few texts in `ship.yaml`. I'll wait until you ask.

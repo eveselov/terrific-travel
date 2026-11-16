@@ -126,6 +126,7 @@ Holds as a lie: the dates and the coral contradict him, which is the point.
 | "A new canoe with a white wing flew away to where the sun goes to sleep" (C11) | A sailing boat, seen by children: the white sail is the wing; the sun sets in the west | Tui's *song* |
 | Tui finds brass buttons with little anchors near the wreck, and Ama keeps more | Buttons off sailors' coats: the crew lived in the village (Jonah says so); Tui is Ama's grandchild | Tui's *buttons*, Ama's *tui* |
 | Most of the crew sailed west, Jonah stayed | West led to the trading routes; he had married into the village | Jonah's *crew* |
+| They sailed west, not home to the east | Out here the trade wind blows from the east (south-east) all year: the voyage out had it behind (Day 4), going home is slower against it, and a small boat can't beat into it for weeks | Jonah's *home*, the voyage's Day 4, the Ship's *home* route |
 | The crew's families in the port still wait for news | Most of the crew came from this port; nobody ever came home, and the boat that sailed west was never heard of | Fairweather's *crew* |
 | The compass reached the port through fishermen from the west (C3) | The crew left it as a gift; it was traded from island to island, eastward to the port | Crane's *compass* (truth), *fishermen* |
 
