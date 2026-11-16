@@ -43,6 +43,10 @@ SSL_PORTS = [4013]  # only used if SSL_ENABLED
 SSH_PORTS = [4014]  # only used if SSH_ENABLED
 AMP_PORT = 4016  # internal Portal <-> Server link
 
+# Evennia's own commands (drop, say, exits...) are built on our MuxCommand, so the
+# scenario recorder sees them too (`record`, world/recorder.py).
+COMMAND_DEFAULT_CLASS = "commands.command.MuxCommand"
+
 
 ######################################################################
 # Settings given in secret_settings.py override those in this file.

@@ -189,6 +189,10 @@ The full rules are at the top of `characters.yaml` (DECISIONS.md, 23). In short:
   reaches a point in the story with a real journal and notebook, and shows the story as
   players meet it. It uses `sail/now` (builders only: the whole voyage at once). After a
   content change that touches its path, update its commands and comments.
+- `record start <name> yes` makes a new scenario as you play: it starts a new expedition,
+  keeps the commands you type (only yours, and only those any player could type), and
+  `record stop` writes `world/scenarios/<name>.ev`, with what the game recorded after each
+  command (new clues, notebook entries, where you are) and a `Why:` line for your reasons.
 - The content check runs on every `reload` and `batchcode build`, and the tests run it too:
   `uv run evennia test --settings settings.py .` from this folder. A content mistake shows
   up as a `ContentError` naming the file and entry.

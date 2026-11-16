@@ -37,6 +37,13 @@ class CmdSail(Command):
     locks = "cmd:all()"
     help_category = "Ship"
 
+    def recorded_as(self) -> str:
+        """In a recorded scenario, a voyage happens at once (`sail/now`)."""
+        text: str = self.args.strip()
+        if not text or text.split()[0].lower() == NOW_SWITCH:
+            return super().recorded_as()
+        return f"sail{NOW_SWITCH} {text}"
+
     def func(self) -> None:
         text: str = self.args.strip()
         now: bool = False

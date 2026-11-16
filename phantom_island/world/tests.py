@@ -1403,3 +1403,83 @@ class TestNotebookContent(DiscoveryTest):
         self.assertIn("You have given the ship an order", mine)
         self.assertNotIn("You have given the ship an order", theirs)
         self.assertIn("lines of latitude", theirs)
+
+
+class TestRecorder(DiscoveryTest):
+    """A developer's play, written as a scenario that `batchcommand` can play back."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        tmp: TemporaryDirectory[str] = TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.folder: Path = Path(tmp.name)
+        folder_patch: Any = patch("world.recorder.scenario_dir", return_value=self.folder)
+        folder_patch.start()
+        self.addCleanup(folder_patch.stop)
+        crew_patch: Any = patch("world.ship.crew_ashore", return_value=[])
+        crew_patch.start()
+        self.addCleanup(crew_patch.stop)
+
+    def record(self, *commands: str) -> list[str]:
+        """Record `commands` as char1 and return the lines of the file written."""
+        self.do(self.char1, "record start demo yes")
+        for command in commands:
+            self.do(self.char1, command)
+        self.assertIn("Saved world/scenarios/demo.ev", self.do(self.char1, "record stop"))
+        return (self.folder / "demo.ev").read_text(encoding="utf-8").splitlines()
+
+    def test_without_yes_nothing_starts(self) -> None:
+        self.assertIn("Type |wrecord start demo yes|n", self.do(self.char1, "record start demo"))
+        self.assertIn("Nothing is being recorded", self.do(self.char1, "record"))
+
+    def test_a_recording_plays_back_from_a_new_expedition(self) -> None:
+        self.at(self.char1, "quay")
+        lines: list[str] = self.record("begin", "east", "look compass", "examine compass")
+        commands: list[str] = [line for line in lines if not line.startswith("#")]
+        self.assertEqual(
+            commands, ["startover yes", "begin", "east", "look compass", "examine compass"]
+        )
+        self.assertIn("#   Now in: Market", lines)
+        self.assertIn("#   Journal: new C2, Coral in the hinge", lines)
+        self.assertIn("#   Notebook: new Coral", lines)
+        # Every command is followed by a comment line, which ends it for batchcommand.
+        for number, line in enumerate(lines[:-1]):
+            if not line.startswith("#"):
+                self.assertTrue(lines[number + 1].startswith("#"), line)
+
+    def test_only_what_any_player_could_type_is_kept(self) -> None:
+        lines: list[str] = self.record(
+            "begin", "xyzzy", "help", "teleport Quay", "startover", "look"
+        )
+        commands: list[str] = [line for line in lines if not line.startswith("#")]
+        self.assertEqual(commands, ["startover yes", "begin", "look"])
+
+    def test_another_players_commands_are_not_recorded(self) -> None:
+        self.do(self.char1, "record start demo yes")
+        self.do(self.char1, "begin")
+        self.do(self.char2, "begin")
+        self.do(self.char2, "look")
+        self.do(self.char1, "record stop")
+        text: str = (self.folder / "demo.ev").read_text(encoding="utf-8")
+        self.assertEqual([line for line in text.splitlines() if line == "look"], [])
+
+    def test_a_voyage_is_written_as_sail_now(self) -> None:
+        self.ship_at("port")
+        self.at(self.char1, "deck")
+        self.do(self.char1, "record start demo yes")
+        self.at(self.char1, "deck")
+        lines: list[str] = self.record_more("sail", "sail to 14 south 40 west")
+        self.assertIn("sail", lines)
+        self.assertIn("sail/now to 14 south 40 west", lines)
+        self.assertIn("#   Journal: new C4, Nothing at the charted position", lines)
+
+    def record_more(self, *commands: str) -> list[str]:
+        for command in commands:
+            self.do(self.char1, command)
+        self.do(self.char1, "record stop")
+        return (self.folder / "demo.ev").read_text(encoding="utf-8").splitlines()
+
+    def test_an_existing_file_is_named_before_it_is_replaced(self) -> None:
+        (self.folder / "demo.ev").write_text("# by hand\n", encoding="utf-8")
+        self.assertIn("replace the existing", self.do(self.char1, "record start demo"))
+        self.assertEqual((self.folder / "demo.ev").read_text(encoding="utf-8"), "# by hand\n")

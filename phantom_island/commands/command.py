@@ -5,12 +5,53 @@ Commands describe the input the account can do to the game.
 
 """
 
+from typing import Any
+
 from evennia.commands.command import Command as BaseCommand
+from evennia.commands.default.muxcommand import MuxCommand as BaseMuxCommand
 
 # from evennia import default_cmds
 
+# Commands every player can use, but which have no place in a recorded scenario.
+NOT_RECORDED: frozenset[str] = frozenset({"help"})
 
-class Command(BaseCommand):
+
+class Recorded:
+    """
+    Notes each command in a developer's scenario recording (`record`, world/recorder.py),
+    before it runs: only commands any player could type (`cmd:all()`) and exits.
+    """
+
+    caller: Any
+    key: str
+    locks: str
+    raw_string: str
+
+    def recorded_as(self) -> str:
+        """The command as the scenario file should repeat it (`sail` becomes `sail/now`)."""
+        return self.raw_string.strip()
+
+    def at_pre_cmd(self) -> Any:
+        from world import recorder
+
+        if recorder.is_recording(self.caller) and self._for_every_player():
+            recorder.step(self.caller, self.recorded_as())
+        return super().at_pre_cmd()  # type: ignore[misc]
+
+    def _for_every_player(self) -> bool:
+        if getattr(self, "is_exit", False):
+            return True
+        return "cmd:all()" in str(self.locks).replace(" ", "") and self.key not in NOT_RECORDED
+
+
+class MuxCommand(Recorded, BaseMuxCommand):
+    """
+    Evennia's own commands (`drop`, `say`, exits...) are built on this class
+    (`COMMAND_DEFAULT_CLASS` in server/conf/settings.py), so they are recorded too.
+    """
+
+
+class Command(Recorded, BaseCommand):
     """
     Base command (you may see this if a child command had no help text defined)
 

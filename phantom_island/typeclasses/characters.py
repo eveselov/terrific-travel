@@ -12,6 +12,7 @@ from typing import Any
 
 from evennia.objects.objects import DefaultCharacter
 
+from world import recorder
 from world.discovery import notice_surroundings, return_things_home
 from world.focus import render_focus_html
 from world.maps import render_no_map_html
@@ -94,6 +95,8 @@ class Character(ObjectParent, DefaultCharacter):
         """
         self.show_location_visuals()
         super().at_post_move(source_location, move_type=move_type, **kwargs)
+        if self.location is not None:
+            recorder.note(self, f"Now in: {self.location.key}")
         notice_surroundings(self)
 
     def at_post_puppet(self, **kwargs: Any) -> None:

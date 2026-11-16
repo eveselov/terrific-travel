@@ -11,6 +11,7 @@ player is told about it.
 from typing import Any
 
 from typeclasses.scripts import JournalEntry
+from world import recorder
 from world.content import CLUE_MARK, ClueSpec, Content, load_content
 from world.expedition import connected_characters, get_expedition
 
@@ -54,9 +55,12 @@ def discover(clue_id: str, finder: Any, source: str | None = None) -> bool:
     if not get_expedition().add_clue(clue_id, str(finder.key), place, source):
         number: int | None = entry_number(clue_id)
         entry: str = f"{number}. " if number is not None else ""
+        recorder.note(finder, f"Journal: again {clue_id}, {clue.title}")
         finder.msg(f"(Already in the journal, {entry}{CLUE_COLOUR}{clue.title}|n: {clue.journal})")
         return False
     line: str = f"{NEW_IN_JOURNAL} {clue.journal}"
+    for character in [finder, *_room_characters(finder.location), *connected_characters()]:
+        recorder.note(character, f"Journal: new {clue_id}, {clue.title}")
     _tell_all(finder, line, f"{finder.key} found something at {place}. {line}")
     return True
 

@@ -15,7 +15,10 @@ them with everything else.
 
 from typing import Any
 
+from evennia.utils.ansi import strip_ansi
+
 from typeclasses.scripts import NoteEntry
+from world import recorder
 from world.content import LEVELS, Content, IdeaSpec, Teaching, load_content
 from world.expedition import get_expedition
 
@@ -49,6 +52,7 @@ def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None 
                 new.append(f"|w{idea.title}|n")
             elif change == "grew":
                 grew.append(f"|w{idea.title}|n")
+        _note_learned(learner, new, grew)
         read_it: bool = bool(learner.attributes.get(READ_IT, False))
         if new:
             hint: str = "" if read_it else f" Type {NOTEBOOK} to read it."
@@ -57,6 +61,17 @@ def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None 
             entries: str = "entry" if len(grew) == 1 else "entries"
             hint = "" if read_it else f" ({NOTEBOOK})"
             learner.msg(f"Your notebook {entries} on {', '.join(grew)} grew.{hint}")
+
+
+def _note_learned(learner: Any, new: list[str], grew: list[str]) -> None:
+    """Tell a scenario recording what the learner's notebook gained."""
+    parts: list[str] = []
+    if new:
+        parts.append("new " + ", ".join(new))
+    if grew:
+        parts.append("grew " + ", ".join(grew))
+    if parts:
+        recorder.note(learner, strip_ansi("Notebook: " + "; ".join(parts)))
 
 
 def _note(learner: Any, idea: IdeaSpec, level_name: str, source: str) -> str | None:
