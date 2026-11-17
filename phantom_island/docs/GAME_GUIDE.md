@@ -84,6 +84,12 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - When clues in the journal fit together, a question about them comes up: `think` lists them all. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
 - Once all three questions are answered, the whole story is told, page by page (`report more`), with the real history behind it.
 
+## Hints
+
+- Stuck? Type `hint`, anywhere. The first hint is a gentle nudge; type `hint` again for a clearer one, and a third time for exactly what to type. When the expedition finds something new, the hints start gently again.
+- Aboard, the Ship gives the hint. Ashore, you think it over with the journal.
+- If nothing new has been found for a while, a hint comes by itself, once.
+
 ## General Tips
 
 - Don't trust everything the characters say. Sometimes they don't know the truth, sometimes they lie, sometimes they are just mistaken - like in real life.

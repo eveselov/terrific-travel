@@ -564,3 +564,179 @@ The first pass applied them to Mrs. Fairweather and Old Barnaby. Her *halcyon* r
 shorter (the flags and white sails went, the oak stayed) and gained a new topic, the *crew*
 and their families waiting for news. His *halcyon* reply gained a connection rather than
 adjectives: he watched her sail, and is sure Crane's compass "came off the bottom".
+
+## Think: Connections
+
+Connection questions: Think feature added
+
+The connection questions are built. The targeted tests (56) pass, and ruff and mypy are clean. The full suite is running now, and I'll report when it finishes.
+
+How it plays:
+
+Once all the clues a question needs are in the journal, the question appears right after the journal line, once, for everyone in the room. For example:
+
+
+New in the journal: A hut in the village is built with oak beams. ...
+
+Something to think about (think): The ribs on the reef and the beams in the village are both oak, from the Halcyon. What else could her timber have been used for? Look for a place where something was built.
+think (or wonder, questions) lists every open question, anywhere.
+
+The journal's footer points to think once there is a question to show.
+
+Where they live: think works anywhere, instead of the chart table that decision 22 first suggested, for the same reason the task is in the journal: on the island there's nobody to ask. This is recorded as decision 30. The questions are worked out from the journal each time, so there's no new state.
+
+The seven questions, in connections at the end of clues.yaml:
+
+| Clues | Question leads to |
+
+|---|---|
+
+| C2 + C3 | where in the sea a compass could lie for years (the reef) |
+
+| C4 + C6 | how far seabirds fish from land (ask ship about birds) |
+
+| C4 + C5 | why one number of the chart was right and the other wrong (report question 2) |
+
+| C7 + (C12 or C13) | which witness was there: Barnaby or the island (ask ship about witnesses) |
+
+| C7 + C8 | what else the oak was used for (the boat at the cove) |
+
+| C8 + C9 | how long the crew stayed, and where they went |
+
+| C11 + C8 | what boat has a white wing, which way is sunset, what it was built of |
+
+Several clue journal lines already state the first conclusion (C8 says "ship timber", C10 "charted in the wrong place"), so each question goes one step further, towards a report question.
+
+For you to check:
+
+Some questions lean towards the answer. The staying and white wing ones are fairly leading. Decision 22 had them as optional reflection, "a strong hint". If they feel too strong once you play them, they're easy to soften in the YAML.
+
+I left out C3 + C4. "The compass came from the west, the chart's position is empty: which way would you search?" would have taken over the central choice of Act 2, which belongs to the players (decision 24). The hints step can push there later, if players get stuck.
+
+The docs are updated: decision 30, GAME_AUTHORING (the files table and the clue recipe), GAME_GUIDE and the README.
+
+## Hints
+
+The hints are built. The targeted tests pass (64), and ruff and mypy are clean. The full suite is running, because the clock for pushed hints now runs after every command in the game. I'll report when it's done.
+
+**How it plays:**
+- **Three levels:** `hint` (or `stuck`) gives a nudge, `hint` again is more direct, and a third time gives the exact command. When the expedition finds a new clue or answers a report question, the hints start gently again.
+- **Who speaks:**
+  - Aboard: *The Ship creaks: "Watch the seabirds at dusk from the Deck, and remember where Crane's fishermen came from."*
+  - Anywhere else: *You leaf through the journal, and think. Ask Tui in the Village about the song.*
+- **Pushed hints:** after 10 minutes of play without progress, the player's next command is followed by the first level, with "(Stuck? hint tells you more.)". This happens once per stretch without progress. A pause between commands counts at most one minute, so coffee breaks don't trigger it. Nothing is pushed in Limbo or during a voyage.
+- **Next step:** the next step is worked out from the state of play, using 19 situations in [hints.yaml](phantom_island/world/content/hints.yaml), checked from the top:
+  - **Port:** compass, coral, Crane, sailing out.
+  - **Sea:** check the reckoning, which way to go, back from a wrong direction.
+  - **Island:** go ashore, the song, the beams, the reef, Jonah, the island's position.
+  - **Report:** the three questions, then a final "complete".
+- **The Ship's *help* topic** now points to `hint` as well.
+
+**For you to check:**
+1. **Report hints never give the letter.** The third level says `report 2` and to "pick the answer the journal proves". It doesn't say which choice, because the report tests understanding.
+2. **"Which way" points the way at level 3.** The third level at the empty sea says "look sky, then sail the way the birds fly". That's as far as I'd go without saying "west", since the choice is the players' (decision 24). After a wrong direction, the hint leads back to the chart's position.
+3. **Island order.** The island steps follow one path: song, beams, reef, Jonah, position. Players exploring in another order just skip the ones they've done, because a situation stops matching once its clue is found.
+4. **Hints change as A4 goes on.** When the gates, the tide and Ama's respect come, each gets its own situation. The authoring guide now says to add one for every new gate.
+
+The docs are updated: decision 31 (including why not a talking Island), the GAME_AUTHORING recipe, a Hints section in GAME_GUIDE, and the README.
+
+### How `hint` picks its hint
+
+There's no reasoning involved: `hint` follows a fixed list. [hints.yaml](phantom_island/world/content/hints.yaml) has 19 situations in the order I wrote them. Each situation has conditions on the **expedition's state**, and `hint` takes the **first situation whose conditions all hold**. The conditions are:
+- where the ship is;
+- clues or flags that must be found, or still be `missing`;
+- report questions still open.
+
+It then shows that situation's next level of text. So on the island, the order is song, beams, reef, Jonah, position, then the report. Whatever is first and still unsolved gets suggested.
+
+**What counts as context:**
+- **It uses:** the shared state of the expedition (the ship, the journal, the flags, the report).
+- **It doesn't use:** where *you* stand, what you just did, or what you're working on.
+
+Your location only picks the voice (the Ship aboard, the journal ashore). Each player has their own hint level, but the situation is the same for everyone.
+
+**This matters with parallel paths.** Say you're on the Hilltop with the chart in hand, about to compare the coastline. `hint` still says "the village children remember things… ask Tui", because the song comes first in the list and isn't found yet. Two players who split up get the same hint. For Phantom Island, with one main path and short parallel branches, that's tolerable. For a bigger game it would feel deaf.
+
+**Ways to make it fit the context, cheapest first:**
+1. **Prefer what's nearby.** Give situations an optional `place`. `hint` first looks for a matching situation at the player's location, and falls back to the list order otherwise. On the Hilltop you'd get the coastline hint.
+2. **Let the player choose.** `hint` alone lists what's still open ("the song, the wreck, the island's position"), and `hint wreck` gives that one's next level. This is how classic adventure hints worked (InvisiClues were organised by question), and it handles any number of parallel goals. It also respects the player's own plan.
+3. **Goals with prerequisites** instead of a list: a small graph of what's available now, picking the one nearest to the player or the one they touched last. This is the most general and the most work. I'd only build it for a second, bigger episode.
+
+I'd do 1 now, since it's a small change and fixes the Hilltop case, and keep 2 in mind if playtests show players juggling several goals.
+
+### How `hint` and `think` are related
+
+They're independent mechanisms that answer different questions:
+
+| | `think` | `hint` |
+|---|---|---|
+| Answers | *why?* How do these facts fit together? | *what next?* Where to go, what to do |
+| Comes from | pairs of clues found (connections in clues.yaml) | the first matching situation (hints.yaml) |
+| Shown | automatically when a question opens, then listed by `think` | on request, or pushed after 10 minutes without progress |
+| Levels | none, and never an answer | three, the last one the exact command |
+| Same for everyone? | yes, from the shared journal | the situation yes, the level is per player |
+
+Neither looks at the other. They also overlap a little: a few connection questions also say what to do ("Look for a place where something was built"), which is really a hint's job.
+
+They could work together in two ways:
+- **When the next step is understanding, not finding:** for example before the report, the hint's first level could point to an open `think` question.
+- **Trimming the overlap:** connection questions could drop their "go and do" parts, keeping each tool to its own job.
+
+Should I make the "prefer what's nearby" change, and trim the connection questions to pure *why* questions?
+
+## Schema
+
+I think the core of your formulation is right. The schema is a good frame for content that teaches through a task. Two parts are optimistic: the novelty, and the claim about evaluation. Both deserve a closer look before you build a series on them.
+
+### What's strong
+
+- **Each piece has one job, and together they cover the learning loop:**
+  - the task says *why* we're here;
+  - the journal holds *what* was found;
+  - the notebook holds *how the world works*;
+  - `think` asks *how it fits*;
+  - `hint` answers *what next*;
+  - the report shows *that it's understood*.
+
+  Learning research calls this inquiry-based learning with scaffolding. You've arrived at a coherent version of it from the game side.
+- **The proof rule is the most valuable idea.** An answer counts only when the journal backs it. It turns "guess the answer" into "show your evidence", which is the historian's and the scientist's habit, and it's what makes the report more than a quiz.
+- **Everything is data, with a checker.** I'd argue this matters more for a series than any single feature. The schema's real bottleneck is the cost of writing good content, and a checker that enforces the rules is what keeps that cost down: every clue backed by background, no dead ends, every hint situation reachable. The next step would be a tool that *plays through* the content files automatically and proves every ending can be reached. That's possible precisely because everything is data.
+
+### Where I'd temper it
+
+**1. Novelty.** The concept has close relatives in educational research:
+- *River City* (Chris Dede's group at Harvard, 2000s): a multi-user virtual environment, close to a graphical MUD. Students investigate why the people of a 19th-century town fall ill, and gather evidence.
+- *Crystal Island* (James Lester's group at NC State): a science mystery for middle school, with a notebook, characters to question and a final diagnosis to prove.
+- On the evaluation side, **evidence-centered design** (Mislevy) and **stealth assessment** (Shute) formalise "claims backed by evidence". That is your report's proof structure, seen from the testing side.
+
+So the idea isn't new. What could be distinctive is the *form*: lightweight, text-first, multiplayer, authored in plain YAML with a checker, playable by one child or a family together, and ready for AI characters while the game keeps control of what is revealed. That's a real and practical niche. I'd claim that, not the concept itself.
+
+**2. Evaluation is the weakest part today.**
+- **The report measures persistence more than understanding.** With hints at three levels and the proof gate, almost anyone gets there in the end.
+- **Real evaluation needs evidence of *how* they got there:** hints used, wrong choices tried, connections opened, notebook ideas *used* versus only *heard*, which clues were found before which answers.
+- **That clashes with decision 8 (no conversation logging).** The tension can be solved: counts and choices aren't conversations. But it has to be designed on purpose, not assumed.
+
+**3. Over-scaffolding.** `hint` and `think` together can end up doing the thinking for the player. The schema doesn't prevent that; the content and playtests do. That's your own point that it "might not work automatically by itself", and I'd make it explicit.
+
+**4. Domain fit.** The schema suits subjects you can *investigate*: history, geography, natural science, detective reasoning. It suits drill and procedural skills (arithmetic, grammar) much less. Saying so makes the claim stronger.
+
+**5. Small corrections to your formulation:**
+- What keeps players focused is the task at the top of the journal. The report is the check against it. Calling `report` early helps only because a wrong or unproved answer tells you what's missing.
+- The notebook isn't free-form: it's structured by area and level. Its freedom is that it isn't tied to the tasks.
+- `think` doesn't make the connections; it asks the question, and the player connects.
+
+### A tightened formulation
+
+> A frame for inquiry-based games built on structured content. A **task** keeps players focused; a shared **journal** collects the evidence; a personal **notebook** grows the background knowledge, by area and level; **connection questions** prompt reasoning without giving answers; **hints** at three levels end fruitless wandering without prescribing a path; and a **report** accepts only conclusions the evidence proves. All content is data, checked for consistency, so authors can write new episodes and domains without code. It supports fun, learning and, with deliberate design, evaluation; it doesn't produce them by itself: the content does, within the frame.
+
+### What generalising would take
+
+When the second episode exists:
+- an explicit model linking tasks, claims, evidence and ideas (today it's implicit, spread across `proof`, `needs`, `teaches` and `connections`);
+- hints that understand parallel goals;
+- an automatic play-through checker;
+- an evaluation design that respects the privacy decision.
+
+None of this needs doing before Phantom Island is finished. It's worth writing the schema down now, while the reasons are fresh.
+
+Should I put the tightened formulation and these notes into a short design document, for example `docs/SCHEMA.md`, kept separate from Phantom Island's own docs as your earlier note about general guides suggested?

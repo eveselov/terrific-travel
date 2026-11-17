@@ -28,6 +28,7 @@ from world.content import (
     CHARACTERS_FILE,
     CLUES_FILE,
     CONTENT_DIR,
+    HINTS_FILE,
     IDEAS_FILE,
     LIMBO_ID,
     MAPS_FILE,
@@ -76,6 +77,7 @@ CONTENT_FILES: tuple[str, ...] = (
     THINGS_FILE,
     IDEAS_FILE,
     REPORT_FILE,
+    HINTS_FILE,
 )
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
@@ -251,6 +253,16 @@ class TestContent(TestCase):
             THINGS_FILE, "needs: [sight_charted]", "needs: [sight_chartd]"
         )
         self.assertIn("sight_chartd", str(error))
+
+    def test_a_hint_at_an_unknown_position_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(HINTS_FILE, "ship: [charted]", "ship: [chartd]")
+        self.assertIn("chartd", str(error))
+
+    def test_a_hint_needs_three_levels(self) -> None:
+        error: ContentError = self._broken_copy(
+            HINTS_FILE, "      - Wait a few moments, then |wlook|n.\n", ""
+        )
+        self.assertIn("situation under_way", str(error))
 
     def test_a_connection_with_an_unknown_clue_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(CLUES_FILE, "needs: [C7, C8]", "needs: [C7, C88]")
@@ -1647,3 +1659,87 @@ class TestConnections(DiscoveryTest):
         self.at(self.char1, "village")
         heard: str = self.do(self.char1, "examine beams")  # C8 again: nothing new
         self.assertNotIn("Something to think about", heard)
+
+
+class TestHints(DiscoveryTest):
+    """The next step at three levels, and pushed hints (DECISIONS.md, 31)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.clock: list[float] = [1000.0]
+        moved: Any = patch("world.hints.now", side_effect=lambda: self.clock[0])
+        moved.start()
+        self.addCleanup(moved.stop)
+
+    def test_hints_get_more_direct(self) -> None:
+        self.at(self.char1, "office")
+        first: str = self.do(self.char1, "hint")
+        self.assertIn("You leaf through the journal", first)
+        self.assertIn("compass in the market", first)
+        self.assertIn("hint|n again", first)
+        self.assertIn("Silas Crane's stall", self.do(self.char1, "hint"))
+        third: str = self.do(self.char1, "hint")
+        self.assertIn("|wlook compass|n", third)
+        self.assertNotIn("again", third)
+        self.assertIn("|wlook compass|n", self.do(self.char1, "hint"))
+
+    def test_progress_starts_the_hints_over(self) -> None:
+        self.at(self.char1, "office")
+        self.do(self.char1, "hint")
+        self.do(self.char1, "hint")
+        get_expedition().add_clue("C1", "someone", "Market")
+        self.assertIn("closer look than a glance", self.do(self.char1, "hint"))
+
+    def test_aboard_the_ship_speaks(self) -> None:
+        self.at(self.char1, "deck")
+        self.assertIn("The Ship creaks", self.do(self.char1, "hint"))
+
+    def test_the_situation_follows_the_state_of_play(self) -> None:
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+        self.assertIn("really at the chart's position", self.do(self.char1, "hint"))
+        get_expedition().set_flag("sight_charted")
+        self.assertIn("hard to measure", self.do(self.char1, "hint"))
+        self.ship_at("anchorage")
+        self.assertIn("Somebody lives here", self.do(self.char1, "hint"))
+
+    def test_a_complete_report_says_so(self) -> None:
+        for question in ("wreck", "why", "crew"):
+            get_expedition().answer(question, "someone")
+        self.at(self.char1, "village")
+        self.assertIn("The report is complete", self.do(self.char1, "hint"))
+
+    def play(self, character: Character, commands: int, seconds: float) -> str:
+        """Type `look` several times, `seconds` apart; what the character read meanwhile."""
+        heard: list[str] = []
+        for _ in range(commands):
+            self.clock[0] += seconds
+            heard.append(self.do(character, "look"))
+        return "\n".join(heard)
+
+    def test_a_hint_is_pushed_after_ten_minutes_without_progress(self) -> None:
+        self.at(self.char1, "office")
+        self.play(self.char1, 1, 0)  # starts the clock
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 19, 30))
+        pushed: str = self.play(self.char1, 1, 30)  # 600 seconds of play
+        self.assertIn("compass in the market", pushed)
+        self.assertIn("Stuck?", pushed)
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 30, 30))
+        # The next asked-for hint is the second level.
+        self.assertIn("Silas Crane's stall", self.do(self.char1, "hint"))
+
+    def test_a_break_does_not_count_as_play(self) -> None:
+        self.at(self.char1, "office")
+        self.play(self.char1, 1, 0)
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 5, 3600))
+
+    def test_progress_resets_the_clock(self) -> None:
+        self.at(self.char1, "office")
+        self.play(self.char1, 1, 0)
+        self.play(self.char1, 19, 30)
+        get_expedition().add_clue("C1", "someone", "Market")
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 5, 30))
+
+    def test_no_hints_are_pushed_in_limbo(self) -> None:
+        self.play(self.char1, 1, 0)
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 30, 30))

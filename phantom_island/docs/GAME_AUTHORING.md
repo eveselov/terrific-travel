@@ -21,6 +21,7 @@ comment listing its fields: that list is the reference, and this guide doesn't r
 | `clues.yaml` | The task at the top of the journal (what the expedition is for), the clues (a title and the line written into the shared journal), and the connection questions that link them (`think`) |
 | `things.yaml` | Objects: to look at, examine, read, use, and sometimes carry |
 | `ideas.yaml` | The notebook: areas and ideas about how the world works (optional) |
+| `hints.yaml` | The next step for players who ask (`hint`) or are stuck: situations of play, each with three hints, nudge first (optional) |
 | `report.yaml` | The report: the choices for each of the task's questions, the proof each right answer needs, and the epilogue (optional) |
 
 The design behind the content (the truth of the mystery, the clue table, the facts that
@@ -150,6 +151,16 @@ false lead. A reply turns a choice down gently and points somewhere, never "wron
 
 The epilogue is a list of pages, each a `title` and a `text`. Real facts in it go into
 the "Sources" list in GAME_STORY.md and on the epilogue's last page (DECISIONS.md, 9).
+
+### A hint
+
+In `hints.yaml`, situations are checked from the top, and the first that matches gives the
+hint: put a situation before the ones it should win over. Its conditions say when it applies
+(`ship` positions, clues or flags it `needs` or that are still `missing`, an `unanswered`
+report question). Its three `hints` go from a nudge (where to look) to the exact command.
+They are spoken by the Ship aboard and by the journal elsewhere, so write them as plain
+advice that suits both, with no "I". When you add a clue, a gate or a timed event, check
+that some situation leads players to it.
 
 ### An area or an idea for the notebook
 

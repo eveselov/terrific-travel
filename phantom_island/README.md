@@ -200,6 +200,11 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
   `think` lists them all. They link clues and never give the answer. Seven of them, in
   `connections` at the end of [world/content/clues.yaml](world/content/clues.yaml).
 
+- **Hints** (`hint`, DECISIONS.md, 31): the next step at three levels, a nudge first and
+  the exact command last, starting over when something new is found. After 10 minutes of
+  play without progress, a hint comes by itself, once. The Ship speaks aboard, the journal
+  elsewhere. The situations are in [world/content/hints.yaml](world/content/hints.yaml).
+
 To try it (spoilers):
 
 ```
@@ -223,6 +228,7 @@ The choices, the proof each answer needs, and the epilogue are in
 | Clues, yellow marks and the journal | `world/content/clues.yaml`, `world/clues.py`, `commands/discover.py` (`journal`) |
 | Things, details, `look`/`examine`/`read`/`use` | `world/content/things.yaml`, `typeclasses/things.py`, `world/discovery.py`, `commands/discover.py` |
 | Late joiners (`begin` while the ship is away) | `typeclasses/exits.py`, `world/ship.py` |
+| Hints (`hint`, and pushed after a while without progress) | `world/content/hints.yaml`, `world/hints.py`, `commands/command.py` (the clock) |
 | The report and the epilogue (`report`) | `world/content/report.yaml`, `world/report.py`, `commands/report.py` |
 | Starting over (`startover`, for developers) | `world/reset.py`, `commands/admin.py` |
 | Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
@@ -277,6 +283,6 @@ Playing it also changed how conversation reads:
 optionally with the ship already at sea or at the island.
 
 Stage A4 (the mystery and the ending), under way: the chart's error is now 1 degree, and the
-`report` with its epilogue and the connection questions (`think`) are built. Still to come: hints, the gates
-(leaving port, meeting Jonah), the tide, dusk and noon, and Ama's respect; C12 can't be found
-yet, and C13 is still given freely.
+`report` with its epilogue, the connection questions (`think`) and the hints (`hint`) are
+built. Still to come: the gates (leaving port, meeting Jonah), the tide, dusk and noon, and
+Ama's respect; C12 can't be found yet, and C13 is still given freely.

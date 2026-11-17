@@ -8,6 +8,7 @@ from evennia.commands.default.general import CmdLook as DefaultCmdLook
 from typeclasses.rooms import Room
 from world.clues import journal_sources_text, journal_text, think_text
 from world.discovery import act, look_at, notice_surroundings, show_focus_for
+from world.hints import hint
 from world.notebook import READ_IT, notebook_text, sources_text
 
 from .command import Command
@@ -169,6 +170,28 @@ class CmdJournal(Command):
             self.caller.msg(journal_sources_text())
         else:
             self.caller.msg(journal_text())
+
+
+class CmdHint(Command):
+    """
+    Get a hint: what the expedition could do next.
+
+    Usage:
+      hint
+
+    The first hint is a gentle nudge. Type hint again for a clearer one, and a
+    third time for exactly what to type. Once the expedition finds something new,
+    the hints start gently again. Aboard, the Ship gives the hint; anywhere else,
+    you think it over with the journal.
+    """
+
+    key = "hint"
+    aliases = ["stuck"]
+    locks = "cmd:all()"
+    help_category = "General"
+
+    def func(self) -> None:
+        hint(self.caller)
 
 
 class CmdThink(Command):

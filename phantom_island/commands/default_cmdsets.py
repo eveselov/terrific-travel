@@ -20,6 +20,7 @@ from .admin import CmdRecord, CmdStartOver
 from .discover import (
     CmdExamine,
     CmdGet,
+    CmdHint,
     CmdJournal,
     CmdLook,
     CmdNotebook,
@@ -60,6 +61,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdJournal())
         self.add(CmdNotebook())
         self.add(CmdThink())
+        self.add(CmdHint())
         self.add(CmdReport())
         self.add(CmdStartOver())
         self.add(CmdRecord())

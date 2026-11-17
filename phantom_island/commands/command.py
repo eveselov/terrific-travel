@@ -19,7 +19,8 @@ NOT_RECORDED: frozenset[str] = frozenset({"help"})
 class Recorded:
     """
     Notes each command in a developer's scenario recording (`record`, world/recorder.py),
-    before it runs: only commands any player could type (`cmd:all()`) and exits.
+    before it runs: only commands any player could type (`cmd:all()`) and exits. After
+    such a command runs, it counts as play on the clock for pushed hints (world/hints.py).
     """
 
     caller: Any
@@ -37,6 +38,14 @@ class Recorded:
         if recorder.is_recording(self.caller) and self._for_every_player():
             recorder.step(self.caller, self.recorded_as())
         return super().at_pre_cmd()  # type: ignore[misc]
+
+    def at_post_cmd(self) -> None:
+        """After a player's command, count it as play for pushed hints (world/hints.py)."""
+        from world import hints
+
+        super().at_post_cmd()  # type: ignore[misc]
+        if self._for_every_player() and self.key != hints.HINT:
+            hints.after_command(self.caller)
 
     def _for_every_player(self) -> bool:
         if getattr(self, "is_exit", False):

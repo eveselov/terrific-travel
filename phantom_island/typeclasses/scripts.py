@@ -199,6 +199,7 @@ class Expedition(Script):
         self.db.voyage = None
         self.db.notebooks = {}
         self.db.answers = {}
+        self.db.hint_clock = {}
 
     @property
     def journal(self) -> list[JournalEntry]:
@@ -272,6 +273,19 @@ class Expedition(Script):
             return False
         self.db.answers = {**self.answers, question: by}
         return True
+
+    @property
+    def progress(self) -> int:
+        """How far the expedition has come: clues found and report questions answered."""
+        return len(self.db.journal or []) + len(self.db.answers or {})
+
+    @property
+    def hint_clock(self) -> dict[str, Any]:
+        """Play since the last progress, for pushed hints (world/hints.py); {} at first."""
+        return dict(self.db.hint_clock or {})
+
+    def set_hint_clock(self, clock: dict[str, Any]) -> None:
+        self.db.hint_clock = dict(clock)
 
     def notebook(self, owner: int) -> list[NoteEntry]:
         """The ideas in one player's notebook (by character id), the first learned first."""
@@ -379,3 +393,4 @@ class Expedition(Script):
         self.db.voyage = None
         self.db.notebooks = {}
         self.db.answers = {}
+        self.db.hint_clock = {}

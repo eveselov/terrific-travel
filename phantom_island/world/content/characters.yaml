@@ -667,14 +667,15 @@ characters:
           "Fresh water is life at sea. Every day at sea we drink from the casks in the
           Cabin. Find a spring ashore and you can fill them again."
       help:
-        # A4: hints that get more direct while the players are stuck (DECISIONS.md, 6b).
-        aliases: [hint, stuck]
+        # The next step itself comes from `hint` (hints.yaml, DECISIONS.md, 31).
+        aliases: [hint, hints, stuck]
         stance: truth
         teaches: {witnesses: heard}
         reply: >
           "Look closely at things, read what's in the Cabin, and ask people questions.
-          People don't always tell the truth, so compare what |wwitnesses|n say. And if something
-          puzzles you, ask me about it. Lost your way? Ask me about the |wexpedition|n."
+          People don't always tell the truth, so compare what |wwitnesses|n say. Lost your
+          way? Ask me about the |wexpedition|n. Stuck? Type |whint|n, anywhere, and again
+          for more."
       expedition:
         aliases: [task, mission, purpose, questions, job]
         stance: truth

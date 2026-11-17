@@ -1,0 +1,198 @@
+# Hints: the next step, for a player who asks (`hint`) or who goes long without progress.
+#
+# SPOILERS: this file holds the way through the mystery. Don't show it to the players.
+#
+# No dead ends (DECISIONS.md, 6b and 31): `hint` gives the next step at three levels. The
+# first `hint` is a nudge (where to look), the second is more direct (what to do), the third
+# gives the exact command. The level starts over whenever the expedition makes progress (a
+# new clue in the journal, or a question of the report answered). A player who goes
+# `push_after` minutes of play without progress gets the first level after their next
+# command, once per stretch without progress.
+#
+# Who speaks: aboard, the Ship; anywhere else, the journal, as the expedition's own
+# thinking. So write hints as plain advice that suits both ("The compass is worth a closer
+# look"), with no "I" and no "you remember me saying".
+#
+# The situations are checked in order, and the first that matches gives the hint. Each has:
+#   id       a short name
+#   ship     optional: the ship's positions where it applies (ship.yaml)
+#   needs    optional: clue ids or flags that must all be found or set
+#   missing  optional: clue ids or flags none of which may be found or set yet
+#   unanswered  optional: a report question id (report.yaml) still open
+#   answered    optional: true when every question of the report is answered
+#   hints    three texts, the first a nudge, the last the exact command
+#
+# When a gate or a timed event is added, add its situation here too, with at least one way
+# through (DECISIONS.md, 6b). After editing, `reload` in the game is enough.
+
+push_after: 10
+voices:
+  aboard: 'The Ship creaks: "{hint}"'
+  ashore: "You leaf through the journal, and think. {hint}"
+
+situations:
+  - id: complete
+    answered: true
+    hints:
+      - The report is complete. The whole story is in the epilogue.
+      - Type report to read the epilogue again, or journal to see everything found.
+      - "|wreport|n"
+
+  - id: under_way
+    ship: [under_way]
+    hints:
+      - The ship is under way. There's nothing to do but watch.
+      - The crew sail her. Wait until she arrives.
+      - Wait a few moments, then |wlook|n.
+
+  # --- Act 1: the port --------------------------------------------------------------------
+
+  - id: compass
+    ship: [port]
+    missing: [C1]
+    hints:
+      - Mrs. Fairweather spoke of a compass in the market. That's the place to start.
+      - The compass is on Silas Crane's stall in the Market, east of the Society Office.
+        Look at it.
+      - In the Market, type |wlook compass|n.
+
+  - id: coral
+    ship: [port]
+    missing: [C2]
+    hints:
+      - The compass is worth a closer look than a glance.
+      - Look very closely at the compass in the Market, at its hinge.
+      - In the Market, type |wexamine compass|n.
+
+  - id: crane
+    ship: [port]
+    missing: [C3]
+    hints:
+      - Silas Crane says the compass washed up on a beach last winter. Does the coral in
+        its hinge fit that story?
+      - Ask Silas Crane about the compass again, now that the coral is in the journal.
+      - In the Market, type |wask crane about compass|n.
+
+  - id: sail_out
+    ship: [port]
+    hints:
+      - The Society's task waits at the island on the Halcyon's chart. Time to sail.
+      - The island's position is written on the Halcyon's chart, in the Cabin. Read it,
+        then give the order on the Deck.
+      - Go |waboard|n and |wdown|n to the Cabin, |wread chart|n, then |wup|n to the Deck
+        and type |wsail to 14 south 40 west|n.
+
+  # --- Act 2: at sea ----------------------------------------------------------------------
+
+  - id: check_reckoning
+    ship: [charted]
+    missing: [sight_charted]
+    hints:
+      - No island where the chart puts it. First make sure the ship is really at the
+        chart's position.
+      - Take a noon sight with the sextant on the Deck, then read the chronometer in the
+        Cabin.
+      - In the Cabin, |wget sextant|n. Then |wup|n, |wuse sextant|n, |wdown|n, and |wread
+        chronometer|n.
+
+  - id: which_way
+    ship: [charted]
+    hints:
+      - Both of the chart's numbers check out, and still no island. Which number is hard to
+        measure? And what else could show the way to land?
+      - Watch the seabirds at dusk from the Deck, and remember where Crane's fishermen came
+        from.
+      - On the Deck, |wlook sky|n. Then |wsail|n the way the birds fly.
+
+  - id: wrong_way
+    ship: [north_of_chart, south_of_chart, east_of_chart]
+    hints:
+      - No island here either. This wasn't the way.
+      - Go back to the chart's position and think again about which way to search.
+      - "On the Deck, type |wsail|n: it names the way back to the chart's position."
+
+  # --- Act 3: the island ------------------------------------------------------------------
+
+  - id: go_ashore
+    ship: [anchorage]
+    missing: [C7, C8, C9, C10, C11, C12, C13]
+    hints:
+      - An island at last. Somebody lives here, and they may know something.
+      - Go ashore and walk inland from the beach, to the village.
+      - On the Deck, type |washore|n, then go |wwest|n to the Village.
+
+  - id: song
+    ship: [anchorage]
+    missing: [C11]
+    hints:
+      - The village children remember things the grown-ups don't talk about.
+      - Ask Tui in the Village about the song.
+      - In the Village, type |wask tui about song|n.
+
+  - id: beams
+    ship: [anchorage]
+    missing: [C8]
+    hints:
+      - One of the village huts is built with an unusual timber.
+      - Look closely at the beams of the hut in the Village. The plant guide helps too.
+      - In the Village, type |wexamine beams|n.
+
+  - id: reef
+    ship: [anchorage]
+    missing: [C7, C13]
+    hints:
+      - Elder Ama said the Western Reef keeps old things, and Tui plays with big bones out
+        there.
+      - Walk out to the Western Reef, west of the Village, and look at what lies there.
+      - On the Western Reef, type |wlook bones|n.
+
+  - id: jonah
+    ship: [anchorage]
+    missing: [C13]
+    hints:
+      - Tui spoke of old Jonah, who makes boats and talks like you.
+      - Find Jonah Pike at the Boat Cove, southwest of the Village, and ask him about the
+        Halcyon.
+      - At the Boat Cove, type |wask jonah about halcyon|n.
+
+  - id: position
+    ship: [anchorage]
+    missing: [C5, C10]
+    hints:
+      - Is this really the island on the Halcyon's chart, and where exactly is it?
+      - Measure the island's position with the sextant and the chronometer, or take the
+        chart up the hill and compare.
+      - In the Cabin, |wget sextant|n. Then |wup|n, |wuse sextant|n, |wdown|n, and |wread
+        chronometer|n.
+
+  # --- The report -------------------------------------------------------------------------
+
+  - id: report_wreck
+    unanswered: wreck
+    hints:
+      - The journal may already say what happened to the Halcyon, and where.
+      - Report what happened to the Halcyon. The wreck on the reef is your proof.
+      - Type |wreport 1|n, and pick the answer the wreck on the reef proves.
+
+  - id: report_why
+    unanswered: why
+    hints:
+      - Why did nobody ever find the Halcyon? The journal holds the answer.
+      - Report why nobody found her. Think of the empty sea at the chart's position, and
+        which of the chart's numbers was wrong.
+      - Type |wreport 2|n, and pick the answer the journal proves.
+
+  - id: report_crew
+    unanswered: crew
+    hints:
+      - What became of the Halcyon's crew? Think of what you heard and saw on the island.
+      - Report what became of the crew. The people of the island, and what the crew left
+        behind, are your proof.
+      - Type |wreport 3|n, and pick the answer the journal proves.
+
+  - id: anything
+    hints:
+      - Read the task at the top of the journal, and think about what is still missing.
+      - Type journal to see the task and the clues, and think to see the questions they
+        raise.
+      - "|wjournal|n"

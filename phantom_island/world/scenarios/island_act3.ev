@@ -208,28 +208,3 @@ go e
 east
 #   Now in: Forest Path
 #   Why:
-go n
-#   Why:
-north
-#   Now in: Hilltop
-#   Why:
-look coastline
-#   Why:
-go s
-#   Why:
-south
-#   Now in: Forest Path
-#   Why:
-go s
-#   Why:
-south
-#   Now in: Village
-#   Why:
-go e
-#   Why:
-east
-#   Now in: Lagoon Beach
-#   Why:
-aboard
-#   Now in: Deck
-#   Why:

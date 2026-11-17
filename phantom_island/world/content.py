@@ -30,6 +30,8 @@ CLUES_FILE: str = "clues.yaml"
 THINGS_FILE: str = "things.yaml"
 IDEAS_FILE: str = "ideas.yaml"  # optional: without it, the notebook stays empty
 REPORT_FILE: str = "report.yaml"  # optional: without it, there is nothing to report
+HINTS_FILE: str = "hints.yaml"  # optional: without it, `hint` has nothing to say
+HINT_LEVELS: int = 3
 
 # How well a player knows an idea, from the first mention to having done it themselves.
 LEVELS: tuple[str, ...] = ("heard", "understood", "used")
@@ -44,7 +46,7 @@ WHITE_WORD: re.Pattern[str] = re.compile(r"\|w(.+?)\|n")
 # out (`|waboard|n`, `|wexamine compass|n`): these are the words a command can start with.
 COMMAND_WORDS: frozenset[str] = frozenset(
     "aboard ashore sail look examine x read use get take drop go map journal notebook ask "
-    "up down begin help report".split()
+    "up down begin help report hint think".split()
 )
 
 LIMBO_ID: str = "limbo"
@@ -357,6 +359,29 @@ class ReportSpec:
 
 
 @dataclass(frozen=True)
+class SituationSpec:
+    """One situation of play, and the next step in it as hints at three levels."""
+
+    id: str
+    hints: tuple[str, ...]
+    ship: tuple[str, ...] = ()
+    needs: tuple[str, ...] = ()
+    missing: tuple[str, ...] = ()
+    unanswered: str | None = None
+    answered: bool = False
+
+
+@dataclass(frozen=True)
+class HintsSpec:
+    """The hints: who speaks them, when they are pushed, and the situations in order."""
+
+    push_after: int  # minutes of play without progress before a hint is pushed
+    aboard: str  # the Ship's voice, with `{hint}` where the hint goes
+    ashore: str  # the journal's voice, anywhere else
+    situations: tuple[SituationSpec, ...]
+
+
+@dataclass(frozen=True)
 class AreaSpec:
     """A part of the notebook: Navigation, Nature..."""
 
@@ -521,6 +546,7 @@ class Content:
     task: TaskSpec | None = None
     report: ReportSpec | None = None
     connections: dict[str, ConnectionSpec] = dataclass_field(default_factory=dict)
+    hints: HintsSpec | None = None
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -949,6 +975,51 @@ def _report(data: dict[str, Any], task: TaskSpec | None) -> ReportSpec | None:
     return ReportSpec(questions=tuple(questions), epilogue=tuple(pages))
 
 
+def _voice(data: dict[str, Any], field: str, where: str) -> str:
+    voice: str = _text(data, field, where)
+    if voice.count("{hint}") != 1:
+        raise ContentError(f"{where}, {field}: must have {{hint}} once, where the hint goes.")
+    return voice
+
+
+def _situation(value: Any, number: int) -> SituationSpec:
+    where: str = f"{HINTS_FILE}, situation {number}"
+    item: dict[str, Any] = _mapping(value, where)
+    situation_id: str = _text(item, "id", where)
+    where = f"{HINTS_FILE}, situation {situation_id}"
+    hints: Any = item.get("hints")
+    if (
+        not isinstance(hints, list)
+        or len(hints) != HINT_LEVELS
+        or not all(isinstance(h, str) and h.strip() for h in hints)
+    ):
+        raise ContentError(f"{where}: `hints` must be {HINT_LEVELS} texts, nudge first.")
+    return SituationSpec(
+        id=situation_id,
+        hints=tuple(" ".join(h.split()) for h in hints),
+        ship=_words(item.get("ship"), "ship", where),
+        needs=_words(item.get("needs"), "needs", where),
+        missing=_words(item.get("missing"), "missing", where),
+        unanswered=_optional_text(item, "unanswered", where),
+        answered=_flag(item, "answered", where),
+    )
+
+
+def _hints(data: dict[str, Any]) -> HintsSpec | None:
+    if not data:
+        return None
+    voices: dict[str, Any] = _mapping(data.get("voices") or {}, f"{HINTS_FILE}, voices")
+    situations: Any = data.get("situations")
+    if not isinstance(situations, list) or not situations:
+        raise ContentError(f"{HINTS_FILE}: `situations` must be a list.")
+    return HintsSpec(
+        push_after=_int(data, "push_after", HINTS_FILE),
+        aboard=_voice(voices, "aboard", f"{HINTS_FILE}, voices"),
+        ashore=_voice(voices, "ashore", f"{HINTS_FILE}, voices"),
+        situations=tuple(_situation(value, n) for n, value in enumerate(situations, start=1)),
+    )
+
+
 def _ideas(data: dict[str, Any]) -> tuple[dict[str, AreaSpec], dict[str, IdeaSpec]]:
     areas_data: dict[str, Any] = _mapping(data.get("areas") or {}, f"{IDEAS_FILE}, areas")
     areas: dict[str, AreaSpec] = {}
@@ -1120,6 +1191,7 @@ def _check(content: Content) -> None:
     _check_clue_marks(content)
     _check_teachings(content)
     _check_report(content)
+    _check_hints(content)
 
 
 def _check_report(content: Content) -> None:
@@ -1186,6 +1258,10 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
         texts.append((f"{CLUES_FILE}, task", content.task.title, None))
     for connection in content.connections.values():
         texts.append((f"{CLUES_FILE}, connection {connection.id}", connection.question, None))
+    if content.hints is not None:
+        for situation in content.hints.situations:
+            for step, hint in enumerate(situation.hints, start=1):
+                texts.append((f"{HINTS_FILE}, situation {situation.id}, {step}", hint, None))
     if content.task is not None:
         for number, question in enumerate(content.task.questions, start=1):
             texts.append((f"{CLUES_FILE}, task, question {number}", question, None))
@@ -1314,6 +1390,36 @@ def _check_needs(where: str, needs: tuple[str, ...], content: Content, flags: se
             raise ContentError(f"{where}: needs flag {need!r}, but nothing `sets` it.")
 
 
+def flags_set(content: Content) -> set[str]:
+    """Every flag something in the content sets (things.yaml: `sets`)."""
+    flags: set[str] = set()
+    for thing in content.things.values():
+        for action in (thing.read, thing.use):
+            if action is not None:
+                flags.update(step.sets for step in action.at.values() if step.sets)
+    return flags
+
+
+def _check_hints(content: Content) -> None:
+    """Hints apply at known positions, need known clues and flags, and ask open questions."""
+    if content.hints is None:
+        return
+    flags: set[str] = flags_set(content)
+    questions: set[str] = (
+        {question.id for question in content.report.questions} if content.report else set()
+    )
+    for situation in content.hints.situations:
+        where: str = f"{HINTS_FILE}, situation {situation.id}"
+        for position in situation.ship:
+            if position not in content.positions:
+                raise ContentError(f"{where}: unknown ship position {position!r}.")
+        _check_needs(where, situation.needs + situation.missing, content, flags)
+        if situation.unanswered is not None and situation.unanswered not in questions:
+            raise ContentError(
+                f"{where}: unknown report question {situation.unanswered!r} ({REPORT_FILE})."
+            )
+
+
 def _check_things(content: Content) -> None:
     for place in content.places.values():
         for detail in place.details.values():
@@ -1321,11 +1427,7 @@ def _check_things(content: Content) -> None:
     for position in content.positions.values():
         for detail in position.details.values():
             _check_extras(f"position {position.id}, detail {detail.id}", detail, content.things)
-    flags: set[str] = set()
-    for thing in content.things.values():
-        for action in (thing.read, thing.use):
-            if action is not None:
-                flags.update(step.sets for step in action.at.values() if step.sets)
+    flags: set[str] = flags_set(content)
     for character in content.characters.values():
         for topic in character.topics.values():
             if topic.truth is not None:
@@ -1444,6 +1546,9 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
     report_data: dict[str, Any] = (
         _read_yaml(directory, REPORT_FILE) if (directory / REPORT_FILE).exists() else {}
     )
+    hints_data: dict[str, Any] = (
+        _read_yaml(directory, HINTS_FILE) if (directory / HINTS_FILE).exists() else {}
+    )
     task: TaskSpec | None = _task(clues_data)
     clues: dict[str, ClueSpec] = _clues(clues_data)
 
@@ -1477,6 +1582,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         task=task,
         report=_report(report_data, task),
         connections=_connections(clues_data, clues),
+        hints=_hints(hints_data),
     )
     _check(content)
     return content
