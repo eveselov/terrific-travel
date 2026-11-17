@@ -252,6 +252,10 @@ class TestContent(TestCase):
         )
         self.assertIn("sight_chartd", str(error))
 
+    def test_a_connection_with_an_unknown_clue_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(CLUES_FILE, "needs: [C7, C8]", "needs: [C7, C88]")
+        self.assertIn("connection oak", str(error))
+
     def test_the_report_asks_the_task_questions(self) -> None:
         content: Content = load_content()
         assert content.report is not None and content.task is not None
@@ -1607,3 +1611,39 @@ class TestReport(DiscoveryTest):
         self.do(self.char1, "report d")
         start_over("port")
         self.assertEqual(get_expedition().answers, {})
+
+
+class TestConnections(DiscoveryTest):
+    """Questions that link clues, never their answer (DECISIONS.md, 22 and 30)."""
+
+    def test_nothing_to_think_about_at_first(self) -> None:
+        self.assertIn("Nothing to think about yet", self.do(self.char1, "think"))
+        self.assertNotIn("Questions to think about", self.do(self.char1, "journal"))
+
+    def test_a_question_comes_with_the_second_clue(self) -> None:
+        self.at(self.char1, "market")
+        self.at(self.char2, "market")
+        self.do(self.char1, "examine compass")  # C1 and C2
+        get_expedition().add_clue("C7", "someone", "Western Reef")
+        self.at(self.char1, "village")
+        self.at(self.char2, "village")
+        with patch.object(self.char2, "msg") as beside:
+            heard: str = self.do(self.char1, "examine beams")  # C8 with C7: the oak question
+        self.assertIn("Something to think about", heard)
+        self.assertIn("What else could her timber", heard)
+        self.assertIn("What else could her timber", texts(beside))
+        self.assertIn("What else could her timber", self.do(self.char2, "think"))
+        self.assertIn("|wthink|n", self.do(self.char2, "journal"))
+
+    def test_an_entry_of_needs_can_be_any_of_several_clues(self) -> None:
+        get_expedition().add_clue("C7", "someone", "Western Reef")
+        self.assertNotIn("Which witness", self.do(self.char1, "think"))
+        get_expedition().add_clue("C13", "someone", "Boat Cove")
+        self.assertIn("Which witness", self.do(self.char1, "think"))
+
+    def test_a_question_is_shown_only_when_it_opens(self) -> None:
+        get_expedition().add_clue("C7", "someone", "Western Reef")
+        get_expedition().add_clue("C8", "someone", "Village")
+        self.at(self.char1, "village")
+        heard: str = self.do(self.char1, "examine beams")  # C8 again: nothing new
+        self.assertNotIn("Something to think about", heard)

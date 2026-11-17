@@ -27,6 +27,8 @@
 #   title      one line: what the expedition is for
 #   questions  the questions to answer
 #
+# The connections, at the end of this file, are questions that link clues.
+#
 # After editing, `reload` in the game is enough.
 
 task:
@@ -102,3 +104,52 @@ clues:
     journal: >
       Jonah Pike was the Halcyon's carpenter. She wrecked on the Western Reef in the storm,
       nobody died, and most of the crew sailed west in a boat they built at the cove.
+
+# Connections (optional): questions that link clues, never their answer (DECISIONS.md, 22
+# and 30). Once every clue a connection `needs` is in the journal, its question is shown
+# to everyone in the finder's room, right after the journal line, and `think` lists every
+# open question from then on. A question points to where the background lives (the Ship,
+# a book, a witness), and leads one step further than the clues' journal lines, towards a
+# question of the report. It never states the conclusion.
+#   needs     clue ids; an entry can be a list, meaning any one of those clues
+#   question  the question
+connections:
+  compass_sea:
+    needs: [C2, C3]
+    question: >
+      The compass lay in the sea for years, and fishermen from the west had it. Where in
+      the sea could it lie for years and still be found?
+  birds_range:
+    needs: [C4, C6]
+    question: >
+      There is no land at the chart's position, yet the seabirds there fly home to land at
+      dusk. How far from land do they fish? The Ship knows: |wask ship about birds|n.
+  which_number:
+    needs: [C4, C5]
+    question: >
+      At the chart's position the sextant and the chronometer agreed with the chart; at the
+      island only the sextant does. Why could the Halcyon's master get one number right and
+      the other wrong? |wask ship about longitude|n, or ask someone who sailed with him.
+  two_witnesses:
+    needs: [C7, [C12, C13]]
+    question: >
+      Old Barnaby is sure the Halcyon sank with all hands. You have seen her wreck, and
+      heard what happened from the island. Which witness was there? (|wask ship about
+      witnesses|n)
+  oak:
+    needs: [C7, C8]
+    question: >
+      The ribs on the reef and the beams in the village are both oak, from the Halcyon.
+      What else could her timber have been used for? Look for a place where something was
+      built.
+  staying:
+    needs: [C8, C9]
+    question: >
+      Ship's timber in a hut, goats and onions in the gardens: it takes time to build and
+      to farm. How long did the Halcyon's people stay, and where did they go afterwards?
+  white_wing:
+    needs: [C11, C8]
+    question: >
+      Tui's song tells of a canoe with a white wing that flew away to where the sun goes to
+      sleep. What kind of boat has a white wing, which way is that, and what could it be
+      built of, here?

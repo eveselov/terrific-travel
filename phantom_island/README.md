@@ -195,6 +195,11 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
   journal shows it under the task. Once all three are answered, every connected player sees
   the epilogue's first page, and `report more` turns the pages.
 
+- **Connection questions** (`think`, DECISIONS.md, 30): once the clues a question needs are
+  in the journal, it comes up right after the journal line, to everyone in the room, and
+  `think` lists them all. They link clues and never give the answer. Seven of them, in
+  `connections` at the end of [world/content/clues.yaml](world/content/clues.yaml).
+
 To try it (spoilers):
 
 ```
@@ -272,6 +277,6 @@ Playing it also changed how conversation reads:
 optionally with the ship already at sea or at the island.
 
 Stage A4 (the mystery and the ending), under way: the chart's error is now 1 degree, and the
-`report` with its epilogue is built. Still to come: connection questions, hints, the gates
+`report` with its epilogue and the connection questions (`think`) are built. Still to come: hints, the gates
 (leaving port, meeting Jonah), the tide, dusk and noon, and Ama's respect; C12 can't be found
 yet, and C13 is still given freely.

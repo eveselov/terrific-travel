@@ -285,6 +285,18 @@ class ClueSpec:
 
 
 @dataclass(frozen=True)
+class ConnectionSpec:
+    """
+    A question that links clues, never their answer (DECISIONS.md, 22): open once the
+    journal holds, for every group in `needs`, any one of its clues.
+    """
+
+    id: str
+    needs: tuple[tuple[str, ...], ...]
+    question: str
+
+
+@dataclass(frozen=True)
 class TaskSpec:
     """What the expedition is for: the top of the journal, from the very beginning."""
 
@@ -508,6 +520,7 @@ class Content:
     ideas: dict[str, IdeaSpec] = dataclass_field(default_factory=dict)
     task: TaskSpec | None = None
     report: ReportSpec | None = None
+    connections: dict[str, ConnectionSpec] = dataclass_field(default_factory=dict)
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -821,6 +834,32 @@ def _clues(data: dict[str, Any]) -> dict[str, ClueSpec]:
             id=clue_id, title=_text(item, "title", where), journal=_text(item, "journal", where)
         )
     return clues
+
+
+def _connections(data: dict[str, Any], clues: dict[str, ClueSpec]) -> dict[str, ConnectionSpec]:
+    found: dict[str, Any] = _mapping(data.get("connections") or {}, f"{CLUES_FILE}, connections")
+    connections: dict[str, ConnectionSpec] = {}
+    for connection_id, value in found.items():
+        where: str = f"{CLUES_FILE}, connection {connection_id}"
+        item: dict[str, Any] = _mapping(value, where)
+        needs_data: Any = item.get("needs")
+        if not isinstance(needs_data, list) or len(needs_data) < 2:
+            raise ContentError(f"{where}: `needs` must list at least two clues.")
+        needs: list[tuple[str, ...]] = []
+        for entry in needs_data:
+            group: tuple[str, ...] = (
+                _words(entry, "needs", where) if isinstance(entry, list) else (str(entry),)
+            )
+            for clue in group:
+                if clue not in clues:
+                    raise ContentError(f"{where}: needs unknown clue {clue!r}.")
+            if not group:
+                raise ContentError(f"{where}: an entry of `needs` is empty.")
+            needs.append(group)
+        connections[connection_id] = ConnectionSpec(
+            id=connection_id, needs=tuple(needs), question=_text(item, "question", where)
+        )
+    return connections
 
 
 def _task(data: dict[str, Any]) -> TaskSpec | None:
@@ -1145,6 +1184,9 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             texts.extend(_look_texts(f"{where}, detail {detail.id}", detail))
     if content.task is not None:
         texts.append((f"{CLUES_FILE}, task", content.task.title, None))
+    for connection in content.connections.values():
+        texts.append((f"{CLUES_FILE}, connection {connection.id}", connection.question, None))
+    if content.task is not None:
         for number, question in enumerate(content.task.questions, start=1):
             texts.append((f"{CLUES_FILE}, task, question {number}", question, None))
     if content.report is not None:
@@ -1403,6 +1445,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         _read_yaml(directory, REPORT_FILE) if (directory / REPORT_FILE).exists() else {}
     )
     task: TaskSpec | None = _task(clues_data)
+    clues: dict[str, ClueSpec] = _clues(clues_data)
 
     places: dict[str, PlaceSpec] = {
         key: _place(key, value, PLACES_FILE) for key, value in places_data.items()
@@ -1427,12 +1470,13 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         ashore_exit=_exit_name(ship_data, "ashore_exit"),
         aboard_exit=_exit_name(ship_data, "aboard_exit"),
         characters=_characters(characters_data),
-        clues=_clues(clues_data),
+        clues=clues,
         things=_things(things_data),
         areas=areas,
         ideas=ideas,
         task=task,
         report=_report(report_data, task),
+        connections=_connections(clues_data, clues),
     )
     _check(content)
     return content

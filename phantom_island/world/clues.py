@@ -12,12 +12,21 @@ from typing import Any
 
 from typeclasses.scripts import JournalEntry
 from world import recorder
-from world.content import CLUE_MARK, ClueSpec, Content, ReportSpec, load_content
+from world.content import (
+    CLUE_MARK,
+    ClueSpec,
+    ConnectionSpec,
+    Content,
+    ReportSpec,
+    load_content,
+)
 from world.expedition import connected_characters, get_expedition
 
 CLUE_COLOUR: str = "|y"
 NEW_IN_JOURNAL: str = f"{CLUE_COLOUR}New in the journal:|n"
 JOURNAL_SOURCES: str = "journal sources"
+THINK: str = "think"
+SOMETHING_TO_THINK: str = f"Something to think about (|w{THINK}|n):"
 
 
 def _yellow(found: Any) -> str:
@@ -52,6 +61,7 @@ def discover(clue_id: str, finder: Any, source: str | None = None) -> bool:
     content: Content = load_content()
     clue: ClueSpec = content.clues[clue_id]
     place: str = place_name(finder)
+    open_before: set[str] = {connection.id for connection in open_connections()}
     if not get_expedition().add_clue(clue_id, str(finder.key), place, source):
         number: int | None = entry_number(clue_id)
         entry: str = f"{number}. " if number is not None else ""
@@ -61,8 +71,41 @@ def discover(clue_id: str, finder: Any, source: str | None = None) -> bool:
     line: str = f"{NEW_IN_JOURNAL} {clue.journal}"
     for character in [finder, *_room_characters(finder.location), *connected_characters()]:
         recorder.note(character, f"Journal: new {clue_id}, {clue.title}")
-    _tell_all(finder, line, f"{finder.key} found something at {place}. {line}")
+    opened: list[ConnectionSpec] = [c for c in open_connections() if c.id not in open_before]
+    here: str = line + "".join(f"\n{SOMETHING_TO_THINK} {c.question}" for c in opened)
+    if opened:
+        recorder.note(finder, "Think: " + ", ".join(c.id for c in opened))
+    _tell_all(finder, here, f"{finder.key} found something at {place}. {line}")
     return True
+
+
+def open_connections() -> list[ConnectionSpec]:
+    """
+    The connection questions open now: those whose every group of needed clues has at
+    least one in the journal (DECISIONS.md, 22), in the content's order.
+    """
+    expedition: Any = get_expedition()
+    return [
+        connection
+        for connection in load_content().connections.values()
+        if all(any(expedition.has_clue(c) for c in group) for group in connection.needs)
+    ]
+
+
+def think_text() -> str:
+    """Every open connection question (`think`), or how they come."""
+    opened: list[ConnectionSpec] = open_connections()
+    if not opened:
+        return (
+            "Nothing to think about yet. When two clues in the journal fit together, a "
+            "question about them comes up here."
+        )
+    lines: list[str] = [
+        "|wSomething to think about|n (the game won't answer these: talk them over, or ask "
+        "someone who might know)"
+    ]
+    lines.extend(f"- {connection.question}" for connection in opened)
+    return "\n".join(lines)
 
 
 def _room_characters(location: Any) -> list[Any]:
@@ -151,6 +194,8 @@ def journal_text() -> str:
         clue: ClueSpec = content.clues[entry.clue]
         lines.append(f"{number}. {CLUE_COLOUR}{clue.title}|n: {clue.journal}")
     lines.append(f"\n(Who found what, and from whom: |w{JOURNAL_SOURCES}|n)")
+    if open_connections():
+        lines.append(f"(Questions to think about, from what you've found: |w{THINK}|n)")
     return "\n".join(lines)
 
 

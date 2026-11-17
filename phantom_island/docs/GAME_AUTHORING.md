@@ -18,7 +18,7 @@ comment listing its fields: that list is the reference, and this guide doesn't r
 | `ship.yaml` | The ship's two rooms (Deck, Cabin), and the positions she can sail to: what is seen from them, routes, orders, voyage passages |
 | `maps.yaml` | The map pictures for the Map pane: one per act (port, sea chart, island) |
 | `characters.yaml` | The people and the Ship: where they stand, how they speak, what they answer (`ask`) |
-| `clues.yaml` | The task at the top of the journal (what the expedition is for), and the clues: a title and the line written into the shared journal |
+| `clues.yaml` | The task at the top of the journal (what the expedition is for), the clues (a title and the line written into the shared journal), and the connection questions that link them (`think`) |
 | `things.yaml` | Objects: to look at, examine, read, use, and sometimes carry |
 | `ideas.yaml` | The notebook: areas and ideas about how the world works (optional) |
 | `report.yaml` | The report: the choices for each of the task's questions, the proof each right answer needs, and the epilogue (optional) |
@@ -97,6 +97,8 @@ New topics or replies need only a `reload`; a new character, or a changed `where
 3. Add it to the clue table in GAME_STORY.md: where it's found, what gates it, and what it
    proves for the `report`. If it proves an answer, add it to that answer's `proof` in
    `report.yaml`.
+
+If the new clue fits together with another one, consider a connection question in `clues.yaml` (`connections`): the clues it `needs`, and a `question` that leads one step further, towards a question of the report, and says where the background lives. It must never state the conclusion.
 
 The same clue can be revealed in several places, in different words. Finding it again adds
 the new source to the journal entry instead of a new entry, so players can compare sources.

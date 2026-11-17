@@ -6,7 +6,7 @@ from evennia.commands.default.general import CmdGet as DefaultCmdGet
 from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
 from typeclasses.rooms import Room
-from world.clues import journal_sources_text, journal_text
+from world.clues import journal_sources_text, journal_text, think_text
 from world.discovery import act, look_at, notice_surroundings, show_focus_for
 from world.notebook import READ_IT, notebook_text, sources_text
 
@@ -169,6 +169,28 @@ class CmdJournal(Command):
             self.caller.msg(journal_sources_text())
         else:
             self.caller.msg(journal_text())
+
+
+class CmdThink(Command):
+    """
+    Think about what the expedition has found.
+
+    Usage:
+      think
+
+    When clues in the journal fit together, a question about them comes up:
+    how far do seabirds fly, what else could a ship's oak be used for... The
+    game won't answer these questions. Talk them over, or ask someone who
+    might know. Working them out helps with the report.
+    """
+
+    key = "think"
+    aliases = ["wonder", "questions"]
+    locks = "cmd:all()"
+    help_category = "General"
+
+    def func(self) -> None:
+        self.caller.msg(think_text())
 
 
 class CmdNotebook(Command):
