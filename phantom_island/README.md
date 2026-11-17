@@ -202,7 +202,7 @@ uv run evennia reload        (new code)
 startover island yes         (as admin: the ship at the island)
 report                       → question 1 and its choices
 report a                     → turned down, with a hint
-report d                     → right, but "Before you write that down": no proof yet
+report d                     → right, but no proof in the journal yet: where to look
 ```
 
 The choices, the proof each answer needs, and the epilogue are in

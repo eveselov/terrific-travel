@@ -40,6 +40,9 @@ HELP_ENTRY_DICTS = [
             the expedition hears about it. Type |wjournal|n to read everything found so
             far.
 
+            In the |wreport|n, a line in |ccyan|n says what the Society makes of your
+            answer: proved, not proved yet, or not fitting what you know.
+
             Not everyone tells the truth, and some people are simply wrong. Compare what
             people say, and trust what you can see for yourself.
         """,

@@ -30,6 +30,10 @@ from world.expedition import connected_characters, get_expedition
 QUESTION_SEEN: str = "report_question"  # the question a player last looked at (its id)
 PAGE_SEEN: str = "report_page"  # the epilogue page a player last read (its index)
 REPORT_MORE: str = "report more"
+VERDICT_COLOUR: str = "|c"  # the report's verdict on an answer (DECISIONS.md, 20 and 29)
+NOT_PROVED: str = "The Society will want proof of that, and the journal doesn't hold it yet."
+DOES_NOT_FIT: str = "This answer doesn't fit what the expedition knows."
+PROVED: str = "Proved: this answer goes into the report."
 MORE_WORDS: tuple[str, ...] = ("more", "next", "on")
 EPILOGUE_WORDS: tuple[str, ...] = ("epilogue", "story", "again")
 NOTHING_TO_REPORT: str = "There is nothing to report on this expedition."
@@ -197,17 +201,25 @@ def answer(caller: Any, spec: ReportSpec, question: QuestionSpec, index: int) ->
     heading: str = f"{caller.key} considers an answer to question {number}: {letter}) {choice.text}"
     if not choice.right:
         recorder.note(caller, f"Report: {question.id} {letter}, turned down")
-        _tell_room(caller, f"{heading}\n{choice.reply}\n{_questions_left(spec)}")
+        _tell_room(
+            caller,
+            f"{heading}\n{verdict(DOES_NOT_FIT)}\n{choice.reply} Pick another answer, or find "
+            f"out more first. {_questions_left(spec)}",
+        )
         return
     missing: ProofSpec | None = missing_proof(choice)
     if missing is not None:
         recorder.note(caller, f"Report: {question.id} {letter}, not proved yet")
-        _tell_room(caller, f"{heading}\nBefore you write that down: {missing.missing}")
+        _tell_room(
+            caller,
+            f"{heading}\n{verdict(NOT_PROVED)}\n{missing.missing} Once the proof is in the "
+            f"|wjournal|n, report this answer again: |wreport {number} {letter}|n.",
+        )
         return
     expedition.answer(question.id, str(caller.key))
     recorder.note(caller, f"Report: {question.id} answered")
     done: str = f"Question {number} is answered in the report: {choice.answer}"
-    here: str = f"{heading}\n{choice.reply}{_proved_by(choice)}\n{done}"
+    here: str = f"{heading}\n{verdict(PROVED)}\n{choice.reply}{_proved_by(choice)}\n{done}"
     elsewhere: str = f"{caller.key} answered a question of the report. {done}"
     told: list[Any] = _tell_room(caller, here)
     for character in connected_characters():
@@ -219,6 +231,14 @@ def answer(caller: Any, spec: ReportSpec, question: QuestionSpec, index: int) ->
             show_page(character, spec, 0)
     else:
         caller.msg(_questions_left(spec))
+
+
+def verdict(text: str) -> str:
+    """
+    The report's verdict on an answer, on its own line and in its own colour, so that it
+    stands out from the longer texts around it. White words inside stay white.
+    """
+    return VERDICT_COLOUR + text.replace("|n", f"|n{VERDICT_COLOUR}") + "|n"
 
 
 def _tell_room(caller: Any, text: str) -> list[Any]:

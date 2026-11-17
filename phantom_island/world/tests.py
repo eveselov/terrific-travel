@@ -1549,7 +1549,8 @@ class TestReport(DiscoveryTest):
 
     def test_the_right_choice_needs_its_proof(self) -> None:
         heard: str = self.do(self.char1, "report d")
-        self.assertIn("Before you write that down", heard)
+        self.assertIn("the journal doesn't hold it yet", heard)
+        self.assertIn("report 1 d", heard)
         self.assertEqual(get_expedition().answers, {})
 
     def test_the_right_choice_with_proof_answers_for_everyone(self) -> None:
@@ -1575,7 +1576,7 @@ class TestReport(DiscoveryTest):
     def test_every_part_of_the_proof_is_needed(self) -> None:
         self.find("C4")
         heard: str = self.do(self.char1, "report 2 c")
-        self.assertIn("same island", heard)
+        self.assertIn("chart's island, only in the wrong place", heard)
         self.find("C10")
         self.do(self.char1, "report 2 c")
         self.assertIn("why", get_expedition().answers)

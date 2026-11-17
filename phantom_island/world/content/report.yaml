@@ -12,7 +12,11 @@
 # A wrong choice is turned down with its `reply`: why it doesn't fit, and where to look. It is
 # never a "you failed". The right choice is accepted only when the journal holds its `proof`;
 # until then the first missing proof's hint is shown. Once all questions are answered, the
-# epilogue follows, page by page (`report more`).
+# epilogue follows, page by page (`report more`). The game frames these texts: a wrong
+# choice's reply is followed by "pick another one, or find out more first", and a `missing`
+# hint is preceded by "the journal doesn't hold the proof yet" and followed by "report this
+# answer again". So write `missing` as a direction (where to look), not as a question.
+# The game's verdict on an answer comes first, on its own line in cyan (DECISIONS.md, 20).
 #
 # Each question has:
 #   id        a short name (also used by `report <id>`, for testing)
@@ -60,8 +64,8 @@ questions:
         proof:
           - clues: [C7, C13]
             missing: >
-              The Society will want to know where she lies. Has anyone of the expedition seen
-              the wreck, or met someone who was there?
+              Find the wreck itself, or someone on the island who was there when it
+              happened.
 
   - id: why
     choices:
@@ -90,12 +94,13 @@ questions:
         proof:
           - clues: [C4]
             missing: >
-              The Society will ask how you know the chart was wrong. Has anyone of the
-              expedition been to the chart's position and seen for themselves?
+              Sail to the position written on the chart, and see for yourselves what is
+              there.
           - clues: [C5, C10]
             missing: >
-              The Society will ask how you know it is the same island, and what exactly the
-              chart got wrong. Measure the island's position, or compare it with the chart.
+              Show that this is the chart's island, only in the wrong place: measure its
+              position with the sextant and the chronometer, or compare its coastline with
+              the chart from somewhere high.
       - text: >
           Because the island moves. Phantom islands drift about the ocean, and appear and
           vanish.
@@ -124,12 +129,12 @@ questions:
         proof:
           - clues: [C12, C13]
             missing: >
-              The Society will ask who says so. Someone on the island remembers the wreck:
-              have they told you what happened that night?
+              Find someone on the island who remembers the wreck, and hear from them what
+              happened to the crew.
           - clues: [C11, C8]
             missing: >
-              The Society will ask how you know they lived on. Is there anything on the
-              island that the crew made, or that the children remember?
+              Look for something on the island that the crew made, or that the children
+              remember about them.
       - text: >
           The islanders saved them, and they built a boat and sailed home, east, but were
           lost on the way.
