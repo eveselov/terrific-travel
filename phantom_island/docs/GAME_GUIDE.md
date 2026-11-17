@@ -76,6 +76,13 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - The same clue can turn up in different words from different sources. Finding it again adds no new entry: you're shown the entry it matches, so you can see they're the same fact.
 - The journal matters to the story too: some people only tell the truth once the right clue is in it, so it pays to come back and ask again.
 
+## Report
+
+- When you think you know the answer to one of the task's questions, `report` it to the Society, anywhere, at any time. It shows a question and a few possible answers; pick one by its letter (`report b`). `report 2` goes to another question, in any order.
+- The Society wants proof: an answer is only accepted once the journal holds the clues that show it. If an answer doesn't fit, or can't be proved yet, you're told why, and where you might look. That's not failing: go and look, and come back.
+- One player's answer counts for the whole expedition, and the journal shows it under the question.
+- Once all three questions are answered, the whole story is told, page by page (`report more`), with the real history behind it.
+
 ## General Tips
 
 - Don't trust everything the characters say. Sometimes they don't know the truth, sometimes they lie, sometimes they are just mistaken - like in real life.

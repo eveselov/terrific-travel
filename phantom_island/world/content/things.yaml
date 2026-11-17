@@ -196,10 +196,11 @@ things:
           needs: [sight_island]
           clue: C5
           text: >
-            Noon on deck came when the chronometer showed twelve minutes to three, home
-            time: 168 minutes after noon at home. Four minutes for every degree makes 42
-            degrees West. [[The island lies at exactly the chart's latitude, but 2 degrees
-            further west than the chart's longitude.]]
+            Noon on deck came when the chronometer showed sixteen minutes to three, home
+            time: 164 minutes after noon at home. Four minutes for every degree makes 41
+            degrees West. [[The island lies at exactly the chart's latitude, but 1 degree
+            further west than the chart's longitude.]] Only four minutes on the clock, and
+            a hundred kilometres of sea.
           otherwise: *no_sight
 
   chart:

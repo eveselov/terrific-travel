@@ -31,12 +31,14 @@ first good sea clocks (chronometers) were new and rare. Older charts often put i
 the wrong east-west position, and some "phantom islands" stayed on maps for centuries.
 One of them, Sandy Island, was removed from maps only in 2012.
 
-The *Halcyon*'s chart has the island at the right latitude (14° S) but 2 degrees too far
-east: 40° W on the chart, 42° W in truth, about 215 km at that latitude, a day's sail. That
-one mistake is why nobody found the wreck. It is small enough that seabirds fishing at the
-charted position still fly home to the island at dusk (C6), and the arithmetic stays easy:
-4 minutes of time per degree, so noon comes 160 minutes after home noon at the charted
-position and 168 minutes after at the island.
+The *Halcyon*'s chart has the island at the right latitude (14° S) but 1 degree too far
+east: 40° W on the chart, 41° W in truth, about 108 km at that latitude, half a day's sail
+(changed from 2° on 2026-11-16, so that the birds hold). That one mistake is why nobody
+found the wreck: from the charted position the island is below the horizon, even from the
+masthead. It is small enough that white terns fishing at the charted position still fly home
+to the island at dusk (C6), and the arithmetic stays easy: 4 minutes of time per degree, so
+noon comes 160 minutes after home noon at the charted position and 164 minutes after at the
+island. Four minutes on the clock, a hundred kilometres of sea.
 
 ## The truth (fixed, stored in the game)
 
@@ -44,6 +46,10 @@ The game keeps this as data. Characters reveal parts of it; they never make up n
 
 1. In 1775 the *Halcyon* reached the island, charted it with a longitude error, and
    anchored off the western reef.
+   - A passing whaler put in for water. The *Halcyon*'s master sent his last letter and a
+     fair copy of his chart home with her ("We sail again soon"). The whaler left about a
+     week before the storm. That is how the letter and the chart, error and all, reached the
+     Society, and why nothing came after them. (Settled 2026-11-16.)
 2. A storm drove her onto the reef. Nobody died: islanders paddled out and rescued the crew.
 3. The crew lived in the village for a season. They salvaged oak timbers from the wreck and,
    with the islanders' help, built a small boat in a sheltered cove.
@@ -66,33 +72,32 @@ plausible as it stands.
 
 | Fact | Depends on | Where it's written |
 |---|---|---|
-| The island is at 14° S, 42° W | — (the truth) | `things.yaml` (sextant, chronometer) |
-| The *Halcyon*'s chart says 14° S, 40° W: latitude right, longitude 2° too far east | Latitude from the noon sun was easy in 1775; longitude needed a sea clock, which she didn't have | `things.yaml` (chart), Jonah's *chart*, the Ship's *latitude* and *longitude* |
-| Noon comes 160 minutes after home noon at the charted position, 168 at the island | 4 minutes of time per degree (the Earth turns 15° an hour) | `things.yaml` (chronometer), the Ship's *longitude* |
-| 2° at 14° S is about 215 km, a long day's sail | 1° of longitude ≈ 111 km × cos(latitude) | `ship.yaml` (the route west from the charted position: morning to "late in the day") |
+| The island is at 14° S, 41° W | — (the truth) | `things.yaml` (sextant, chronometer) |
+| The *Halcyon*'s chart says 14° S, 40° W: latitude right, longitude 1° too far east | Latitude from the noon sun was easy in 1775; longitude needed a sea clock, which she didn't have | `things.yaml` (chart), Jonah's *chart*, the Ship's *latitude* and *longitude* |
+| Noon comes 160 minutes after home noon at the charted position, 164 at the island | 4 minutes of time per degree (the Earth turns 15° an hour) | `things.yaml` (chronometer), the Ship's *longitude* |
+| 1° at 14° S is about 108 km, half a day's sail | 1° of longitude ≈ 111 km × cos(latitude); about 200 km a day | `ship.yaml` (the route west from the charted position: morning to "early in the afternoon") |
 | Home and the island lie on the same latitude, 14° S, so the course out is due west | Latitude sailing: keep the noon sun's latitude, sail east or west | `ship.yaml` (the Ship's answer to the order), `things.yaml` (chart, examined: the ruled line), the sea chart picture |
 | The voyage out takes 21 days | 40° at 14° S ≈ 4,300 km, at about 200 km (110 nautical miles) a day | `ship.yaml` (the passage out, Day 4 to Day 21) |
 | The wind out is steady from the southeast, and going home is slower | The southeast trade winds blow at 14° S; the great storm of '75 from the west was unusual (Barnaby's *storm*) | `ship.yaml` (the passages out and home, the Ship's "trade wind behind us") |
 | Noon comes later by the home clock as the ship sails west | 4 minutes per degree, as above | `ship.yaml` (passage, Day 17), `things.yaml` (chronometer under way) |
-| The charted position shows empty sea (C4) | The island is 215 km away, below the horizon even from the masthead | `ship.yaml` (charted position) |
+| The charted position shows empty sea (C4) | The island is 108 km away, below the horizon even from the masthead (about 55–70 km) | `ship.yaml` (charted position) |
 | From a masthead a lookout sees about 20 km of open sea, a hilly island 50–70 km away | The Earth's curve: horizon ≈ 3.6 km × √(height in m); a masthead of about 30 m sees a hill of 100–200 m from 55–70 km | the Ship's *horizon*, `ideas.yaml` (*The horizon*) |
 | The Society trusted the chart; Barnaby thinks she sank | Nobody could check the longitude | Fairweather's *chart*, Barnaby's *halcyon* |
+| The last letter and a copy of the chart reached home; nothing came after | A whaler that watered at the island carried them, a week before the storm | Fairweather's *letter* ("We sail again soon"), Jonah's *letter* |
 | Barnaby found latitude with a quadrant; your ship carries a sextant and a chronometer | Hadley's "quadrant" (really an octant, 1731) was the old sailor's instrument; the sextant (1757) measures wider angles and was newer and dearer. Either gives latitude from the noon sun; only a sea clock gives longitude, so Barnaby's generation guessed it | Barnaby's *sailing* and *quadrant* (the old way), the Ship's *sextant*, *chronometer*, *longitude* (the new way) |
 
-Holds, except the birds (next chain).
+Holds.
 
 ### Birds: which way is land (C6)
 
 | Fact | Depends on | Where it's written |
 |---|---|---|
-| At dusk at the charted position, seabirds all fly west | They fish at sea by day and fly home to land at night; land is to the west | `ship.yaml` (the *sky* detail), the Ship's *birds* |
+| At dusk at the charted position, white terns all fly west | They fish at sea by day and fly home to land to sleep, from as far as about 120 miles (about 190 km); the island is 108 km to the west | `ship.yaml` (the *sky* detail), the Ship's *birds*, `ideas.yaml` (*Seabirds at dusk*) |
+| On the way west, noddies join the white terns | Noddies stray only about 40 miles (65 km) from land: seeing them means land is near | `ship.yaml` (the passage west) |
 
-**Doesn't hold yet.** Terns and noddies, the birds island navigators watched, are usually
-taken as a sign of land within roughly 20–50 km. The island is about 215 km from the charted
-position. To check against sources (DECISIONS.md, 9) and then fix: either birds that range
-further and still roost on land (boobies, frigatebirds: check), or the birds seen on the
-voyage west, nearer the island, or a smaller error. A smaller error is limited by C4: a
-hilly island can be seen from a masthead at about 50–70 km.
+Holds (checked 2026-11-16: the Hōkūleʻa wayfinding pages and the Science Learning Hub, see
+"Sources"). Red-footed boobies were considered and dropped: their foraging trips last one to
+five days, so they don't reliably fly home at dusk.
 
 ### The wreck: where she was lost
 
@@ -147,7 +152,7 @@ The players' ship is two rooms that travel with them through all three acts:
 | Place | What's there |
 |---|---|
 | Deck | For observing: the sky, the sea, birds, coastlines. `sail`, the noon sight and going ashore happen here. What you see changes with where the ship is and the time of day. |
-| Cabin | For instruments and records: the chronometer, the chart table with the *Halcyon*'s chart and the ship's own track, water casks, books, the Ship's voice, and the `report`. |
+| Cabin | For instruments and records: the chronometer, the chart table with the *Halcyon*'s chart and the ship's own track, water casks, books and the Ship's voice. |
 
 ### Act 1: The Port
 
@@ -202,16 +207,19 @@ Explore, talk, collect clues, then make the report.
 | Hilltop | View of the whole island. With the chart, the coastline can be compared to it. |
 | Boat Cove | Old wood chips, a slipway, a carved board. Jonah Pike is often here. |
 
-**Ending:** back in the ship's Cabin, the players `report` what happened. The game checks three
-questions against the journal, the same ones that stand at the top of the journal from the
-start (`task` in clues.yaml; DECISIONS.md, 28):
+**Ending:** anywhere, at any moment, a player can `report` what happened (DECISIONS.md, 29).
+The report asks three questions one at a time, the same ones that stand at the top of the
+journal from the start (`task` in clues.yaml; DECISIONS.md, 28). Each is answered by picking
+from choices that open with the clues in the journal:
 - What happened to the *Halcyon*, and where? (The answer it checks: where she wrecked. The
   question doesn't say "wreck", which the Society doesn't know at the start.)
 - Why did nobody ever find the *Halcyon*?
 - What became of the *Halcyon*'s crew?
 
-A full answer gets the full epilogue. A partial answer gets a partial one, plus a hint of
-what they missed. They can go back and look again, so it doesn't feel like failing a quiz.
+One player's answer counts for the whole expedition. A wrong choice is turned down with a
+hint of what is missing, and the players can go back and look again, so it doesn't feel like
+failing a quiz. Once all three questions are answered, the full epilogue follows; there is no
+partial one.
 
 ## Characters
 
@@ -288,7 +296,7 @@ and sailed away. The players have just solved a mystery shaped like a real one.
 - **The ship** is two rooms (Deck, Cabin) that never move. The Deck's view and its `ashore`
   exit change with the ship's position (Quay, positions at sea, island anchorage), which
   `sail <direction>` updates. The places the ship can reach are kept as data.
-- **Ending:** a `report` command in the Cabin that checks the journal.
+- **Ending:** a `report` command, usable anywhere, that checks answers against the journal (DECISIONS.md, 29).
 - **The screen** has three panes: Main (text), Map and Focus (the room's picture, or the
   thing being examined). The map switches by act: the port plan, the sea chart (the
   *Halcyon*'s chart, with the island in the wrong place until it's found, and the ship's
@@ -297,6 +305,23 @@ and sailed away. The players have just solved a mystery shaped like a real one.
 Size: 12 rooms (3 port, 2 ship, 7 island) plus the Limbo prologue, 7 characters, 13 clues. That's small enough to build quickly and play in
 one visit.
 
+## Sources
+
+Checked on 2026-11-16 (DECISIONS.md, 9). The players' version is the epilogue's last page in
+[report.yaml](../world/content/report.yaml).
+
+| Fact | Source |
+|---|---|
+| White terns range about 120 miles (about 190–200 km) from land, noddies about 40 miles (65 km); both fly home to land at dusk, and wayfinders follow them | Polynesian Voyaging Society, "Locating land" (archive.hokulea.com/navigate/land.html); Science Learning Hub, "Locating land" (sciencelearn.org.nz/resources/629-locating-land) |
+| Red-footed boobies forage about 113 km out on trips of 1–5 days (why they weren't used) | Trevail et al., *Marine Ecology Progress Series* 724 (2023), doi 10.3354/meps14479 |
+| Harrison's H4 tried at sea in 1761; Kendall's copy K1 went with Cook on his second voyage, his "never failing guide" | Royal Museums Greenwich (rmg.co.uk), K1 and the timekeeper method |
+| La Pérouse vanished in 1788; Dillon saw a silver sword guard on Tikopia in 1826, which led to Vanikoro; anchors and cannon on the reefs; survivors built a small boat and left, never seen again | Australian Dictionary of Biography, "Dillon, Peter"; Solomon Islands Historical Encyclopaedia, "La Pérouse Expedition, 1785–1788" |
+| Sandy Island: reported by the whaler *Velocity* in 1876, found to be deep water (over 1,400 m) by the *Southern Surveyor* in November 2012, then removed from maps | M. Seton et al., "Obituary: Sandy Island (1876–2012)", *Eos* 94(15), 2013 |
+| 1° of longitude at 14° S ≈ 108 km; the Earth turns 15° an hour | arithmetic (111.3 km × cos 14°) |
+
+Still to check: how fast coral grows over an object on a reef; ships carrying live goats and
+onions on long voyages; the masthead horizon distances (the Ship's *horizon*).
+
 ## Questions for the kids (spoiler-free)
 
 1. What is our ship called, and does she really have a mind of her own?
@@ -304,4 +329,6 @@ one visit.
 
 ## Open questions for the author
 
-1. What happened to the crew who sailed west? Leave it as a mystery for a later adventure?
+1. ~~What happened to the crew who sailed west?~~ Left open on purpose (2026-11-16), as in
+   the real story of La Pérouse's survivors; the epilogue says so. A later adventure can take
+   it up.

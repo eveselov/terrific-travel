@@ -181,9 +181,9 @@ class Expedition(Script):
     The state of the expedition: the one place where the adventure's progress is kept.
 
     That is where the ship is and where she has been, the shared journal (the clues found,
-    in the order they were found) and the flags set by what players did (a noon sight
-    taken, say). Keeping it all here keeps checkpoints simple to add (DECISIONS.md, 7).
-    Find it with `world.expedition.get_expedition()`.
+    in the order they were found), the flags set by what players did (a noon sight
+    taken, say) and the report's questions answered so far. Keeping it all here keeps
+    checkpoints simple to add (DECISIONS.md, 7). Find it with `world.expedition.get_expedition()`.
     """
 
     def at_script_creation(self) -> None:
@@ -198,6 +198,7 @@ class Expedition(Script):
         self.db.flags = []
         self.db.voyage = None
         self.db.notebooks = {}
+        self.db.answers = {}
 
     @property
     def journal(self) -> list[JournalEntry]:
@@ -259,6 +260,18 @@ class Expedition(Script):
         """Whether every clue id or flag in `needs` has been found or set."""
         found: set[str] = {entry.clue for entry in self.journal} | set(self.flags)
         return all(need in found for need in needs)
+
+    @property
+    def answers(self) -> dict[str, str]:
+        """The report's questions answered so far (by question id), and who answered each."""
+        return {str(question): str(by) for question, by in (self.db.answers or {}).items()}
+
+    def answer(self, question: str, by: str) -> bool:
+        """Record a question of the report as answered. False if it already was."""
+        if question in self.answers:
+            return False
+        self.db.answers = {**self.answers, question: by}
+        return True
 
     def notebook(self, owner: int) -> list[NoteEntry]:
         """The ideas in one player's notebook (by character id), the first learned first."""
@@ -365,3 +378,4 @@ class Expedition(Script):
         self.db.flags = []
         self.db.voyage = None
         self.db.notebooks = {}
+        self.db.answers = {}

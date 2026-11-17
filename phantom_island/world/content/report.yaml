@@ -1,0 +1,202 @@
+# The expedition's report and the epilogue: `report`, anywhere, at any moment.
+#
+# SPOILERS: this file holds the solution of the mystery. Don't show it to the players.
+#
+# The report asks the task's questions (clues.yaml, `task`) one at a time, in the same order
+# (DECISIONS.md, 29). Each is answered by picking one of its choices. The choices are always
+# the same, so the right one never gives itself away by appearing. The wrong ones are what
+# the witnesses believe or claim (Barnaby's sinking, the chart being right), or a natural
+# misunderstanding: choosing between them is the test of understanding (DECISIONS.md, 6b).
+# One player's answer counts for the whole expedition.
+#
+# A wrong choice is turned down with its `reply`: why it doesn't fit, and where to look. It is
+# never a "you failed". The right choice is accepted only when the journal holds its `proof`;
+# until then the first missing proof's hint is shown. Once all questions are answered, the
+# epilogue follows, page by page (`report more`).
+#
+# Each question has:
+#   id        a short name (also used by `report <id>`, for testing)
+#   choices   two to five, shown as a, b, c...; exactly one has `right: true`
+#
+# Each choice has:
+#   text      the choice as players read it
+#   reply     wrong choices: why it doesn't fit, and a hint where to look
+#   right     true for the right choice; it then has, instead of `reply`:
+#     answer  a short line for the journal, under the task's question
+#     reply   what players read when it is accepted
+#     proof   the clues that prove it: a list of groups, each one needing any one of its
+#             `clues` in the journal; `missing` is the hint shown while a group isn't met
+#
+# Report needs (GAME_STORY.md, "Clues"): wreck site = C7; why not found = C4 + C5 (or C10);
+# crew = C12 or C13, plus C11 or C8.
+#
+# The epilogue's pages: `title` and `text`. Its facts are checked against the sources on its
+# last page (DECISIONS.md, 9; GAME_STORY.md, "Sources").
+#
+# After editing, `reload` in the game is enough.
+
+questions:
+  - id: wreck
+    choices:
+      - text: She sank far out at sea in the great storm of '75, with all hands.
+        reply: >
+          That is what Old Barnaby believes, and he is right about the storm. But a ship that
+          sinks in deep water leaves nothing anyone can find, and something of the Halcyon
+          was found. Where would a piece of her lie in the shallows for years?
+      - text: She reached the island, then sailed on and was lost somewhere else.
+        reply: >
+          Her last letter does say "We sail again soon". But did she? If she sailed on, her
+          timbers sailed with her. Look at what the island is built of.
+      - text: She never reached the island at all. The chart was only a guess.
+        reply: >
+          The chart's island was drawn by someone who saw it: its coastline is drawn with
+          care. Is there a place where you can compare the drawing with the island itself?
+      - text: She was wrecked on the island's Western Reef in the great storm of '75.
+        right: true
+        answer: Wrecked on the island's Western Reef, in the great storm of '75.
+        reply: >
+          You write it down: the Halcyon was wrecked on the Western Reef, in the great storm
+          of '75. Old Barnaby was right about the storm and wrong about the sinking.
+        proof:
+          - clues: [C7, C13]
+            missing: >
+              The Society will want to know where she lies. Has anyone of the expedition seen
+              the wreck, or met someone who was there?
+
+  - id: why
+    choices:
+      - text: Because she sank in deep water, and the sea keeps what it takes.
+        reply: >
+          Even a ship lost without a trace leaves her island behind. But at the chart's
+          position there was no island at all. Why?
+      - text: >
+          Because the chart's latitude was wrong: the island lies further north or south than
+          the chart says.
+        reply: >
+          The noon sun says otherwise. The sextant measures latitude from the height of the
+          noon sun, and the island lies at exactly the chart's latitude. Which of the
+          chart's two numbers is hard to measure?
+      - text: >
+          Because the chart's longitude was wrong. With no sea clock aboard, her master could
+          only reckon how far west he had come, and he put the island too far east.
+        right: true
+        answer: >
+          The chart's longitude was wrong: without a sea clock, the island was put 1 degree
+          too far east.
+        reply: >
+          You write it down: the Halcyon's master measured his latitude by the noon sun,
+          and it was right. His longitude was only reckoned, and it put the island 1 degree
+          too far east. Everyone who searched, searched in the wrong place.
+        proof:
+          - clues: [C4]
+            missing: >
+              The Society will ask how you know the chart was wrong. Has anyone of the
+              expedition been to the chart's position and seen for themselves?
+          - clues: [C5, C10]
+            missing: >
+              The Society will ask how you know it is the same island, and what exactly the
+              chart got wrong. Measure the island's position, or compare it with the chart.
+      - text: >
+          Because the island moves. Phantom islands drift about the ocean, and appear and
+          vanish.
+        reply: >
+          Islands don't drift: this one is rock, coral and a hill. What can move is the
+          drawing of an island, from one place on a chart to another. Which of the chart's
+          numbers could be wrong?
+
+  - id: crew
+    choices:
+      - text: They all drowned when she went down.
+        reply: >
+          Old Barnaby believes it. But somebody on the island remembers that night. Ask the
+          old ones, and listen to what the children sing.
+      - text: >
+          The islanders saved them all. They lived in the village for a season, built a boat
+          from the Halcyon's oak, and most of them sailed west. One stayed on the island.
+        right: true
+        answer: >
+          Saved by the islanders. They built a boat from the Halcyon's oak, and most sailed
+          west; one stayed.
+        reply: >
+          You write it down: nobody drowned. The islanders saved the whole crew, and most of
+          them sailed west in a boat built from the Halcyon's own oak. Their families at home
+          can stop waiting for a ship, and start hoping for news from the west.
+        proof:
+          - clues: [C12, C13]
+            missing: >
+              The Society will ask who says so. Someone on the island remembers the wreck:
+              have they told you what happened that night?
+          - clues: [C11, C8]
+            missing: >
+              The Society will ask how you know they lived on. Is there anything on the
+              island that the crew made, or that the children remember?
+      - text: >
+          The islanders saved them, and they built a boat and sailed home, east, but were
+          lost on the way.
+        reply: >
+          Home lies east, and out here the trade wind blows from the east, day after day.
+          Which way would a small boat really go? Someone on the island watched it leave.
+      - text: They all stayed on the island, and their children live there now.
+        reply: >
+          Then where is everybody? Only one sailor still lives on the island. And something
+          was built at the cove, and sailed away.
+
+epilogue:
+  - title: What happened
+    text: >
+      In 1775 the Halcyon found the island and charted it. A whaler put in for water, and
+      the Halcyon's master sent his last letter home with her, and a fair copy of his
+      chart.|/A week later the great storm of '75 blew out of the west. The Halcyon's anchors
+      dragged, and she struck the Western Reef in the night. The islanders paddled out into
+      the storm and brought the whole crew ashore, alive.|/The crew lived in the village for a
+      season. With the islanders' help they built a boat from the Halcyon's oak, with island
+      rope and a canvas sail. Most of them sailed west, towards the trading routes, and were
+      never heard of again. Jonah Pike, the carpenter, stayed. He married, and the island
+      became his home.|/The ship's compass stayed too. Years later it travelled from island to
+      island, eastward, until fishermen from the west traded it to Silas Crane.
+
+  - title: How it all fits
+    text: >
+      Why nobody found her: The Earth turns 15 degrees every hour, so noon comes 4
+      minutes later for every degree you go west. At the chart's position noon came 160
+      minutes after noon at home: 40 degrees West, as the chart says. At the island it came
+      164 minutes after: 41 degrees West. Four minutes on the clock, and about 108 km of sea,
+      too far to see the island even from the masthead. The Halcyon had no sea clock, so her
+      longitude was a reckoning, and it was 1 degree out. Her latitude, from the noon sun,
+      was exact.|/Why the birds knew: White terns fish as far as a hundred miles from
+      land and fly home at dusk. At the chart's position they flew west, and the island was
+      there, half a day's sail away.|/Where she was lost: A wind out of the west drives a
+      ship anchored off the island's west side onto the Western Reef. Her ribs are still
+      there, grown over with coral.|/What became of the crew: No oak grows on a tropical
+      island, so the oak beams in the village are the Halcyon's timber. Ships carried live
+      goats and onions for long voyages, and both are still on the island. Coral grows only
+      under the sea, and slowly: Crane's compass had lain in the sea for years, not on a
+      beach for one winter. And a child's song about a canoe with a white wing, flying to
+      where the sun goes to sleep, is a sailing boat, going west.
+
+  - title: The real story
+    text: >
+      This story is invented, but it is shaped like real ones.|/In 1788 the French explorer
+      La Pérouse sailed into the Pacific with two ships and vanished. In 1826 an Irish
+      captain, Peter Dillon, stopped at the island of Tikopia and noticed a silver sword
+      guard, of French make. The islanders said it came from Vanikoro, an island nearby.
+      There Dillon, and the French after him, found anchors and cannon on the reefs.
+      The people of Vanikoro remembered that some of the sailors had survived, built a small
+      boat and sailed away. Nobody knows what became of them.|/John Harrison's sea clocks
+      solved the longitude problem: his H4 was tried at sea in 1761, and Captain Cook carried
+      a copy of it, K1, on his second voyage, and called it his "never failing guide".|/And
+      islands that were never there stayed on charts for a very long time. Sandy Island, in
+      the Coral Sea, was reported by a whaling ship in 1876 and stayed on maps until 2012,
+      when scientists sailed to its position and found only deep water.
+
+  - title: Sources
+    text: >
+      Where the real facts in this story come from, if you want to read more:|/- Royal Museums
+      Greenwich, on Harrison's timekeepers and Kendall's K1: rmg.co.uk|/- Peter Dillon, in the
+      Australian Dictionary of Biography: adb.anu.edu.au/biography/dillon-peter-1978|/- The
+      La Pérouse Expedition, 1785-1788, in the Solomon Islands Historical Encyclopaedia:
+      solomonencyclopaedia.net|/- M. Seton and others, "Obituary: Sandy Island (1876-2012)",
+      Eos 94 (2013)|/- Seabirds as signs of land: the Polynesian Voyaging Society,
+      archive.hokulea.com/navigate/land.html, and the Science Learning Hub,
+      sciencelearn.org.nz|/- To read: Dava Sobel, "Longitude" (1995), the story of John
+      Harrison's clocks.

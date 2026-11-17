@@ -29,9 +29,11 @@ CHARACTERS_FILE: str = "characters.yaml"
 CLUES_FILE: str = "clues.yaml"
 THINGS_FILE: str = "things.yaml"
 IDEAS_FILE: str = "ideas.yaml"  # optional: without it, the notebook stays empty
+REPORT_FILE: str = "report.yaml"  # optional: without it, there is nothing to report
 
 # How well a player knows an idea, from the first mention to having done it themselves.
 LEVELS: tuple[str, ...] = ("heard", "understood", "used")
+CHOICE_LETTERS: str = "abcde"  # how the report's choices are named
 
 # A clue's fact inside a text: `[[coral, grown into the brass]]` (DECISIONS.md, 20).
 CLUE_MARK: re.Pattern[str] = re.compile(r"\[\[(.+?)\]\]", re.DOTALL)
@@ -291,6 +293,58 @@ class TaskSpec:
 
 
 @dataclass(frozen=True)
+class ProofSpec:
+    """One part of the proof of a report answer: any one of these clues will do."""
+
+    clues: tuple[str, ...]
+    missing: str  # the hint shown while none of them is in the journal
+
+
+@dataclass(frozen=True)
+class ChoiceSpec:
+    """One choice of a report question. The right one has an `answer` and its `proof`."""
+
+    text: str
+    reply: str
+    right: bool = False
+    answer: str | None = None
+    proof: tuple[ProofSpec, ...] = ()
+
+
+@dataclass(frozen=True)
+class QuestionSpec:
+    """
+    One question of the report: the task's question with the same number (`text`), and
+    the choices players pick from.
+    """
+
+    id: str
+    text: str
+    choices: tuple[ChoiceSpec, ...]
+
+    @property
+    def right(self) -> ChoiceSpec:
+        """The right choice (the content check makes sure there is exactly one)."""
+        return next(choice for choice in self.choices if choice.right)
+
+
+@dataclass(frozen=True)
+class PageSpec:
+    """One page of the epilogue."""
+
+    title: str
+    text: str
+
+
+@dataclass(frozen=True)
+class ReportSpec:
+    """The report's questions, in the task's order, and the epilogue that follows them."""
+
+    questions: tuple[QuestionSpec, ...]
+    epilogue: tuple[PageSpec, ...]
+
+
+@dataclass(frozen=True)
 class AreaSpec:
     """A part of the notebook: Navigation, Nature..."""
 
@@ -453,6 +507,7 @@ class Content:
     areas: dict[str, AreaSpec] = dataclass_field(default_factory=dict)
     ideas: dict[str, IdeaSpec] = dataclass_field(default_factory=dict)
     task: TaskSpec | None = None
+    report: ReportSpec | None = None
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -783,6 +838,78 @@ def _task(data: dict[str, Any]) -> TaskSpec | None:
     )
 
 
+def _proof(value: Any, where: str) -> ProofSpec:
+    item: dict[str, Any] = _mapping(value, where)
+    clues: tuple[str, ...] = _words(item.get("clues"), "clues", where)
+    if not clues:
+        raise ContentError(f"{where}: `clues` must name at least one clue.")
+    return ProofSpec(clues=clues, missing=_text(item, "missing", where))
+
+
+def _choice(value: Any, where: str) -> ChoiceSpec:
+    item: dict[str, Any] = _mapping(value, where)
+    right: bool = _flag(item, "right", where)
+    proof_data: Any = item.get("proof") or []
+    if not isinstance(proof_data, list):
+        raise ContentError(f"{where}: `proof` must be a list.")
+    proof: tuple[ProofSpec, ...] = tuple(
+        _proof(part, f"{where}, proof {number}") for number, part in enumerate(proof_data, 1)
+    )
+    if right and not proof:
+        raise ContentError(f"{where}: the right choice needs a `proof`.")
+    if not right and (proof or item.get("answer") is not None):
+        raise ContentError(f"{where}: only the right choice has an `answer` and a `proof`.")
+    return ChoiceSpec(
+        text=_text(item, "text", where),
+        reply=_text(item, "reply", where),
+        right=right,
+        answer=_text(item, "answer", where) if right else None,
+        proof=proof,
+    )
+
+
+def _report(data: dict[str, Any], task: TaskSpec | None) -> ReportSpec | None:
+    if not data:
+        return None
+    if task is None:
+        raise ContentError(f"{REPORT_FILE}: the report needs the task in {CLUES_FILE}.")
+    questions_data: Any = data.get("questions") or []
+    if not isinstance(questions_data, list) or len(questions_data) != len(task.questions):
+        raise ContentError(
+            f"{REPORT_FILE}: `questions` must be a list with one entry for each of the "
+            f"task's {len(task.questions)} questions, in the same order."
+        )
+    questions: list[QuestionSpec] = []
+    for number, value in enumerate(questions_data, start=1):
+        where: str = f"{REPORT_FILE}, question {number}"
+        item: dict[str, Any] = _mapping(value, where)
+        question_id: str = _text(item, "id", where)
+        where = f"{REPORT_FILE}, question {question_id}"
+        choices_data: Any = item.get("choices") or []
+        if not isinstance(choices_data, list) or not 2 <= len(choices_data) <= 5:
+            raise ContentError(f"{where}: `choices` must be a list of two to five.")
+        choices: tuple[ChoiceSpec, ...] = tuple(
+            _choice(choice, f"{where}, choice {CHOICE_LETTERS[index]}")
+            for index, choice in enumerate(choices_data)
+        )
+        if sum(choice.right for choice in choices) != 1:
+            raise ContentError(f"{where}: exactly one choice must have `right: true`.")
+        questions.append(
+            QuestionSpec(id=question_id, text=task.questions[number - 1], choices=choices)
+        )
+    if len({question.id for question in questions}) != len(questions):
+        raise ContentError(f"{REPORT_FILE}: two questions have the same id.")
+    pages_data: Any = data.get("epilogue") or []
+    if not isinstance(pages_data, list) or not pages_data:
+        raise ContentError(f"{REPORT_FILE}: `epilogue` must be a list of pages.")
+    pages: list[PageSpec] = []
+    for number, value in enumerate(pages_data, start=1):
+        where = f"{REPORT_FILE}, epilogue page {number}"
+        page: dict[str, Any] = _mapping(value, where)
+        pages.append(PageSpec(title=_text(page, "title", where), text=_text(page, "text", where)))
+    return ReportSpec(questions=tuple(questions), epilogue=tuple(pages))
+
+
 def _ideas(data: dict[str, Any]) -> tuple[dict[str, AreaSpec], dict[str, IdeaSpec]]:
     areas_data: dict[str, Any] = _mapping(data.get("areas") or {}, f"{IDEAS_FILE}, areas")
     areas: dict[str, AreaSpec] = {}
@@ -953,6 +1080,21 @@ def _check(content: Content) -> None:
     _check_things(content)
     _check_clue_marks(content)
     _check_teachings(content)
+    _check_report(content)
+
+
+def _check_report(content: Content) -> None:
+    """Every clue a report answer needs as proof exists."""
+    if content.report is None:
+        return
+    for question in content.report.questions:
+        for number, part in enumerate(question.right.proof, start=1):
+            for clue in part.clues:
+                if clue not in content.clues:
+                    raise ContentError(
+                        f"{REPORT_FILE}, question {question.id}, proof {number}: "
+                        f"unknown clue {clue!r}."
+                    )
 
 
 def _look_texts(where: str, look: LookSpec) -> list[tuple[str, str, str | None]]:
@@ -1005,6 +1147,18 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
         texts.append((f"{CLUES_FILE}, task", content.task.title, None))
         for number, question in enumerate(content.task.questions, start=1):
             texts.append((f"{CLUES_FILE}, task, question {number}", question, None))
+    if content.report is not None:
+        for asked in content.report.questions:
+            for index, choice in enumerate(asked.choices):
+                where = f"{REPORT_FILE}, question {asked.id}, choice {CHOICE_LETTERS[index]}"
+                texts.append((where, choice.text, None))
+                texts.append((f"{where}, reply", choice.reply, None))
+                if choice.answer is not None:
+                    texts.append((f"{where}, answer", choice.answer, None))
+                for number, part in enumerate(choice.proof, start=1):
+                    texts.append((f"{where}, proof {number}", part.missing, None))
+        for number, page in enumerate(content.report.epilogue, start=1):
+            texts.append((f"{REPORT_FILE}, epilogue page {number}", page.text, None))
     for idea in content.ideas.values():
         for level, text in idea.texts.items():
             texts.append((f"{IDEAS_FILE}, idea {idea.id}, {level}", text, None))
@@ -1245,6 +1399,10 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         _read_yaml(directory, IDEAS_FILE) if (directory / IDEAS_FILE).exists() else {}
     )
     areas, ideas = _ideas(ideas_data)
+    report_data: dict[str, Any] = (
+        _read_yaml(directory, REPORT_FILE) if (directory / REPORT_FILE).exists() else {}
+    )
+    task: TaskSpec | None = _task(clues_data)
 
     places: dict[str, PlaceSpec] = {
         key: _place(key, value, PLACES_FILE) for key, value in places_data.items()
@@ -1273,7 +1431,8 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         things=_things(things_data),
         areas=areas,
         ideas=ideas,
-        task=_task(clues_data),
+        task=task,
+        report=_report(report_data, task),
     )
     _check(content)
     return content

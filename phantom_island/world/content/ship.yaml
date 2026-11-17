@@ -70,7 +70,9 @@ sea_chart: sea_chart
 #
 # Distances and days go together (GAME_STORY.md, "Facts that depend on each other"):
 # about 200 km a day, so the 40 degrees out to the chart's position take three weeks and
-# the 2 degrees on to the island a long day.
+# the 1 degree on to the island (about 108 km) half a day. White terns range about 200 km
+# from land and noddies about 65 km, so at the chart's position only white terns are seen,
+# and the noddies join them on the way west.
 positions:
   port:
     name: Moored at the Quay
@@ -140,10 +142,10 @@ positions:
     details:
       sky:
         teaches: {seabirds: used}
-        aliases: [birds, seabirds, terns, evening, dusk]
+        aliases: [birds, seabirds, terns, white terns, evening, dusk]
         clue: C6
         desc: >
-          The sun is going down. The seabirds that fished around the ship all day are
+          The sun is going down. The white terns that fished around the ship all day are
           leaving, in long lines low over the water, [[all flying the same way: west]].
     cabin: >
       The cabin creaks as the ship rolls on the open sea.
@@ -161,9 +163,10 @@ positions:
           - >
             Morning. Nothing but sea ahead. A lookout climbs to the masthead.
           - >
-            Afternoon. There are more seabirds now, fishing ahead of the bow.
+            Late morning. There are more seabirds now, fishing ahead of the bow: small
+            dark |wnoddies|n among the white terns.
           - >
-            Late in the day the lookout shouts from the masthead: land!
+            Early in the afternoon the lookout shouts from the masthead: land!
       # A day's search north, south or east finds nothing, and the instruments say why
       # (things.yaml): it costs time and water, and teaches. About 200 km a day: 2 degrees.
       north:
@@ -287,8 +290,8 @@ positions:
 
   anchorage:
     name: Anchored off the island
-    coords: 14 S, 42 W
-    chart_pos: [230, 290]
+    coords: 14 S, 41 W
+    chart_pos: [450, 290]
     map: island
     map_pos: [875, 545]
     ashore: beach

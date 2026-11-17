@@ -21,6 +21,7 @@ comment listing its fields: that list is the reference, and this guide doesn't r
 | `clues.yaml` | The task at the top of the journal (what the expedition is for), and the clues: a title and the line written into the shared journal |
 | `things.yaml` | Objects: to look at, examine, read, use, and sometimes carry |
 | `ideas.yaml` | The notebook: areas and ideas about how the world works (optional) |
+| `report.yaml` | The report: the choices for each of the task's questions, the proof each right answer needs, and the epilogue (optional) |
 
 The design behind the content (the truth of the mystery, the clue table, the facts that
 depend on each other) is in [GAME_STORY.md](GAME_STORY.md). The reasons for the rules below
@@ -37,7 +38,7 @@ content check runs whenever the files are read, and stops with the file and entr
 | Place id (`quay`, `deck`) | `places.yaml`, `ship.yaml` (`rooms`) | exits; a character's `where`; a thing's `where`; a position's `ashore`; an action's `only_in` |
 | Map key (`port`, `island`) | `maps.yaml` | a place's `map`; a position's `map`; `sea_chart` in `ship.yaml` |
 | Position id (`charted`) | `ship.yaml` (`positions`) | routes' `to`; `start`; a thing's `at:` (what it does at that position) |
-| Clue id (`C4`) | `clues.yaml` | `clue:` beside any text that reveals it; `needs:` |
+| Clue id (`C4`) | `clues.yaml` | `clue:` beside any text that reveals it; `needs:`; a report answer's `proof` |
 | Flag (`sight_charted`) | `sets:` on a thing's `at:` step | `needs:` elsewhere |
 | Thing id (`chart`) | `things.yaml` | `with:` on details (more to see when carrying it) |
 | Area id, idea id | `ideas.yaml` | an idea's `area`; `teaches:` beside any text that teaches it |
@@ -94,7 +95,8 @@ New topics or replies need only a `reload`; a new character, or a changed `where
 2. Reveal it: put `clue: C<n>` beside the text that shows it (a topic reply, a detail, a
    thing's look or action, a position's Deck view) and mark the fact in it `[[...]]`.
 3. Add it to the clue table in GAME_STORY.md: where it's found, what gates it, and what it
-   proves for the `report`.
+   proves for the `report`. If it proves an answer, add it to that answer's `proof` in
+   `report.yaml`.
 
 The same clue can be revealed in several places, in different words. Finding it again adds
 the new source to the journal entry instead of a new entry, so players can compare sources.
@@ -131,6 +133,21 @@ In `ship.yaml`, under `positions`:
 
 Distances and days must agree with GAME_STORY.md's facts table (about 200 km, 2 degrees of
 longitude here, a day).
+
+### The report and the epilogue
+
+In `report.yaml`, one entry per question of the task in `clues.yaml`, in the same order.
+Each question has two to five `choices`; exactly one has `right: true`, an `answer` (the
+line shown in the journal) and a `proof`: groups of clues, each needing any one of its
+clues in the journal, with a `missing` hint shown while it isn't. Every other choice has a
+`reply`: why it doesn't fit, and where to look.
+
+The wrong choices are what the witnesses believe or claim, or a natural misunderstanding
+(the wrong number of the chart). Never invent a new element just to be wrong: it would be a
+false lead. A reply turns a choice down gently and points somewhere, never "wrong!".
+
+The epilogue is a list of pages, each a `title` and a `text`. Real facts in it go into
+the "Sources" list in GAME_STORY.md and on the epilogue's last page (DECISIONS.md, 9).
 
 ### An area or an idea for the notebook
 

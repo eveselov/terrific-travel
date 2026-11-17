@@ -12,7 +12,7 @@ from typing import Any
 
 from typeclasses.scripts import JournalEntry
 from world import recorder
-from world.content import CLUE_MARK, ClueSpec, Content, load_content
+from world.content import CLUE_MARK, ClueSpec, Content, ReportSpec, load_content
 from world.expedition import connected_characters, get_expedition
 
 CLUE_COLOUR: str = "|y"
@@ -108,6 +108,27 @@ def entry_number(clue_id: str) -> int | None:
     return None
 
 
+def _task_lines(content: Content) -> list[str]:
+    """
+    The task's questions, each with the expedition's answer once the report has it
+    (DECISIONS.md, 29), and how to answer them or read the epilogue again.
+    """
+    assert content.task is not None
+    report: ReportSpec | None = content.report
+    answers: dict[str, str] = get_expedition().answers
+    lines: list[str] = []
+    for number, text in enumerate(content.task.questions, start=1):
+        lines.append(f"  - {text}")
+        if report is not None and report.questions[number - 1].id in answers:
+            lines.append(f"    Answered: {report.questions[number - 1].right.answer}")
+    if report is not None:
+        if all(question.id in answers for question in report.questions):
+            lines.append("The report is complete: |wreport|n tells the whole story again.")
+        else:
+            lines.append("When you know an answer, and can prove it: |wreport|n.")
+    return lines
+
+
 def journal_text() -> str:
     """
     The journal, as shown by the `journal` command: the expedition's task first (always
@@ -118,7 +139,7 @@ def journal_text() -> str:
     lines: list[str] = ["|wThe expedition's journal|n"]
     if content.task is not None:
         lines.append(f"\n{content.task.title}")
-        lines.extend(f"  - {question}" for question in content.task.questions)
+        lines.extend(_task_lines(content))
         lines.append("")
     if not entries:
         lines.append(

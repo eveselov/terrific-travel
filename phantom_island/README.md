@@ -181,6 +181,33 @@ sends every player character, online or not, to Limbo; `begin` then leads to the
 Office, or to the Deck if the ship is away. Accounts and characters are kept. (It isn't
 called `reset`: that is Evennia's own command, and it reboots the server.)
 
+## Playing stage A4 (under way)
+
+A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built so far:
+
+- **The 1-degree error** (2026-11-16): the island is at 14 S, 41 W, half a day's sail west
+  of the chart's position, so the white terns seen there at dusk can really be flying home
+  to it. The chronometer at the island reads 164 minutes after home noon.
+- **The report** (`report`, DECISIONS.md, 29), anywhere and at any moment. It asks the
+  task's three questions one at a time; `report b` picks a choice, `report 2` goes to
+  another question. A wrong choice is turned down with a hint; the right one is accepted
+  only once the journal holds its proof. One player's answer counts for everyone, and the
+  journal shows it under the task. Once all three are answered, every connected player sees
+  the epilogue's first page, and `report more` turns the pages.
+
+To try it (spoilers):
+
+```
+uv run evennia reload        (new code)
+startover island yes         (as admin: the ship at the island)
+report                       → question 1 and its choices
+report a                     → turned down, with a hint
+report d                     → right, but "Before you write that down": no proof yet
+```
+
+The choices, the proof each answer needs, and the epilogue are in
+[world/content/report.yaml](world/content/report.yaml).
+
 ## How it fits together
 
 | Part | Files |
@@ -191,6 +218,7 @@ called `reset`: that is Evennia's own command, and it reboots the server.)
 | Clues, yellow marks and the journal | `world/content/clues.yaml`, `world/clues.py`, `commands/discover.py` (`journal`) |
 | Things, details, `look`/`examine`/`read`/`use` | `world/content/things.yaml`, `typeclasses/things.py`, `world/discovery.py`, `commands/discover.py` |
 | Late joiners (`begin` while the ship is away) | `typeclasses/exits.py`, `world/ship.py` |
+| The report and the epilogue (`report`) | `world/content/report.yaml`, `world/report.py`, `commands/report.py` |
 | Starting over (`startover`, for developers) | `world/reset.py`, `commands/admin.py` |
 | Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
@@ -241,6 +269,9 @@ Playing it also changed how conversation reads:
   and another player's turns after a fainter dotted line.
 
 `startover` (developers only) starts a new expedition without resetting the database,
-optionally with the ship already at sea or at the island. Ama's respect, the time gates
-(tide, dusk, noon), `show` and `report` wait for A4; C12 can't be found yet, and C13 is still
-given freely. Next: A4, the mystery and the ending.
+optionally with the ship already at sea or at the island.
+
+Stage A4 (the mystery and the ending), under way: the chart's error is now 1 degree, and the
+`report` with its epilogue is built. Still to come: connection questions, hints, the gates
+(leaving port, meeting Jonah), the tide, dusk and noon, and Ama's respect; C12 can't be found
+yet, and C13 is still given freely.

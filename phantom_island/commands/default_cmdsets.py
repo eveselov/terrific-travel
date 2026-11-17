@@ -19,6 +19,7 @@ from evennia import default_cmds
 from .admin import CmdRecord, CmdStartOver
 from .discover import CmdExamine, CmdGet, CmdJournal, CmdLook, CmdNotebook, CmdRead, CmdUse
 from .explore import CmdGo, CmdMap
+from .report import CmdReport
 from .talk import CmdAsk
 
 
@@ -49,6 +50,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdUse())
         self.add(CmdJournal())
         self.add(CmdNotebook())
+        self.add(CmdReport())
         self.add(CmdStartOver())
         self.add(CmdRecord())
 

@@ -32,6 +32,7 @@ from world.content import (
     LIMBO_ID,
     MAPS_FILE,
     PLACES_FILE,
+    REPORT_FILE,
     SHIP_FILE,
     THINGS_FILE,
     UNDER_WAY,
@@ -74,6 +75,7 @@ CONTENT_FILES: tuple[str, ...] = (
     CLUES_FILE,
     THINGS_FILE,
     IDEAS_FILE,
+    REPORT_FILE,
 )
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
@@ -249,6 +251,24 @@ class TestContent(TestCase):
             THINGS_FILE, "needs: [sight_charted]", "needs: [sight_chartd]"
         )
         self.assertIn("sight_chartd", str(error))
+
+    def test_the_report_asks_the_task_questions(self) -> None:
+        content: Content = load_content()
+        assert content.report is not None and content.task is not None
+        self.assertEqual(
+            [question.text for question in content.report.questions], list(content.task.questions)
+        )
+
+    def test_two_right_choices_are_an_error(self) -> None:
+        sank: str = (
+            "      - text: She sank far out at sea in the great storm of '75, with all hands."
+        )
+        error: ContentError = self._broken_copy(REPORT_FILE, sank, f"{sank}\n        right: true")
+        self.assertIn("question wreck", str(error))
+
+    def test_proof_with_an_unknown_clue_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(REPORT_FILE, "clues: [C7, C13]", "clues: [C7, C99]")
+        self.assertIn("C99", str(error))
 
 
 class TestCharacterContent(TestCase):
@@ -1198,7 +1218,7 @@ class TestAtSea(DiscoveryTest):
         self.at(self.char1, "deck")
         self.do(self.char1, "use sextant")
         self.at(self.char1, "cabin")
-        self.assertIn("2 degrees further west", self.do(self.char1, "read chronometer"))
+        self.assertIn("1 degree further west", self.do(self.char1, "read chronometer"))
 
     def test_others_in_the_room_hear_what_is_read(self) -> None:
         self.at(self.char1, "cabin")
@@ -1496,3 +1516,93 @@ class TestRecorder(DiscoveryTest):
         (self.folder / "demo.ev").write_text("# by hand\n", encoding="utf-8")
         self.assertIn("replace the existing", self.do(self.char1, "record start demo"))
         self.assertEqual((self.folder / "demo.ev").read_text(encoding="utf-8"), "# by hand\n")
+
+
+class TestReport(DiscoveryTest):
+    """The report (DECISIONS.md, 29): choices, proof from the journal, and the epilogue."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        connected: Any = patch(
+            "world.report.connected_characters", return_value=[self.char1, self.char2]
+        )
+        connected.start()
+        self.addCleanup(connected.stop)
+        self.at(self.char1, "village")
+        self.at(self.char2, "deck")
+
+    def find(self, *clues: str) -> None:
+        for clue in clues:
+            get_expedition().add_clue(clue, "someone", "somewhere")
+
+    def test_report_shows_the_first_question_and_its_choices(self) -> None:
+        heard: str = self.do(self.char1, "report")
+        self.assertIn("question 1 of 3", heard)
+        self.assertIn("What happened to the Halcyon, and where?", heard)
+        self.assertIn("a) She sank far out at sea", heard)
+        self.assertIn("report d", heard)
+
+    def test_a_wrong_choice_is_turned_down_with_a_hint(self) -> None:
+        heard: str = self.do(self.char1, "report a")
+        self.assertIn("Old Barnaby believes", heard)
+        self.assertEqual(get_expedition().answers, {})
+
+    def test_the_right_choice_needs_its_proof(self) -> None:
+        heard: str = self.do(self.char1, "report d")
+        self.assertIn("Before you write that down", heard)
+        self.assertEqual(get_expedition().answers, {})
+
+    def test_the_right_choice_with_proof_answers_for_everyone(self) -> None:
+        self.find("C7")
+        with patch.object(self.char2, "msg") as elsewhere:
+            heard: str = self.do(self.char1, "report d")
+        self.assertIn("wrecked on the Western Reef", heard)
+        self.assertIn("Proved in the journal: 1.", heard)
+        self.assertEqual(get_expedition().answers, {"wreck": self.char1.key})
+        self.assertIn("answered a question of the report", texts(elsewhere))
+        journal: str = self.do(self.char2, "journal")
+        self.assertIn("Answered: Wrecked on the island's Western Reef", journal)
+        # The next open question comes up by itself.
+        self.assertIn("question 2 of 3", self.do(self.char1, "report"))
+
+    def test_questions_can_be_answered_in_any_order(self) -> None:
+        self.find("C12", "C11")
+        self.assertIn("question 3 of 3", self.do(self.char1, "report 3"))
+        self.do(self.char1, "report b")
+        self.assertEqual(list(get_expedition().answers), ["crew"])
+        self.assertIn("Answered by", self.do(self.char1, "report 3"))
+
+    def test_every_part_of_the_proof_is_needed(self) -> None:
+        self.find("C4")
+        heard: str = self.do(self.char1, "report 2 c")
+        self.assertIn("same island", heard)
+        self.find("C10")
+        self.do(self.char1, "report 2 c")
+        self.assertIn("why", get_expedition().answers)
+
+    def test_the_epilogue_follows_the_last_answer(self) -> None:
+        self.find("C7", "C4", "C5", "C13", "C8")
+        self.do(self.char1, "report 1 d")
+        self.do(self.char1, "report 2 c")
+        with patch.object(self.char2, "msg") as elsewhere:
+            heard: str = self.do(self.char1, "report 3 b")
+        self.assertIn("the report is complete", heard)
+        self.assertIn("Epilogue, 1 of 4: What happened", heard)
+        self.assertIn("Epilogue, 1 of 4", texts(elsewhere))
+        self.assertIn("Epilogue, 2 of 4: How it all fits", self.do(self.char2, "report more"))
+        self.do(self.char2, "report more")
+        self.assertIn("Sources", self.do(self.char2, "report more"))
+        self.assertIn("end of the story", self.do(self.char2, "report more"))
+        self.assertIn("Epilogue, 1 of 4", self.do(self.char2, "report"))
+        self.assertIn("The report is complete", self.do(self.char1, "journal"))
+
+    def test_more_before_the_end_says_what_is_left(self) -> None:
+        heard: str = self.do(self.char1, "report more")
+        self.assertIn("once every question", heard)
+        self.assertIn("report 1", heard)
+
+    def test_starting_over_forgets_the_answers(self) -> None:
+        self.find("C7")
+        self.do(self.char1, "report d")
+        start_over("port")
+        self.assertEqual(get_expedition().answers, {})

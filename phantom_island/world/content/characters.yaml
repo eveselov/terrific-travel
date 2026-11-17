@@ -519,8 +519,16 @@ characters:
         teaches: {sea_clocks: heard, dead_reckoning: heard}
         reply: >
           "Our master swore by his longitude. But we had no sea clock, only dead reckoning
-          and his moon tables, and we'd been months at sea. If anyone ever came looking,
-          I always thought they'd look in the wrong place."
+          and his moon tables, and we'd been months at sea. He sent the chart home with his
+          |wletter|n. If anyone ever came looking, I always thought they'd look in the
+          wrong place."
+      letter:
+        aliases: [letters, whaler, last letter]
+        stance: truth
+        reply: >
+          "A whaler put in for water while we lay at anchor. Our master sent his letter
+          home with her, and a fair copy of his |wchart|n. She sailed a week before the
+          |wstorm|n. So the letter got home, and we didn't."
       compass:
         stance: truth
         reply: >
@@ -636,13 +644,14 @@ characters:
           Where they differ, look for something you can see for yourself: a thing can't
           lie."
       birds:
-        aliases: [seabirds, terns, noddies, sky]
+        aliases: [seabirds, terns, white terns, noddies, noddy, sky]
         stance: truth
         teaches: {seabirds: understood}
         reply: >
-          "Watch the sky at dusk. Terns and noddies fish at sea all day and fly home to land
-          for the night. Follow them with your eyes, and you'll know where land is.
-          Island navigators have done it for a very long time."
+          "Watch the sky at dusk. White terns fish at sea all day, as far as a hundred
+          miles from land, and fly home to it for the night. Noddies do the same, but never
+          stray as far. Follow them with your eyes, and you'll know where land is. Island
+          navigators have done it for a very long time."
       tide:
         aliases: [tides, low tide, high tide]
         stance: truth
