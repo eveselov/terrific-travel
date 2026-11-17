@@ -115,11 +115,11 @@ characters:
         stance: truth
         reply: >
           "The Society wants the truth about the |wHalcyon|n: what happened to her, why
-          nobody ever found her, and what became of her |wcrew|n. I have written the three
-          questions at the top of the expedition's |wjournal|n. Now a |wcompass|n with her
-          name on it has turned up in our own market, on Silas Crane's stall, just east of
-          here. Look at it first. Then take your |wship|n to the |wisland|n on the
-          Halcyon's |wchart|n."
+          nobody ever found her, and what became of her |wcrew|n. The three questions stand
+          at the top of the expedition's |wjournal|n. When you can prove the answers, send
+          me your |wreport|n. Start with the |wcompass|n that has turned up on Silas Crane's
+          stall in the market, just east of here. Then take your |wship|n to the |wisland|n
+          on the Halcyon's |wchart|n."
       halcyon:
         stance: truth
         teaches: {oak: heard}

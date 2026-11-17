@@ -49,6 +49,10 @@ limbo:
     reason.
 
 
+    When you know what happened, and can prove it, send your |wreport|n to the Society. You
+    can try it at any time.
+
+
     Type |wbegin|n to start.
   exits:
     begin: {to: office, aliases: [start]}

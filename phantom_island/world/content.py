@@ -44,7 +44,7 @@ WHITE_WORD: re.Pattern[str] = re.compile(r"\|w(.+?)\|n")
 # out (`|waboard|n`, `|wexamine compass|n`): these are the words a command can start with.
 COMMAND_WORDS: frozenset[str] = frozenset(
     "aboard ashore sail look examine x read use get take drop go map journal notebook ask "
-    "up down begin help".split()
+    "up down begin help report".split()
 )
 
 LIMBO_ID: str = "limbo"
