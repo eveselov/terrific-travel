@@ -70,6 +70,48 @@ Settled on 2026-11-11.
 | 31 | **Hints** (2026-11-17) | **`hint`, anywhere, gives the next step at three levels: a nudge, then more direct, then the exact command.** The level starts over when the expedition makes progress (a clue, a report answer). After 10 minutes of play without progress, a player's next command is followed by the first level, once per stretch without progress; pauses between commands count at most a minute, so breaks don't push. **Aboard, the Ship gives the hint; anywhere else, the journal does**, as the expedition's own thinking ("You leaf through the journal, and think."). Not a talking Island, Port or Map: an island that speaks would know the whole truth, the all-knowing character 22 rules out, and would bring magic into a story solved by measuring. Detecting players who read too fast was left out: hard to tell reliably, and pushed hints already reach players who are lost. | Situations in [hints.yaml](../world/content/hints.yaml), checked in order, the first that matches wins: conditions on the ship's position, clues and flags found or missing, report questions open. Every new gate or timed event adds its situation there. Code in `world/hints.py`; the clock is kept in the `Expedition` script and counted after every player command (`commands/command.py`). |
 | 32 | **The report is the case board** (2026-11-18, after playing: the report turned out to be the tool players consult whenever they don't know what to do) | **`report` alone shows every question of the task, answered or not, with the possibilities (theories) the expedition has come across so far. It shows only what the players could know: a theory opens with the clues that raise it, and the right one never opens alone.** At the start, each question shows only what the Society believes, and a note that more possibilities may come. When a clue opens a theory, the finder's room hears "New for the report: another possibility for question 1", without the theory itself. Right theories are written as claims, not explanations: the why belongs in the epilogue and the connection questions. This changes 29's "the choices are always the same": they still never give the right one away, because it always arrives together with a wrong rival from the same evidence. | Each choice in [report.yaml](../world/content/report.yaml) has `opens` (clue groups, as a connection's `needs`); the content check fails if the right theory has no wrong one with the same `opens`. Theories are lettered among those open, in the file's order, so the ones open from the start come first and keep their letters. Code in `world/report.py` (the board) and `world/clues.py` (which theories are open). |
 
+## Stage A4: what is built, what remains
+
+Updated 2026-11-18. The order was set on 2026-11-16 (GAME_INCEPTION.md, the A4 row); A4 is
+done when the adventure can be played from start to finish, alone or together, and reach
+every ending, and a player who wanders is led back towards the task (tested with two players).
+
+**Built (2026-11-16 to 18):**
+- **Story fixes:**
+  - The chart's error is 1 degree, not 2, so that the birds hold. White terns, not boobies, with sources checked (GAME_STORY.md, "Sources").
+  - A whaler carried the last letter and the chart home.
+  - The crew who sailed west stay a mystery on purpose.
+- **(1) The report (29), then the case board (32):**
+  - A cyan verdict line (20).
+  - The report is mentioned on the Limbo title page and in Mrs. Fairweather's *mission*.
+- **(2) Connection questions (30).**
+- **(3) Hints (31).**
+
+**Still to do, in order:**
+1. **Gates**, each with at least two ways through and a hint situation in hints.yaml (6b):
+   - **Leaving port.** GAME_STORY says the ship sails once Crane admits the fishermen came from the west (C3). A second way through is not designed yet.
+   - **Meeting Jonah.** GAME_STORY says after the wreck and Ama's account (C7 + C12). A second way, and where Jonah is when he is not at the cove ("Jonah's hours"), are not designed. Until then C13 is given freely.
+2. **Time: the tide, dusk and noon.**
+   - The Western Reef only at low tide (C7), the birds only at dusk (C6), the noon sight only at noon (C5).
+   - Tui moves between the Village and the Reef, presumably with the tide.
+   - To design first:
+     - how long a game day lasts in real time;
+     - when the ship arrives somewhere;
+     - whether there is a `wait` command.
+
+     Waiting must stay short in a 30–60 minute session, and every timed gate needs a hint situation.
+3. **Ama's respect** (the `respect` flag, which makes C12 findable).
+   - One idea: asking her about the reef before going there.
+   - A second way is needed, for players who went to the reef first.
+4. **Promised elsewhere, to build or drop:**
+   - counting the water (26);
+   - `show <thing> to <character>` (19).
+
+**Proposed, waiting for a decision:**
+- **Hints prefer what is near the player.** An optional `place` on hint situations; a matching situation where the player stands wins over the list order (the Hilltop case).
+- **Connection questions ask only "why".** Drop their "go and look" parts (*oak*: "Look for a place where something was built"), which are a hint's job.
+- **A neutral first reply to an unproved right theory**, if playtests show players trying every letter. Today "The Society will want proof of that" says it is the right one.
+
 ## Open questions
 
 - Checkpoints: needed when the game goes to the co-designers; which commands, and what is saved? (from 7)

@@ -280,11 +280,57 @@ game or its players.
 - **An explicit knowledge model.** Today the links between tasks, claims, evidence and ideas
   are spread across several fields (a report answer's proof, a topic's conditions, what a text
   teaches, the connections). One model linking task → claim → evidence → source → idea would
-  serve authors, hints and evaluation at once.
-- **Hints that understand parallel goals.** Hints now follow one fixed order of situations.
-  A larger game needs hints that prefer what is near the player, or let the player choose
-  which goal to get help with.
+  serve authors, hints and evaluation at once. The Source of the diagrams, in particular,
+  exists only as a concept: in the files it is spread across topics, details, things' actions
+  and the views from the ship.
+- **Hints that understand parallel goals.** Hints now follow one fixed order of situations,
+  and only the shared state of play decides which applies, not where the player stands or
+  what they are doing. Three ways forward, cheapest first:
+  1. prefer a situation tied to the player's place;
+  2. let the player choose the goal (`hint` lists what is open, `hint wreck` helps with that
+     one), as classic adventure hints were organised by question;
+  3. a small graph of goals with prerequisites, choosing the one nearest the player or the
+     one they touched last.
 - **The play-through check** described above.
-- **Evaluation by design**, with records that respect the players' privacy.
+- **Evaluation by design**, with records that respect the players' privacy. One known leak
+  to design out: feedback on an answer can reveal more than intended (in Phantom Island, "the
+  Society will want proof" tells the player the theory is right, only unproved).
 - **A second episode**, to show which parts are truly general. Shared code is extracted only
   once two real games exist.
+- **Check the prior art before citing it.** The relatives named above are given from
+  general knowledge; check them against sources before this document is shared widely.
+
+## Engine and episode
+
+What would carry over to every game, and what belongs to one episode, as it looks after
+Phantom Island:
+
+| Engine (would carry over) | Episode (Phantom Island's own) |
+|---|---|
+| clues and the shared journal, the task, the case board with proof, the epilogue | the 13 clues, the three questions, the theories, the epilogue's text |
+| connection questions; hints with situations, pushed after a stretch without progress | which clues connect; the hint path |
+| the notebook of ideas and its three levels | latitude, coral, tides, seabirds... |
+| the content loader and checker, the scenario recorder, starting over | places, characters, things |
+| the ship that travels between positions (perhaps) | the sea chart, the 1 degree error |
+
+## Replay
+
+A mystery is spent once it is solved; that is normal for the genre, and can be designed as a
+feature. Ways to give a series lasting value, cheapest first:
+
+1. **The series is the replay.** Each episode is played once, like a book in a series. The
+   notebook carries over: a player who learned latitude in one adventure arrives at the next
+   with it already *understood*, and the new episode can build on it. Competence then grows
+   across the series, which suits learning better than replaying one story.
+2. **Replay as a guide.** A player who has finished can join a newcomer as an adviser, who
+   can talk but not find clues or report. In Phantom Island the first young player is
+   expected to guide the next one this way.
+3. **A record of how it went**, on the epilogue's last page: clues found (11 of 13),
+   connections opened, hints used, notebook ideas *used*. It gives a reason to go back for
+   what was missed, without turning the game into a quiz, and it costs little: all of it is
+   already in the state of play.
+4. **Variation between runs**: another island, another error, different witnesses holding
+   different facts. This is expensive, because "everything fits together" must then be
+   computed, not written. Facts that are arithmetic (4 minutes of time per degree) can vary;
+   the story and its people can't without many more texts. Free conversation with AI
+   characters will bring some variety by itself.
