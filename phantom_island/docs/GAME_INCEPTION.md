@@ -740,3 +740,35 @@ When the second episode exists:
 None of this needs doing before Phantom Island is finished. It's worth writing the schema down now, while the reasons are fresh.
 
 Should I put the tightened formulation and these notes into a short design document, for example `docs/SCHEMA.md`, kept separate from Phantom Island's own docs as your earlier note about general guides suggested?
+
+## Report as Case Board
+
+The report now works as a case board, and it shows only what the players could know. The targeted tests pass (71), and ruff and mypy are clean. The full suite is running in the background, and I'll report when it finishes.
+
+**What players see now.** `report` alone, at the start:
+```
+The report for the Society: the task's questions, and what might be
+1. What happened to the Halcyon, and where?
+   a) She sank far out at sea in the great storm of '75, with all hands.
+   b) She reached the island, then sailed on and was lost somewhere else.
+   (More possibilities may come up as the expedition finds out more.)
+2. Why did nobody ever find the Halcyon?
+   a) Because she sank in deep water, and the sea keeps what it takes.
+   b) Nobody searched long enough. The island is where the chart says it is.
+   (More possibilities ...)
+3. What became of the Halcyon's crew?
+   a) They all drowned when she went down.
+   (More possibilities ...)
+Answer a question with the letter of the possibility you can prove, like report 1 a. ...
+```
+
+**How possibilities open.** A test checks that the starting board mentions no reef, no longitude, no west and no boat. When a clue opens a possibility, the room hears "New for the report: another possibility for question 1 (report 1)", but not what it is.
+- **Question 1:** the coral (or the wreck, or Jonah) adds "she sank in the deep ocean" (wrong: coral grows only in shallow water) and "wrecked on a reef near the island" (right).
+- **Question 2:** the empty sea adds "latitude wrong", "longitude wrong" and "the island moves". The right one is now a claim: "the chart's longitude was wrong: it put the island too far east or west". The *no sea clock* explanation moved to the accepted reply and the epilogue.
+- **Question 3:** the oak beams, the song, Ama or Jonah add three survival stories: west with one staying (right), home to the east, or all staying.
+
+**The rule, enforced.** The content check fails if a question's right possibility doesn't share its exact `opens` with a wrong one. So a new possibility never gives itself away by appearing. Letters count only the possibilities shown, in file order, with the starting ones first, so their letters never change.
+
+**Replies.** I rewrote the replies of the possibilities shown from the start, because three of them mentioned things players can't know yet: "somebody on the island remembers", "at the chart's position there was no island", "a piece of her in the shallows".
+
+**Docs:** decision 32 (it amends decision 29's "the choices are always the same"), GAME_SCHEMA (a section "The report is the centre, not the end" and design rule 11), and the GAME_AUTHORING recipe, GAME_GUIDE and the README walkthrough.

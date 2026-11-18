@@ -30,6 +30,9 @@ are in [DECISIONS.md](DECISIONS.md).
 
 ## How the files refer to each other
 
+The entities behind the files, and how they relate, are drawn in GAME_SCHEMA.md ("The
+entities"); this section is the same model at the level of files and fields.
+
 Entries are named by ids, and other files use those ids. A typo isn't silently ignored: the
 content check runs whenever the files are read, and stops with the file and entry at fault
 (`ship.yaml, position charted, route west: unknown position 'anchorag'`).
@@ -148,6 +151,14 @@ clues in the journal, with a `missing` hint shown while it isn't. Every other ch
 The wrong choices are what the witnesses believe or claim, or a natural misunderstanding
 (the wrong number of the chart). Never invent a new element just to be wrong: it would be a
 false lead. A reply turns a choice down gently and points somewhere, never "wrong!".
+
+The report is the players' case board, consulted all through the game, so it must show
+only what they could know (DECISIONS.md, 32). Give each choice the clues that raise it
+(`opens`); a choice without `opens` is what the Society believes at the start. The right
+one must open together with a wrong rival (the same `opens`), or its appearing gives it
+away. Write the right one as a claim, not an explanation, and check that no reply
+mentions what the players can't know yet when its theory opens. Put the ones open from
+the start first: theories are lettered among those open, in the file's order.
 
 The epilogue is a list of pages, each a `title` and a `text`. Real facts in it go into
 the "Sources" list in GAME_STORY.md and on the epilogue's last page (DECISIONS.md, 9).

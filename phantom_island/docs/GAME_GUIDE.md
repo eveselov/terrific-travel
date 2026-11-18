@@ -78,7 +78,8 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 ## Report
 
-- When you think you know the answer to one of the task's questions, `report` it to the Society, anywhere, at any time. It shows a question and a few possible answers; pick one by its letter (`report b`). `report 2` goes to another question, in any order.
+- `report` is your case board, anywhere, at any time: the task's three questions, and for each one the possibilities you have come across so far. New possibilities come up as the expedition finds things out. Whenever you don't know what to do next, look at it.
+- When you think you know an answer, pick its letter: `report 1 b`. `report 2` shows one question on its own.
 - The Society wants proof: an answer is only accepted once the journal holds the clues that show it. If an answer doesn't fit, or can't be proved yet, you're told why, and where you might look. That's not failing: go and look, and come back.
 - One player's answer counts for the whole expedition, and the journal shows it under the question.
 - When clues in the journal fit together, a question about them comes up: `think` lists them all. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.

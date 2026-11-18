@@ -316,13 +316,17 @@ class ProofSpec:
 
 @dataclass(frozen=True)
 class ChoiceSpec:
-    """One choice of a report question. The right one has an `answer` and its `proof`."""
+    """
+    One theory for a report question. It is shown once its `opens` clues are in the journal
+    (none: from the start). The right one has an `answer` and its `proof`.
+    """
 
     text: str
     reply: str
     right: bool = False
     answer: str | None = None
     proof: tuple[ProofSpec, ...] = ()
+    opens: tuple[tuple[str, ...], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -871,21 +875,37 @@ def _connections(data: dict[str, Any], clues: dict[str, ClueSpec]) -> dict[str, 
         needs_data: Any = item.get("needs")
         if not isinstance(needs_data, list) or len(needs_data) < 2:
             raise ContentError(f"{where}: `needs` must list at least two clues.")
-        needs: list[tuple[str, ...]] = []
-        for entry in needs_data:
-            group: tuple[str, ...] = (
-                _words(entry, "needs", where) if isinstance(entry, list) else (str(entry),)
-            )
-            for clue in group:
-                if clue not in clues:
-                    raise ContentError(f"{where}: needs unknown clue {clue!r}.")
-            if not group:
-                raise ContentError(f"{where}: an entry of `needs` is empty.")
-            needs.append(group)
         connections[connection_id] = ConnectionSpec(
-            id=connection_id, needs=tuple(needs), question=_text(item, "question", where)
+            id=connection_id,
+            needs=clue_groups(needs_data, "needs", where, clues),
+            question=_text(item, "question", where),
         )
     return connections
+
+
+def clue_groups(
+    value: Any, field: str, where: str, clues: dict[str, ClueSpec] | None = None
+) -> tuple[tuple[str, ...], ...]:
+    """
+    Clue conditions like `[C4, [C12, C13]]`: every entry is needed, and an entry that is a
+    list needs any one of its clues. Checks the clues exist when `clues` is given.
+    """
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise ContentError(f"{where}: `{field}` must be a list of clue ids.")
+    groups: list[tuple[str, ...]] = []
+    for entry in value:
+        group: tuple[str, ...] = (
+            _words(entry, field, where) if isinstance(entry, list) else (str(entry),)
+        )
+        if not group:
+            raise ContentError(f"{where}: an entry of `{field}` is empty.")
+        for clue in group:
+            if clues is not None and clue not in clues:
+                raise ContentError(f"{where}: `{field}` names unknown clue {clue!r}.")
+        groups.append(group)
+    return tuple(groups)
 
 
 def _task(data: dict[str, Any]) -> TaskSpec | None:
@@ -930,6 +950,7 @@ def _choice(value: Any, where: str) -> ChoiceSpec:
         right=right,
         answer=_text(item, "answer", where) if right else None,
         proof=proof,
+        opens=clue_groups(item.get("opens"), "opens", where),
     )
 
 
@@ -1195,10 +1216,26 @@ def _check(content: Content) -> None:
 
 
 def _check_report(content: Content) -> None:
-    """Every clue a report answer needs as proof exists."""
+    """
+    Every clue a report theory opens with, or an answer needs as proof, exists; and the
+    right theory never opens alone (DECISIONS.md, 32): some wrong theory of the same question
+    has exactly the same `opens`, so a new theory never gives itself away by appearing.
+    """
     if content.report is None:
         return
     for question in content.report.questions:
+        for index, choice in enumerate(question.choices):
+            where: str = f"{REPORT_FILE}, question {question.id}, choice {index + 1}"
+            for group in choice.opens:
+                for clue in group:
+                    if clue not in content.clues:
+                        raise ContentError(f"{where}: `opens` names unknown clue {clue!r}.")
+        right: ChoiceSpec = question.right
+        if not any(not c.right and c.opens == right.opens for c in question.choices):
+            raise ContentError(
+                f"{REPORT_FILE}, question {question.id}: the right theory must open together "
+                "with a wrong one (the same `opens`), or its appearing gives it away."
+            )
         for number, part in enumerate(question.right.proof, start=1):
             for clue in part.clues:
                 if clue not in content.clues:

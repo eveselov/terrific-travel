@@ -268,6 +268,13 @@ class TestContent(TestCase):
         error: ContentError = self._broken_copy(CLUES_FILE, "needs: [C7, C8]", "needs: [C7, C88]")
         self.assertIn("connection oak", str(error))
 
+    def test_the_right_theory_must_not_open_alone(self) -> None:
+        rival: str = "        opens: [[C2, C7, C13]]\n        reply: >\n          Coral grows"
+        error: ContentError = self._broken_copy(
+            REPORT_FILE, rival, "        reply: >\n          Coral grows"
+        )
+        self.assertIn("must open together with a wrong one", str(error))
+
     def test_the_report_asks_the_task_questions(self) -> None:
         content: Content = load_content()
         assert content.report is not None and content.task is not None
@@ -1551,12 +1558,33 @@ class TestReport(DiscoveryTest):
         for clue in clues:
             get_expedition().add_clue(clue, "someone", "somewhere")
 
-    def test_report_shows_the_first_question_and_its_choices(self) -> None:
+    def test_the_board_shows_only_what_the_society_knows(self) -> None:
         heard: str = self.do(self.char1, "report")
-        self.assertIn("question 1 of 3", heard)
-        self.assertIn("What happened to the Halcyon, and where?", heard)
+        self.assertIn("The report for the Society", heard)
+        self.assertIn("1. What happened to the Halcyon, and where?", heard)
         self.assertIn("a) She sank far out at sea", heard)
-        self.assertIn("report d", heard)
+        self.assertIn("More possibilities may come up", heard)
+        for spoiler in ("reef", "longitude", "west", "boat"):
+            self.assertNotIn(spoiler, heard.lower())
+
+    def test_a_question_shows_its_open_theories(self) -> None:
+        heard: str = self.do(self.char1, "report 1")
+        self.assertIn("question 1 of 3", heard)
+        self.assertIn("b) She reached the island, then sailed on", heard)
+        self.assertNotIn("c)", heard)
+        self.assertIn("report 1 b", heard)
+
+    def test_theories_open_with_their_clues_and_never_alone(self) -> None:
+        self.at(self.char1, "market")
+        heard: str = self.do(self.char1, "examine compass")  # C1 and C2
+        self.assertIn("another possibility for question 1", heard)
+        board: str = self.do(self.char1, "report 1")
+        self.assertIn("c) She sank in the deep ocean", board)
+        self.assertIn("d) She was wrecked on a reef near the island", board)
+
+    def test_a_letter_beyond_the_open_theories_is_not_a_choice(self) -> None:
+        heard: str = self.do(self.char1, "report 1 d")
+        self.assertIn("Pick one of the possibilities", heard)
 
     def test_a_wrong_choice_is_turned_down_with_a_hint(self) -> None:
         heard: str = self.do(self.char1, "report a")
@@ -1564,7 +1592,8 @@ class TestReport(DiscoveryTest):
         self.assertEqual(get_expedition().answers, {})
 
     def test_the_right_choice_needs_its_proof(self) -> None:
-        heard: str = self.do(self.char1, "report d")
+        self.find("C2")
+        heard: str = self.do(self.char1, "report 1 d")
         self.assertIn("the journal doesn't hold it yet", heard)
         self.assertIn("report 1 d", heard)
         self.assertEqual(get_expedition().answers, {})
@@ -1572,15 +1601,14 @@ class TestReport(DiscoveryTest):
     def test_the_right_choice_with_proof_answers_for_everyone(self) -> None:
         self.find("C7")
         with patch.object(self.char2, "msg") as elsewhere:
-            heard: str = self.do(self.char1, "report d")
+            heard: str = self.do(self.char1, "report 1 d")
         self.assertIn("wrecked on the Western Reef", heard)
         self.assertIn("Proved in the journal: 1.", heard)
         self.assertEqual(get_expedition().answers, {"wreck": self.char1.key})
         self.assertIn("answered a question of the report", texts(elsewhere))
         journal: str = self.do(self.char2, "journal")
         self.assertIn("Answered: Wrecked on the island's Western Reef", journal)
-        # The next open question comes up by itself.
-        self.assertIn("question 2 of 3", self.do(self.char1, "report"))
+        self.assertIn("Answered by", self.do(self.char1, "report"))
 
     def test_questions_can_be_answered_in_any_order(self) -> None:
         self.find("C12", "C11")
@@ -1591,16 +1619,16 @@ class TestReport(DiscoveryTest):
 
     def test_every_part_of_the_proof_is_needed(self) -> None:
         self.find("C4")
-        heard: str = self.do(self.char1, "report 2 c")
+        heard: str = self.do(self.char1, "report 2 d")
         self.assertIn("chart's island, only in the wrong place", heard)
         self.find("C10")
-        self.do(self.char1, "report 2 c")
+        self.do(self.char1, "report 2 d")
         self.assertIn("why", get_expedition().answers)
 
     def test_the_epilogue_follows_the_last_answer(self) -> None:
         self.find("C7", "C4", "C5", "C13", "C8")
-        self.do(self.char1, "report 1 d")
-        self.do(self.char1, "report 2 c")
+        self.do(self.char1, "report 1 e")
+        self.do(self.char1, "report 2 d")
         with patch.object(self.char2, "msg") as elsewhere:
             heard: str = self.do(self.char1, "report 3 b")
         self.assertIn("the report is complete", heard)
@@ -1620,7 +1648,7 @@ class TestReport(DiscoveryTest):
 
     def test_starting_over_forgets_the_answers(self) -> None:
         self.find("C7")
-        self.do(self.char1, "report d")
+        self.do(self.char1, "report 1 d")
         start_over("port")
         self.assertEqual(get_expedition().answers, {})
 

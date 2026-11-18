@@ -188,9 +188,10 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
 - **The 1-degree error** (2026-11-16): the island is at 14 S, 41 W, half a day's sail west
   of the chart's position, so the white terns seen there at dusk can really be flying home
   to it. The chronometer at the island reads 164 minutes after home noon.
-- **The report** (`report`, DECISIONS.md, 29), anywhere and at any moment. It asks the
-  task's three questions one at a time; `report b` picks a choice, `report 2` goes to
-  another question. A wrong choice is turned down with a hint; the right one is accepted
+- **The report** (`report`, DECISIONS.md, 29 and 32), anywhere and at any moment. `report`
+  alone is the case board: the task's three questions, each with the possibilities met so
+  far. A possibility opens with the clues that raise it, and the right one never opens
+  alone. `report 1 b` answers, `report 2` shows one question. A wrong choice is turned down with a hint; the right one is accepted
   only once the journal holds its proof. One player's answer counts for everyone, and the
   journal shows it under the task. Once all three are answered, every connected player sees
   the epilogue's first page, and `report more` turns the pages.
@@ -210,9 +211,12 @@ To try it (spoilers):
 ```
 uv run evennia reload        (new code)
 startover island yes         (as admin: the ship at the island)
-report                       → question 1 and its choices
-report a                     → turned down, with a hint
-report d                     → right, but no proof in the journal yet: where to look
+report                       → the case board: what the Society believes, nothing more
+report 1 a                   → turned down, with a hint
+teleport Market
+examine compass              → the coral: "New for the report: another possibility"
+report 1                     → now also the deep ocean, and a reef near the island
+report 1 d                   → right, but no proof in the journal yet: where to look
 ```
 
 The choices, the proof each answer needs, and the epilogue are in

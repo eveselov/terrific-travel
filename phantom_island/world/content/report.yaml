@@ -2,30 +2,42 @@
 #
 # SPOILERS: this file holds the solution of the mystery. Don't show it to the players.
 #
-# The report asks the task's questions (clues.yaml, `task`) one at a time, in the same order
-# (DECISIONS.md, 29). Each is answered by picking one of its choices. The choices are always
-# the same, so the right one never gives itself away by appearing. The wrong ones are what
-# the witnesses believe or claim (Barnaby's sinking, the chart being right), or a natural
-# misunderstanding: choosing between them is the test of understanding (DECISIONS.md, 6b).
-# One player's answer counts for the whole expedition.
+# The report is the expedition's case board (DECISIONS.md, 29 and 32): the task's questions
+# (clues.yaml, `task`), in the same order, each with the theories the expedition has come
+# across so far. Players consult it whenever they wonder what to do, so it must show only what
+# they could know. A theory `opens` with the evidence that raises it; without `opens`, it is
+# what the Society believes at the start. The right theory never opens alone: some wrong
+# theory of the same question has exactly the same `opens` (the content check makes sure), so
+# a new theory never gives itself away by appearing. Theories are lettered a, b, c... among
+# those open, in the order written here, so write the ones open from the start first.
 #
-# A wrong choice is turned down with its `reply`: why it doesn't fit, and where to look. It is
-# never a "you failed". The right choice is accepted only when the journal holds its `proof`;
-# until then the first missing proof's hint is shown. Once all questions are answered, the
-# epilogue follows, page by page (`report more`). The game frames these texts: a wrong
-# choice's reply is followed by "pick another one, or find out more first", and a `missing`
-# hint is preceded by "the journal doesn't hold the proof yet" and followed by "report this
-# answer again". So write `missing` as a direction (where to look), not as a question.
-# The game's verdict on an answer comes first, on its own line in cyan (DECISIONS.md, 20).
+# The wrong theories are what witnesses believe or claim (Barnaby's sinking, the chart being
+# right), or a natural misunderstanding: choosing between them is the test of understanding
+# (DECISIONS.md, 6b). Never invent a new element just to be wrong. Write the right theory as a
+# claim, not an explanation: the why belongs in the epilogue and the connection questions.
+# A reply must not mention what the players may not know yet when the theory is open (a theory
+# open from the start can't speak of the island's reef).
+#
+# One player's answer counts for the whole expedition. A wrong theory is turned down with its
+# `reply`: why it doesn't fit, and where to look. It is never a "you failed". The right one is
+# accepted only when the journal holds its `proof`; until then the first missing proof's hint
+# is shown. Once all questions are answered, the epilogue follows, page by page (`report
+# more`). The game frames these texts: a wrong theory's reply is followed by "pick another
+# answer, or find out more first", and a `missing` hint is preceded by "the journal doesn't
+# hold the proof yet" and followed by "report this answer again". So write `missing` as a
+# direction (where to look), not as a question. The game's verdict on an answer comes first,
+# on its own line in cyan (DECISIONS.md, 20).
 #
 # Each question has:
 #   id        a short name (also used by `report <id>`, for testing)
-#   choices   two to five, shown as a, b, c...; exactly one has `right: true`
+#   choices   two to five theories; exactly one has `right: true`
 #
-# Each choice has:
-#   text      the choice as players read it
-#   reply     wrong choices: why it doesn't fit, and a hint where to look
-#   right     true for the right choice; it then has, instead of `reply`:
+# Each choice (theory) has:
+#   text      the theory as players read it
+#   opens     optional: the clues that raise it, as in a connection's `needs` (an entry can
+#             be a list: any one of those clues); without it, open from the start
+#   reply     wrong theories: why it doesn't fit, and a hint where to look
+#   right     true for the right theory; it then has, instead of `reply`:
 #     answer  a short line for the journal, under the task's question
 #     reply   what players read when it is accepted
 #     proof   the clues that prove it: a list of groups, each one needing any one of its
@@ -45,17 +57,26 @@ questions:
       - text: She sank far out at sea in the great storm of '75, with all hands.
         reply: >
           That is what Old Barnaby believes, and he is right about the storm. But a ship that
-          sinks in deep water leaves nothing anyone can find, and something of the Halcyon
-          was found. Where would a piece of her lie in the shallows for years?
+          sinks far out at sea leaves nothing anyone can find, and something of the Halcyon
+          has been found. Look closely at it.
       - text: She reached the island, then sailed on and was lost somewhere else.
         reply: >
-          Her last letter does say "We sail again soon". But did she? If she sailed on, her
-          timbers sailed with her. Look at what the island is built of.
+          Her last letter does say "We sail again soon". But nobody knows that she did.
+          Find the island first, and see what is there.
       - text: She never reached the island at all. The chart was only a guess.
+        opens: [C4]
         reply: >
           The chart's island was drawn by someone who saw it: its coastline is drawn with
-          care. Is there a place where you can compare the drawing with the island itself?
-      - text: She was wrecked on the island's Western Reef in the great storm of '75.
+          care. Find a place where you can compare the drawing with an island.
+      - text: She sank in the deep ocean, and the compass lay on the sea floor until someone
+          found it.
+        opens: [[C2, C7, C13]]
+        reply: >
+          Coral grows only in warm, clear, shallow water, never in the deep ocean, and
+          nothing can be brought up from the bottom of the deep sea. The compass lay
+          somewhere shallow, near land.
+      - text: She was wrecked on a reef near the island, in the great storm of '75.
+        opens: [[C2, C7, C13]]
         right: true
         answer: Wrecked on the island's Western Reef, in the great storm of '75.
         reply: >
@@ -71,26 +92,32 @@ questions:
     choices:
       - text: Because she sank in deep water, and the sea keeps what it takes.
         reply: >
-          Even a ship lost without a trace leaves her island behind. But at the chart's
-          position there was no island at all. Why?
+          Even a ship lost without a trace leaves her island behind, and nobody found the
+          island either. Sail to where the chart puts it, and see for yourselves.
+      - text: Nobody searched long enough. The island is where the chart says it is.
+        reply: >
+          Then it will be there when you arrive. Sail to the position on the chart, and see
+          for yourselves.
       - text: >
           Because the chart's latitude was wrong: the island lies further north or south than
           the chart says.
+        opens: [C4]
         reply: >
           The noon sun says otherwise. The sextant measures latitude from the height of the
-          noon sun, and the island lies at exactly the chart's latitude. Which of the
-          chart's two numbers is hard to measure?
+          noon sun, and it agrees with the chart. Which of the chart's two numbers is hard to
+          measure?
       - text: >
-          Because the chart's longitude was wrong. With no sea clock aboard, her master could
-          only reckon how far west he had come, and he put the island too far east.
+          Because the chart's longitude was wrong: it put the island too far east or west.
+        opens: [C4]
         right: true
         answer: >
           The chart's longitude was wrong: without a sea clock, the island was put 1 degree
           too far east.
         reply: >
           You write it down: the Halcyon's master measured his latitude by the noon sun,
-          and it was right. His longitude was only reckoned, and it put the island 1 degree
-          too far east. Everyone who searched, searched in the wrong place.
+          and it was right. His longitude was only reckoned, without a sea clock, and it put
+          the island 1 degree too far east. Everyone who searched, searched in the wrong
+          place.
         proof:
           - clues: [C4]
             missing: >
@@ -104,20 +131,22 @@ questions:
       - text: >
           Because the island moves. Phantom islands drift about the ocean, and appear and
           vanish.
+        opens: [C4]
         reply: >
-          Islands don't drift: this one is rock, coral and a hill. What can move is the
-          drawing of an island, from one place on a chart to another. Which of the chart's
-          numbers could be wrong?
+          Islands don't drift: an island is rock and earth, fixed to the bottom of the sea.
+          What can move is the drawing of an island, from one place on a chart to another.
+          Which of the chart's numbers could be wrong?
 
   - id: crew
     choices:
       - text: They all drowned when she went down.
         reply: >
-          Old Barnaby believes it. But somebody on the island remembers that night. Ask the
-          old ones, and listen to what the children sing.
+          Old Barnaby believes it, but nobody has looked where the Halcyon was really lost.
+          Find out where that was, and who lives there.
       - text: >
-          The islanders saved them all. They lived in the village for a season, built a boat
-          from the Halcyon's oak, and most of them sailed west. One stayed on the island.
+          They survived the wreck and lived on the island for a season. Most of them sailed
+          west in a boat they built, and one stayed.
+        opens: [[C8, C11, C12, C13]]
         right: true
         answer: >
           Saved by the islanders. They built a boat from the Halcyon's oak, and most sailed
@@ -136,12 +165,14 @@ questions:
               Look for something on the island that the crew made, or that the children
               remember about them.
       - text: >
-          The islanders saved them, and they built a boat and sailed home, east, but were
-          lost on the way.
+          They survived the wreck, built a boat and sailed home, east, but were lost on the
+          way.
+        opens: [[C8, C11, C12, C13]]
         reply: >
           Home lies east, and out here the trade wind blows from the east, day after day.
           Which way would a small boat really go? Someone on the island watched it leave.
       - text: They all stayed on the island, and their children live there now.
+        opens: [[C8, C11, C12, C13]]
         reply: >
           Then where is everybody? Only one sailor still lives on the island. And something
           was built at the cove, and sailed away.

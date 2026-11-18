@@ -14,9 +14,11 @@ from typeclasses.scripts import JournalEntry
 from world import recorder
 from world.content import (
     CLUE_MARK,
+    ChoiceSpec,
     ClueSpec,
     ConnectionSpec,
     Content,
+    QuestionSpec,
     ReportSpec,
     load_content,
 )
@@ -62,6 +64,7 @@ def discover(clue_id: str, finder: Any, source: str | None = None) -> bool:
     clue: ClueSpec = content.clues[clue_id]
     place: str = place_name(finder)
     open_before: set[str] = {connection.id for connection in open_connections()}
+    theories_before: dict[str, int] = _open_theory_count()
     if not get_expedition().add_clue(clue_id, str(finder.key), place, source):
         number: int | None = entry_number(clue_id)
         entry: str = f"{number}. " if number is not None else ""
@@ -73,10 +76,55 @@ def discover(clue_id: str, finder: Any, source: str | None = None) -> bool:
         recorder.note(character, f"Journal: new {clue_id}, {clue.title}")
     opened: list[ConnectionSpec] = [c for c in open_connections() if c.id not in open_before]
     here: str = line + "".join(f"\n{SOMETHING_TO_THINK} {c.question}" for c in opened)
+    here += "".join(f"\n{text}" for text in _new_theories(theories_before))
     if opened:
         recorder.note(finder, "Think: " + ", ".join(c.id for c in opened))
     _tell_all(finder, here, f"{finder.key} found something at {place}. {line}")
     return True
+
+
+def found_clues() -> set[str]:
+    """The ids of the clues in the journal (read once, for checking many conditions)."""
+    return {entry.clue for entry in get_expedition().journal}
+
+
+def groups_met(groups: tuple[tuple[str, ...], ...], found: set[str] | None = None) -> bool:
+    """Whether every group of clues has at least one in the journal (none: always)."""
+    known: set[str] = found_clues() if found is None else found
+    return all(any(clue in known for clue in group) for group in groups)
+
+
+def open_theories(question: QuestionSpec, found: set[str] | None = None) -> list[ChoiceSpec]:
+    """A report question's theories the expedition has come across, in the content's order."""
+    known: set[str] = found_clues() if found is None else found
+    return [choice for choice in question.choices if groups_met(choice.opens, known)]
+
+
+def _open_theory_count() -> dict[str, int]:
+    """How many theories are open for each report question (by id)."""
+    report: ReportSpec | None = load_content().report
+    if report is None:
+        return {}
+    known: set[str] = found_clues()
+    return {question.id: len(open_theories(question, known)) for question in report.questions}
+
+
+def _new_theories(before: dict[str, int]) -> list[str]:
+    """`New for the report: ...` lines for questions that gained theories since `before`."""
+    report: ReportSpec | None = load_content().report
+    if report is None:
+        return []
+    answers: dict[str, str] = get_expedition().answers
+    known: set[str] = found_clues()
+    lines: list[str] = []
+    for number, question in enumerate(report.questions, start=1):
+        opened: int = len(open_theories(question, known))
+        if question.id in answers or opened <= before.get(question.id, 0):
+            continue
+        lines.append(
+            f"New for the report: another possibility for question {number} (|wreport {number}|n)."
+        )
+    return lines
 
 
 def open_connections() -> list[ConnectionSpec]:
@@ -84,11 +132,11 @@ def open_connections() -> list[ConnectionSpec]:
     The connection questions open now: those whose every group of needed clues has at
     least one in the journal (DECISIONS.md, 22), in the content's order.
     """
-    expedition: Any = get_expedition()
+    known: set[str] = found_clues()
     return [
         connection
         for connection in load_content().connections.values()
-        if all(any(expedition.has_clue(c) for c in group) for group in connection.needs)
+        if groups_met(connection.needs, known)
     ]
 
 

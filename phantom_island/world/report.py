@@ -1,8 +1,10 @@
 """
-The expedition's report and the epilogue (`report`, DECISIONS.md, 29).
+The expedition's report and the epilogue (`report`, DECISIONS.md, 29 and 32).
 
-The report asks the task's questions one at a time, anywhere and at any moment. A player
-answers by picking one of a question's choices, and one player's answer counts for the whole
+The report is the expedition's case board: `report` alone shows the task's questions, each
+answered or with the possibilities (theories) the expedition has come across so far; a theory
+opens with the clues that raise it. It works anywhere and at any moment. A player answers by
+picking one of a question's open theories, and one player's answer counts for the whole
 expedition. A wrong choice is turned down with a reason and a hint; the right one is accepted
 only when the journal holds its proof. Once every question is answered, every connected
 player is shown the epilogue's first page, and `report more` turns the pages.
@@ -14,7 +16,7 @@ character; what has been answered is kept in the `Expedition` script.
 from typing import Any
 
 from world import recorder
-from world.clues import entry_number
+from world.clues import entry_number, open_theories
 from world.content import (
     CHOICE_LETTERS,
     ChoiceSpec,
@@ -37,6 +39,7 @@ PROVED: str = "Proved: this answer goes into the report."
 MORE_WORDS: tuple[str, ...] = ("more", "next", "on")
 EPILOGUE_WORDS: tuple[str, ...] = ("epilogue", "story", "again")
 NOTHING_TO_REPORT: str = "There is nothing to report on this expedition."
+MORE_TO_COME: str = "(More possibilities may come up as the expedition finds out more.)"
 
 
 def report(caller: Any, args: str) -> None:
@@ -50,7 +53,7 @@ def report(caller: Any, args: str) -> None:
         if is_complete(spec):
             show_page(caller, spec, int(caller.attributes.get(PAGE_SEEN, 0)))
         else:
-            show_question(caller, current_question(caller, spec))
+            show_board(caller, spec)
         return
     if words[0] in MORE_WORDS:
         if is_complete(spec):
@@ -73,12 +76,12 @@ def report(caller: Any, args: str) -> None:
     else:
         question = current_question(caller, spec)
     letter: str = words[0]
-    if len(letter) == 1 and letter in CHOICE_LETTERS[: len(question.choices)]:
+    if len(letter) == 1 and letter in CHOICE_LETTERS[: len(open_theories(question))]:
         answer(caller, spec, question, CHOICE_LETTERS.index(letter))
         return
     caller.msg(
-        f"Pick one of the choices by its letter, like |wreport a|n, or a question by its "
-        f"number, like |wreport 1|n. {_questions_left(spec)}"
+        f"Pick one of the possibilities by its letter, like |wreport 1 a|n, or a question by "
+        f"its number, like |wreport 1|n. {_questions_left(spec)}"
     )
 
 
@@ -133,8 +136,39 @@ def _questions_left(spec: ReportSpec) -> str:
     return "Questions still open: " + ", ".join(left) + "."
 
 
+def _theory_lines(question: QuestionSpec, indent: str) -> list[str]:
+    """The theories open for a question, lettered, and a note if more may come."""
+    theories: list[ChoiceSpec] = open_theories(question)
+    lines: list[str] = [
+        f"{indent}{CHOICE_LETTERS[index]}) {choice.text}" for index, choice in enumerate(theories)
+    ]
+    if len(theories) < len(question.choices):
+        lines.append(f"{indent}{MORE_TO_COME}")
+    return lines
+
+
+def show_board(caller: Any, spec: ReportSpec) -> None:
+    """
+    The case board (`report` alone): every question of the task, answered or not, with the
+    possibilities the expedition has come across so far (DECISIONS.md, 32).
+    """
+    answers: dict[str, str] = get_expedition().answers
+    lines: list[str] = ["|wThe report for the Society|n: the task's questions, and what might be"]
+    for number, question in enumerate(spec.questions, start=1):
+        lines.append(f"{number}. {question.text}")
+        if question.id in answers:
+            lines.append(f"   Answered by {answers[question.id]}: {question.right.answer}")
+        else:
+            lines.extend(_theory_lines(question, "   "))
+    lines.append(
+        "Answer a question with the letter of the possibility you can prove, like "
+        "|wreport 1 a|n. Only what the journal proves is accepted."
+    )
+    caller.msg("\n".join(lines))
+
+
 def show_question(caller: Any, question: QuestionSpec) -> None:
-    """A question of the report with its choices, or who answered it and how."""
+    """A question of the report with its open theories, or who answered it and how."""
     spec: ReportSpec | None = load_content().report
     assert spec is not None
     caller.attributes.add(QUESTION_SEEN, question.id)
@@ -148,19 +182,12 @@ def show_question(caller: Any, question: QuestionSpec) -> None:
         lines.append(_questions_left(spec))
         caller.msg("\n".join(lines))
         return
-    for index, choice in enumerate(question.choices):
-        lines.append(f"  {CHOICE_LETTERS[index]}) {choice.text}")
+    lines.extend(_theory_lines(question, "  "))
     letters: str = ", ".join(
-        f"|wreport {CHOICE_LETTERS[index]}|n" for index in range(len(question.choices))
+        f"|wreport {number} {CHOICE_LETTERS[index]}|n"
+        for index in range(len(open_theories(question)))
     )
-    others: list[str] = [
-        f"|wreport {other}|n" for other in range(1, len(spec.questions) + 1) if other != number
-    ]
-    lines.append(
-        f"Pick the answer you can prove: {letters}. Or look at another question: "
-        + ", ".join(others)
-        + "."
-    )
+    lines.append(f"Pick the one you can prove: {letters}. All the questions: |wreport|n.")
     caller.msg("\n".join(lines))
 
 
@@ -196,7 +223,7 @@ def answer(caller: Any, spec: ReportSpec, question: QuestionSpec, index: int) ->
     if question.id in expedition.answers:
         show_question(caller, question)
         return
-    choice: ChoiceSpec = question.choices[index]
+    choice: ChoiceSpec = open_theories(question)[index]
     letter: str = CHOICE_LETTERS[index]
     heading: str = f"{caller.key} considers an answer to question {number}: {letter}) {choice.text}"
     if not choice.right:
