@@ -78,7 +78,8 @@ class CmdRecord(Command):
 
     `record stop` writes world/scenarios/<name>.ev, with what the game recorded
     after each command (new clues, notebook entries, where you are), ready to play
-    back with `batchcommand/interactive scenarios.<name>`. `record cancel` drops
+    back with `batchcommand/interactive scenarios.<name>` (`record start
+    scenarios.<name>` works too). `record cancel` drops
     the recording. `record` alone says whether one is running.
 
     Without `yes` it only says what it would do, and whether it would replace a
@@ -109,7 +110,9 @@ class CmdRecord(Command):
 
     def _start(self, words: list[str]) -> None:
         confirmed: bool = bool(words) and words[-1] == CONFIRM
-        names: list[str] = words[:-1] if confirmed else words
+        names: list[str] = [
+            recorder.bare_name(name) for name in (words[:-1] if confirmed else words)
+        ]
         if len(names) != 1 or not recorder.valid_name(names[0]):
             self.caller.msg(
                 "Usage: |wrecord start <name>|n, with a name of small letters, digits and _."

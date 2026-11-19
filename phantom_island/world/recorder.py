@@ -34,6 +34,11 @@ def scenario_path(name: str) -> Path:
     return scenario_dir() / f"{name}.ev"
 
 
+def bare_name(name: str) -> str:
+    """A scenario's name as `record` takes it: `scenarios.island` (as `batchcommand` has it)."""
+    return name.removeprefix(f"{scenario_dir().name}.")
+
+
 def valid_name(name: str) -> bool:
     return bool(NAME.fullmatch(name))
 

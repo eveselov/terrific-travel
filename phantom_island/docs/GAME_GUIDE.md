@@ -14,7 +14,7 @@ Phantom Island is a mystery to solve together, in words and pictures:
 ## Expedition
 
 - The expedition is all the players together: one team, sent out by the Society to find out what happened to the lost ship *Halcyon*.
-- You join it by typing `begin` on the title page (Limbo). Mrs. Fairweather, in the Society Office, explains the task.
+- You join it by typing `begin` on the title page (Limbo). Mrs. Fairweather, in the Society Office, explains the task. You are the expedition's captain: the crew sail the ship, and you decide where she goes and what to look into. Playing together, everyone is a captain.
 - You lead the expedition and command its ship: the crew follow your orders, and the ship goes where you decide (`sail` on the Deck). The ship herself has a voice and gives advice: `ask ship`.
 - The expedition has its own ship and one shared journal. Where the ship is, and what has been found, is the same for every player.
 - One player alone is a whole expedition; more players simply share the work.
@@ -50,6 +50,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - `ask <someone>` greets them, and they suggest things to ask about. `ask <someone> about <something>` asks. `about` is always needed for a topic, so `ask ship` always means the Ship, never a question about ships.
 - After that, `ask about <something>` (or `ask him`, `her`, `them about …`) goes on talking to the same person, as long as they're still there. With only one person around, `ask about …` is enough from the start.
 - The start of a long name is enough: `ask fair about the chart`.
+- Anyone can be asked about themselves: `ask barnaby about yourself`, or `ask tui about you`.
 - Walk with the exit's name (`east`, `aboard`) or with `go`: `go east`, `go to the market`.
 
 ## Sailing
@@ -84,6 +85,8 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - The Society wants proof: an answer is only accepted once the journal holds the clues that show it. If an answer doesn't fit, or can't be proved yet, you're told why, and where you might look. That's not failing: go and look, and come back.
 - One player's answer counts for the whole expedition, and the journal shows it under the question.
 - When clues in the journal fit together, a question about them comes up in `think`. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
+- `think compass` (or `think 2`, a journal number) shows only the questions about that clue.
+- Under a question you see the ideas from your notebook that help with it, and where to learn the ones you don't have yet.
 - Once all three questions are answered, the whole story is told, page by page (`report more`), with the real history behind it.
 
 ## Council

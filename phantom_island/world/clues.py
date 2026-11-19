@@ -20,6 +20,7 @@ from world.content import (
     ClueSpec,
     ConnectionSpec,
     Content,
+    IdeaSpec,
     QuestionSpec,
     ReportSpec,
     TaskSpec,
@@ -171,24 +172,79 @@ def open_connections() -> list[ConnectionSpec]:
     ]
 
 
-def think_text(owner: Any) -> str:
-    """Every open connection question (`think`), the owner's new ones marked, or how they come."""
+THINK_OPENING: str = (
+    "|wQuestions worth turning over.|n Talk them over, or ask someone who might know."
+)
+
+
+def _about(connection: ConnectionSpec, word: str, content: Content) -> bool:
+    """
+    Whether a connection question involves `word`: a journal number (`think 2`), or a word
+    in the question or in the title or text of one of its clues (`think compass`).
+    """
+    clue_ids: set[str] = {clue_id for group in connection.needs for clue_id in group}
+    if word.isdigit():
+        return any(entry_number(clue_id) == int(word) for clue_id in clue_ids)
+    texts: list[str] = [connection.question]
+    for clue_id in clue_ids:
+        clue: ClueSpec | None = content.clues.get(clue_id)
+        if clue is not None:
+            texts.extend((clue.title, clue.journal))
+    return any(word in text.lower() for text in texts)
+
+
+def _idea_lines(owner: Any, connection: ConnectionSpec, content: Content) -> list[str]:
+    """
+    The notebook ideas that help with a question: those the owner has, and where to learn
+    the others (DECISIONS.md, A4: clues and ideas apart, and joined).
+    """
+    if not connection.ideas:
+        return []
+    known: set[str] = {entry.idea for entry in get_expedition().notebook(owner.id)}
+    have: list[str] = []
+    lacking: list[str] = []
+    for idea_id in connection.ideas:
+        idea: IdeaSpec | None = content.ideas.get(idea_id)
+        if idea is None:
+            continue
+        if idea_id in known:
+            have.append(idea.title)
+        else:
+            lacking.append(f"{idea.title} ({idea.learn})" if idea.learn else idea.title)
+    lines: list[str] = []
+    if have:
+        lines.append(f"  In your notebook: {', '.join(have)}.")
+    if lacking:
+        lines.append(f"  Worth learning: {'; '.join(lacking)}.")
+    return lines
+
+
+def think_text(owner: Any, word: str = "") -> str:
+    """
+    The open connection questions (`think`), or only those involving `word` (`think
+    compass`), each with the notebook ideas that help; the owner's new ones are marked.
+    """
     opened: list[ConnectionSpec] = open_connections()
     if not opened:
         return (
             "Nothing to think about yet. When two clues in the journal fit together, a "
             "question about them comes up here."
         )
+    content: Content = load_content()
+    wanted: str = " ".join(word.lower().split())
+    if wanted:
+        opened = [connection for connection in opened if _about(connection, wanted, content)]
+        if not opened:
+            return (
+                f"Nothing to think about on '{word.strip()}' yet. |wthink|n alone shows every "
+                "question."
+            )
     keys: list[str] = [f"think:{connection.id}" for connection in opened]
     new: set[str] = unseen(owner, keys)
-    lines: list[str] = [
-        "|wSomething to think about|n (the game won't answer these: talk them over, or ask "
-        "someone who might know)"
-    ]
-    lines.extend(
-        f"- {connection.question}" + (f" {NEW}" if key in new else "")
-        for connection, key in zip(opened, keys, strict=True)
-    )
+    lines: list[str] = [THINK_OPENING]
+    for connection, key in zip(opened, keys, strict=True):
+        lines.append(f"- {connection.question}" + (f" {NEW}" if key in new else ""))
+        lines.extend(_idea_lines(owner, connection, content))
     get_expedition().mark_seen(owner.id, keys)
     return "\n".join(lines)
 

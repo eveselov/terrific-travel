@@ -200,11 +200,14 @@ class CmdThink(Command):
 
     Usage:
       think
+      think <word>       (only the questions about it: think compass, think 2)
 
     When clues in the journal fit together, a question about them comes up:
     how far do seabirds fly, what else could a ship's oak be used for... The
     game won't answer these questions. Talk them over, or ask someone who
-    might know. Working them out helps with the report.
+    might know. Under each question are the ideas from your notebook that
+    help, and where to learn the ones you don't have yet. Working them out
+    helps with the report.
     """
 
     key = "think"
@@ -213,7 +216,7 @@ class CmdThink(Command):
     help_category = "General"
 
     def func(self) -> None:
-        self.caller.msg(think_text(self.caller))
+        self.caller.msg(think_text(self.caller, self.args))
 
 
 class CmdNotebook(Command):

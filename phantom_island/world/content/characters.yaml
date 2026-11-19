@@ -72,6 +72,9 @@
 #   hidden    optional: true for a topic players find only by thinking of it (the Ship's
 #             name). Every other topic must be in `suggest` or white in one of the
 #             character's own texts; the content check makes sure of it.
+#   (self)    the topic id `self` is what a character says about themselves (`ask barnaby
+#             about yourself`, `who are you`); its words are in `topic_aliases`. Optional:
+#             without one, a short default. Mark it `hidden: true`.
 #   sets      optional: a flag to remember once this topic is asked about (`briefed`: the
 #             task appears in the journal and the report, DECISIONS.md, 33)
 #   truth     optional, for what a character hides: the reply given once `needs` holds
@@ -88,6 +91,8 @@ topic_aliases:
   crew: [sailors, survivors, the crew]
   chart: [map, old chart, the chart]
   reef: [western reef, the reef]
+  # "you" counts only as the whole question (`ask ship about you`), never as one word of it.
+  self: [yourself, you, name, your name, who are you, about yourself, himself, herself]
 
 characters:
   # --- The port -------------------------------------------------------------------------
@@ -104,9 +109,10 @@ characters:
       The patron of the Society: a tall woman in a grey coat, with ink on her fingers and
       a pile of papers she keeps straightening.
     greeting: >
-      "Ah, you've come: the newest members of the Society's expedition. Welcome aboard,
-      or nearly. Sit down. There is a great deal to tell, and very little of it is
-      certain."
+      "Ah, Captain, you've come. The Society has hired a ship and a crew for this
+      expedition, and put them under your orders: the crew do the sailing, and you decide
+      where to go and what to look into. Sit down. There is a great deal to tell, and very
+      little of it is certain."
     suggest: [mission, halcyon, chart, letter]
     fallback: >
       Mrs. Fairweather frowns politely. "I'm afraid that is outside my knowledge. The
@@ -117,17 +123,19 @@ characters:
         stance: truth
         sets: briefed  # the task appears in the journal and the report (DECISIONS.md, 33)
         reply: >
-          "The Society wants the truth about the |wHalcyon|n: what happened to her, why
-          nobody ever found her, and what became of her |wcrew|n. The three questions stand
+          "The Society wants the truth about the |wHalcyon|n, a ship that sailed from this
+          harbour fifteen years ago and never came back: what happened to her, why nobody
+          ever found her, and what became of her |wcrew|n. The three questions stand
           at the top of the expedition's |wjournal|n. When you can prove the answers, send
-          me your |wreport|n. Start with the |wcompass|n that has turned up on Silas Crane's
-          stall in the market, just east of here. Then take your |wship|n to the |wisland|n
+          me your |wreport|n. Start with the |wcompass|n on Silas Crane's stall in the
+          market, just east of here. Then take your |wship|n to the |wisland|n
           on the Halcyon's |wchart|n."
       halcyon:
         stance: truth
         teaches: {oak: heard}
         reply: >
-          "The Halcyon sailed from this harbour in 1775 to chart a small |wisland|n far out
+          "The Halcyon was a sailing ship. She left this harbour in 1775 to chart a small
+          |wisland|n far out
           in the ocean. A sound ship, built of good oak, with a careful master. Her last
           |wletter|n reached us, and then nothing. Not a plank, not a word. The families of
           her |wcrew|n still ask me for news."
@@ -178,6 +186,13 @@ characters:
         reply: >
           "Our members collect charts, journals and specimens from every voyage they can.
           A map is only as good as the people who made it, so we like to check."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "I am the patron of the |wSociety|n: I find the money for its voyages and answer
+          its letters. I chose this expedition's captain with particular care, so I expect
+          the truth, and proof of it."
 
   barnaby:
     name: Old Barnaby
@@ -256,6 +271,13 @@ characters:
         reply: >
           "Crane's been waving that compass at everyone. Washed out of the wreck, I'd say,
           and up on some beach. Ask him where he got it, if you can get a straight answer."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "Me? Forty years at sea, man and boy, and now I sit on this quay and watch the
+          young ones go. I was at sea myself the year of |wthe great storm|n, mind. Ask me
+          about that one."
 
   crane:
     name: Silas Crane
@@ -326,6 +348,13 @@ characters:
         reply: >
           "Pots, cloth, knives, a bit of everything. Everything's for sale at the right
           price. That |wcompass|n, now: that one's special."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "Silas Crane, honest trader. I buy from whoever sails in and sell to whoever walks
+          by, and I don't ask where things come from. Questions are bad for |wtrade|n,
+          friend."
 
   # --- The island -----------------------------------------------------------------------
 
@@ -404,6 +433,13 @@ characters:
           reply: >
             "[[They built a boat at the cove, with wood from their broken ship]] and rope
             from our trees. One of them stayed. He still lives among us."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "I am the eldest here. I have watched the |wreef|n take many things, and give a
+          few back. When the young ones want to know what came before them, they come and
+          sit with me."
 
   tui:
     name: Tui
@@ -459,6 +495,12 @@ characters:
         reply: >
           "Old Jonah lives by the |wcove|n. He makes boats, and he talks funny, like you.
           He's nice. He made me a whistle."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "I'm Tui! I'm nearly ten, and I know the whole |wsong|n, every word. Grandmother
+          says I talk too much. Do you want to see my |wbuttons|n?"
 
   jonah:
     name: Jonah Pike
@@ -478,6 +520,14 @@ characters:
       Jonah rubs his chin. "Fifteen years here, and I've forgotten more about that than
       I ever knew."
     topics:
+      self:
+        hidden: true
+        stance: truth
+        clue: C13
+        reply: >
+          "Jonah Pike. [[I was the Halcyon's carpenter.]] Now I build canoes for the
+          village. Fifteen years, and I'm still working out the outriggers. Ask me about
+          the |wboat|n we built."
       halcyon:
         stance: truth
         clue: C13
@@ -557,7 +607,7 @@ characters:
       The timbers creak, and somehow it sounds like a voice. "You called? Ask me about
       the sea and the sky, the |wwind|n, the |wtide|n, the |whorizon|n. Or about the
       instruments below, and the |wwater|n casks."
-    suggest: [course, sextant, chronometer, latitude, longitude, birds, help]
+    suggest: [course, sextant, chronometer, latitude, longitude, birds, advice]
     fallback: >
       The Ship creaks thoughtfully. "That's beyond what a ship knows. Try me on
       navigation, or on the sea and the sky."
@@ -602,7 +652,8 @@ characters:
           Sailors who trust their |wlatitude|n but not their |wlongitude|n sail along the
           latitude until they find land."
       course:
-        aliases: [position, voyage, destination, heading, where to, coordinates]
+        aliases: [position, voyage, destination, heading, where to, coordinates, sail,
+          sails, sailing]
         stance: truth
         teaches: {positions: understood}
         reply: >
@@ -669,9 +720,9 @@ characters:
         reply: >
           "Fresh water is life at sea. Every day at sea we drink from the casks in the
           Cabin. Find a spring ashore and you can fill them again."
-      help:
+      advice:
         # The next step itself comes from `hint` (hints.yaml, DECISIONS.md, 31).
-        aliases: [hint, hints, stuck, advice, lost]
+        aliases: [help, hint, hints, stuck, lost]
         stance: truth
         teaches: {witnesses: heard}
         reply: >
@@ -693,8 +744,8 @@ characters:
         reply: >
           "You lead this expedition, and the Society gave you three questions: what
           happened to the Halcyon, why nobody ever found her, and what became of her crew.
-          They're at the top of the |wjournal|n, with everything found so far. Which of
-          them could you answer today?"
+          They're at the top of the |wjournal|n, with everything found so far. When you
+          can answer one, tell the Society: type |wreport|n."
       captain:
         aliases: [command, orders, crew, sailors]
         stance: truth
@@ -702,9 +753,8 @@ characters:
           "The captain? You are, all of you together: the Society put the expedition in your
           hands. I'll tell you what I know of the sea, but where we go is your choice. Give
           the word on deck: |wsail|n."
-      name:
-        aliases: [yourself, you]
-        hidden: true  # a surprise for whoever thinks of asking
+      self:
+        hidden: true  # a surprise for whoever thinks of asking her name
         stance: truth
         reply: >
           "My name? That's for my crew to decide. Choose well; I'll be wearing it for a

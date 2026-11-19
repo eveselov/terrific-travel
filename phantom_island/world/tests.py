@@ -45,6 +45,7 @@ from world.content import (
     IdeaSpec,
     RouteSpec,
     TopicSpec,
+    _character,
     all_teachings,
     all_texts,
     load_content,
@@ -162,7 +163,17 @@ class TestContent(TestCase):
             "        hidden: true  # a surprise",
             "        hidden: false  # a surprise",
         )
-        self.assertIn("topic name: players can't find it", str(error))
+        self.assertIn("ship, topic self: players can't find it", str(error))
+
+    def test_a_connection_idea_must_be_known_and_say_where_to_learn_it(self) -> None:
+        unknown: ContentError = self._broken_copy(
+            CLUES_FILE, "    ideas: [coral]", "    ideas: [nowhere]"
+        )
+        self.assertIn("connection compass_sea: unknown idea 'nowhere'", str(unknown))
+        silent: ContentError = self._broken_copy(
+            IDEAS_FILE, '    learn: "|wread animal guide|n, in the Cabin"\n', ""
+        )
+        self.assertIn("needs a `learn` text", str(silent))
 
     def test_teaching_an_unknown_idea_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
@@ -342,6 +353,34 @@ class TestCharacterContent(TestCase):
     def test_the_same_word_means_the_same_topic_for_everyone(self) -> None:
         for character_id in ("barnaby", "jonah", "ama", "crane", "fairweather"):
             self.assertEqual(self.topic_id(character_id, "the Halcyon"), "halcyon", character_id)
+
+    def test_everyone_can_be_asked_about_themselves(self) -> None:
+        for character_id in self.characters:
+            for text in ("yourself", "you", "who are you", "your name"):
+                self.assertEqual(self.topic_id(character_id, text), "self", (character_id, text))
+
+    def test_you_counts_only_as_the_whole_question(self) -> None:
+        self.assertEqual(self.topic_id("ship", "how do you sail"), "course")
+
+    def test_a_character_without_a_self_topic_gets_the_default(self) -> None:
+        data: dict[str, Any] = {
+            "name": "the Cook",
+            "where": "quay",
+            "desc": "A cook.",
+            "greeting": "Hello.",
+            "fallback": "No idea.",
+        }
+        cook: CharacterSpec = _character("cook", data, {"self": ("yourself",)})
+        self.assertEqual(
+            cook.topics["self"].reply, "The Cook would rather talk about other things."
+        )
+        self.assertEqual(cook.topic("yourself"), cook.topics["self"])
+
+    def test_the_ship_answers_sail_and_advice(self) -> None:
+        for text in ("sail", "sails", "sailing"):
+            self.assertEqual(self.topic_id("ship", text), "course", text)
+        for text in ("advice", "help", "hint", "stuck"):
+            self.assertEqual(self.topic_id("ship", text), "advice", text)
 
 
 class WorldTest(EvenniaTest):
@@ -786,7 +825,7 @@ class TestAsk(WorldTest):
 
     def test_the_start_of_a_name_is_enough(self) -> None:
         self.at("office")
-        self.assertIn("sailed from this harbour", self.ask("fair about halcyon"))
+        self.assertIn("left this harbour", self.ask("fair about halcyon"))
         self.assertIn("nobody called", self.ask("fa about halcyon"))  # too short
 
     def test_about_alone_goes_to_whoever_you_spoke_to_last(self) -> None:
@@ -853,7 +892,7 @@ class TestAsk(WorldTest):
         self.at("office")
         heard: str = self.ask("fairweather about halcyon chart")
         self.assertIn("You ask Mrs. Fairweather about halcyon.", heard)
-        self.assertIn("sailed from this harbour", heard)
+        self.assertIn("left this harbour", heard)
         self.assertNotIn("most precious paper", heard)
         self.assertIn("One thing at a time: you can ask about |wchart|n next.", heard)
 
@@ -1168,7 +1207,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.at(self.char1, "cove")
         told: str = self.do(self.char1, "ask jonah about east")
         self.assertIn("trade wind blows from the east", told)
-        self.assertIn("Names of winds", told)  # the notebook
+        self.assertIn("How winds are named", told)  # the notebook
 
     def test_the_ship_points_to_the_task(self) -> None:
         self.at(self.char1, "deck")
@@ -1709,6 +1748,36 @@ class TestConnections(DiscoveryTest):
         self.assertNotIn("Which witness", self.do(self.char1, "think"))
         get_expedition().add_clue("C13", "someone", "Boat Cove")
         self.assertIn("Which witness", self.do(self.char1, "think"))
+
+    def test_think_about_one_clue(self) -> None:
+        for clue_id, place in (
+            ("C2", "Market"),
+            ("C3", "Market"),
+            ("C7", "Reef"),
+            ("C8", "Village"),
+        ):
+            get_expedition().add_clue(clue_id, "someone", place)
+        everything: str = self.do(self.char1, "think")
+        self.assertIn("Questions worth turning over.", everything)
+        self.assertIn("where in the sea does coral grow", everything)
+        self.assertIn("What else could her timber", everything)
+        compass: str = self.do(self.char1, "think Compass")
+        self.assertIn("where in the sea does coral grow", compass)
+        self.assertNotIn("What else could her timber", compass)
+        self.assertIn("What else could her timber", self.do(self.char1, "think 4"))  # C8
+        self.assertNotIn("where in the sea does coral grow", self.do(self.char1, "think 4"))
+        self.assertIn("Nothing to think about on 'pirates'", self.do(self.char1, "think pirates"))
+
+    def test_a_question_shows_the_ideas_that_help(self) -> None:
+        get_expedition().add_clue("C2", "someone", "Market")
+        get_expedition().add_clue("C3", "someone", "Market")
+        lacking: str = self.do(self.char1, "think")
+        self.assertIn("Worth learning: Coral (|wread animal guide|n, in the Cabin).", lacking)
+        get_expedition().note(self.char1.id, "coral", 1, "heard", "brass compass")
+        having: str = self.do(self.char1, "think")
+        self.assertIn("In your notebook: Coral.", having)
+        self.assertNotIn("Worth learning", having)
+        self.assertIn("Worth learning: Coral", self.do(self.char2, "think"))  # notebooks are each
 
     def test_a_question_is_shown_only_when_it_opens(self) -> None:
         get_expedition().add_clue("C7", "someone", "Western Reef")

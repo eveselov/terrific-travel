@@ -26,6 +26,11 @@
 #   area     the area it belongs to
 #   title    its name in the notebook (Latitude)
 #   heard, understood, used   its texts, at least one
+#   learn    optional: where to learn it, shown by `think` to players who don't have it
+#            yet. Needed for every idea a connection (clues.yaml) lists in `ideas`.
+#
+# A title names the idea in general, how the world works ("How winds are named"), never
+# what was found ("Birds flying west at dusk" is a clue's title, in the journal).
 #
 # The notebook shows only areas the player has started, with how many of their ideas they
 # know ("Navigation: 2 of 9"). Keep it small: ideas the game actually uses, not an
@@ -66,6 +71,7 @@ ideas:
   longitude:
     area: navigation
     title: Longitude
+    learn: "|wask ship about longitude|n"
     heard: >
       How far east or west you are. Old sailors could only guess it.
     understood: >
@@ -79,6 +85,7 @@ ideas:
   sea_clocks:
     area: navigation
     title: Sea clocks
+    learn: "|wask ship about chronometer|n"
     heard: >
       Some ships now carry a clock that keeps the time of home all voyage long. Not every
       old sailor trusts one.
@@ -91,6 +98,7 @@ ideas:
   dead_reckoning:
     area: navigation
     title: Dead reckoning
+    learn: "|wask ship about reckoning|n"
     heard: >
       Working out where you are from your heading, your speed and how long you have
       sailed.
@@ -130,7 +138,8 @@ ideas:
   # U the Ship's birds · D the sky at dusk, at the chart's position
   seabirds:
     area: sea_and_sky
-    title: Seabirds at dusk
+    title: How seabirds show land
+    learn: "|wask ship about birds|n"
     understood: >
       White terns and noddies fish at sea all day and fly home to land to sleep: white terns
       from as far as a hundred miles out, noddies from nearer. At dusk, the way they fly
@@ -151,17 +160,19 @@ ideas:
   # H Barnaby's storm · U the Ship's wind
   winds:
     area: sea_and_sky
-    title: Names of winds
+    title: How winds are named
     heard: >
-      A wind is named for where it comes from.
+      A wind is named for where it comes from: a west wind blows from the west.
     understood: >
-      A west wind blows out of the west, towards the east, and pushes anything afloat
-      eastwards. An east wind pushes it west.
+      So a west wind blows towards the east, and pushes anything afloat eastwards; an east
+      wind, like the trade wind out here, pushes it west. Mix up a wind's name and its
+      direction, and you look for whatever it carried on the wrong side.
 
   # U the Ship's horizon
   horizon:
     area: sea_and_sky
-    title: The horizon
+    title: How far a lookout sees
+    learn: "|wask ship about horizon|n"
     understood: >
       The Earth is round, so the sea curves away out of sight. From a masthead a lookout
       sees about 20 kilometres of open sea, and a hilly island perhaps 50 to 70 kilometres
@@ -181,6 +192,7 @@ ideas:
   coral:
     area: nature
     title: Coral
+    learn: "|wread animal guide|n, in the Cabin"
     heard: >
       Coral grows only under the sea.
     understood: >
@@ -193,6 +205,7 @@ ideas:
   oak:
     area: nature
     title: Oak and island trees
+    learn: "|wread plant guide|n, in the Cabin"
     heard: >
       Good ships are built of oak.
     understood: >
@@ -205,6 +218,7 @@ ideas:
   onions:
     area: nature
     title: Onions on ships
+    learn: "|wread plant guide|n, in the Cabin"
     understood: >
       Onions keep for months, so ships carry them, and sailors plant them wherever they stay
       a while.
@@ -215,6 +229,7 @@ ideas:
   island_animals:
     area: nature
     title: How animals reach islands
+    learn: "|wread animal guide|n, in the Cabin"
     understood: >
       Few land animals ever reach islands far out in the ocean on their own: birds fly
       there, and lizards drift there on logs. Goats never do. Sailors carry goats for milk
@@ -228,6 +243,7 @@ ideas:
   witnesses:
     area: people
     title: Comparing witnesses
+    learn: "|wask ship about witnesses|n"
     heard: >
       People don't always tell the truth, so compare what they say.
     understood: >
@@ -238,7 +254,8 @@ ideas:
   # H Tui's song · U Ama's song
   songs:
     area: people
-    title: Songs remember
+    title: Songs that keep history
+    learn: "|wask ama about song|n, in the Village"
     heard: >
       Some songs tell of things that really happened.
     understood: >

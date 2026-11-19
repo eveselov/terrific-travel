@@ -56,6 +56,13 @@ UNDER_WAY: str = "under_way"
 ROOM_KINDS: tuple[str, ...] = ("room", "deck", "cabin")
 STANCES: tuple[str, ...] = ("truth", "mistaken", "hiding")
 ABOARD_WHERE: str = "aboard"  # a character's `where` for the Ship: the Deck and the Cabin
+# Asking a character about themselves (`ask barnaby about yourself`): their optional `self`
+# topic, or this short default. Its words come from `topic_aliases` in characters.yaml.
+SELF_TOPIC: str = "self"
+DEFAULT_SELF: str = "{name} would rather talk about other things."
+# Words that name a topic only as the whole question, never as one word of a longer one:
+# `ask ship about you` is about herself, `ask ship about how you sail` isn't.
+WHOLE_ONLY: frozenset[str] = frozenset({"you"})
 
 # Words dropped from the front of what players type, so `about the storm` finds `storm`.
 _LEADING_WORDS: tuple[str, ...] = ("the", "a", "an", "her", "his", "your")
@@ -299,6 +306,7 @@ class ConnectionSpec:
     id: str
     needs: tuple[tuple[str, ...], ...]
     question: str
+    ideas: tuple[str, ...] = ()  # notebook ideas that help to answer it (`think` lists them)
 
 
 @dataclass(frozen=True)
@@ -449,6 +457,7 @@ class IdeaSpec:
     area: str
     title: str
     texts: dict[str, str]
+    learn: str | None = None  # where to learn it, for `think` (needed if a question uses it)
 
     def entry(self, level: str) -> str:
         """The notebook text up to this level: the texts of it and the levels before."""
@@ -558,6 +567,8 @@ class CharacterSpec:
                 return topic
         found: list[TopicSpec] = []
         for word in wanted.split():
+            if word in WHOLE_ONLY:
+                continue
             for topic in self.topics.values():
                 if word in topic.words and topic not in found:
                     found.append(topic)
@@ -571,6 +582,8 @@ class CharacterSpec:
         """
         found: list[TopicSpec] = []
         for word in normalise_words(text).split():
+            if word in WHOLE_ONLY:
+                continue
             for topic in self.topics.values():
                 if word in topic.words and topic not in found:
                     found.append(topic)
@@ -882,9 +895,15 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
                 f"{where}: `where` must be a place id, a list of them, or {ABOARD_WHERE}."
             )
     topics_data: dict[str, Any] = _mapping(data.get("topics") or {}, f"{where}, topics")
+    name: str = _text(data, "name", where)
+    topics: dict[str, TopicSpec] = {
+        key: _topic(key, item, shared, f"{where}, topic {key}") for key, item in topics_data.items()
+    }
+    if SELF_TOPIC not in topics:
+        topics[SELF_TOPIC] = _default_self(name, shared)
     return CharacterSpec(
         id=character_id,
-        name=_text(data, "name", where),
+        name=name,
         aliases=_aliases(data.get("aliases"), where),
         places=places,
         aboard=where_value == ABOARD_WHERE,
@@ -894,10 +913,21 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
         fallback=_text(data, "fallback", where),
         image=_optional_text(data, "image", where),
         voice=_optional_text(data, "voice", where),
-        topics={
-            key: _topic(key, item, shared, f"{where}, topic {key}")
-            for key, item in topics_data.items()
-        },
+        topics=topics,
+    )
+
+
+def _default_self(name: str, shared: dict[str, tuple[str, ...]]) -> TopicSpec:
+    """What a character without a `self` topic says when asked about themselves."""
+    words: list[str] = [SELF_TOPIC, *shared.get(SELF_TOPIC, ())]
+    return TopicSpec(
+        id=SELF_TOPIC,
+        words=tuple(dict.fromkeys(normalise_words(word) for word in words)),
+        reply=DEFAULT_SELF.format(name=f"{name[0].upper()}{name[1:]}"),
+        stance="truth",
+        clue=None,
+        truth=None,
+        hidden=True,
     )
 
 
@@ -928,6 +958,7 @@ def _connections(data: dict[str, Any], clues: dict[str, ClueSpec]) -> dict[str, 
             id=connection_id,
             needs=clue_groups(needs_data, "needs", where, clues),
             question=_text(item, "question", where),
+            ideas=_words(item.get("ideas"), "ideas", where),
         )
     return connections
 
@@ -1178,7 +1209,11 @@ def _ideas(data: dict[str, Any]) -> tuple[dict[str, AreaSpec], dict[str, IdeaSpe
         if not texts:
             raise ContentError(f"{where}: needs a text for at least one of {', '.join(LEVELS)}.")
         ideas[idea_id] = IdeaSpec(
-            id=idea_id, area=area, title=_text(item, "title", where), texts=texts
+            id=idea_id,
+            area=area,
+            title=_text(item, "title", where),
+            texts=texts,
+            learn=_optional_text(item, "learn", where),
         )
     return areas, ideas
 
@@ -1331,6 +1366,7 @@ def _check(content: Content) -> None:
     _check_report(content)
     _check_hints(content)
     _check_councils(content)
+    _check_connection_ideas(content)
     if content.task is not None and content.task.after is not None:
         if content.task.after not in flags_set(content):
             raise ContentError(
@@ -1458,6 +1494,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
     for idea in content.ideas.values():
         for level, text in idea.texts.items():
             texts.append((f"{IDEAS_FILE}, idea {idea.id}, {level}", text, None))
+        if idea.learn is not None:
+            texts.append((f"{IDEAS_FILE}, idea {idea.id}, learn", idea.learn, None))
     for character in content.characters.values():
         where = f"{CHARACTERS_FILE}, {character.id}"
         for field, text in (
@@ -1582,6 +1620,23 @@ def flags_set(content: Content) -> set[str]:
             if action is not None:
                 flags.update(step.sets for step in action.at.values() if step.sets)
     return flags
+
+
+def _check_connection_ideas(content: Content) -> None:
+    """A connection's ideas are known, and each says where to `learn` it (with a notebook)."""
+    if not content.ideas:  # the notebook is optional: without one, `think` lists no ideas
+        return
+    for connection in content.connections.values():
+        where: str = f"{CLUES_FILE}, connection {connection.id}"
+        for idea_id in connection.ideas:
+            idea: IdeaSpec | None = content.ideas.get(idea_id)
+            if idea is None:
+                raise ContentError(f"{where}: unknown idea {idea_id!r}.")
+            if idea.learn is None:
+                raise ContentError(
+                    f"{where}: idea {idea_id!r} needs a `learn` text in {IDEAS_FILE}, to say "
+                    "where players can learn it."
+                )
 
 
 def _check_councils(content: Content) -> None:
