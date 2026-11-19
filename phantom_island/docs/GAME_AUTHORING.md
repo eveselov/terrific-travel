@@ -43,7 +43,7 @@ content check runs whenever the files are read, and stops with the file and entr
 | Map key (`port`, `island`) | `maps.yaml` | a place's `map`; a position's `map`; `sea_chart` in `ship.yaml` |
 | Position id (`charted`) | `ship.yaml` (`positions`) | routes' `to`; `start`; a thing's `at:` (what it does at that position) |
 | Clue id (`C4`) | `clues.yaml` | `clue:` beside any text that reveals it; `needs:`; a report answer's `proof` |
-| Flag (`sight_charted`) | `sets:` on a thing's `at:` step | `needs:` elsewhere |
+| Flag (`sight_charted`, `briefed`) | `sets:` on a thing's `at:` step, or on a topic | `needs:` elsewhere; the task's `after:` (until it is set, the journal and the report show their `before:` texts) |
 | Thing id (`chart`) | `things.yaml` | `with:` on details (more to see when carrying it) |
 | Area id, idea id | `ideas.yaml` | an idea's `area`; `teaches:` beside any text that teaches it |
 | Topic id (`storm`) | a character's `topics` | `suggest`; `topic_aliases` (words shared by all characters) |

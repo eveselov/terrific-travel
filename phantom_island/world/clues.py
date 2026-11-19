@@ -3,7 +3,9 @@ Clues and the expedition's shared journal.
 
 A text that reveals a clue marks the fact itself `[[like this]]` in the content files. Players
 see that part in yellow, and a journal line always follows it, so the meaning never depends
-on colour alone (DECISIONS.md, 20). The journal is kept in the `Expedition` script, shared by
+on colour alone (DECISIONS.md, 20). That line is a quiet one (`world/notices.py`): what the
+clue means for the task waits in `journal`, `think` and `report`, which mark what each player
+hasn't seen there yet (33). The journal is kept in the `Expedition` script, shared by
 everyone: a clue found by one player is in every player's journal, and every connected
 player is told about it.
 """
@@ -11,7 +13,7 @@ player is told about it.
 from typing import Any
 
 from typeclasses.scripts import JournalEntry
-from world import recorder
+from world import notices, recorder
 from world.content import (
     CLUE_MARK,
     ChoiceSpec,
@@ -20,15 +22,20 @@ from world.content import (
     Content,
     QuestionSpec,
     ReportSpec,
+    TaskSpec,
     load_content,
 )
 from world.expedition import connected_characters, get_expedition
 
 CLUE_COLOUR: str = "|y"
-NEW_IN_JOURNAL: str = f"{CLUE_COLOUR}New in the journal:|n"
+NOTED: str = "Noted in the journal:"
+JOURNAL: str = "journal"
 JOURNAL_SOURCES: str = "journal sources"
 THINK: str = "think"
-SOMETHING_TO_THINK: str = f"Something to think about (|w{THINK}|n):"
+REPORT: str = "report"
+NEW: str = "(new)"
+# Set on a character once they have opened the journal: the "Type journal" hint stops.
+READ_JOURNAL: str = "has_read_journal"
 
 
 def _yellow(found: Any) -> str:
@@ -64,22 +71,25 @@ def discover(clue_id: str, finder: Any, source: str | None = None) -> bool:
     clue: ClueSpec = content.clues[clue_id]
     place: str = place_name(finder)
     open_before: set[str] = {connection.id for connection in open_connections()}
-    theories_before: dict[str, int] = _open_theory_count()
     if not get_expedition().add_clue(clue_id, str(finder.key), place, source):
         number: int | None = entry_number(clue_id)
         entry: str = f"{number}. " if number is not None else ""
         recorder.note(finder, f"Journal: again {clue_id}, {clue.title}")
-        finder.msg(f"(Already in the journal, {entry}{CLUE_COLOUR}{clue.title}|n: {clue.journal})")
+        notices.tell(finder, f"Already in the journal, {entry}{clue.title}: {clue.journal}")
         return False
-    line: str = f"{NEW_IN_JOURNAL} {clue.journal}"
     for character in [finder, *_room_characters(finder.location), *connected_characters()]:
         recorder.note(character, f"Journal: new {clue_id}, {clue.title}")
     opened: list[ConnectionSpec] = [c for c in open_connections() if c.id not in open_before]
-    here: str = line + "".join(f"\n{SOMETHING_TO_THINK} {c.question}" for c in opened)
-    here += "".join(f"\n{text}" for text in _new_theories(theories_before))
     if opened:
         recorder.note(finder, "Think: " + ", ".join(c.id for c in opened))
-    _tell_all(finder, here, f"{finder.key} found something at {place}. {line}")
+    told: list[Any] = list(dict.fromkeys([finder, *_room_characters(finder.location)]))
+    for character in dict.fromkeys([*told, *connected_characters()]):
+        line: str = f"{NOTED} {clue.journal}"
+        if character not in told:
+            line = f"{finder.key} found something at {place}. {line}"
+        if not character.attributes.get(READ_JOURNAL, False):
+            line += f" Type |w{JOURNAL}|n to read it."
+        notices.tell(character, line)
     return True
 
 
@@ -100,31 +110,52 @@ def open_theories(question: QuestionSpec, found: set[str] | None = None) -> list
     return [choice for choice in question.choices if groups_met(choice.opens, known)]
 
 
-def _open_theory_count() -> dict[str, int]:
-    """How many theories are open for each report question (by id)."""
-    report: ReportSpec | None = load_content().report
-    if report is None:
-        return {}
-    known: set[str] = found_clues()
-    return {question.id: len(open_theories(question, known)) for question in report.questions}
+def theory_key(question: QuestionSpec, choice: ChoiceSpec) -> str:
+    """How `seen` remembers a theory of the report: `theory:wreck:2`."""
+    return f"theory:{question.id}:{question.choices.index(choice)}"
 
 
-def _new_theories(before: dict[str, int]) -> list[str]:
-    """`New for the report: ...` lines for questions that gained theories since `before`."""
+def briefed() -> bool:
+    """
+    Whether the expedition has been given its task (the task's `after` flag, `briefed`):
+    until then the journal and the report only introduce themselves (DECISIONS.md, 33).
+    """
+    task: TaskSpec | None = load_content().task
+    return task is None or task.after is None or get_expedition().met((task.after,))
+
+
+def unseen(owner: Any, keys: list[str]) -> set[str]:
+    """Which of these `seen` keys the owner hasn't been shown yet."""
+    known: set[str] = get_expedition().seen(owner.id)
+    return {key for key in keys if key not in known}
+
+
+def report_keys() -> list[str]:
+    """The `seen` keys of the theories open for the report's unanswered questions."""
     report: ReportSpec | None = load_content().report
-    if report is None:
+    if report is None or not briefed():
         return []
     answers: dict[str, str] = get_expedition().answers
     known: set[str] = found_clues()
-    lines: list[str] = []
-    for number, question in enumerate(report.questions, start=1):
-        opened: int = len(open_theories(question, known))
-        if question.id in answers or opened <= before.get(question.id, 0):
-            continue
-        lines.append(
-            f"New for the report: another possibility for question {number} (|wreport {number}|n)."
-        )
-    return lines
+    return [
+        theory_key(question, choice)
+        for question in report.questions
+        if question.id not in answers
+        for choice in open_theories(question, known)
+    ]
+
+
+def news(owner: Any) -> list[str]:
+    """
+    The commands with something the owner hasn't seen yet there: `think` (a connection
+    question) and `report` (a possibility), for a pushed hint to mention.
+    """
+    commands: list[str] = []
+    if unseen(owner, [f"think:{c.id}" for c in open_connections()]):
+        commands.append(THINK)
+    if unseen(owner, report_keys()):
+        commands.append(REPORT)
+    return commands
 
 
 def open_connections() -> list[ConnectionSpec]:
@@ -140,19 +171,25 @@ def open_connections() -> list[ConnectionSpec]:
     ]
 
 
-def think_text() -> str:
-    """Every open connection question (`think`), or how they come."""
+def think_text(owner: Any) -> str:
+    """Every open connection question (`think`), the owner's new ones marked, or how they come."""
     opened: list[ConnectionSpec] = open_connections()
     if not opened:
         return (
             "Nothing to think about yet. When two clues in the journal fit together, a "
             "question about them comes up here."
         )
+    keys: list[str] = [f"think:{connection.id}" for connection in opened]
+    new: set[str] = unseen(owner, keys)
     lines: list[str] = [
         "|wSomething to think about|n (the game won't answer these: talk them over, or ask "
         "someone who might know)"
     ]
-    lines.extend(f"- {connection.question}" for connection in opened)
+    lines.extend(
+        f"- {connection.question}" + (f" {NEW}" if key in new else "")
+        for connection, key in zip(opened, keys, strict=True)
+    )
+    get_expedition().mark_seen(owner.id, keys)
     return "\n".join(lines)
 
 
@@ -160,17 +197,6 @@ def _room_characters(location: Any) -> list[Any]:
     if location is None:
         return []
     return list(location.contents_get(content_type="character"))
-
-
-def _tell_all(finder: Any, here: str, elsewhere: str) -> None:
-    """`here` to the finder and everyone in their room; `elsewhere` to other players."""
-    location: Any = finder.location
-    told: list[Any] = [finder, *_room_characters(location)]
-    for character in dict.fromkeys(told):
-        character.msg(here, from_obj=finder)
-    for character in connected_characters():
-        if character not in told:
-            character.msg(elsewhere, from_obj=finder)
 
 
 def discover_all(clue_ids: list[str | None], finder: Any, source: str | None = None) -> None:
@@ -202,34 +228,40 @@ def entry_number(clue_id: str) -> int | None:
 def _task_lines(content: Content) -> list[str]:
     """
     The task's questions, each with the expedition's answer once the report has it
-    (DECISIONS.md, 29), and how to answer them or read the epilogue again.
+    (DECISIONS.md, 29), and how to answer them or read the epilogue again. Before the
+    briefing, only what the journal is for (33).
     """
     assert content.task is not None
+    if not briefed():
+        return [content.task.before or ""]
     report: ReportSpec | None = content.report
     answers: dict[str, str] = get_expedition().answers
-    lines: list[str] = []
+    lines: list[str] = [content.task.title]
     for number, text in enumerate(content.task.questions, start=1):
         lines.append(f"  - {text}")
         if report is not None and report.questions[number - 1].id in answers:
             lines.append(f"    Answered: {report.questions[number - 1].right.answer}")
     if report is not None:
         if all(question.id in answers for question in report.questions):
-            lines.append("The report is complete: |wreport|n tells the whole story again.")
+            lines.append(f"The report is complete: |w{REPORT}|n tells the whole story again.")
         else:
-            lines.append("When you know an answer, and can prove it: |wreport|n.")
+            lines.append(f"When you know an answer, and can prove it: |w{REPORT}|n.")
     return lines
 
 
-def journal_text() -> str:
+def journal_text(owner: Any) -> str:
     """
     The journal, as shown by the `journal` command: the expedition's task first (always
-    there, so players can look up what they are here for), then the clues found.
+    there, once given, so players can look up what they are here for), then the clues
+    found, those the owner hasn't seen here yet marked new, and what's new in `think`
+    and `report`.
     """
     content: Content = load_content()
     entries: list[JournalEntry] = _listed_entries()
+    owner.attributes.add(READ_JOURNAL, True)
     lines: list[str] = ["|wThe expedition's journal|n"]
     if content.task is not None:
-        lines.append(f"\n{content.task.title}")
+        lines.append("")
         lines.extend(_task_lines(content))
         lines.append("")
     if not entries:
@@ -238,16 +270,25 @@ def journal_text() -> str:
             f"{CLUE_COLOUR}yellow|n), it is written here, for the whole expedition."
         )
         return "\n".join(lines)
-    for number, entry in enumerate(entries, start=1):
+    keys: list[str] = [f"clue:{entry.clue}" for entry in entries]
+    new: set[str] = unseen(owner, keys)
+    for number, (entry, key) in enumerate(zip(entries, keys, strict=True), start=1):
         clue: ClueSpec = content.clues[entry.clue]
-        lines.append(f"{number}. {CLUE_COLOUR}{clue.title}|n: {clue.journal}")
+        mark: str = f" {NEW}" if key in new else ""
+        lines.append(f"{number}. {CLUE_COLOUR}{clue.title}|n: {clue.journal}{mark}")
+    get_expedition().mark_seen(owner.id, keys)
     lines.append(f"\n(Who found what, and from whom: |w{JOURNAL_SOURCES}|n)")
-    if open_connections():
-        lines.append(f"(Questions to think about, from what you've found: |w{THINK}|n)")
+    connections: list[str] = [f"think:{c.id}" for c in open_connections()]
+    if connections:
+        fresh: int = len(unseen(owner, connections))
+        more: str = f", {fresh} new" if fresh else ""
+        lines.append(f"(Questions to think about, from what you've found: |w{THINK}|n{more})")
+    if unseen(owner, report_keys()):
+        lines.append(f"(New possibilities for the report: |w{REPORT}|n)")
     return "\n".join(lines)
 
 
-def journal_sources_text() -> str:
+def journal_sources_text(owner: Any) -> str:
     """
     Who found each clue, where and from whom or what, and every later source that
     confirmed it (`journal sources`): for comparing sources, kept out of the plain journal
@@ -256,7 +297,7 @@ def journal_sources_text() -> str:
     content: Content = load_content()
     entries: list[JournalEntry] = _listed_entries()
     if not entries:
-        return journal_text()
+        return journal_text(owner)
     lines: list[str] = ["|wWho found what|n"]
     for number, entry in enumerate(entries, start=1):
         clue: ClueSpec = content.clues[entry.clue]

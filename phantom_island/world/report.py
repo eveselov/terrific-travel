@@ -16,7 +16,7 @@ character; what has been answered is kept in the `Expedition` script.
 from typing import Any
 
 from world import recorder
-from world.clues import entry_number, open_theories
+from world.clues import NEW, briefed, entry_number, open_theories, theory_key, unseen
 from world.content import (
     CHOICE_LETTERS,
     ChoiceSpec,
@@ -47,6 +47,9 @@ def report(caller: Any, args: str) -> None:
     spec: ReportSpec | None = load_content().report
     if spec is None:
         caller.msg(NOTHING_TO_REPORT)
+        return
+    if spec.before is not None and not briefed():
+        caller.msg(spec.before)
         return
     words: list[str] = args.strip().lower().replace(")", " ").split()
     if not words:
@@ -136,12 +139,19 @@ def _questions_left(spec: ReportSpec) -> str:
     return "Questions still open: " + ", ".join(left) + "."
 
 
-def _theory_lines(question: QuestionSpec, indent: str) -> list[str]:
-    """The theories open for a question, lettered, and a note if more may come."""
+def _theory_lines(caller: Any, question: QuestionSpec, indent: str) -> list[str]:
+    """
+    The theories open for a question, lettered, those the caller hasn't seen here marked
+    new (DECISIONS.md, 33), and a note if more may come.
+    """
     theories: list[ChoiceSpec] = open_theories(question)
+    keys: list[str] = [theory_key(question, choice) for choice in theories]
+    new: set[str] = unseen(caller, keys)
     lines: list[str] = [
-        f"{indent}{CHOICE_LETTERS[index]}) {choice.text}" for index, choice in enumerate(theories)
+        f"{indent}{CHOICE_LETTERS[index]}) {choice.text}" + (f" {NEW}" if key in new else "")
+        for index, (choice, key) in enumerate(zip(theories, keys, strict=True))
     ]
+    get_expedition().mark_seen(caller.id, keys)
     if len(theories) < len(question.choices):
         lines.append(f"{indent}{MORE_TO_COME}")
     return lines
@@ -159,7 +169,7 @@ def show_board(caller: Any, spec: ReportSpec) -> None:
         if question.id in answers:
             lines.append(f"   Answered by {answers[question.id]}: {question.right.answer}")
         else:
-            lines.extend(_theory_lines(question, "   "))
+            lines.extend(_theory_lines(caller, question, "   "))
     lines.append(
         "Answer a question with the letter of the possibility you can prove, like "
         "|wreport 1 a|n. Only what the journal proves is accepted."
@@ -182,7 +192,7 @@ def show_question(caller: Any, question: QuestionSpec) -> None:
         lines.append(_questions_left(spec))
         caller.msg("\n".join(lines))
         return
-    lines.extend(_theory_lines(question, "  "))
+    lines.extend(_theory_lines(caller, question, "  "))
     letters: str = ", ".join(
         f"|wreport {number} {CHOICE_LETTERS[index]}|n"
         for index in range(len(open_theories(question)))

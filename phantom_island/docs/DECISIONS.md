@@ -91,7 +91,7 @@ every ending, and a player who wanders is led back towards the task (tested with
 
 **Still to do, in order:**
 0. **Fixes from the playtest of 2026-11-18** (start to the island):
-   - **Find first, reflect later (33):** the quiet journal/notebook line; no "New for the report" or connection question on finding; "new" marks in `journal`, `think` and `report`; the `briefed` flag, with introductions before it.
+   - **Find first, reflect later (33)** (built 2026-11-19): the quiet journal/notebook line; no "New for the report" or connection question on finding; "new" marks in `journal`, `think` and `report`; the `briefed` flag, with introductions before it.
    - **The chart's position (34):** the Ship's framing, three connection questions, the hint ladder, the answer to `sail to` coordinates.
    - **`think <word>`** shows only the questions involving that clue; a warmer opening line than "(the game won't answer these…)"; the *compass_sea* question points at the coral (settle with the compass's coral, open questions).
    - **Clues and ideas apart, and joined:** `think` lists the notebook ideas a question relies on, or where to learn one the player lacks. Idea titles sound general ("How seabirds find land"). *Names of winds* gets examples and why it matters (mixing up a wind's name and its direction sends you the wrong way).

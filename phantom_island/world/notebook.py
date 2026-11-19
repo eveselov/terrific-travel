@@ -18,7 +18,7 @@ from typing import Any
 from evennia.utils.ansi import strip_ansi
 
 from typeclasses.scripts import NoteEntry
-from world import recorder
+from world import notices, recorder
 from world.content import LEVELS, Content, IdeaSpec, Teaching, load_content
 from world.expedition import get_expedition
 
@@ -31,9 +31,10 @@ USED: str = "used"
 def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None = None) -> None:
     """
     `doer` (and `hearers`, who heard or watched it) learned what a text teaches, from
-    `source` ("Old Barnaby", "the sextant"). Each learner gets one line naming the new ideas,
-    and one for entries that grew; nothing is said when they knew it this well already. How
-    to read the notebook is said only until they have opened it.
+    `source` ("Old Barnaby", "the sextant"). Each learner gets a quiet note (`world/notices.py`,
+    joined with the journal's) naming the new ideas and the entries that grew; nothing is said
+    when they knew it this well already. How to read the notebook is said only until they
+    have opened it.
     """
     if not teaching:
         return
@@ -49,18 +50,21 @@ def learn(doer: Any, teaching: Teaching, source: str, hearers: list[Any] | None 
                 level_name = LEVELS[LEVELS.index(USED) - 1]  # watching isn't doing
             change: str | None = _note(learner, idea, level_name, source)
             if change == "new":
-                new.append(f"|w{idea.title}|n")
+                new.append(idea.title)
             elif change == "grew":
-                grew.append(f"|w{idea.title}|n")
+                grew.append(idea.title)
         _note_learned(learner, new, grew)
         read_it: bool = bool(learner.attributes.get(READ_IT, False))
+        parts: list[str] = []
         if new:
-            hint: str = "" if read_it else f" Type {NOTEBOOK} to read it."
-            learner.msg(f"New in your notebook: {', '.join(new)}.{hint}")
+            parts.append(f"New in your notebook: {', '.join(new)}.")
         if grew:
             entries: str = "entry" if len(grew) == 1 else "entries"
-            hint = "" if read_it else f" ({NOTEBOOK})"
-            learner.msg(f"Your notebook {entries} on {', '.join(grew)} grew.{hint}")
+            parts.append(f"Your notebook {entries} on {', '.join(grew)} grew.")
+        if parts:
+            if not read_it:
+                parts.append(f"Type {NOTEBOOK} to read it.")
+            notices.tell(learner, " ".join(parts))
 
 
 def _note_learned(learner: Any, new: list[str], grew: list[str]) -> None:

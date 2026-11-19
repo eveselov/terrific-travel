@@ -9,7 +9,8 @@ whenever the expedition makes progress (a clue found, a report question answered
 Pushed hints: after every command a player types, the expedition's clock adds the time
 since the last command (at most `GAP_CAP` seconds, so a break or a night away doesn't count
 as play). Once `push_after` minutes of play pass without progress, the player gets the first
-level, once per stretch without progress.
+level, once per stretch without progress, with a quiet note if `think` or `report` holds
+something new the player hasn't looked at (DECISIONS.md, 33).
 
 Aboard, the Ship speaks the hint; anywhere else, the journal does, as the expedition's own
 thinking.
@@ -19,8 +20,10 @@ import time
 from typing import Any
 
 from typeclasses.rooms import Room, ShipRoom
+from world.clues import news
 from world.content import LIMBO_ID, Content, HintsSpec, SituationSpec, load_content
 from world.expedition import get_expedition
+from world.notices import quiet
 
 HINT: str = "hint"
 HINT_STATE: str = "hint_state"  # on a character: the situation, level and progress last hinted
@@ -126,7 +129,11 @@ def after_command(caller: Any) -> None:
             caller.attributes.add(
                 HINT_STATE, {"situation": situation.id, "level": 0, "progress": progress}
             )
-            caller.msg(
-                spoken(caller, spec, situation.hints[0]) + f" (Stuck? |w{HINT}|n tells you more.)"
-            )
+            text: str = spoken(caller, spec, situation.hints[0])
+            text += f" (Stuck? |w{HINT}|n tells you more.)"
+            fresh: list[str] = news(caller)
+            if fresh:  # found earlier, never announced (DECISIONS.md, 33)
+                commands: str = " and ".join(f"|w{command}|n" for command in fresh)
+                text += "\n" + quiet(f"Something new you haven't looked at yet: {commands}.")
+            caller.msg(text)
     expedition.set_hint_clock(clock)

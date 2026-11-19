@@ -47,6 +47,14 @@ situations:
 
   # --- Act 1: the port --------------------------------------------------------------------
 
+  - id: briefing
+    ship: [port]
+    missing: [briefed]
+    hints:
+      - The Society called you here. Mrs. Fairweather will tell you what it wants.
+      - Ask Mrs. Fairweather about the mission, in the Society Office.
+      - In the Society Office, type |wask fairweather about mission|n.
+
   - id: compass
     ship: [port]
     missing: [C1]

@@ -28,6 +28,9 @@
 # direction (where to look), not as a question. The game's verdict on an answer comes first,
 # on its own line in cyan (DECISIONS.md, 20).
 #
+# `before` (optional) is all `report` says until the expedition has been given its task (the
+# task's `after` flag in clues.yaml, DECISIONS.md, 33).
+#
 # Each question has:
 #   id        a short name (also used by `report <id>`, for testing)
 #   choices   two to five theories; exactly one has `right: true`
@@ -50,6 +53,11 @@
 # last page (DECISIONS.md, 9; GAME_STORY.md, "Sources").
 #
 # After editing, `reload` in the game is enough.
+
+before: >
+  The report is how you'll tell the Society what you have worked out from the clues in the
+  journal. You haven't been given its questions yet: speak with Mrs. Fairweather, in the
+  Society Office.
 
 questions:
   - id: wreck

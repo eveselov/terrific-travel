@@ -856,7 +856,7 @@ class TestAsk(WorldTest):
             get_expedition().add_clue("C2", "someone", "Market")
             heard: str = self.ask("crane about compass")
         self.assertIn("I didn't find it", heard)
-        self.assertIn("New in the journal", heard)
+        self.assertIn("Noted in the journal", heard)
         self.assertTrue(get_expedition().has_clue("C3"))
 
     def test_ama_still_waits_for_respect(self) -> None:
@@ -928,6 +928,8 @@ class DiscoveryTest(WorldTest):
         )
         connected.start()
         self.addCleanup(connected.stop)
+        # Most tests play after the briefing: the task is in the journal and the report.
+        get_expedition().set_flag("briefed")
 
     def at(self, character: Character, place_id: str) -> None:
         character.move_to(self.rooms[place_id], quiet=True)
@@ -1045,7 +1047,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
         entry: JournalEntry = expedition.journal[0]
         self.assertEqual(entry.source, "Silas Crane")
         self.assertEqual([s.source for s in entry.also], ["Old Barnaby"])
-        listing: str = journal_sources_text()
+        listing: str = journal_sources_text(self.char1)
         self.assertIn("found by Test, Market, from Silas Crane", listing)
         self.assertIn("again by Admin, Quay, from Old Barnaby", listing)
 
@@ -1056,7 +1058,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.do(self.char1, "look goats")
         self.at(self.char1, "spring")
         self.do(self.char1, "look shoots")
-        listing: str = journal_sources_text()
+        listing: str = journal_sources_text(self.char1)
         self.assertIn("from the goats, with the animal guide", listing)
         self.assertIn("again by", listing)
         self.assertIn("from the shoots, with the plant guide", listing)
@@ -1065,7 +1067,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.at(self.char1, "market")
         seen: str = self.do(self.char1, "look compass")
         self.assertIn("|yHALCYON|n", seen)
-        self.assertIn("New in the journal:|n Silas Crane is selling", seen)
+        self.assertIn("Noted in the journal: Silas Crane is selling", seen)
         entry: JournalEntry = get_expedition().journal[0]
         self.assertEqual((entry.clue, entry.finder, entry.place), ("C1", self.char1.key, "Market"))
 
@@ -1131,7 +1133,9 @@ class TestLookingAndTheJournal(DiscoveryTest):
         self.assertIn("1. |yA wreck on the Western Reef|n", listed)
         self.assertNotIn("found by", listed)  # the sources are kept apart
         self.assertIn("|wjournal sources|n", listed)
-        self.assertEqual(listed, journal_text())
+        self.assertIn("Western Reef|n: ", listed)
+        self.assertIn("(new)", listed)  # char2 hasn't seen it in the journal yet...
+        self.assertEqual(listed.replace(" (new)", ""), journal_text(self.char2))  # ...now has
         sources: str = self.do(self.char2, "journal sources")
         self.assertIn(f"1. |yA wreck on the Western Reef|n: found by {self.char1.key}", sources)
         self.assertLess(listed.index("Why did nobody"), listed.index("1. "))
@@ -1384,7 +1388,7 @@ class TestNotebook(DiscoveryTest):
         self.at(self.char2, "quay")
         with patch.object(self.char2, "msg") as heard:
             told: str = self.do(self.char1, "ask barnaby about sailing")
-        self.assertIn("New in your notebook: |wLatitude|n. Type |wnotebook|n to read it.", told)
+        self.assertIn("New in your notebook: Latitude. Type |wnotebook|n|x to read it.", told)
         self.assertIn("New in your notebook", texts(heard))
         page: str = self.notebook(self.char2)
         self.assertIn("|wNavigation|n: 1 of 2", page)
@@ -1397,7 +1401,7 @@ class TestNotebook(DiscoveryTest):
         self.at(self.char1, "quay")
         self.do(self.char1, "ask barnaby about sailing")
         self.at(self.char1, "deck")
-        self.assertIn("entry on |wLatitude|n grew", self.do(self.char1, "ask ship about latitude"))
+        self.assertIn("entry on Latitude grew", self.do(self.char1, "ask ship about latitude"))
         page: str = self.notebook(self.char1)
         self.assertIn("How far north or south you are. The higher the noon sun", page)
         self.assertIn("1 of 2", page)
@@ -1428,8 +1432,8 @@ class TestNotebook(DiscoveryTest):
         self.at(self.char1, "quay")
         self.notebook(self.char1)
         told: str = self.do(self.char1, "ask barnaby about sailing")
-        self.assertIn("New in your notebook: |wLatitude|n.", told)
-        self.assertNotIn("Type", told)
+        self.assertIn("New in your notebook: Latitude.", told)
+        self.assertNotIn("Type |wnotebook", told)
 
     def test_a_new_expedition_starts_with_empty_notebooks(self) -> None:
         self.at(self.char1, "quay")
@@ -1577,10 +1581,14 @@ class TestReport(DiscoveryTest):
     def test_theories_open_with_their_clues_and_never_alone(self) -> None:
         self.at(self.char1, "market")
         heard: str = self.do(self.char1, "examine compass")  # C1 and C2
-        self.assertIn("another possibility for question 1", heard)
+        self.assertNotIn("report", heard)  # not announced: the board marks it (33)
         board: str = self.do(self.char1, "report 1")
         self.assertIn("c) She sank in the deep ocean", board)
         self.assertIn("d) She was wrecked on a reef near the island", board)
+        self.assertIn("storm of '75. (new)", board)
+        self.assertNotIn("a) She sank far out at sea (new)", self.do(self.char1, "report"))
+        self.assertNotIn("(new)", self.do(self.char1, "report 1"))
+        self.assertIn("(new)", self.do(self.char2, "report"))
 
     def test_a_letter_beyond_the_open_theories_is_not_a_choice(self) -> None:
         heard: str = self.do(self.char1, "report 1 d")
@@ -1669,11 +1677,14 @@ class TestConnections(DiscoveryTest):
         self.at(self.char2, "village")
         with patch.object(self.char2, "msg") as beside:
             heard: str = self.do(self.char1, "examine beams")  # C8 with C7: the oak question
-        self.assertIn("Something to think about", heard)
-        self.assertIn("What else could her timber", heard)
-        self.assertIn("What else could her timber", texts(beside))
-        self.assertIn("What else could her timber", self.do(self.char2, "think"))
-        self.assertIn("|wthink|n", self.do(self.char2, "journal"))
+        self.assertNotIn("What else could her timber", heard)  # not announced (33)
+        self.assertNotIn("What else could her timber", texts(beside))
+        self.assertIn("|wthink|n, 1 new", self.do(self.char2, "journal"))
+        thought: str = self.do(self.char2, "think")
+        self.assertIn("What else could her timber", thought)
+        self.assertIn("(new)", thought)
+        self.assertNotIn("(new)", self.do(self.char2, "think"))
+        self.assertNotIn("1 new", self.do(self.char2, "journal"))
 
     def test_an_entry_of_needs_can_be_any_of_several_clues(self) -> None:
         get_expedition().add_clue("C7", "someone", "Western Reef")
@@ -1685,8 +1696,10 @@ class TestConnections(DiscoveryTest):
         get_expedition().add_clue("C7", "someone", "Western Reef")
         get_expedition().add_clue("C8", "someone", "Village")
         self.at(self.char1, "village")
+        self.do(self.char1, "think")
         heard: str = self.do(self.char1, "examine beams")  # C8 again: nothing new
-        self.assertNotIn("Something to think about", heard)
+        self.assertIn("Already in the journal", heard)
+        self.assertNotIn("(new)", self.do(self.char1, "think"))
 
 
 class TestHints(DiscoveryTest):
@@ -1698,6 +1711,14 @@ class TestHints(DiscoveryTest):
         moved: Any = patch("world.hints.now", side_effect=lambda: self.clock[0])
         moved.start()
         self.addCleanup(moved.stop)
+
+    def test_a_pushed_hint_mentions_what_is_new(self) -> None:
+        get_expedition().add_clue("C7", "someone", "Western Reef")
+        get_expedition().add_clue("C8", "someone", "Village")  # the oak question
+        self.at(self.char1, "village")
+        self.play(self.char1, 1, 0)
+        pushed: str = self.play(self.char1, 20, 30)
+        self.assertIn("Something new you haven't looked at yet: |wthink|n", pushed)
 
     def test_hints_get_more_direct(self) -> None:
         self.at(self.char1, "office")
@@ -1771,3 +1792,59 @@ class TestHints(DiscoveryTest):
     def test_no_hints_are_pushed_in_limbo(self) -> None:
         self.play(self.char1, 1, 0)
         self.assertNotIn("leaf through the journal", self.play(self.char1, 30, 30))
+
+
+class TestFindFirst(DiscoveryTest):
+    """A first encounter reads like a book; the links to the task wait (DECISIONS.md, 33)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        get_expedition().start_over(["port"])  # not briefed yet
+
+    def test_before_the_briefing_the_journal_and_report_introduce_themselves(self) -> None:
+        journal: str = self.do(self.char1, "journal")
+        self.assertIn("will hold the clues", journal)
+        self.assertNotIn("What became of the Halcyon's crew?", journal)
+        report: str = self.do(self.char1, "report")
+        self.assertIn("speak with Mrs. Fairweather", report)
+        self.assertNotIn("a)", report)
+        self.assertIn("speak with Mrs. Fairweather", self.do(self.char1, "report 1 a"))
+        self.at(self.char1, "office")
+        self.assertIn("Mrs. Fairweather will tell you", self.do(self.char1, "hint"))
+
+    def test_the_mission_briefs_the_expedition(self) -> None:
+        self.at(self.char1, "office")
+        self.do(self.char1, "ask fairweather about mission")
+        self.assertIn("What became of the Halcyon's crew?", self.do(self.char2, "journal"))
+        self.assertIn("The report for the Society", self.do(self.char2, "report"))
+
+    def test_the_ship_briefs_too(self) -> None:
+        self.at(self.char1, "deck")
+        self.do(self.char1, "ask ship about expedition")
+        self.assertTrue(get_expedition().met(("briefed",)))
+
+    def test_a_find_gives_one_quiet_line_for_journal_and_notebook(self) -> None:
+        self.at(self.char1, "village")
+        heard: str = self.do(self.char1, "ask tui about song")
+        notes: list[str] = [line for line in heard.split("\n") if "|x(" in line]
+        self.assertEqual(len(notes), 1)
+        self.assertTrue(notes[0].startswith("  |x(Noted in the journal: "))
+        self.assertIn("New in your notebook", notes[0])
+        self.assertIn("Type |wjournal|n", notes[0])
+        self.do(self.char1, "journal")
+        self.at(self.char1, "market")
+        self.assertNotIn("Type |wjournal", self.do(self.char1, "look compass"))
+
+    def test_a_player_elsewhere_gets_a_quiet_line_too(self) -> None:
+        self.at(self.char1, "market")
+        self.at(self.char2, "quay")
+        with patch.object(self.char2, "msg") as elsewhere:
+            self.char1.execute_cmd("look compass")
+        self.assertIn(f"|x({self.char1.key} found something at Market.", texts(elsewhere))
+
+    def test_starting_over_forgets_what_was_seen(self) -> None:
+        get_expedition().add_clue("C1", "someone", "Market")
+        self.do(self.char1, "journal")
+        get_expedition().start_over(["port"])
+        get_expedition().add_clue("C1", "someone", "Market")
+        self.assertIn("(new)", self.do(self.char1, "journal"))

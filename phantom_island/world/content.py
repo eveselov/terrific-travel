@@ -304,6 +304,8 @@ class TaskSpec:
 
     title: str
     questions: tuple[str, ...]
+    after: str | None = None  # a flag: until it is set, `before` stands in its place (33)
+    before: str | None = None
 
 
 @dataclass(frozen=True)
@@ -360,6 +362,7 @@ class ReportSpec:
 
     questions: tuple[QuestionSpec, ...]
     epilogue: tuple[PageSpec, ...]
+    before: str | None = None  # shown instead, until the task's `after` flag is set (33)
 
 
 @dataclass(frozen=True)
@@ -474,6 +477,7 @@ class TopicSpec:
     truth: TruthSpec | None
     teaches: Teaching = ()
     hidden: bool = False  # found only by asking: never suggested, needs no white word
+    sets: str | None = None  # a flag to remember once it is asked (`briefed`)
 
 
 @dataclass(frozen=True)
@@ -809,6 +813,7 @@ def _topic(topic_id: str, value: Any, shared: dict[str, tuple[str, ...]], where:
         truth=_truth(data.get("truth"), f"{where}, truth"),
         teaches=_teaches(data, where),
         hidden=_flag(data, "hidden", where),
+        sets=_optional_text(data, "sets", where),
     )
 
 
@@ -918,8 +923,15 @@ def _task(data: dict[str, Any]) -> TaskSpec | None:
         isinstance(q, str) and q.strip() for q in questions
     ):
         raise ContentError(f"{where}: `questions` must be a list of texts.")
+    after: str | None = _optional_text(item, "after", where)
+    before: str | None = _optional_text(item, "before", where)
+    if (after is None) != (before is None):
+        raise ContentError(f"{where}: `after` and `before` go together.")
     return TaskSpec(
-        title=_text(item, "title", where), questions=tuple(q.strip() for q in questions)
+        title=_text(item, "title", where),
+        questions=tuple(q.strip() for q in questions),
+        after=after,
+        before=before,
     )
 
 
@@ -993,7 +1005,10 @@ def _report(data: dict[str, Any], task: TaskSpec | None) -> ReportSpec | None:
         where = f"{REPORT_FILE}, epilogue page {number}"
         page: dict[str, Any] = _mapping(value, where)
         pages.append(PageSpec(title=_text(page, "title", where), text=_text(page, "text", where)))
-    return ReportSpec(questions=tuple(questions), epilogue=tuple(pages))
+    before: str | None = _optional_text(data, "before", REPORT_FILE)
+    if before is not None and task.after is None:
+        raise ContentError(f"{REPORT_FILE}: `before` needs the task's `after` in {CLUES_FILE}.")
+    return ReportSpec(questions=tuple(questions), epilogue=tuple(pages), before=before)
 
 
 def _voice(data: dict[str, Any], field: str, where: str) -> str:
@@ -1213,6 +1228,12 @@ def _check(content: Content) -> None:
     _check_teachings(content)
     _check_report(content)
     _check_hints(content)
+    if content.task is not None and content.task.after is not None:
+        if content.task.after not in flags_set(content):
+            raise ContentError(
+                f"{CLUES_FILE}, task: `after` names flag {content.task.after!r}, but nothing "
+                "`sets` it."
+            )
 
 
 def _check_report(content: Content) -> None:
@@ -1293,6 +1314,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             texts.extend(_look_texts(f"{where}, detail {detail.id}", detail))
     if content.task is not None:
         texts.append((f"{CLUES_FILE}, task", content.task.title, None))
+        if content.task.before is not None:
+            texts.append((f"{CLUES_FILE}, task, before", content.task.before, None))
     for connection in content.connections.values():
         texts.append((f"{CLUES_FILE}, connection {connection.id}", connection.question, None))
     if content.hints is not None:
@@ -1312,6 +1335,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
                     texts.append((f"{where}, answer", choice.answer, None))
                 for number, part in enumerate(choice.proof, start=1):
                     texts.append((f"{where}, proof {number}", part.missing, None))
+        if content.report.before is not None:
+            texts.append((f"{REPORT_FILE}, before", content.report.before, None))
         for number, page in enumerate(content.report.epilogue, start=1):
             texts.append((f"{REPORT_FILE}, epilogue page {number}", page.text, None))
     for idea in content.ideas.values():
@@ -1428,8 +1453,13 @@ def _check_needs(where: str, needs: tuple[str, ...], content: Content, flags: se
 
 
 def flags_set(content: Content) -> set[str]:
-    """Every flag something in the content sets (things.yaml: `sets`)."""
-    flags: set[str] = set()
+    """Every flag something in the content sets (`sets`, in things.yaml and on topics)."""
+    flags: set[str] = {
+        topic.sets
+        for character in content.characters.values()
+        for topic in character.topics.values()
+        if topic.sets is not None
+    }
     for thing in content.things.values():
         for action in (thing.read, thing.use):
             if action is not None:

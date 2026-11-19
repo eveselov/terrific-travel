@@ -72,6 +72,8 @@
 #   hidden    optional: true for a topic players find only by thinking of it (the Ship's
 #             name). Every other topic must be in `suggest` or white in one of the
 #             character's own texts; the content check makes sure of it.
+#   sets      optional: a flag to remember once this topic is asked about (`briefed`: the
+#             task appears in the journal and the report, DECISIONS.md, 33)
 #   truth     optional, for what a character hides: the reply given once `needs` holds
 #     needs   clue ids already in the journal, or flags such as `respect` (set by things
 #             players do; the flags come in A4)
@@ -113,6 +115,7 @@ characters:
       mission:
         aliases: [expedition, job, task]
         stance: truth
+        sets: briefed  # the task appears in the journal and the report (DECISIONS.md, 33)
         reply: >
           "The Society wants the truth about the |wHalcyon|n: what happened to her, why
           nobody ever found her, and what became of her |wcrew|n. The three questions stand
@@ -679,6 +682,7 @@ characters:
       expedition:
         aliases: [task, mission, purpose, questions, job]
         stance: truth
+        sets: briefed
         reply: >
           "You lead this expedition, and the Society gave you three questions: what
           happened to the Halcyon, why nobody ever found her, and what became of her crew.

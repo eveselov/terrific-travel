@@ -197,9 +197,15 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
   the epilogue's first page, and `report more` turns the pages.
 
 - **Connection questions** (`think`, DECISIONS.md, 30): once the clues a question needs are
-  in the journal, it comes up right after the journal line, to everyone in the room, and
-  `think` lists them all. They link clues and never give the answer. Seven of them, in
-  `connections` at the end of [world/content/clues.yaml](world/content/clues.yaml).
+  in the journal, `think` lists it. They link clues and never give the answer. Seven of
+  them, in `connections` at the end of [world/content/clues.yaml](world/content/clues.yaml).
+
+- **Find first, reflect later** (DECISIONS.md, 33): a find prints the scene, then one dim,
+  indented line for the journal and the notebook together (`world/notices.py`). Nothing
+  about the report or `think` is announced then: `journal`, `think` and `report` mark with
+  "(new)" what a player hasn't seen there yet, and a pushed hint mentions it. Until Mrs.
+  Fairweather's *mission* (or the Ship's *expedition*) sets the `briefed` flag, the journal
+  and the report only introduce themselves.
 
 - **Hints** (`hint`, DECISIONS.md, 31): the next step at three levels, a nudge first and
   the exact command last, starting over when something new is found. After 10 minutes of
@@ -214,8 +220,8 @@ startover island yes         (as admin: the ship at the island)
 report                       → the case board: what the Society believes, nothing more
 report 1 a                   → turned down, with a hint
 teleport Market
-examine compass              → the coral: "New for the report: another possibility"
-report 1                     → now also the deep ocean, and a reef near the island
+examine compass              → the coral, and a quiet line: noted in the journal
+report 1                     → now also the deep ocean, and a reef near the island (new)
 report 1 d                   → right, but no proof in the journal yet: where to look
 ```
 

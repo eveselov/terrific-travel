@@ -18,6 +18,7 @@ from typing import Any
 
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import ShipRoom
+from world import notices
 from world.clues import discover, show_marks
 from world.content import (
     CharacterSpec,
@@ -356,7 +357,10 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
     _say_to_room(caller, mine, theirs, speech(spec, said.text))
     if rest:
         caller.msg(_one_at_a_time(rest))
-    if said.clue is not None:
-        discover(said.clue, caller, spec.name)
-    learn(caller, said.teaches, spec.name, _players_here(caller))
+    if topic.sets is not None:
+        get_expedition().set_flag(topic.sets)
+    with notices.together():
+        if said.clue is not None:
+            discover(said.clue, caller, spec.name)
+        learn(caller, said.teaches, spec.name, _players_here(caller))
     return topic

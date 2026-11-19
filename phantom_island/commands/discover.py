@@ -167,9 +167,9 @@ class CmdJournal(Command):
 
     def func(self) -> None:
         if self.args.strip().lower() in ("sources", "source", "who"):
-            self.caller.msg(journal_sources_text())
+            self.caller.msg(journal_sources_text(self.caller))
         else:
-            self.caller.msg(journal_text())
+            self.caller.msg(journal_text(self.caller))
 
 
 class CmdHint(Command):
@@ -213,7 +213,7 @@ class CmdThink(Command):
     help_category = "General"
 
     def func(self) -> None:
-        self.caller.msg(think_text())
+        self.caller.msg(think_text(self.caller))
 
 
 class CmdNotebook(Command):

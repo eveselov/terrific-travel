@@ -18,6 +18,7 @@ from evennia.objects.objects import DefaultCharacter
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
 from typeclasses.things import Thing
+from world import notices
 from world.clues import discover, show_marks
 from world.content import (
     ActionSpec,
@@ -100,12 +101,13 @@ def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:
     caller.msg("\n\n".join(show_marks(reveal.text) for reveal, _ in shown))
     caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], None))
     found: set[str] = set()
-    for reveal, source in shown:
-        if reveal.clue is not None and reveal.clue not in found:
-            found.add(reveal.clue)
-            discover(reveal.clue, caller, source)
-    for reveal, source in shown:
-        learn(caller, reveal.teaches, source)  # looking is private: only the looker learns
+    with notices.together():
+        for reveal, source in shown:
+            if reveal.clue is not None and reveal.clue not in found:
+                found.add(reveal.clue)
+                discover(reveal.clue, caller, source)
+        for reveal, source in shown:
+            learn(caller, reveal.teaches, source)  # looking is private: only the looker learns
 
 
 def look_at(caller: Any, text: str, close: bool = False) -> bool:
@@ -178,8 +180,6 @@ def act(caller: Any, verb: str, text: str) -> bool:
         location.msg_contents(text_shown, from_obj=caller)
     else:
         caller.msg(text_shown)
-    if outcome.clue is not None:
-        discover(outcome.clue, caller, f"the {spec.name}")
     watching: list[Any] = []
     if location is not None:
         watching = [
@@ -187,7 +187,10 @@ def act(caller: Any, verb: str, text: str) -> bool:
             for c in location.contents_get(content_type="character")
             if c is not caller and not isinstance(c, Inhabitant)
         ]
-    learn(caller, outcome.teaches, f"the {spec.name}", watching)
+    with notices.together():
+        if outcome.clue is not None:
+            discover(outcome.clue, caller, f"the {spec.name}")
+        learn(caller, outcome.teaches, f"the {spec.name}", watching)
     return True
 
 

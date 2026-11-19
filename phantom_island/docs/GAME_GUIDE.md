@@ -69,8 +69,9 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 ## Journal
 
-- The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it. At the top is the expedition's task: the three questions the Society wants answered. If you lose track of what you're here for, look there.
-- A clue is a fact shown in **yellow**, in what someone says, in what you look at, or in what an instrument or book shows. Right after it comes a line starting "New in the journal:", so a clue is never missed, even without colours.
+- The journal is the expedition's notebook of clues: `journal` (or `notes`, `clues`) shows it. Once Mrs. Fairweather has told you the mission, the expedition's task stands at the top: the three questions the Society wants answered. If you lose track of what you're here for, look there.
+- A clue is a fact shown in **yellow**, in what someone says, in what you look at, or in what an instrument or book shows. Right after the scene comes a quieter line in grey, starting "Noted in the journal:", so a clue is never missed, even without colours. The same line says when your notebook learned something.
+- What's new since you last looked is marked "(new)": clues in the journal, possibilities in the report, questions in `think`. The journal's last lines tell you when `think` or the report has something new.
 - Entries are kept in the order they were found, one line each. `journal sources` shows who found each one, where, and from whom or what. When another source confirms a clue later, it is added to the same entry, so you can see who agrees with whom.
 - There is one journal for the whole expedition: everyone sees the same entries, and every player hears of a new clue at once, wherever they are.
 - The same clue can turn up in different words from different sources. Finding it again adds no new entry: you're shown the entry it matches, so you can see they're the same fact.
@@ -82,7 +83,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - When you think you know an answer, pick its letter: `report 1 b`. `report 2` shows one question on its own.
 - The Society wants proof: an answer is only accepted once the journal holds the clues that show it. If an answer doesn't fit, or can't be proved yet, you're told why, and where you might look. That's not failing: go and look, and come back.
 - One player's answer counts for the whole expedition, and the journal shows it under the question.
-- When clues in the journal fit together, a question about them comes up: `think` lists them all. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
+- When clues in the journal fit together, a question about them comes up in `think`. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
 - Once all three questions are answered, the whole story is told, page by page (`report more`), with the real history behind it.
 
 ## Hints

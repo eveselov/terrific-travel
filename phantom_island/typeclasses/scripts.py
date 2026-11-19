@@ -200,6 +200,7 @@ class Expedition(Script):
         self.db.notebooks = {}
         self.db.answers = {}
         self.db.hint_clock = {}
+        self.db.seen = {}
 
     @property
     def journal(self) -> list[JournalEntry]:
@@ -286,6 +287,24 @@ class Expedition(Script):
 
     def set_hint_clock(self, clock: dict[str, Any]) -> None:
         self.db.hint_clock = dict(clock)
+
+    def seen(self, owner: int) -> set[str]:
+        """
+        What one player (by character id) has already been shown in `journal`, `think` and
+        `report` (keys like `clue:C4`), so that what's new can be marked (DECISIONS.md, 33).
+        """
+        return {str(key) for key in (self.db.seen or {}).get(str(owner)) or []}
+
+    def mark_seen(self, owner: int, keys: list[str]) -> None:
+        """Remember that a player has been shown these."""
+        known: set[str] = self.seen(owner)
+        if all(key in known for key in keys):
+            return
+        seen: dict[str, list[str]] = {
+            key: list(value) for key, value in (self.db.seen or {}).items()
+        }
+        seen[str(owner)] = sorted(known.union(keys))
+        self.db.seen = seen
 
     def notebook(self, owner: int) -> list[NoteEntry]:
         """The ideas in one player's notebook (by character id), the first learned first."""
@@ -394,3 +413,4 @@ class Expedition(Script):
         self.db.notebooks = {}
         self.db.answers = {}
         self.db.hint_clock = {}
+        self.db.seen = {}
