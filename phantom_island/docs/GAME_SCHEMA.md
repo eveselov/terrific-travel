@@ -12,8 +12,9 @@ A frame for inquiry-based games built on structured content. A **task** keeps pl
 focused; a shared **journal** collects the evidence; a personal **notebook** grows the
 background knowledge, by area and level; **connection questions** prompt reasoning without
 giving answers; **hints** at three levels end fruitless wandering without prescribing a path;
-and a **report**, the players' case board, shows the questions with the possibilities met
-so far and accepts only conclusions the evidence proves. All content is data, checked
+a **council** turns many findings into one decision, step by step, wherever exploring must
+converge; and a **report**, the players' case board, shows the questions with the
+possibilities met so far and accepts only conclusions the evidence proves. All content is data, checked
 for consistency, so authors can write new episodes and subjects without code. It supports
 fun, learning and, with deliberate design, evaluation. It doesn't produce them by itself:
 the content does, within the frame.
@@ -29,6 +30,7 @@ the content does, within the frame.
 | **Notebook** | Personal background knowledge: ideas about how the world works, by area, at three levels (*heard*, *understood*, *used*) | `notebook` | latitude, longitude, coral, tides, seabirds at dusk |
 | **Connections** | Questions that link two or more clues once all are found; never the answer | shown when they open; `think` | "Oak ribs on the reef, oak beams in the village: what else could her timber have been used for?" |
 | **Hints** | The next step, at three levels, from a nudge to the exact command; given when asked, or offered after a long stretch without progress | `hint` | aboard the ship she speaks; ashore the player "thinks it over with the journal" |
+| **Council** | At a convergence point, where many findings must become one decision: a short sequence of questions, one at a time, each answered by a choice the journal must support; the last step sums up, and the player then acts | `council`, offered at the moment, never forced | at the empty chart position, the Ship asks: which number is wrong, which side, how far; then "Your order, Captain" |
 | **Report (the case board)** | The task's questions, each with the possibilities (theories) met so far; an answer counts only when the journal proves it; an epilogue tells the whole story once all are answered | `report`, consulted all through the game | at first only "she sank in a storm" and "she sailed on"; the coral on the compass adds "sank in the deep ocean" and "wrecked on a reef near the island" |
 
 ### How they work together
@@ -65,6 +67,41 @@ So it is less a final exam than a **case board**, like a detective's wall of que
 suspects and proof (in inquiry teaching, a "driving question board"). Handing in the
 answers is only one thing done at it. Because players read it so often, it is also where
 spoilers do the most harm, hence rule 11 below.
+
+### Exploring and converging: the council
+
+A game of this kind has two kinds of play. **Exploring** has no single result: players
+wander, meet people and look at things in any order, and every find is a small reward on
+its own, which suits short attention spans. **Converging** must turn many findings into one
+decision: where to search, whom to believe, what happened. At a convergence point, the
+tools for exploring (reading the journal, connection questions, hints) expect the insight
+to come silently and at once, in one head. In Phantom Island's first playtest it didn't,
+even for the author, who knew the plot.
+
+So a convergence point gets a **process**: a council. In the story, the captain gathers the
+crew and the discussion is held in steps; in the game, a guide character (in Phantom
+Island, the Ship) asks one question at a time, each with a few choices, and the player
+answers. A step is accepted only when the journal holds its evidence; when it doesn't, the
+guide says where to look and the council waits, to carry on where it stopped. A wrong
+choice leads back to the evidence. The last step sums up, and the player still makes the
+decision themselves (gives the order, picks the door): the council builds the decision, the
+player takes it.
+
+- **It is the report's machinery, used mid-game.** A step is a question with possibilities
+  and a proved right answer; what a council adds is the order of the steps, the moment and
+  place it belongs to, and the summing up. The report itself is the last and largest
+  council.
+- **Steps are the parts of the decision, each ruling something out.** At the chart's
+  position: which number is wrong (so search east or west, not north or south), which side
+  (west, not east), how far (near). Designing a convergence point means finding these parts
+  first; if a decision has no parts, it is a guess, and players will feel it.
+- **It is offered, never forced.** A player who knows can act at once, which keeps replays
+  and experienced players free.
+- **Together, it is a real discussion.** Everyone present takes part and anyone may answer:
+  the council structures the conversation between the players (a child and a grandparent on
+  the sofa), which is the best discussion a game can have.
+- **An episode may have several.** The game's structure becomes phases of exploration, each
+  ending in a convergence point with its council, and the report at the end.
 
 ## The entities (a conceptual model)
 
@@ -201,11 +238,15 @@ These are the rules the schema depends on; without them the elements are just fe
     the evidence or the witness that raises it, and the right one never arrives alone: it
     comes with a wrong rival raised by the same evidence, so its appearing gives nothing
     away. Right answers are written as claims; their explanation waits for the epilogue.
+12. **Where exploring must converge, give it a process.** A decision that needs several
+    findings at once gets a council: its parts as steps, one at a time, each supported by
+    the journal, offered but never forced. A pile of clues and a hint are not enough.
 
 ## Content as data
 
 Everything above is written in plain data files (YAML), not code: places, characters and
-their topics, things, clues, the task, connections, notebook ideas, hints and the report.
+their topics, things, clues, the task, connections, notebook ideas, hints, councils and the
+report.
 A **content check** runs every time the world is built and stops it with a precise message
 if the content doesn't fit together: a clue revealed without being marked, a proof naming a
 clue that doesn't exist, a hint for a position the ship can't reach, a topic nobody can
@@ -237,7 +278,10 @@ stealth assessment formalise "claims backed by evidence".
 What may be distinctive is the form: lightweight and text-first; multiplayer, with solo and
 cooperative play in one world; authored in plain data files with a checker that keeps the
 story consistent; a notebook that shows competence as text; and AI characters planned on top,
-with the game, not the AI, deciding what may be revealed.
+with the game, not the AI, deciding what may be revealed. The council may be new in its
+framing: deduction boards and fill-in conclusions are worked alone, while a council is led
+inside the story, step by step, and held together by everyone present (to check against the
+prior art, like the rest of this section).
 
 ## Evaluation
 
@@ -291,6 +335,10 @@ game or its players.
      one), as classic adventure hints were organised by question;
   3. a small graph of goals with prerequisites, choosing the one nearest the player or the
      one they touched last.
+- **Finding the convergence points.** Phantom Island found its first one in a playtest.
+  A method would help authors: list the decisions with a single right result, and for each,
+  its parts and the evidence for each part. Candidates in Phantom Island besides the chart's
+  position: whom to believe about the sinking (the two witnesses), and the report itself.
 - **The play-through check** described above.
 - **Evaluation by design**, with records that respect the players' privacy. One known leak
   to design out: feedback on an answer can reveal more than intended (in Phantom Island, "the
@@ -308,6 +356,7 @@ Phantom Island:
 | Engine (would carry over) | Episode (Phantom Island's own) |
 |---|---|
 | clues and the shared journal, the task, the case board with proof, the epilogue | the 13 clues, the three questions, the theories, the epilogue's text |
+| councils at convergence points, on the report's machinery | the council at the chart's position, its three steps, the Ship as its guide |
 | connection questions; hints with situations, pushed after a stretch without progress | which clues connect; the hint path |
 | the notebook of ideas and its three levels | latitude, coral, tides, seabirds... |
 | the content loader and checker, the scenario recorder, starting over | places, characters, things |

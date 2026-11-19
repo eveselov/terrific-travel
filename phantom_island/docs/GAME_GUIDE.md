@@ -86,6 +86,14 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - When clues in the journal fit together, a question about them comes up in `think`. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
 - Once all three questions are answered, the whole story is told, page by page (`report more`), with the real history behind it.
 
+## Council
+
+- When the expedition has a big decision to make aboard, the Ship will say so: call a `council`. The crew gather, and the Ship asks the questions that settle it, one at a time. Answer each with its letter: `council b`.
+- An answer only counts once the journal shows it. If it doesn't yet, the Ship tells you where to look, and the council waits: type `council` again when you're ready, and it carries on where it stopped.
+- When the council has decided, the order is still yours to give.
+- Playing together, everyone in the room is at the council, and anyone can answer. Talk it over first!
+- Positions can be given as orders too: `sail to 14 south 40 west`.
+
 ## Hints
 
 - Stuck? Type `hint`, anywhere. The first hint is a gentle nudge; type `hint` again for a clearer one, and a third time for exactly what to type. When the expedition finds something new, the hints start gently again.

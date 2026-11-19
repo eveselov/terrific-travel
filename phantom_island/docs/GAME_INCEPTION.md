@@ -772,3 +772,87 @@ Answer a question with the letter of the possibility you can prove, like report 
 **Replies.** I rewrote the replies of the possibilities shown from the start, because three of them mentioned things players can't know yet: "somebody on the island remembers", "at the chart's position there was no island", "a piece of her in the shallows".
 
 **Docs:** decision 32 (it amends decision 29's "the choices are always the same"), GAME_SCHEMA (a section "The report is the centre, not the end" and design rule 11), and the GAME_AUTHORING recipe, GAME_GUIDE and the README walkthrough.
+
+## Council
+
+I think you've found something real, and it's more than a metaphor.
+
+## What you noticed
+
+The game has two kinds of play, and until now we've built only one of them:
+- **Exploring:** wander, meet people, look and examine, in any order. Nothing has to come out of it right away, so a short attention span is fine. Every find is a small reward.
+- **Converging:** many findings have to become one decision. This is where the chart's position sits, and where the report sits at the end.
+
+For converging, the game currently offers the same tools as for exploring: read the journal, `think`, `hint`. Those are tools for thinking alone. They expect the "eureka" to happen silently in one head, all at once, and you've shown it doesn't, even for you. My decision 34 improves the material (three clear questions), but it is still silent reading. It doesn't give the moment a **process**.
+
+Your picture of the captain calling the crew together is the right model. A council is a way of thinking in steps, out loud, with someone keeping order. It suits a 12-year-old much better than a pile of notes: one question at a time, each answered before the next, and the conclusion builds up step by step. It also suits the sofa. The council structures the conversation between you and your grandson, which is the best discussion the game can have.
+
+## What a council could look like
+
+The captain calls it: `council`, on the Deck. The Ship leads the questions, which fits her written voice: she "asks questions back instead of giving answers". The captain answers. Each step is one of the three parts from the table:
+
+```
+> council
+The crew gather on the Deck. The Ship's timbers creak: "Open sea, Captain, where the
+chart put the island. So the chart is wrong somewhere. Let's settle it, one thing at
+a time.
+First: the chart gives two numbers. Which one could the Halcyon's master have got
+wrong without knowing it?"
+  a) The latitude, north or south.
+  b) The longitude, east or west.
+  c) Both of them.
+(Answer: council a, b or c.)
+
+> council a
+"The noon sun gave him his latitude every day, and our sextant says the same as his
+chart. What did he have no way to check?"
+
+> council b
+"Yes. Without a sea clock, longitude is only a reckoning. So the island lies on our
+own latitude: east of us or west.
+Second: east or west? What does the journal say about that?"
+  a) East.
+  b) West.
+  c) There's no way to tell.
+
+> council c
+"Is there not? Something here knows where land is. Watch the sky at dusk, Captain,
+and call us again."
+(The council waits. council carries on where it stopped.)
+```
+
+At the end, the Ship sums up: "So: west along our latitude, and not far: the terns say land is within a day. Your order, Captain." The player still types `sail west` (or, with option (b) from my last message, `sail to 14 south 41 west`). The council builds the decision; the captain makes it.
+
+## The rules I'd give it
+
+- **Only the journal counts.** As in the report, an answer is accepted only once the journal holds its evidence. If something is missing, the Ship says where to look, and the council waits there. It doesn't hand out the clue. This keeps exploring meaningful: the council can't skip it.
+- **A wrong answer leads back to the evidence, never to failure.** This is the same rule as the report (29).
+- **It's offered, never forced.** The Ship suggests a council when the ship arrives, and a pushed hint can suggest it too. A player who already knows can simply `sail west`. That protects replays and keeps the no-dead-ends rule (6b).
+- **Playing together, everyone aboard is at the council,** and any captain may answer. Arguing it out in the room is exactly the point.
+
+## How it fits what we have
+
+**The council is the report's machinery, used mid-game.**
+- A step is a question with theories, and a right answer that needs its evidence. That's what a report question already is.
+- What's new: the steps come in order, they belong to one place and moment, and finishing sums up and leads to an action.
+- So it costs less than it sounds: most of `world/report.py` carries over, and the content format is almost the same.
+
+**It gives the schema a new element.**
+- The game becomes **exploration phases that end in convergence points**, and each convergence point has a council.
+- The final report is simply the last and biggest council.
+- That belongs in GAME_SCHEMA.md. It's general: every episode will have its "where now?" moments.
+- Other mystery games have similar devices: deduction boards, fill-in-the-blank conclusions, and confirming several answers together. But in those the player works alone. Making it a council the captain leads, with the crew in the story, is ours. That claim needs a proper prior-art check before we write it down.
+
+**It also changes decision 34:**
+- The Ship's framing on arrival becomes her offer of a council.
+- The three `think` questions become the council's three steps. `think` stays for open-ended links, such as the compass and the reef.
+- The hints point to the council first, then down the same ladder to the command.
+- The coordinate answer from my last message stays.
+
+## Decisions for you
+
+1. **Voices:** the Ship alone, or a few crew voices too (the lookout on the horizon, a hand who watched the birds)? Crew voices make it feel like a real council, but they mean new speakers. Decision 23 warns against adding elements for decoration. I'd start with the Ship alone, plus a line or two of background crew ("The lookout nods.").
+2. **Answers:** pick a letter only, or also name the journal entry that shows it, like presenting evidence? Naming evidence is a stronger detective lesson, but harder for a 12-year-old. I'd start with letters only and see how it plays.
+3. **Scope:** build the council now as the way decision 34 is done, with this one council at the chart's position, and add it to the schema as a general element? That's my recommendation.
+
+If you agree, I'll write this up as a new decision (it replaces most of 34) before building anything.

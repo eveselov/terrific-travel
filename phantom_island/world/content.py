@@ -31,6 +31,7 @@ THINGS_FILE: str = "things.yaml"
 IDEAS_FILE: str = "ideas.yaml"  # optional: without it, the notebook stays empty
 REPORT_FILE: str = "report.yaml"  # optional: without it, there is nothing to report
 HINTS_FILE: str = "hints.yaml"  # optional: without it, `hint` has nothing to say
+COUNCILS_FILE: str = "councils.yaml"  # optional: councils where exploring converges (35)
 HINT_LEVELS: int = 3
 
 # How well a player knows an idea, from the first mention to having done it themselves.
@@ -46,7 +47,7 @@ WHITE_WORD: re.Pattern[str] = re.compile(r"\|w(.+?)\|n")
 # out (`|waboard|n`, `|wexamine compass|n`): these are the words a command can start with.
 COMMAND_WORDS: frozenset[str] = frozenset(
     "aboard ashore sail look examine x read use get take drop go map journal notebook ask "
-    "up down begin help report hint think".split()
+    "up down begin help report hint think council".split()
 )
 
 LIMBO_ID: str = "limbo"
@@ -206,6 +207,8 @@ class PositionSpec:
     cabin: str
     shore: str
     routes: tuple[RouteSpec, ...]
+    # Orders by position are read as a direction here: a searching position (DECISIONS.md, 34).
+    search: bool = False
 
     def route(self, direction: str) -> RouteSpec | None:
         """The route in this direction, or None if the ship can't sail that way from here."""
@@ -363,6 +366,45 @@ class ReportSpec:
     questions: tuple[QuestionSpec, ...]
     epilogue: tuple[PageSpec, ...]
     before: str | None = None  # shown instead, until the task's `after` flag is set (33)
+
+
+@dataclass(frozen=True)
+class CouncilChoiceSpec:
+    """One choice at a step of a council: the right one needs its proof in the journal."""
+
+    text: str
+    reply: str
+    right: bool = False
+    proof: tuple[ProofSpec, ...] = ()  # each part: any one of its clues or flags
+
+
+@dataclass(frozen=True)
+class CouncilStepSpec:
+    """One step of a council: a question, its choices, and the flag set once it is settled."""
+
+    id: str
+    question: str
+    choices: tuple[CouncilChoiceSpec, ...]
+    sets: str
+
+    @property
+    def right(self) -> CouncilChoiceSpec:
+        """The right choice (the content check makes sure there is exactly one)."""
+        return next(choice for choice in self.choices if choice.right)
+
+
+@dataclass(frozen=True)
+class CouncilSpec:
+    """
+    A council at a convergence point (DECISIONS.md, 35): the steps of one decision, asked
+    one at a time by the Ship, where the ship is `at`; the summary once all are settled.
+    """
+
+    id: str
+    at: str  # a ship position
+    opening: str
+    steps: tuple[CouncilStepSpec, ...]
+    summary: str
 
 
 @dataclass(frozen=True)
@@ -555,6 +597,7 @@ class Content:
     report: ReportSpec | None = None
     connections: dict[str, ConnectionSpec] = dataclass_field(default_factory=dict)
     hints: HintsSpec | None = None
+    councils: dict[str, CouncilSpec] = dataclass_field(default_factory=dict)
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck` or `cabin`)."""
@@ -760,6 +803,7 @@ def _position(position_id: str, value: Any) -> PositionSpec:
             _route(direction, item, f"{where}, route {direction}")
             for direction, item in routes_data.items()
         ),
+        search=_flag(data, "search", where),
     )
 
 
@@ -1056,6 +1100,64 @@ def _hints(data: dict[str, Any]) -> HintsSpec | None:
     )
 
 
+def _council_choice(value: Any, where: str) -> CouncilChoiceSpec:
+    item: dict[str, Any] = _mapping(value, where)
+    right: bool = _flag(item, "right", where)
+    proof_data: Any = item.get("proof") or []
+    if not isinstance(proof_data, list):
+        raise ContentError(f"{where}: `proof` must be a list.")
+    proof: tuple[ProofSpec, ...] = tuple(
+        _proof(part, f"{where}, proof {number}") for number, part in enumerate(proof_data, 1)
+    )
+    if proof and not right:
+        raise ContentError(f"{where}: only the right choice has a `proof`.")
+    return CouncilChoiceSpec(
+        text=_text(item, "text", where), reply=_text(item, "reply", where), right=right, proof=proof
+    )
+
+
+def _council_step(value: Any, where: str) -> CouncilStepSpec:
+    item: dict[str, Any] = _mapping(value, where)
+    step_id: str = _text(item, "id", where)
+    where = f"{where} ({step_id})"
+    choices_data: Any = item.get("choices") or []
+    if not isinstance(choices_data, list) or not 2 <= len(choices_data) <= len(CHOICE_LETTERS):
+        raise ContentError(f"{where}: `choices` must be a list of two to five.")
+    choices: tuple[CouncilChoiceSpec, ...] = tuple(
+        _council_choice(choice, f"{where}, choice {CHOICE_LETTERS[index]}")
+        for index, choice in enumerate(choices_data)
+    )
+    if sum(choice.right for choice in choices) != 1:
+        raise ContentError(f"{where}: exactly one choice must have `right: true`.")
+    return CouncilStepSpec(
+        id=step_id,
+        question=_text(item, "question", where),
+        choices=choices,
+        sets=_text(item, "sets", where),
+    )
+
+
+def _councils(data: dict[str, Any]) -> dict[str, CouncilSpec]:
+    councils: dict[str, CouncilSpec] = {}
+    for council_id, value in _mapping(data.get("councils") or {}, COUNCILS_FILE).items():
+        where: str = f"{COUNCILS_FILE}, council {council_id}"
+        item: dict[str, Any] = _mapping(value, where)
+        steps_data: Any = item.get("steps") or []
+        if not isinstance(steps_data, list) or not steps_data:
+            raise ContentError(f"{where}: `steps` must be a list.")
+        councils[council_id] = CouncilSpec(
+            id=council_id,
+            at=_text(item, "at", where),
+            opening=_text(item, "opening", where),
+            steps=tuple(
+                _council_step(step, f"{where}, step {number}")
+                for number, step in enumerate(steps_data, start=1)
+            ),
+            summary=_text(item, "summary", where),
+        )
+    return councils
+
+
 def _ideas(data: dict[str, Any]) -> tuple[dict[str, AreaSpec], dict[str, IdeaSpec]]:
     areas_data: dict[str, Any] = _mapping(data.get("areas") or {}, f"{IDEAS_FILE}, areas")
     areas: dict[str, AreaSpec] = {}
@@ -1228,6 +1330,7 @@ def _check(content: Content) -> None:
     _check_teachings(content)
     _check_report(content)
     _check_hints(content)
+    _check_councils(content)
     if content.task is not None and content.task.after is not None:
         if content.task.after not in flags_set(content):
             raise ContentError(
@@ -1339,6 +1442,19 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             texts.append((f"{REPORT_FILE}, before", content.report.before, None))
         for number, page in enumerate(content.report.epilogue, start=1):
             texts.append((f"{REPORT_FILE}, epilogue page {number}", page.text, None))
+    for council in content.councils.values():
+        where = f"{COUNCILS_FILE}, council {council.id}"
+        texts.append((f"{where}, opening", council.opening, None))
+        texts.append((f"{where}, summary", council.summary, None))
+        for council_step in council.steps:
+            step_where: str = f"{where}, step {council_step.id}"
+            texts.append((step_where, council_step.question, None))
+            for index, council_choice in enumerate(council_step.choices):
+                choice_where: str = f"{step_where}, choice {CHOICE_LETTERS[index]}"
+                texts.append((choice_where, council_choice.text, None))
+                texts.append((f"{choice_where}, reply", council_choice.reply, None))
+                for number, part in enumerate(council_choice.proof, start=1):
+                    texts.append((f"{choice_where}, proof {number}", part.missing, None))
     for idea in content.ideas.values():
         for level, text in idea.texts.items():
             texts.append((f"{IDEAS_FILE}, idea {idea.id}, {level}", text, None))
@@ -1460,11 +1576,28 @@ def flags_set(content: Content) -> set[str]:
         for topic in character.topics.values()
         if topic.sets is not None
     }
+    flags.update(step.sets for council in content.councils.values() for step in council.steps)
     for thing in content.things.values():
         for action in (thing.read, thing.use):
             if action is not None:
                 flags.update(step.sets for step in action.at.values() if step.sets)
     return flags
+
+
+def _check_councils(content: Content) -> None:
+    """A council is held at a known position; its proofs and flags are known, each set once."""
+    flags: set[str] = flags_set(content)
+    seen: set[str] = set()
+    for council in content.councils.values():
+        where: str = f"{COUNCILS_FILE}, council {council.id}"
+        if council.at not in content.positions or council.at == UNDER_WAY:
+            raise ContentError(f"{where}: `at` must be a ship position, not {council.at!r}.")
+        for step in council.steps:
+            if step.sets in seen:
+                raise ContentError(f"{where}, step {step.id}: flag {step.sets!r} is set twice.")
+            seen.add(step.sets)
+            for part in step.right.proof:
+                _check_needs(f"{where}, step {step.id}, proof", part.clues, content, flags)
 
 
 def _check_hints(content: Content) -> None:
@@ -1616,6 +1749,9 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
     hints_data: dict[str, Any] = (
         _read_yaml(directory, HINTS_FILE) if (directory / HINTS_FILE).exists() else {}
     )
+    councils_data: dict[str, Any] = (
+        _read_yaml(directory, COUNCILS_FILE) if (directory / COUNCILS_FILE).exists() else {}
+    )
     task: TaskSpec | None = _task(clues_data)
     clues: dict[str, ClueSpec] = _clues(clues_data)
 
@@ -1650,6 +1786,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         report=_report(report_data, task),
         connections=_connections(clues_data, clues),
         hints=_hints(hints_data),
+        councils=_councils(councils_data),
     )
     _check(content)
     return content

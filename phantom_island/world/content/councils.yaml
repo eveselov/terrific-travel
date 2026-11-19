@@ -1,0 +1,122 @@
+# Councils: where exploring must converge on one decision (`council`, DECISIONS.md, 35).
+#
+# SPOILERS: this file holds the way to the island. Don't show it to the players.
+#
+# Exploring has no single result; at a convergence point many findings must become one
+# decision. A council gives that a process: the captain types `council` aboard, and the Ship
+# asks the decision's parts one at a time. Each part should rule something out (DECISIONS.md,
+# 34); a decision with no parts is a guess. Only the journal counts: the right choice is
+# accepted once its `proof` holds, and until then the Ship says where to look (`missing`)
+# and the council waits. A wrong choice's `reply` leads back to the evidence, never to
+# failure. The summary sums up and leaves the order to the captain. It is offered, never
+# forced: players who know can just act.
+#
+# Each council has:
+#   at        the ship's position (ship.yaml) where it is held, aboard
+#   opening   what the Ship says when the council is first called
+#   steps     the parts of the decision, in order; each has:
+#     id        a short name
+#     question  what the Ship asks (in her voice, with the quotes)
+#     sets      the flag remembered once the step is settled (hints can use it)
+#     choices   two to five; exactly one has `right: true`. Each has `text` and `reply`
+#               (said once it is chosen: why not, or, for the right one, why yes); the
+#               right one has `proof`: a list of parts, each needing any one of its `clues`
+#               (clue ids or flags), with `missing`, said while it doesn't hold
+#   summary   the decision, once every step is settled, and what is left to the captain
+#
+# The game frames the texts: "<player> answers: b) ...", and a quiet line saying how to
+# answer, or that the council waits. After editing, `reload` in the game is enough.
+
+councils:
+  charted:
+    at: charted
+    opening: >
+      The crew gather on the Deck, and the Ship's timbers creak: "Open sea, Captain, where
+      the chart put the island. So the chart is wrong somewhere. Let's settle it, one thing
+      at a time."
+    steps:
+      - id: line
+        sets: line_settled
+        question: >
+          "First: the chart gives two numbers. Which one could the Halcyon's master have got
+          wrong without knowing it?"
+        choices:
+          - text: The latitude, north or south.
+            reply: >
+              "The noon sun gave him his latitude every day, and our |wsextant|n agrees with
+              his chart. Which number had he no way to check?"
+          - text: The longitude, east or west.
+            right: true
+            reply: >
+              "Yes. Without a sea clock, longitude is only a reckoning, and small errors add
+              up. His latitude was right, so the island lies on our own latitude: east of us,
+              or west."
+            proof:
+              - clues: [sight_charted]
+                missing: >
+                  "Before we blame the chart, check my reckoning, Captain: take a noon sight
+                  with the |wsextant|n on the Deck, then read my |wchronometer|n in the Cabin.
+                  Then call the council again."
+          - text: Both of them.
+            reply: >
+              "Our |wsextant|n agrees with his latitude: that one he measured, every noon. Is
+              there one he could only guess?"
+      - id: side
+        sets: side_settled
+        question: >
+          "Second: east or west?"
+        choices:
+          - text: East.
+            reply: >
+              "East is the way we came: three weeks of empty sea behind us. Is there anything
+              in the journal that points the other way?"
+          - text: West.
+            right: true
+            reply: >
+              "West. That's what the journal says, and whatever told it, birds or fishermen,
+              knows this sea better than the chart does."
+            proof:
+              - clues: [C6, C3]
+                missing: >
+                  "Something here knows where land is. Watch the |wsky|n from the Deck at dusk,
+                  Captain, and call the council again."
+          - text: There's no way to tell.
+            reply: >
+              "Is there not? Something here knows where land is, and somebody in port knew
+              where the compass came from."
+      - id: far
+        sets: far_settled
+        question: >
+          "Third: how far west? Out here, one degree of longitude is about 107 kilometres, or
+          67 miles. Think of how far from land the terns fish, and how far my lookout can
+          see."
+        choices:
+          - text: Less than half a degree.
+            reply: >
+              "Then my lookout would see it from the masthead. Ask me about the |whorizon|n if
+              you doubt it."
+          - text: About one degree.
+            right: true
+            reply: >
+              "About one degree. Further than my lookout can see, so we see nothing, but well
+              within a tern's flight home, so they fish here. Close, Captain: a day's sail."
+            proof:
+              - clues: [C6]
+                missing: >
+                  "Have you watched the terns here at dusk? Look at the |wsky|n from the Deck,
+                  Captain, and call the council again."
+          - text: Ten degrees or more.
+            reply: >
+              "Then why are terns fishing all round us? Ask me how far they go from land:
+              |wask ship about birds|n."
+          - text: There's no way to tell.
+            reply: >
+              "There is: the terns and the horizon together. |wask ship about birds|n, and
+              about the |whorizon|n."
+    summary: >
+      The Ship's timbers creak: "So the council agrees. The Halcyon's master had his latitude
+      right and his longitude wrong. The island lies west of us, on our own latitude, about a
+      degree away. We are at 14 south, 40 west, so one degree further west is 41 west. It's
+      still a judgement, not a certainty, but it's the best the council can make. The order
+      is yours, Captain: |wsail to 14 south 41 west|n. And this may answer one of the
+      Society's questions too: have a look at the |wreport|n."

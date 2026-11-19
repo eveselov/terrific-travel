@@ -22,6 +22,7 @@ comment listing its fields: that list is the reference, and this guide doesn't r
 | `things.yaml` | Objects: to look at, examine, read, use, and sometimes carry |
 | `ideas.yaml` | The notebook: areas and ideas about how the world works (optional) |
 | `hints.yaml` | The next step for players who ask (`hint`) or are stuck: situations of play, each with three hints, nudge first (optional) |
+| `councils.yaml` | Councils where exploring must converge on one decision: the steps the Ship asks, one at a time, each with choices and the proof the right one needs (optional) |
 | `report.yaml` | The report: the choices for each of the task's questions, the proof each right answer needs, and the epilogue (optional) |
 
 The design behind the content (the truth of the mystery, the clue table, the facts that
@@ -41,9 +42,9 @@ content check runs whenever the files are read, and stops with the file and entr
 |---|---|---|
 | Place id (`quay`, `deck`) | `places.yaml`, `ship.yaml` (`rooms`) | exits; a character's `where`; a thing's `where`; a position's `ashore`; an action's `only_in` |
 | Map key (`port`, `island`) | `maps.yaml` | a place's `map`; a position's `map`; `sea_chart` in `ship.yaml` |
-| Position id (`charted`) | `ship.yaml` (`positions`) | routes' `to`; `start`; a thing's `at:` (what it does at that position) |
+| Position id (`charted`) | `ship.yaml` (`positions`) | routes' `to`; `start`; a thing's `at:` (what it does at that position); a council's `at` |
 | Clue id (`C4`) | `clues.yaml` | `clue:` beside any text that reveals it; `needs:`; a report answer's `proof` |
-| Flag (`sight_charted`, `briefed`) | `sets:` on a thing's `at:` step, or on a topic | `needs:` elsewhere; the task's `after:` (until it is set, the journal and the report show their `before:` texts) |
+| Flag (`sight_charted`, `briefed`, `line_settled`) | `sets:` on a thing's `at:` step, on a topic, or on a council's step | `needs:` elsewhere; the task's `after:` (until it is set, the journal and the report show their `before:` texts) |
 | Thing id (`chart`) | `things.yaml` | `with:` on details (more to see when carrying it) |
 | Area id, idea id | `ideas.yaml` | an idea's `area`; `teaches:` beside any text that teaches it |
 | Topic id (`storm`) | a character's `topics` | `suggest`; `topic_aliases` (words shared by all characters) |
@@ -162,6 +163,21 @@ the start first: theories are lettered among those open, in the file's order.
 
 The epilogue is a list of pages, each a `title` and a `text`. Real facts in it go into
 the "Sources" list in GAME_STORY.md and on the epilogue's last page (DECISIONS.md, 9).
+
+### A council
+
+Where many findings must become one decision (DECISIONS.md, 35), write a council in
+`councils.yaml`. First find the decision's parts, each ruling something out: at the
+chart's position, which number is wrong, which side, how far. If a decision has no parts,
+it's a guess, and players will feel it. Each part is a `step`: the Ship's `question`,
+two to five `choices` (one `right`, with its `proof`: clue ids or flags), a `reply` for
+each, and the flag it `sets` once settled. A wrong reply leads back to the evidence; a
+`missing` text says where to look while the proof isn't there. The `summary` sums up and
+leaves the action to the player, but spells out what the decision means in the game's own
+terms (a position to sail to, not only "about a degree"). Give each step a hint situation
+(`missing:` its flag), so the hints follow the council, and have the scene offer it where
+it can't be missed: in the place's own view (the Deck's `deck` text there, seen on arrival
+and on every `look`), not in a passage line that scrolls past.
 
 ### A hint
 

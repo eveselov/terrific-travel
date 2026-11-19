@@ -277,8 +277,11 @@ class Expedition(Script):
 
     @property
     def progress(self) -> int:
-        """How far the expedition has come: clues found and report questions answered."""
-        return len(self.db.journal or []) + len(self.db.answers or {})
+        """
+        How far the expedition has come: clues found, flags set (a noon sight taken, a step
+        of a council settled) and report questions answered.
+        """
+        return len(self.db.journal or []) + len(self.flags) + len(self.db.answers or {})
 
     @property
     def hint_clock(self) -> dict[str, Any]:

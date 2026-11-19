@@ -1,5 +1,6 @@
-"""The expedition's report: answering the task's questions, and the epilogue."""
+"""The expedition's report (the task's questions, the epilogue) and councils on the way."""
 
+from world.council import council
 from world.report import report
 
 from .command import Command
@@ -36,3 +37,27 @@ class CmdReport(Command):
 
     def func(self) -> None:
         report(self.caller, self.args)
+
+
+class CmdCouncil(Command):
+    """
+    Call a council aboard, when the expedition has a big decision to make.
+
+    Usage:
+      council
+      council <letter>
+
+    The crew gather, and the Ship asks the questions that settle the decision,
+    one at a time. Answer each with the letter of your choice (council b). An
+    answer counts once the journal shows it; if it doesn't yet, the Ship says
+    where to look, and the council carries on where it stopped. When it has
+    decided, the order is still yours to give.
+    """
+
+    key = "council"
+    aliases = ["meeting"]
+    locks = "cmd:all()"
+    help_category = "General"
+
+    def func(self) -> None:
+        council(self.caller, self.args)

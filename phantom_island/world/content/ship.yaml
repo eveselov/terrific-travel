@@ -46,6 +46,9 @@ sea_chart: sea_chart
 #              `sail to 14 south 40 west`.
 #   orders     optional: what `sail` alone says here, the choices in words. Without it,
 #              `sail` lists the directions.
+#   search     optional: true where nobody knows the true position yet. An order by
+#              position is then read as a direction: the same latitude further west is
+#              west (latitude sailing), a changed latitude north or south.
 #   chart_pos  where it is on the sea chart, [x, y]
 #   map        optional: a closer map to show aboard instead of the sea chart, and
 #   map_pos    the ship's place on it
@@ -127,17 +130,23 @@ positions:
   charted:
     name: The charted position
     coords: 14 S, 40 W
-    # No list of directions here: which way to search is the players' own choice (DECISIONS.md, 25).
+    # Orders by position are read as a direction here (`search`, DECISIONS.md, 34), and no list
+    # of directions is given: which way to search is the players' own choice (25). The
+    # decision has its council (councils.yaml, DECISIONS.md, 35).
+    search: true
     orders: >
-      Open sea all round, where the chart put the island, and no island. Where now? Name
-      a direction (|wsail north|n, |wsail south|n, |wsail east|n, |wsail west|n), or
-      |wsail home|n. The Ship creaks: "Before you choose, check the chart's two numbers
-      with the |wsextant|n and my |wchronometer|n. Then ask yourselves which one to trust."
+      Open sea all round, where the chart put the island, and no island. Where now? Give the
+      order as a position, |wsail to|n a latitude and a longitude (we are at 14 south, 40
+      west), or |wsail home|n. The Ship creaks: "A big decision, Captain. Check my reckoning
+      with the |wsextant|n and my |wchronometer|n first. Then call a |wcouncil|n, and we'll
+      settle it one thing at a time."
     chart_pos: [560, 290]
     deck: >
       Open sea in every direction. According to the Halcyon's old chart, the island should
       be right here. [[There is nothing but water, all the way to the |whorizon|n.]] High above,
-      seabirds wheel in the evening |wsky|n.
+      seabirds wheel in the evening |wsky|n. The Ship's timbers creak: "No island, Captain.
+      Before we search, call a |wcouncil|n, and we'll settle where to look, one thing at a
+      time."
     clue: C4
     details:
       sky:

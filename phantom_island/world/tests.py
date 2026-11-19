@@ -28,6 +28,7 @@ from world.content import (
     CHARACTERS_FILE,
     CLUES_FILE,
     CONTENT_DIR,
+    COUNCILS_FILE,
     HINTS_FILE,
     IDEAS_FILE,
     LIMBO_ID,
@@ -42,6 +43,7 @@ from world.content import (
     Content,
     ContentError,
     IdeaSpec,
+    RouteSpec,
     TopicSpec,
     all_teachings,
     all_texts,
@@ -61,6 +63,7 @@ from world.ship import (
     ASHORE,
     LATE_JOINER,
     STEP_SECONDS,
+    find_route,
     moor_ship,
     normalise_direction,
     resume_voyage,
@@ -78,6 +81,7 @@ CONTENT_FILES: tuple[str, ...] = (
     IDEAS_FILE,
     REPORT_FILE,
     HINTS_FILE,
+    COUNCILS_FILE,
 )
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
@@ -253,6 +257,19 @@ class TestContent(TestCase):
             THINGS_FILE, "needs: [sight_charted]", "needs: [sight_chartd]"
         )
         self.assertIn("sight_chartd", str(error))
+
+    def test_a_council_proof_with_an_unknown_flag_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            COUNCILS_FILE, "clues: [sight_charted]", "clues: [sight_chartd]"
+        )
+        self.assertIn("council charted, step line", str(error))
+
+    def test_a_council_step_needs_exactly_one_right_choice(self) -> None:
+        error: ContentError = self._broken_copy(
+            COUNCILS_FILE, "- text: West.\n            right: true\n", "- text: West.\n"
+        )
+        # Caught as a proof on a wrong choice, before the count of right choices.
+        self.assertIn("step 2 (side), choice b", str(error))
 
     def test_a_hint_at_an_unknown_position_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(HINTS_FILE, "ship: [charted]", "ship: [chartd]")
@@ -1236,8 +1253,9 @@ class TestAtSea(DiscoveryTest):
         self.ship_at("charted")
         self.at(self.char1, "deck")
         options: str = self.do(self.char1, "sail")
-        self.assertIn("sail north", options)
-        self.assertIn("which one to trust", options)
+        self.assertNotIn("sail north", options)
+        self.assertIn("|wsail to|n a latitude and a longitude", options)
+        self.assertIn("|wcouncil|n", options)
 
     def test_at_the_island_the_longitude_is_ten_degrees_out(self) -> None:
         self.ship_at("anchorage")
@@ -1748,7 +1766,7 @@ class TestHints(DiscoveryTest):
         self.at(self.char1, "deck")
         self.assertIn("really at the chart's position", self.do(self.char1, "hint"))
         get_expedition().set_flag("sight_charted")
-        self.assertIn("hard to measure", self.do(self.char1, "hint"))
+        self.assertIn("talked over", self.do(self.char1, "hint"))
         self.ship_at("anchorage")
         self.assertIn("Somebody lives here", self.do(self.char1, "hint"))
 
@@ -1848,3 +1866,120 @@ class TestFindFirst(DiscoveryTest):
         get_expedition().start_over(["port"])
         get_expedition().add_clue("C1", "someone", "Market")
         self.assertIn("(new)", self.do(self.char1, "journal"))
+
+
+class TestCouncil(DiscoveryTest):
+    """Where exploring must converge: a council, one step at a time (DECISIONS.md, 35)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+        self.at(self.char2, "deck")
+
+    def test_no_council_elsewhere(self) -> None:
+        self.ship_at("port")
+        self.assertIn("nothing to hold a council about", self.do(self.char1, "council"))
+        self.ship_at("charted")
+        self.at(self.char1, "quay")
+        self.assertIn("nothing to hold a council about", self.do(self.char1, "council"))
+
+    def test_the_council_is_offered_where_it_is_needed(self) -> None:
+        self.assertIn("call a |wcouncil|n", self.do(self.char1, "look"))
+        self.assertIn("|wcouncil|n", self.do(self.char1, "ask ship about advice"))
+        self.assertIn("big decision", self.do(self.char1, "ask ship about council"))
+
+    def test_the_council_opens_with_its_first_question(self) -> None:
+        with patch.object(self.char2, "msg") as beside:
+            heard: str = self.do(self.char1, "council")
+        self.assertIn("The crew gather on the Deck", heard)
+        self.assertIn("Which one could the Halcyon's master", heard)
+        self.assertIn("b) The longitude, east or west.", heard)
+        self.assertIn("|wcouncil a|n", heard)
+        self.assertIn("Which one could the Halcyon's master", texts(beside))  # all are there
+
+    def test_a_wrong_choice_leads_back_to_the_evidence(self) -> None:
+        heard: str = self.do(self.char1, "council a")
+        self.assertIn(f"{self.char1.key} answers: a) The latitude", heard)
+        self.assertIn("Which number had he no way to check?", heard)
+        self.assertFalse(get_expedition().met(("line_settled",)))
+
+    def test_the_right_choice_waits_for_its_evidence(self) -> None:
+        heard: str = self.do(self.char1, "council b")
+        self.assertIn("take a noon sight", heard)
+        self.assertIn("The council waits", heard)
+        self.assertFalse(get_expedition().met(("line_settled",)))
+
+    def test_the_council_carries_on_where_it_stopped(self) -> None:
+        get_expedition().set_flag("sight_charted")
+        settled: str = self.do(self.char1, "council b")
+        self.assertIn("Without a sea clock", settled)
+        self.assertIn("Second: east or west?", settled)
+        self.assertTrue(get_expedition().met(("line_settled",)))
+        again: str = self.do(self.char2, "council")
+        self.assertNotIn("The crew gather on the Deck", again)  # the opening is said once
+        self.assertIn("Second: east or west?", again)
+        self.assertIn("Watch the |wsky|n", self.do(self.char2, "council b"))  # no C3, no C6
+        get_expedition().add_clue("C3", "someone", "Market")  # Crane's fishermen will do
+        self.assertIn("Third: how far west?", self.do(self.char2, "council b"))
+        self.assertIn("look at the |wsky|n", self.do(self.char2, "council b").lower())  # C6
+        get_expedition().add_clue("C6", "someone", "Deck")
+        decided: str = self.do(self.char2, "council b")
+        self.assertIn("a day's sail", decided)
+        self.assertIn("The order is yours, Captain", decided)
+        self.assertIn("|wsail to 14 south 41 west|n", decided)
+        self.assertIn("|wreport|n", decided)
+        self.assertIn("The order is yours", self.do(self.char1, "council"))
+
+    def test_hints_follow_the_council(self) -> None:
+        get_expedition().set_flag("sight_charted")
+        self.assertIn("talked over", self.do(self.char1, "hint"))
+        get_expedition().set_flag("line_settled")
+        self.assertIn("East or west?", self.do(self.char1, "hint"))
+        get_expedition().set_flag("side_settled")
+        self.assertIn("How far?", self.do(self.char1, "hint"))
+        get_expedition().set_flag("far_settled")
+        self.assertIn("The council has decided", self.do(self.char1, "hint"))
+
+    def test_starting_over_forgets_the_council(self) -> None:
+        get_expedition().set_flag("sight_charted")
+        self.do(self.char1, "council b")
+        start_over("port")
+        self.assertFalse(get_expedition().met(("line_settled",)))
+
+
+class TestSearchByPosition(DiscoveryTest):
+    """At the chart's position an order by position is read as a direction (34)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+
+    def route(self, order: str) -> RouteSpec | str:
+        return find_route(current_position(), order)
+
+    def test_further_west_on_the_same_latitude_is_west(self) -> None:
+        for order in ("to 14 south 41 west", "to 14 south 45 west"):
+            found: RouteSpec | str = self.route(order)
+            assert not isinstance(found, str)
+            self.assertEqual(found.direction, "west")
+
+    def test_east_north_and_south(self) -> None:
+        for order, direction in (
+            ("to 14 south 38 west", "east"),
+            ("to 12 south 40 west", "north"),
+            ("to 16 south 40 west", "south"),
+        ):
+            found: RouteSpec | str = self.route(order)
+            assert not isinstance(found, str)
+            self.assertEqual(found.direction, direction)
+
+    def test_both_numbers_at_once_are_refused(self) -> None:
+        found: RouteSpec | str = self.route("to 13 south 41 west")
+        self.assertIsInstance(found, str)
+        self.assertIn("Both numbers at once", str(found))
+
+    def test_elsewhere_an_unknown_position_is_still_unknown(self) -> None:
+        self.ship_at("port")
+        self.assertIn("nothing there worth sailing to", str(self.route("to 14 south 45 west")))

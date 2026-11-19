@@ -55,6 +55,10 @@ NO_SUCH_PLACE: str = (
     'The Ship creaks doubtfully. "{where}? I know of nothing there worth sailing to. The '
     "island's position is written on the Halcyon's chart, in the Cabin: |wread chart|n.\""
 )
+BOTH_NUMBERS: str = (
+    "The Ship creaks. \"Both numbers at once? Then we'd be searching blind. Keep one of "
+    'them, Captain, the one we can trust, and change the other."'
+)
 NOT_A_POSITION: str = (
     "A position needs two numbers, each with its side of the world: the latitude, north or "
     "south, and the longitude, east or west. For example: |wsail to 10 north 25 east|n."
@@ -171,6 +175,8 @@ def find_route(position: PositionSpec, text: str) -> RouteSpec | str:
         for route in position.routes:
             if content.positions[route.to].coords == coords:
                 return route
+        if position.search and position.coords is not None:
+            return _search_route(position, position.coords, coords)
         return NO_SUCH_PLACE.format(where=coords_text(coords))
     if any(ch.isdigit() for ch in order):
         return NOT_A_POSITION
@@ -179,6 +185,27 @@ def find_route(position: PositionSpec, text: str) -> RouteSpec | str:
         found = position.route_named(order)
     if found is None:
         return f"You can't sail {order} from here. {sailing_options(position)}"
+    return found
+
+
+def _search_route(position: PositionSpec, here: Coords, there: Coords) -> RouteSpec | str:
+    """
+    Where nobody knows the true position, an order by position is read as a direction
+    (DECISIONS.md, 34): the same latitude further west is west, as in latitude sailing, and
+    the ship finds whatever lies on the way. Changing both numbers at once is refused.
+    """
+    latitude_change: int = there[0] - here[0]
+    longitude_change: int = there[1] - here[1]
+    if latitude_change and longitude_change:
+        return BOTH_NUMBERS
+    direction: str
+    if latitude_change:
+        direction = "north" if latitude_change > 0 else "south"
+    else:
+        direction = "east" if longitude_change > 0 else "west"
+    found: RouteSpec | None = position.route(direction)
+    if found is None:
+        return f"You can't sail {direction} from here. {sailing_options(position)}"
     return found
 
 

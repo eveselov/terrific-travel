@@ -103,14 +103,44 @@ situations:
       - In the Cabin, |wget sextant|n. Then |wup|n, |wuse sextant|n, |wdown|n, and |wread
         chronometer|n.
 
+  # The decision at the chart's position follows its council (councils.yaml, DECISIONS.md,
+  # 35): one situation per step, each pointing to the council first.
+  - id: council_line
+    ship: [charted]
+    missing: [line_settled]
+    hints:
+      - Both of the chart's numbers check out by the ship's reckoning, and still no island.
+        A big decision like this is best talked over, one question at a time.
+      - Call a council aboard. The Ship will ask the questions; the first is which of the
+        chart's numbers could be wrong.
+      - Type |wcouncil|n. Latitude was measured by the noon sun every day; longitude was a
+        reckoning.
+
+  - id: council_side
+    ship: [charted]
+    missing: [side_settled]
+    hints:
+      - East or west? Something out here knows where land is.
+      - Watch the seabirds at dusk from the Deck, and remember where Crane's fishermen came
+        from. Then go on with the council.
+      - On the Deck, |wlook sky|n. Then |wcouncil|n again.
+
+  - id: council_far
+    ship: [charted]
+    missing: [far_settled]
+    hints:
+      - How far? Terns fish a long way from land, but not without limit, and a lookout sees
+        far, but not without limit.
+      - Ask the Ship how far terns fish, and how far a lookout sees. Then work it out in
+        degrees, and go on with the council.
+      - "|wask ship about birds|n and |wask ship about horizon|n, then |wcouncil|n again."
+
   - id: which_way
     ship: [charted]
     hints:
-      - Both of the chart's numbers check out, and still no island. Which number is hard to
-        measure? And what else could show the way to land?
-      - Watch the seabirds at dusk from the Deck, and remember where Crane's fishermen came
-        from.
-      - On the Deck, |wlook sky|n. Then |wsail|n the way the birds fly.
+      - The council has decided. The order is yours.
+      - Sail west along this latitude, about one degree.
+      - On the Deck, type |wsail to 14 south 41 west|n.
 
   - id: wrong_way
     ship: [north_of_chart, south_of_chart, east_of_chart]

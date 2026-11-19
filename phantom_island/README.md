@@ -200,6 +200,13 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
   in the journal, `think` lists it. They link clues and never give the answer. Seven of
   them, in `connections` at the end of [world/content/clues.yaml](world/content/clues.yaml).
 
+- **The council** (`council`, DECISIONS.md, 34 and 35): at the chart's position the
+  Ship offers a council, which asks the decision's three parts one at a time (which number
+  is wrong, which side, how far), each accepted only once the journal shows it. Where it
+  stands is kept in flags (`line_settled`...), so it carries on where it stopped. Orders
+  there can be positions: `sail to 14 south 45 west` is read as west. Content in
+  [world/content/councils.yaml](world/content/councils.yaml), code in `world/council.py`.
+
 - **Find first, reflect later** (DECISIONS.md, 33): a find prints the scene, then one dim,
   indented line for the journal and the notebook together (`world/notices.py`). Nothing
   about the report or `think` is announced then: `journal`, `think` and `report` mark with

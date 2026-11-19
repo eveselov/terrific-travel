@@ -29,7 +29,7 @@ from .discover import (
     CmdUse,
 )
 from .explore import CmdGo, CmdMap
-from .report import CmdReport
+from .report import CmdCouncil, CmdReport
 from .talk import CmdAsk
 
 
@@ -63,6 +63,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdThink())
         self.add(CmdHint())
         self.add(CmdReport())
+        self.add(CmdCouncil())
         self.add(CmdStartOver())
         self.add(CmdRecord())
 

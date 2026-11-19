@@ -671,14 +671,21 @@ characters:
           Cabin. Find a spring ashore and you can fill them again."
       help:
         # The next step itself comes from `hint` (hints.yaml, DECISIONS.md, 31).
-        aliases: [hint, hints, stuck]
+        aliases: [hint, hints, stuck, advice, lost]
         stance: truth
         teaches: {witnesses: heard}
         reply: >
           "Look closely at things, read what's in the Cabin, and ask people questions.
           People don't always tell the truth, so compare what |wwitnesses|n say. Lost your
-          way? Ask me about the |wexpedition|n. Stuck? Type |whint|n, anywhere, and again
-          for more."
+          way? Ask me about the |wexpedition|n. A big decision to make at sea? Call a
+          |wcouncil|n aboard. Stuck? Type |whint|n, anywhere, and again for more."
+      council:
+        aliases: [meeting, decision, decide, search, where now]
+        stance: truth
+        reply: >
+          "When the expedition has a big decision to make, call a |wcouncil|n aboard, and
+          I'll ask the questions that settle it, one at a time. Not every place needs one:
+          I'll tell you when there's nothing to decide."
       expedition:
         aliases: [task, mission, purpose, questions, job]
         stance: truth
