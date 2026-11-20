@@ -1,8 +1,8 @@
 """
 Talking to the characters: `ask <character> about <topic>`.
 
-Who can be asked: the inhabitants standing in the asker's room, and, anywhere aboard (Deck
-and Cabin), the Ship. What they say comes from `world/content/characters.yaml`.
+Who can be asked: the inhabitants standing in the asker's room, and, aboard (her Deck), the
+Ship. What they say comes from `world/content/characters.yaml`.
 
 Conversations are heard by everyone in the room, so players exploring together hear the same
 answers. Nothing is logged (DECISIONS.md, 8).

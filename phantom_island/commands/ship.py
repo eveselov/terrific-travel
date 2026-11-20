@@ -27,7 +27,7 @@ class CmdSail(Command):
     Without an order, shows where the ship is and what you can order here.
     A position is two numbers, each with its side of the world, for example
     sail to 10 north 25 east. The island's position is on the Halcyon's chart,
-    in the Cabin. At sea you can also sail by direction (sail west).
+    in the chart house. At sea you can also sail by direction (sail west).
 
     The voyage takes a few moments: the crew sail her, and you watch. The ship
     only leaves when everyone is aboard.

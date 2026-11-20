@@ -54,7 +54,7 @@ areas:
 ideas:
   # --- Navigation ---------------------------------------------------------------------------
 
-  # H Barnaby's sailing · U the Ship's latitude, sextant · D the sextant on deck
+  # H Barnaby's sailing · U the Ship's latitude, sextant · D the sextant used
   latitude:
     area: navigation
     title: Latitude
@@ -192,7 +192,7 @@ ideas:
   coral:
     area: nature
     title: Coral
-    learn: "|wread animal guide|n, in the Cabin"
+    learn: "|wread animal guide|n, in the chart house"
     heard: >
       Coral grows only under the sea.
     understood: >
@@ -205,7 +205,7 @@ ideas:
   oak:
     area: nature
     title: Oak and island trees
-    learn: "|wread plant guide|n, in the Cabin"
+    learn: "|wread plant guide|n, in the chart house"
     heard: >
       Good ships are built of oak.
     understood: >
@@ -218,7 +218,7 @@ ideas:
   onions:
     area: nature
     title: Onions on ships
-    learn: "|wread plant guide|n, in the Cabin"
+    learn: "|wread plant guide|n, in the chart house"
     understood: >
       Onions keep for months, so ships carry them, and sailors plant them wherever they stay
       a while.
@@ -229,7 +229,7 @@ ideas:
   island_animals:
     area: nature
     title: How animals reach islands
-    learn: "|wread animal guide|n, in the Cabin"
+    learn: "|wread animal guide|n, in the chart house"
     understood: >
       Few land animals ever reach islands far out in the ocean on their own: birds fly
       there, and lizards drift there on logs. Goats never do. Sailors carry goats for milk

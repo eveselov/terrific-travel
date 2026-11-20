@@ -14,7 +14,9 @@ Building again after editing the YAML files is safe and is the normal way to wor
 - inhabitants are found by their character id and updated in place, and put back in their
   place if they aren't in one of their places; characters removed from the file are deleted;
 - things are found by their thing id and updated in place, and put back in their place
-  unless a player is carrying them; things removed from the file are deleted.
+  unless a player is carrying them; things removed from the file are deleted;
+- rooms whose place was removed from the files (the old Cabin) are deleted, and whoever
+  was in them goes to the Deck.
 """
 
 from typing import Any
@@ -26,7 +28,7 @@ from evennia.utils.search import search_object, search_tag
 
 from typeclasses.exits import Exit
 from typeclasses.inhabitants import Inhabitant
-from typeclasses.rooms import Deck, Room, ShipRoom
+from typeclasses.rooms import Deck, Room
 from typeclasses.things import Thing
 from world.content import (
     LIMBO_ID,
@@ -52,10 +54,11 @@ from world.places import (
     find_inhabitant,
     find_place,
     find_thing,
+    place_id_of,
 )
 from world.ship import ABOARD, ASHORE, moor_ship
 
-ROOM_CLASSES: dict[str, type[Room]] = {"room": Room, "deck": Deck, "cabin": ShipRoom}
+ROOM_CLASSES: dict[str, type[Room]] = {"room": Room, "deck": Deck}
 
 
 def _tell(caller: Any | None, message: str) -> None:
@@ -227,11 +230,30 @@ def build_world(caller: Any | None = None, limbo: Room | None = None) -> dict[st
 
     inhabitant_count: int = place_inhabitants(content, rooms)
     thing_count: int = place_things(content, rooms)
+    removed: int = remove_old_places(content, deck)
 
     _tell(
         caller,
         f"Phantom Island built: {len(rooms)} places, {exit_count} exits, "
         f"{inhabitant_count} inhabitants and {thing_count} things, the ship "
-        f"{current_position().name.lower()}.",
+        f"{current_position().name.lower()}."
+        + (f" {removed} old places removed." if removed else ""),
     )
     return rooms
+
+
+def remove_old_places(content: Content, refuge: Any) -> int:
+    """
+    Delete the rooms built for places no longer in the content (the Cabin, once the ship
+    became one room). Whatever is still in them goes to `refuge` first. Returns how many.
+    """
+    removed: int = 0
+    for room in list(search_tag(category=PLACE_TAG_CATEGORY)):
+        place_id: str | None = place_id_of(room)
+        if place_id is None or place_id in content.places:
+            continue
+        for obj in list(room.contents):
+            obj.move_to(refuge, quiet=True, move_type="teleport")
+        room.delete()
+        removed += 1
+    return removed

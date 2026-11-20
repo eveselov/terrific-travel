@@ -89,14 +89,8 @@ aboard
 #   Why:
 sail
 #   Why:
-down
-#   Now in: Cabin
-#   Why:
 read chart
 #   Notebook: new Positions and charts
-#   Why:
-up
-#   Now in: Deck
 #   Why:
 ask ship
 #   Why:

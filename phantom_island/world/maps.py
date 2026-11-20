@@ -8,8 +8,8 @@ Copied from the playground (`game/world/maps.py`) and changed for this game:
   `MAP_TAG_CATEGORY` category, and its position on the picture is its `map_pos` attribute.
   The world builder sets both from `places.yaml`.
 - **The ship** is drawn too, wherever she is: on the port plan when moored, on the sea chart
-  at sea, on the island map at anchor. Whenever she is on the map, a side view of her (Deck
-  and Cabin) sits in a free corner, joined to her marker by a callout line; on a map she isn't
+  at sea, on the island map at anchor. Whenever she is on the map, a side view of her (her
+  Deck) sits in a free corner, joined to her marker by a callout line; on a map she isn't
   on, neither appears. Her own rooms show the map she is on, with her marker as "You are
   here" and your room ringed in the side view. On the sea chart her track is a dashed line.
   Under way she is on the sea chart, moved a step along her route with each line of the
@@ -56,10 +56,10 @@ class MapPlace:
 
 @dataclass(frozen=True)
 class ShipRoomMark:
-    """One of the ship's rooms in the ship's side view (the callout)."""
+    """The ship's room (her Deck) in the ship's side view (the callout)."""
 
     label: str
-    kind: str  # "deck" or "cabin"
+    kind: str  # "deck"
     is_here: bool
 
 
@@ -131,7 +131,7 @@ def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> M
     """
     The map a viewer sees from `here`, a room at `location`.
 
-    `ship_kind` is the kind of ship's room `here` is ("deck" or "cabin"), or None ashore.
+    `ship_kind` is the kind of ship's room `here` is ("deck"), or None ashore.
     Aboard, the ship's marker is "You are here" and your room is ringed in the callout.
     """
     content: Content = load_content()
@@ -153,7 +153,7 @@ def build_map_view(here: Any, location: MapLocation, ship_kind: str | None) -> M
             ShipRoomMark(
                 label=content.place_of_kind(kind).name, kind=kind, is_here=kind == ship_kind
             )
-            for kind in ("deck", "cabin")
+            for kind in ("deck",)
         ]
     track: list[Point] = []
     track_names: list[str] = []
@@ -232,7 +232,7 @@ _CALLOUT_MARGIN: int = 16
 # Keep the callout this far (in its units) from any place, so it hides none of them.
 _CALLOUT_CLEARANCE: int = 60
 # Where each ship's room is in the side view.
-_CALLOUT_ROOM_POS: dict[str, Point] = {"deck": (70, 62), "cabin": (95, 112)}
+_CALLOUT_ROOM_POS: dict[str, Point] = {"deck": (70, 62)}
 
 
 def _callout_box(view: MapView, scale: float) -> tuple[float, float, float, float]:

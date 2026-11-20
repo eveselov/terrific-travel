@@ -3,11 +3,12 @@ Room
 
 Rooms are simple containers that has no location of their own.
 
-Phantom Island has three room typeclasses:
+Phantom Island has these room typeclasses:
 
 - `Room`: Limbo and every place in the port and on the island;
-- `ShipRoom`: the ship's Cabin. What it shows depends on where the ship is;
-- `Deck`: the ship's Deck, a `ShipRoom` that also carries the `sail` command.
+- `ShipRoom`: a room aboard the ship, whose view depends on where the ship is;
+- `Deck`: the ship's one room (DECISIONS.md, 36), a `ShipRoom` that also carries the `sail`
+  command. The chart house, with the instruments and books, is a detail of it.
 
 The rooms are built from the content files by `world/builder.py`, not by hand.
 """
@@ -55,7 +56,7 @@ class Room(ObjectParent, DefaultRoom):
     - attribute `image`: URL of its picture for the Focus pane (optional).
     """
 
-    ship_kind: str | None = None  # "deck" or "cabin" for the ship's rooms
+    ship_kind: str | None = None  # "deck" for the ship's room
 
     @property
     def place_id(self) -> str | None:
@@ -116,15 +117,15 @@ class Room(ObjectParent, DefaultRoom):
 
 class ShipRoom(Room):
     """
-    One of the ship's rooms. The rooms themselves never move: what is seen from them, and
-    which map they show, follow the ship's position (`world/content/ship.yaml`).
+    A room aboard the ship. It never moves: what is seen from it, and which map it shows,
+    follow the ship's position (`world/content/ship.yaml`).
     """
 
-    ship_kind = "cabin"
+    ship_kind = "deck"
 
     def position_text(self, position: PositionSpec) -> str:
-        """What is noticed in this room at a position."""
-        return position.cabin
+        """What is seen from the ship here; its clue (the empty sea, C4) shows in yellow."""
+        return show_marks(position.deck)
 
     def map_location(self) -> MapLocation | None:
         """The ship's rooms are wherever the ship is."""
@@ -135,15 +136,9 @@ class ShipRoom(Room):
 
 
 class Deck(ShipRoom):
-    """The ship's Deck: the view of sea and sky, and where `sail` works."""
-
-    ship_kind = "deck"
+    """The ship's Deck: the view of sea and sky, the chart house, and where `sail` works."""
 
     def at_object_creation(self) -> None:
         """Give the Deck its `sail` command (a cmdset on the room, for those in it)."""
         super().at_object_creation()
         self.cmdset.add("commands.ship.DeckCmdSet", persistent=True)
-
-    def position_text(self, position: PositionSpec) -> str:
-        """What is seen from the Deck here; its clue (the empty sea, C4) shows in yellow."""
-        return show_marks(position.deck)

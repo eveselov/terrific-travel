@@ -55,7 +55,7 @@ councils:
               - clues: [sight_charted]
                 missing: >
                   "Before we blame the chart, check my reckoning, Captain: take a noon sight
-                  with the |wsextant|n on the Deck, then read my |wchronometer|n in the Cabin.
+                  with the |wsextant|n, then read my |wchronometer|n.
                   Then call the council again."
           - text: Both of them.
             reply: >
@@ -78,7 +78,7 @@ councils:
             proof:
               - clues: [C6, C3]
                 missing: >
-                  "Something here knows where land is. Watch the |wsky|n from the Deck at dusk,
+                  "Something here knows where land is. Watch the |wsky|n at dusk,
                   Captain, and call the council again."
           - text: There's no way to tell.
             reply: >
@@ -103,7 +103,7 @@ councils:
             proof:
               - clues: [C6]
                 missing: >
-                  "Have you watched the terns here at dusk? Look at the |wsky|n from the Deck,
+                  "Have you watched the terns here at dusk? Look at the |wsky|n,
                   Captain, and call the council again."
           - text: Ten degrees or more.
             reply: >

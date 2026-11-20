@@ -23,7 +23,7 @@ class CmdGet(DefaultCmdGet):
       take <thing>
       pick up <thing>
 
-    Some things can be carried: the sextant up to the Deck, a book or the chart ashore.
+    Some things can be carried: a book or the chart ashore.
     Put them down again with drop. inventory (or i) shows what you carry.
 
     Examples:

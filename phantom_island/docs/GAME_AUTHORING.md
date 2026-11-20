@@ -15,7 +15,7 @@ comment listing its fields: that list is the reference, and this guide doesn't r
 | File | Holds |
 |---|---|
 | `places.yaml` | Limbo (the title page), the port and the island: names, descriptions, exits, details to look at |
-| `ship.yaml` | The ship's two rooms (Deck, Cabin), and the positions she can sail to: what is seen from them, routes, orders, voyage passages |
+| `ship.yaml` | The ship's Deck (with its chart house), and the positions she can sail to: what is seen from them, routes, orders, voyage passages |
 | `maps.yaml` | The map pictures for the Map pane: one per act (port, sea chart, island) |
 | `characters.yaml` | The people and the Ship: where they stand, how they speak, what they answer (`ask`) |
 | `clues.yaml` | The task at the top of the journal (what the expedition is for), the clues (a title and the line written into the shared journal), and the connection questions that link them (`think`) |
@@ -124,14 +124,13 @@ have a `stays:` line for when someone tries.
   (the sextant has a reading at each).
 - `sets:` and `needs:` on an `at:` step: the first step remembers a flag for the whole
   expedition, and a later one waits for it, with an `otherwise` text until then. That is how
-  the noon sight on the Deck and the chronometer in the Cabin make one measurement that two
-  players can share.
+  the noon sight and the chronometer make one measurement in two steps, whoever does each.
 
 ### A ship position, a route, a voyage
 
 In `ship.yaml`, under `positions`:
 
-- `deck` and `cabin`: what is seen from each room there. `clue:` on the Deck view reveals
+- `deck`: what is seen from the Deck there. `clue:` on the Deck view reveals
   a clue on arrival (the empty sea, C4).
 - `coords` (`14 S, 40 W`): lets players sail there by naming the position. `orders`: what
   `sail` alone says there, in words (leave out a ready-made menu where the choice should be

@@ -42,7 +42,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - Talk to other players with `say <text>` (the whole room), `whisper <name> = <text>` (one person in the room) or `page <name> = <text>` (anyone, anywhere). `ask` is only for the story's characters.
 - In the web client, your own commands are shown in green after a dashed line, and other players' turns after a fainter dotted line, so you can tell them apart.
 - The journal is shared: a clue found by anyone goes into it, and every player hears about it, wherever they are.
-- Splitting up is faster: some tasks have two halves, such as the noon sight on the Deck and the chronometer in the Cabin. Something you carry (a book, the chart) is with you, not with the others, until you drop it or log out.
+- Splitting up is faster: one can talk to people while another looks around. Some tasks have two steps, such as the noon sight and then the chronometer; anyone can do either, at any time. Something you carry (a book, the chart) is with you, not with the others, until you drop it or log out.
 - Nobody gets left behind: the ship won't sail while someone is still ashore. Someone joining late, while the ship is away, starts on the Deck and catches up with `journal`.
 
 ## Talking and moving
@@ -56,7 +56,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 ## Sailing
 
 - Orders are given on the Deck with `sail`. On its own, `sail` tells you where the ship is and what you can order there.
-- A place at sea is a position: two numbers, the **latitude** (how far north or south) and the **longitude** (how far east or west). The island's position is written on the *Halcyon*'s chart in the Cabin: `read chart`, and `examine chart` for a closer look.
+- A place at sea is a position: two numbers, the **latitude** (how far north or south) and the **longitude** (how far east or west). The island's position is written on the *Halcyon*'s chart in the chart house, on the Deck: `read chart`, and `examine chart` for a closer look.
 - Give the position as your order: `sail to <latitude> <longitude>`, for example `sail to 10 north 25 east`. The Ship repeats the order and explains the course before she sets off.
 - Out at sea, where no chart helps, you can also sail by direction (`sail west`), or simply `sail home`.
 - A voyage takes a few moments of real time: a few lines tell the days at sea while the ship moves along the chart in the Map pane. Nothing needs doing meanwhile: the crew sail her.

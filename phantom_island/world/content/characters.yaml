@@ -53,7 +53,7 @@
 #   aliases   other words players can use for them (`ask barnaby`, `ask sailor`)
 #   where     a place id from places.yaml, a list of them (the character will move
 #             between them from A4; until then they stand in the first), or `aboard`
-#             (the Deck and the Cabin)
+#             (her Deck)
 #   desc      what players read when they look at them
 #   voice     how they speak: a note for the writer, and for the AI characters of phase B
 #   image     optional: URL of their picture, shown in the Focus pane when someone looks at
@@ -144,7 +144,7 @@ characters:
         stance: mistaken
         reply: >
           "The Halcyon's chart is the |wSociety|n's most precious paper, so the original stays
-          locked away here. A fair copy is waiting for you in your ship's cabin. The island
+          locked away here. A fair copy is waiting for you in your ship's chart house. The island
           is drawn on it, with its latitude and longitude written beside it. The Halcyon's
           master was a careful man; I have never had reason to doubt it."
       letter:
@@ -253,7 +253,7 @@ characters:
           "In my day we found our way with a compass, a log line and a good guess. Dead
           reckoning, it's called. North and south you could trust, from the noon sun and a
           |wsextant|n. East and west was guesswork. Your ship has one of those new sea
-          clocks below, I hear. Never trusted 'em myself."
+          clocks aboard, I hear. Never trusted 'em myself."
       sextant:
         # The same word as the Ship's, so players meet one instrument, not two (playtest
         # 2026-11-19). Barnaby knows the old way; the Ship explains the new sea clock.
@@ -603,7 +603,7 @@ characters:
     greeting: >
       The timbers creak, and somehow it sounds like a voice. "You called? Ask me about
       the sea and the sky, the |wwind|n, the |wtide|n, the |whorizon|n. Or about the
-      instruments below, and the |wwater|n casks."
+      instruments in the chart house, and the |wwater|n casks."
     suggest: [course, sextant, chronometer, latitude, longitude, birds, advice]
     fallback: >
       The Ship creaks thoughtfully. "That's beyond what a ship knows. Try me on
@@ -614,8 +614,8 @@ characters:
         teaches: {latitude: understood}
         reply: >
           "The sextant measures how high the sun stands above the horizon. It lives in the
-          Cabin: carry it up to the Deck and measure the sun at noon, when it's highest.
-          Look the height up in the tables, and you have your |wlatitude|n."
+          chart house: use it at noon, when the sun is highest. Look the height up in the
+          tables, and you have your |wlatitude|n."
       chronometer:
         aliases: [clock, sea clock]
         stance: truth
@@ -631,7 +631,7 @@ characters:
         reply: >
           "Latitude is how far north or south you are. The higher the noon sun stands, the
           nearer you are to the equator. Sailors have measured it well for centuries: take
-          the |wsextant|n up on deck at noon."
+          the |wsextant|n at noon."
       longitude:
         stance: truth
         teaches: {longitude: understood}
@@ -657,8 +657,8 @@ characters:
           "You're the |wcaptain|n: tell me where to go, and I'll take you there. A place at
           sea is two numbers:
           its |wlatitude|n, north or south, and its |wlongitude|n, east or west. The
-          Halcyon's |wchart|n in the Cabin gives the island's. Then say on deck, for
-          example: sail to 10 north 25 east."
+          Halcyon's |wchart|n in the chart house gives the island's. Then give the order,
+          for example: sail to 10 north 25 east."
       reckoning:
         aliases: [dead reckoning, reckon]
         stance: truth
@@ -715,15 +715,15 @@ characters:
         stance: truth
         teaches: {fresh_water: understood}
         reply: >
-          "Fresh water is life at sea. Every day at sea we drink from the casks in the
-          Cabin. Find a spring ashore and you can fill them again."
+          "Fresh water is life at sea. Every day at sea we drink from the casks in my
+          hold. Find a spring ashore and you can fill them again."
       advice:
         # The next step itself comes from `hint` (hints.yaml, DECISIONS.md, 31).
         aliases: [help, hint, hints, stuck, lost]
         stance: truth
         teaches: {witnesses: heard}
         reply: >
-          "Look closely at things, read what's in the Cabin, and ask people questions.
+          "Look closely at things, read what's in the chart house, and ask people questions.
           People don't always tell the truth, so compare what |wwitnesses|n say. Lost your
           way? Ask me about the |wexpedition|n. A big decision to make at sea? Call a
           |wcouncil|n aboard. Stuck? Type |whint|n, anywhere, and again for more."
@@ -749,7 +749,7 @@ characters:
         reply: >
           "The captain? You are, all of you together: the Society put the expedition in your
           hands. I'll tell you what I know of the sea, but where we go is your choice. Give
-          the word on deck: |wsail|n."
+          the word: |wsail|n."
       self:
         hidden: true  # a surprise for whoever thinks of asking her name
         stance: truth

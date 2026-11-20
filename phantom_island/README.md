@@ -58,9 +58,10 @@ New characters start in Limbo, which is the title page. Type `begin` to go into 
 Office. From there:
 
 - walk with compass directions (`se`, `east`...); `look` lists a room's exits;
-- on the Quay, `aboard` takes you onto the ship's Deck; `down` goes to the Cabin;
+- on the Quay, `aboard` takes you onto the ship's Deck, the ship's one room (its chart house
+  keeps the instruments and books: `look chart house`);
 - on the Deck, `sail` says what you can order. From port, give the island's position from the
-  chart (`read chart` in the Cabin): `sail to 14 south 40 west`; at sea, `sail west` or
+  chart (`read chart`): `sail to 14 south 40 west`; at sea, `sail west` or
   `sail home`. The voyage is told in a few lines, one every few seconds. The ship won't leave
   while another connected player is still ashore (players in Limbo don't count);
 - at the island, `ashore` lands you on Lagoon Beach;
@@ -91,7 +92,7 @@ The characters of the story stand in their places, and rooms list them under
   suggests asking about *chart* next;
 - `ask` is for the story's characters. Another player gets a pointer to `say`, and
   something to look at (`ask beams`) gets a pointer to `look beams`;
-- aboard, on the Deck or in the Cabin, `ask ship about longitude` asks the Ship herself;
+- aboard, `ask ship about longitude` asks the Ship herself;
 - everyone in the room hears the conversation.
 
 Who is where (as admin, `teleport Village` and so on gets you there quickly): Mrs. Fairweather in
@@ -114,9 +115,9 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
 - `look <something>` looks at things (`look compass`) and at parts of a room
   (`look beams`); `examine <something>` (or `x`) looks closer. Builders still have Evennia's
   own `@examine` (and `ex`).
-- **Things**: the compass in the Market (it stays on Crane's stall) and, in the Cabin, the
-  sextant, the chronometer, the *Halcyon*'s chart and two guide books. `get` and `drop`
-  the portable ones. Carrying a book or the chart shows more of what you look at: the plant
+- **Things**: the compass in the Market (it stays on Crane's stall) and, in the chart house
+  on the Deck, the sextant and the chronometer (both stay there), the *Halcyon*'s chart and
+  two guide books. `get` and `drop` the portable ones. Carrying a book or the chart shows more of what you look at: the plant
   guide in the Village and at the Spring, the animal guide on the Beach, the chart on the
   Hilltop. Carried things go back to their place when their carrier leaves the game, and
   also when the server starts cold or on `batchcode build`, if their carrier isn't being played.
@@ -124,8 +125,7 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
   card with its name (only Crane has a picture so far, `image:` in characters.yaml);
   looking at anything else, a plain `look` or moving on brings back the room's picture.
 - `read <thing>` and `use <thing>` are heard by the whole room. The longitude puzzle: at sea,
-  `use sextant` on the Deck (the noon sight), then `read chronometer` in the Cabin. One
-  player can do each.
+  `use sextant` (the noon sight), then `read chronometer`. Anyone can do either step.
 - `journal` shows the expedition's task, then everything found, one line per clue, in the
   order it was found. `journal sources` adds who found each clue, where and from whom or
   what. A clue confirmed later by another source keeps one entry, and the new source is
@@ -149,13 +149,10 @@ teleport Market
 look compass                 → C1
 examine compass              → C2
 ask crane about compass      → now he admits the truth, C3
-teleport Cabin
-get sextant
-up
+teleport Deck
 sail to 14 south 40 west     → after the passage, the empty sea, C4
 look sky                     → the birds, C6
 use sextant
-down
 read chronometer             → 40 W: C4 again, confirmed (C5 is measured at the island)
 journal
 ```
@@ -248,7 +245,7 @@ The choices, the proof each answer needs, and the epilogue are in
 | Hints (`hint`, and pushed after a while without progress) | `world/content/hints.yaml`, `world/hints.py`, `commands/command.py` (the clock) |
 | The report and the epilogue (`report`) | `world/content/report.yaml`, `world/report.py`, `commands/report.py` |
 | Starting over (`startover`, for developers) | `world/reset.py`, `commands/admin.py` |
-| Rooms: land, Cabin, Deck | `typeclasses/rooms.py` |
+| Rooms: land, and the ship's Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
 | Map and Focus panes, `map` command | `world/maps.py`, `world/focus.py`, `commands/explore.py` |
 | Characters and `ask` | `world/content/characters.yaml`, `typeclasses/inhabitants.py`, `world/conversation.py`, `commands/talk.py` |

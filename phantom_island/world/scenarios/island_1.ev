@@ -89,14 +89,8 @@ aboard
 #   Why:
 sail
 #   Why:
-down
-#   Now in: Cabin
-#   Why:
 read chart
 #   Notebook: new Positions and charts
-#   Why:
-up
-#   Now in: Deck
 #   Why:
 ask ship
 #   Why:
@@ -116,54 +110,19 @@ council
 council b
 #   Council: charted line, not proved yet
 #   Why:
-go down
-#   Why:
-down
-#   Now in: Cabin
-#   Why:
 get sectant
-#   Why:
-go up
-#   Why:
-up
-#   Now in: Deck
-#   Journal: again C4, Nothing at the charted position
 #   Why:
 use sextant
 #   Why:
 read sextant
 #   Why:
-go down
-#   Why:
-down
-#   Now in: Cabin
-#   Why:
-get sextant
-#   Why:
-go up
-#   Why:
-up
-#   Now in: Deck
-#   Journal: again C4, Nothing at the charted position
-#   Why:
 use sextant
 #   Journal: again C4, Nothing at the charted position
 #   Notebook: grew Latitude
 #   Why:
-go down
-#   Why:
-down
-#   Now in: Cabin
-#   Why:
 read chronometer
 #   Journal: again C4, Nothing at the charted position
 #   Notebook: grew Longitude
-#   Why:
-go up
-#   Why:
-up
-#   Now in: Deck
-#   Journal: again C4, Nothing at the charted position
 #   Why:
 council
 #   Why:

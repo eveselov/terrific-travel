@@ -85,10 +85,9 @@ situations:
     ship: [port]
     hints:
       - The Society's task waits at the island on the Halcyon's chart. Time to sail.
-      - The island's position is written on the Halcyon's chart, in the Cabin. Read it,
-        then give the order on the Deck.
-      - Go |waboard|n and |wdown|n to the Cabin, |wread chart|n, then |wup|n to the Deck
-        and type |wsail to 14 south 40 west|n.
+      - The island's position is written on the Halcyon's chart, in the ship's chart
+        house. Read it, then give the order.
+      - Go |waboard|n, |wread chart|n, and type |wsail to 14 south 40 west|n.
 
   # --- Act 2: at sea ----------------------------------------------------------------------
 
@@ -98,10 +97,8 @@ situations:
     hints:
       - No island where the chart puts it. First make sure the ship is really at the
         chart's position.
-      - Take a noon sight with the sextant on the Deck, then read the chronometer in the
-        Cabin.
-      - In the Cabin, |wget sextant|n. Then |wup|n, |wuse sextant|n, |wdown|n, and |wread
-        chronometer|n.
+      - Take a noon sight with the sextant, then read the chronometer.
+      - On the Deck, |wuse sextant|n, then |wread chronometer|n.
 
   # The decision at the chart's position follows its council (councils.yaml, DECISIONS.md,
   # 35): one situation per step, each pointing to the council first.
@@ -200,8 +197,7 @@ situations:
       - Is this really the island on the Halcyon's chart, and where exactly is it?
       - Measure the island's position with the sextant and the chronometer, or take the
         chart up the hill and compare.
-      - In the Cabin, |wget sextant|n. Then |wup|n, |wuse sextant|n, |wdown|n, and |wread
-        chronometer|n.
+      - Aboard, |wuse sextant|n, then |wread chronometer|n.
 
   # --- The report -------------------------------------------------------------------------
 

@@ -53,9 +53,9 @@ COMMAND_WORDS: frozenset[str] = frozenset(
 LIMBO_ID: str = "limbo"
 # The ship's position while she sails between two others (ship.yaml, `under_way`).
 UNDER_WAY: str = "under_way"
-ROOM_KINDS: tuple[str, ...] = ("room", "deck", "cabin")
+ROOM_KINDS: tuple[str, ...] = ("room", "deck")
 STANCES: tuple[str, ...] = ("truth", "mistaken", "hiding")
-ABOARD_WHERE: str = "aboard"  # a character's `where` for the Ship: the Deck and the Cabin
+ABOARD_WHERE: str = "aboard"  # a character's `where` for the Ship: her Deck
 # Asking a character about themselves (`ask barnaby about yourself`): their optional `self`
 # topic, or this short default. Its words come from `topic_aliases` in characters.yaml.
 SELF_TOPIC: str = "self"
@@ -213,7 +213,6 @@ class PositionSpec:
     deck: str
     clue: str | None  # revealed by the `deck` text
     details: dict[str, LookSpec]  # seen from the Deck
-    cabin: str
     shore: str
     routes: tuple[RouteSpec, ...]
     # Orders by position are read as a direction here: a searching position (DECISIONS.md, 34).
@@ -620,7 +619,7 @@ class Content:
     councils: dict[str, CouncilSpec] = dataclass_field(default_factory=dict)
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
-        """The one place of this kind (`deck` or `cabin`)."""
+        """The one place of this kind (`deck`)."""
         for place in self.places.values():
             if place.kind == kind:
                 return place
@@ -817,7 +816,6 @@ def _position(position_id: str, value: Any) -> PositionSpec:
         deck=_text(data, "deck", where),
         clue=_optional_text(data, "clue", where),
         details=_details(data.get("details"), where),
-        cabin=_text(data, "cabin", where),
         shore=_text(data, "shore", where) if ashore else "",
         routes=tuple(
             _route(direction, item, f"{where}, route {direction}")
@@ -1322,7 +1320,7 @@ def _check(content: Content) -> None:
     places: dict[str, PlaceSpec] = content.places
     if LIMBO_ID not in places:
         raise ContentError(f"{PLACES_FILE}: the `{LIMBO_ID}` prologue is missing.")
-    for kind in ("deck", "cabin"):
+    for kind in ("deck",):
         found: list[str] = [p.id for p in places.values() if p.kind == kind]
         if len(found) != 1:
             raise ContentError(f"Exactly one place must have kind {kind!r} (found {found}).")
@@ -1446,7 +1444,6 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
     for position in content.positions.values():
         where: str = f"position {position.id}"
         texts.append((f"{where}, deck", position.deck, position.clue))
-        texts.append((f"{where}, cabin", position.cabin, None))
         if position.shore:
             texts.append((f"{where}, shore", position.shore, None))
         if position.orders:

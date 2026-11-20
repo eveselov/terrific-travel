@@ -1,16 +1,17 @@
 """
 The players' ship: sailing between positions, and the exits between ship and shore.
 
-The ship is two rooms (Deck and Cabin) that never move. Sailing changes the ship's position
-in the expedition state, and moves two exits: `ashore` on the Deck and `aboard` on the shore.
-At sea both are put nowhere (location None), so they disappear until the ship moors again.
+The ship is one room, her Deck, that never moves (DECISIONS.md, 36). Sailing changes the
+ship's position in the expedition state, and moves two exits: `ashore` on the Deck and
+`aboard` on the shore. At sea both are put nowhere (location None), so they disappear until
+the ship moors again.
 
 An order names where to go: a position from the chart (`sail to 14 south 40 west`), a
 direction (`sail west`), or a name (`sail to the island`, `sail home`). The Ship answers the
 order, and the voyage is told as a short passage: one line every `STEP_SECONDS` real
 seconds, the ship's marker moving along the sea chart, and the arrival with the last line.
 Nothing needs doing while she sails. Her position meanwhile is `under_way` (ship.yaml), so
-the Deck, the Cabin and the instruments show the open sea.
+the Deck and the instruments show the open sea.
 """
 
 from collections.abc import Callable
@@ -53,7 +54,7 @@ STILL_SAILING: str = (
 ALREADY_THERE: str = 'The Ship creaks, amused. "We\'re there already: {where}. Look around!"'
 NO_SUCH_PLACE: str = (
     'The Ship creaks doubtfully. "{where}? I know of nothing there worth sailing to. The '
-    "island's position is written on the Halcyon's chart, in the Cabin: |wread chart|n.\""
+    "island's position is written on the Halcyon's chart, in the chart house: |wread chart|n.\""
 )
 BOTH_NUMBERS: str = (
     "The Ship creaks. \"Both numbers at once? Then we'd be searching blind. Keep one of "
@@ -72,7 +73,7 @@ def ship_rooms() -> list[ShipRoom]:
     """The ship's built rooms (the Deck first), skipping any that haven't been built."""
     content: Content = load_content()
     rooms: list[ShipRoom] = []
-    for kind in ("deck", "cabin"):
+    for kind in ("deck",):
         room: Any = find_place(content.place_of_kind(kind).id)
         if isinstance(room, ShipRoom):
             rooms.append(room)

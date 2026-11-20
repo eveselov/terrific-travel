@@ -14,6 +14,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from evennia.objects.objects import DefaultCharacter
+from evennia.utils.create import create_object
 from evennia.utils.test_resources import EvenniaTest
 
 import world.content
@@ -57,7 +58,13 @@ from world.discovery import return_stray_things, return_things_home
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
-from world.places import find_inhabitant, find_ship_exit, find_thing
+from world.places import (
+    PLACE_TAG_CATEGORY,
+    find_inhabitant,
+    find_place,
+    find_ship_exit,
+    find_thing,
+)
 from world.reset import route_to, shortcut_position, start_over
 from world.ship import (
     ABOARD,
@@ -86,7 +93,7 @@ CONTENT_FILES: tuple[str, ...] = (
 )
 
 PORT_PLACES: set[str] = {"office", "quay", "market"}
-SHIP_PLACES: set[str] = {"deck", "cabin"}
+SHIP_PLACES: set[str] = {"deck"}
 ISLAND_PLACES: set[str] = {"beach", "village", "reef", "forest", "spring", "hilltop", "cove"}
 
 
@@ -183,7 +190,7 @@ class TestContent(TestCase):
         )
         self.assertIn("connection compass_sea: unknown idea 'nowhere'", str(unknown))
         silent: ContentError = self._broken_copy(
-            IDEAS_FILE, '    learn: "|wread animal guide|n, in the Cabin"\n', ""
+            IDEAS_FILE, '    learn: "|wread animal guide|n, in the chart house"\n', ""
         )
         self.assertIn("needs a `learn` text", str(silent))
 
@@ -250,7 +257,8 @@ class TestContent(TestCase):
     def test_the_thirteen_clues_and_the_things(self) -> None:
         content: Content = read_content()
         self.assertEqual(list(content.clues), [f"C{n}" for n in range(1, 14)])
-        self.assertEqual(content.things["sextant"].where, "cabin")
+        self.assertEqual(content.things["sextant"].where, "deck")
+        self.assertFalse(content.things["sextant"].portable)  # used where it's kept (36)
         self.assertTrue(content.things["plant_guide"].portable)
         self.assertFalse(content.things["compass"].portable)
 
@@ -429,10 +437,17 @@ class TestBuild(WorldTest):
         content: Content = load_content()
         self.assertEqual(set(self.rooms), set(content.places))
         self.assertIsInstance(self.rooms["deck"], Deck)
-        self.assertIsInstance(self.rooms["cabin"], ShipRoom)
-        self.assertNotIsInstance(self.rooms["cabin"], Deck)
+        self.assertIsInstance(self.rooms["deck"], ShipRoom)
         self.assertEqual(self.rooms[LIMBO_ID], self.room1)
         self.assertEqual(self.room1.key, "Phantom Island")
+
+    def test_rebuilding_removes_a_place_no_longer_in_the_content(self) -> None:
+        old_cabin: Room = create_object(Room, key="Cabin")
+        old_cabin.tags.add("cabin", category=PLACE_TAG_CATEGORY)
+        self.char2.move_to(old_cabin, quiet=True)
+        build_world(limbo=self.room1)
+        self.assertIsNone(find_place("cabin"))
+        self.assertEqual(self.char2.location, self.rooms["deck"])
 
     def test_limbo_leads_into_the_society_office(self) -> None:
         self.assertEqual(self.exits_from(LIMBO_ID)["begin"].destination, self.rooms["office"])
@@ -568,7 +583,7 @@ class TestSail(WorldTest):
         self.assertEqual(current_position().id, "port")
 
     def test_everyone_aboard_sees_the_new_view(self) -> None:
-        self.char2.move_to(self.rooms["cabin"], quiet=True)
+        self.char2.move_to(self.rooms["deck"], quiet=True)
         with patch.object(self.char2, "msg") as mock_msg:
             sail(self.char1, "west")
         self.assertIn("Day 21", texts(mock_msg))
@@ -712,20 +727,17 @@ class TestMapsAndFocus(WorldTest):
         self.assertFalse(ship_on_quay[0].is_here)
         self.assertTrue(ship_aboard[0].is_here)
 
-    def test_aboard_the_map_shows_which_ship_room_you_are_in(self) -> None:
+    def test_aboard_the_map_shows_you_on_the_ship(self) -> None:
         quay: MapView | None = self.rooms["quay"].map_view()
         assert quay is not None
-        self.assertEqual([m.label for m in quay.ship_rooms], ["Deck", "Cabin"])
+        self.assertEqual([m.label for m in quay.ship_rooms], ["Deck"])
         self.assertFalse(any(m.is_here for m in quay.ship_rooms))
-        for place_id, here_label in (("deck", "Deck"), ("cabin", "Cabin")):
-            view: MapView | None = self.rooms[place_id].map_view()
-            assert view is not None
-            self.assertEqual([m.label for m in view.ship_rooms if m.is_here], [here_label])
-            ship: list[MapPlace] = [p for p in view.places if p.is_ship]
-            self.assertEqual(ship[0].label, f"{SHIP_LABEL} ({here_label})")
-            self.assertIn(
-                f"You are here: {SHIP_LABEL} ({here_label})", self.rooms[place_id].map_text()
-            )
+        view: MapView | None = self.rooms["deck"].map_view()
+        assert view is not None
+        self.assertEqual([m.label for m in view.ship_rooms if m.is_here], ["Deck"])
+        ship: list[MapPlace] = [p for p in view.places if p.is_ship]
+        self.assertEqual(ship[0].label, f"{SHIP_LABEL} (Deck)")
+        self.assertIn(f"You are here: {SHIP_LABEL} (Deck)", self.rooms["deck"].map_text())
 
     def test_the_callout_follows_the_ship(self) -> None:
         self.assertIn("<line", render_map_html(self._view("quay")))
@@ -733,30 +745,29 @@ class TestMapsAndFocus(WorldTest):
         on_quay: MapView = self._view("quay")
         self.assertEqual(on_quay.ship_rooms, [])
         self.assertNotIn("<line", render_map_html(on_quay))
-        self.assertNotIn("Cabin", render_map_html(on_quay))
-        self.assertEqual(len(self._view("cabin").ship_rooms), 2)  # on the sea chart now
+        self.assertEqual(len(self._view("deck").ship_rooms), 1)  # on the sea chart now
 
     def _view(self, place_id: str) -> MapView:
         view: MapView | None = self.rooms[place_id].map_view()
         assert view is not None
         return view
 
-    def test_going_below_updates_the_map(self) -> None:
-        self.char1.move_to(self.rooms["deck"], quiet=True)
+    def test_going_aboard_updates_the_map(self) -> None:
+        self.char1.move_to(self.rooms["quay"], quiet=True)
         with patch.object(self.char1, "msg") as mock_msg:
-            self.go(self.char1, "down")
+            self.go(self.char1, "aboard")
         map_html: str = sent(mock_msg, "map")[0]
-        self.assertIn(f"{SHIP_LABEL} (Cabin)", map_html)
-        self.assertIn('font-weight="bold" fill="#1d2b36">Cabin', map_html)
+        self.assertIn(f"{SHIP_LABEL} (Deck)", map_html)
+        self.assertIn('font-weight="bold" fill="#1d2b36">Deck', map_html)
 
     def test_at_sea_the_deck_shows_the_sea_chart_with_the_track(self) -> None:
         get_expedition().move_ship("charted")
-        view: MapView | None = self.rooms["cabin"].map_view()
+        view: MapView | None = self.rooms["deck"].map_view()
         assert view is not None
         self.assertEqual(view.picture_map.key, "sea_chart")
         self.assertEqual(len(view.track), 2)
         self.assertIn("polyline", render_map_html(view))
-        self.assertIn("track", self.rooms["cabin"].map_text())
+        self.assertIn("track", self.rooms["deck"].map_text())
 
     def test_map_command_describes_the_map_in_words(self) -> None:
         self.char1.move_to(self.rooms["village"], quiet=True)
@@ -963,10 +974,9 @@ class TestAsk(WorldTest):
         self.at("quay")
         self.assertIn("There's nobody called 'crane' here", self.ask("crane about compass"))
 
-    def test_the_ship_answers_on_deck_and_in_the_cabin(self) -> None:
-        for place_id in ("deck", "cabin"):
-            self.at(place_id)
-            self.assertIn("15 degrees every hour", self.ask("ship about longitude"), place_id)
+    def test_the_ship_answers_on_deck(self) -> None:
+        self.at("deck")
+        self.assertIn("15 degrees every hour", self.ask("ship about longitude"))
 
     def test_the_ship_is_silent_ashore(self) -> None:
         self.at("quay")
@@ -1037,22 +1047,22 @@ class TestThings(DiscoveryTest):
         self.assertEqual(self.thing("compass").location, self.rooms["market"])
 
     def test_books_can_be_carried(self) -> None:
-        self.at(self.char1, "cabin")
+        self.at(self.char1, "deck")
         self.do(self.char1, "get plant guide")
         self.assertEqual(self.thing("plant_guide").location, self.char1)
 
     def test_rebuilding_leaves_carried_things_with_their_carrier(self) -> None:
-        self.at(self.char1, "cabin")
+        self.at(self.char1, "deck")
         self.do(self.char1, "get chart")
         build_world(limbo=self.room1)
         self.assertEqual(self.thing("chart").location, self.char1)
 
     def test_carried_things_go_home_when_their_carrier_leaves(self) -> None:
-        self.at(self.char1, "cabin")
+        self.at(self.char1, "deck")
         self.do(self.char1, "get chart")
         self.at(self.char1, "hilltop")
         return_things_home(self.char1)
-        self.assertEqual(self.thing("chart").location, self.rooms["cabin"])
+        self.assertEqual(self.thing("chart").location, self.rooms["deck"])
 
     def test_things_held_by_someone_nobody_plays_go_home(self) -> None:
         # char1 has a session in EvenniaTest, char2 has none (as after a server restart).
@@ -1062,10 +1072,10 @@ class TestThings(DiscoveryTest):
         self.thing("plant_guide").move_to(self.char2, quiet=True)
         build_world(limbo=self.room1)
         self.assertEqual(self.thing("chart").location, self.char1)
-        self.assertEqual(self.thing("plant_guide").location, self.rooms["cabin"])
+        self.assertEqual(self.thing("plant_guide").location, self.rooms["deck"])
         self.thing("animal_guide").move_to(self.char2, quiet=True)
         self.assertEqual(return_stray_things(), [self.thing("animal_guide")])
-        self.assertEqual(self.thing("animal_guide").location, self.rooms["cabin"])
+        self.assertEqual(self.thing("animal_guide").location, self.rooms["deck"])
 
     def focus_after(self, command: str) -> str:
         """The last Focus pane content char1's client gets after a command."""
@@ -1251,24 +1261,24 @@ class TestAtSea(DiscoveryTest):
         self.assertIn("|yall flying the same way: west", self.do(self.char1, "look birds"))
         self.assertIn("C6", self.journal_ids())
 
-    def test_the_sextant_needs_the_deck(self) -> None:
-        self.at(self.char1, "cabin")
-        self.assertIn("get sextant", self.do(self.char1, "use sextant"))
+    def test_the_sextant_stays_in_the_chart_house(self) -> None:
+        self.at(self.char1, "deck")
+        self.assertIn("used right here on deck", self.do(self.char1, "get sextant"))
+        self.assertEqual(self.thing("sextant").location, self.rooms["deck"])
+        self.assertIn("Latitude 14 degrees South", self.do(self.char1, "use sextant"))
 
     def test_take_and_pick_up_work_like_get(self) -> None:
-        self.at(self.char1, "cabin")
-        self.do(self.char1, "take sextant")
-        self.assertEqual(self.thing("sextant").location, self.char1)
-        self.do(self.char1, "drop sextant")
-        self.do(self.char1, "pick up sextant")
-        self.assertEqual(self.thing("sextant").location, self.char1)
+        self.at(self.char1, "deck")
+        self.do(self.char1, "take plant guide")
+        self.assertEqual(self.thing("plant_guide").location, self.char1)
+        self.do(self.char1, "drop plant guide")
+        self.do(self.char1, "pick up plant guide")
+        self.assertEqual(self.thing("plant_guide").location, self.char1)
 
     def test_at_the_charted_position_the_measurements_confirm_the_empty_sea(self) -> None:
         self.ship_at("charted")
-        self.at(self.char2, "cabin")
+        self.at(self.char2, "deck")
         self.assertIn("Take a noon sight", self.do(self.char2, "read chronometer"))
-        self.at(self.char1, "cabin")
-        self.do(self.char1, "get sextant")
         self.at(self.char1, "deck")
         self.do(self.char1, "look")  # the empty sea: C4
         self.assertIn("|yLatitude 14 degrees South", self.do(self.char1, "use sextant"))
@@ -1281,7 +1291,6 @@ class TestAtSea(DiscoveryTest):
 
     def test_a_day_north_the_sextant_shows_the_latitude_changed(self) -> None:
         self.ship_at("charted")
-        self.thing("sextant").move_to(self.char1, quiet=True)
         self.at(self.char1, "deck")
         with patch("world.ship.crew_ashore", return_value=[]):
             self.assertTrue(sail(self.char1, "north"))
@@ -1294,12 +1303,10 @@ class TestAtSea(DiscoveryTest):
 
     def test_a_day_east_the_chronometer_shows_the_way_back(self) -> None:
         self.ship_at("charted")
-        self.thing("sextant").move_to(self.char1, quiet=True)
         self.at(self.char1, "deck")
         with patch("world.ship.crew_ashore", return_value=[]):
             sail(self.char1, "east")
         self.do(self.char1, "use sextant")
-        self.at(self.char1, "cabin")
         self.assertIn("38 degrees West", self.do(self.char1, "read chronometer"))
 
     def test_no_list_of_directions_at_the_charted_position(self) -> None:
@@ -1312,15 +1319,13 @@ class TestAtSea(DiscoveryTest):
 
     def test_at_the_island_the_longitude_is_ten_degrees_out(self) -> None:
         self.ship_at("anchorage")
-        self.thing("sextant").move_to(self.char1, quiet=True)
         self.at(self.char1, "deck")
         self.do(self.char1, "use sextant")
-        self.at(self.char1, "cabin")
         self.assertIn("1 degree further west", self.do(self.char1, "read chronometer"))
 
     def test_others_in_the_room_hear_what_is_read(self) -> None:
-        self.at(self.char1, "cabin")
-        self.at(self.char2, "cabin")
+        self.at(self.char1, "deck")
+        self.at(self.char2, "deck")
         with patch.object(self.char2, "msg") as mock_msg:
             self.char1.execute_cmd("read plant guide")
         heard: str = texts(mock_msg)
@@ -1373,7 +1378,7 @@ class TestStartOver(DiscoveryTest):
         self.assertEqual(expedition.flags, [])
         self.assertEqual(expedition.track, ["port"])
         self.assertEqual(current_position().id, "port")
-        self.assertEqual(self.thing("plant_guide").location, self.rooms["cabin"])
+        self.assertEqual(self.thing("plant_guide").location, self.rooms["deck"])
         # char1 is being played and is moved; char2 (no session) is kept nowhere, as Evennia
         # keeps offline characters, and comes back in Limbo at its next login.
         self.assertEqual(self.char1.location, self.rooms["limbo"])
@@ -1480,7 +1485,6 @@ class TestNotebook(DiscoveryTest):
 
     def test_only_the_one_who_does_it_has_used_it(self) -> None:
         self.ship_at("charted")
-        self.thing("sextant").move_to(self.char1, quiet=True)
         self.at(self.char1, "deck")
         self.at(self.char2, "deck")
         self.do(self.char1, "use sextant")
@@ -1844,7 +1848,7 @@ class TestConnections(DiscoveryTest):
         get_expedition().add_clue("C2", "someone", "Market")
         get_expedition().add_clue("C3", "someone", "Market")
         lacking: str = self.do(self.char1, "think")
-        self.assertIn("Worth learning: Coral (|wread animal guide|n, in the Cabin).", lacking)
+        self.assertIn("Worth learning: Coral (|wread animal guide|n, in the chart house).", lacking)
         get_expedition().note(self.char1.id, "coral", 1, "heard", "brass compass")
         having: str = self.do(self.char1, "think")
         self.assertIn("In your notebook: Coral.", having)

@@ -86,7 +86,7 @@ You can't try it in the game yet. `characters.yaml` is content only: nothing in 
 To make it playable, A2 needs this code:
 
 1. **A loader** in `world/content.py` that reads `characters.yaml` into typed classes, the same way places and the ship are loaded.
-2. **A `Character` typeclass** for the inhabitants. The build places each one in its `where` room, so `look barnaby` shows the description. The Ship gets no object in a room; `ask` finds her whenever you're on the Deck or in the Cabin.
+2. **A `Character` typeclass** for the inhabitants. The build places each one in its `where` room, so `look barnaby` shows the description. The Ship gets no object in a room; `ask` finds her whenever you're on the Deck.
 3. **An `ask` command** that handles `ask <character>` (greeting plus suggested topics), `ask <character> about <topic>` (a reply, or the fallback), and aliases.
 4. **Tests** for the loader and the command, with strict mypy and ruff passing.
 
@@ -112,7 +112,7 @@ ask barnaby about storm
 ask barnaby about pirates        → his fallback
 ```
 
-On the island, `teleport village` (as admin) takes you straight to Ama and Tui. Aboard, `ask ship about longitude` works on the Deck and in the Cabin.
+On the island, `teleport village` (as admin) takes you straight to Ama and Tui. Aboard, `ask ship about longitude` works on the Deck.
 
 After that, editing a reply in the YAML needs only `uv run evennia reload`. Adding or removing characters, or changing where they stand, also needs `batchcode build` again.
 

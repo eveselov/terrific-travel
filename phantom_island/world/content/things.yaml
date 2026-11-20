@@ -39,8 +39,8 @@
 #     needs      flags or clue ids that must already be found, and
 #     otherwise  what happens until they are
 #
-# Flags are remembered by the expedition, so they work between players: one takes the noon
-# sight on the Deck, the other reads the chronometer in the Cabin.
+# Flags are remembered by the expedition: the noon sight sets one, and reading the
+# chronometer needs it, whoever does each step and whenever (DECISIONS.md, 36).
 
 things:
   # --- In the port ------------------------------------------------------------------------
@@ -69,19 +69,20 @@ things:
   sextant:
     name: sextant
     aliases: [the sextant]
-    where: cabin
-    portable: true
+    where: deck
+    stays: >
+      The sextant lives in its box in the chart house, and it's used right here on deck,
+      where the sun and the horizon are. There's nothing to measure with it ashore.
     desc: >
       A brass instrument shaped like a slice of pie, with a small telescope, mirrors and a
-      curved scale. Navigators |wuse|n it to measure how high the sun stands, out on deck
-      where they can see the sun and the horizon. You can |wget|n it and carry it up there.
-      Ask the Ship about the |wsextant|n to learn more.
+      curved scale, kept in its box in the chart house. Navigators |wuse|n it at noon to
+      measure how high the sun stands above the horizon. Ask the Ship about the |wsextant|n
+      to learn more.
     use:
       teaches: {latitude: used}
       only_in: deck
       elsewhere: >
-        You need the sun and a clear horizon for that. Carry the sextant up on the Deck
-        (|wget sextant|n, then |wup|n).
+        You need the sun and a clear sea horizon for that: it's done on the ship's Deck.
       text: >
         You wait for noon, when the sun stands highest, and measure it. Latitude 14 degrees
         South: the harbour's own latitude, as every chart of it says. Noon here is noon at
@@ -99,8 +100,8 @@ things:
           text: >
             You wait for noon, when the sun stands highest, and measure it. [[Latitude 14
             degrees South: exactly the latitude written beside the island on the Halcyon's
-            chart.]] Now the longitude: someone should read the time of noon on the
-            |wchronometer|n in the Cabin.
+            chart.]] Now the longitude: |wread chronometer|n to see the time of noon at
+            home.
         north_of_chart:
           teaches: {latitude: used}
           sets: sight_north
@@ -121,24 +122,24 @@ things:
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 14
             degrees South: still the latitude on the Halcyon's chart. The |wchronometer|n
-            in the Cabin will tell how far east you have come.
+            will tell how far east you have come.
         anchorage:
           teaches: {latitude: used}
           sets: sight_island
           text: >
             You wait for noon, when the sun stands highest, and measure it. Latitude 14
             degrees South: the island's latitude on the Halcyon's chart, to the minute.
-            Someone should note the time of noon on the chronometer in the Cabin.
+            Now |wread chronometer|n for the longitude.
 
   chronometer:
     name: chronometer
     aliases: [clock, sea clock, brass clock]
-    where: cabin
+    where: deck
     stays: >
       The chronometer is screwed into its box, and the box is screwed to the ship. It
       stays where it is. (And it really should: moving it would spoil its timekeeping.)
     desc: >
-      A fat brass clock in a wooden box, fixed beside the chart table. It keeps the time
+      A fat brass clock in a wooden box, fixed beside the chart table in the chart house. It keeps the time
       of the home port, all voyage long. You can |wread|n it.
     read:
       text: >
@@ -156,7 +157,7 @@ things:
           needs: [sight_charted]
           clue: C4
           text: >
-            Noon on deck came when the chronometer showed twenty to three in the afternoon,
+            Noon came when the chronometer showed twenty to three in the afternoon,
             home time: 160 minutes after noon at home. Four minutes for every degree makes
             [[40 degrees West: the longitude on the Halcyon's chart. Both of the chart's
             numbers check out. You are exactly where the chart puts the island, and there is
@@ -166,12 +167,12 @@ things:
           otherwise: &no_sight >
             The chronometer ticks steadily, keeping home time. On its own it can't say
             where you are: you also need the moment of noon out here. Take a noon sight
-            with the sextant on the Deck first.
+            first: |wuse sextant|n.
         north_of_chart:
           teaches: {longitude: used}
           needs: [sight_north]
           text: >
-            Noon on deck came at twenty to three, home time, the same as at the chart's
+            Noon came at twenty to three, home time, the same as at the chart's
             position: still 40 degrees West. Sailing north changed the latitude, not the
             longitude.
           otherwise: *no_sight
@@ -179,7 +180,7 @@ things:
           teaches: {longitude: used}
           needs: [sight_south]
           text: >
-            Noon on deck came at twenty to three, home time, the same as at the chart's
+            Noon came at twenty to three, home time, the same as at the chart's
             position: still 40 degrees West. Sailing south changed the latitude, not the
             longitude.
           otherwise: *no_sight
@@ -187,7 +188,7 @@ things:
           teaches: {longitude: used}
           needs: [sight_east]
           text: >
-            Noon on deck came at twenty-eight minutes to three, home time: 152 minutes after
+            Noon came at twenty-eight minutes to three, home time: 152 minutes after
             noon at home, so 38 degrees West. Two degrees back towards home, on waters the
             ship already crossed on the way out.
           otherwise: *no_sight
@@ -196,7 +197,7 @@ things:
           needs: [sight_island]
           clue: C5
           text: >
-            Noon on deck came when the chronometer showed sixteen minutes to three, home
+            Noon came when the chronometer showed sixteen minutes to three, home
             time: 164 minutes after noon at home. Four minutes for every degree makes 41
             degrees West. [[The island lies at exactly the chart's latitude, but 1 degree
             further west than the chart's longitude.]] Only four minutes on the clock, and
@@ -206,7 +207,7 @@ things:
   chart:
     name: Halcyon's chart
     aliases: [chart, old chart, the chart, map, halcyon chart]
-    where: cabin
+    where: deck
     portable: true
     desc: >
       A fair copy of the Halcyon's chart, lent by the Society. It shows an island drawn in
@@ -225,14 +226,14 @@ things:
       text: >
         In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
         large figures: Latitude 14 degrees South, longitude 40 degrees West of
-        home.|/On the Deck, give it as your order: |wsail to 14 south 40 west|n. The coastline is
+        home.|/Give it to the crew as your order: |wsail to 14 south 40 west|n. The coastline is
         drawn with care: round in the east with a lagoon, a hill in the middle, a long reef
         down the west side, and a little cove in the south, like a hook.
 
   plant_guide:
     name: plant guide
     aliases: [guide to plants, plants, plant book, botany]
-    where: cabin
+    where: deck
     portable: true
     desc: >
       "A Naturalist's Guide to Useful Plants", a thick book full of careful drawings. Carry
@@ -249,7 +250,7 @@ things:
   animal_guide:
     name: animal guide
     aliases: [guide to animals, animals, animal book, zoology]
-    where: cabin
+    where: deck
     portable: true
     desc: >
       "A Naturalist's Guide to Animals", with drawings of beasts, birds and fish. Carry it,

@@ -149,12 +149,12 @@ its one exit leads into the Society Office.
 
 ### The ship
 
-The players' ship is two rooms that travel with them through all three acts:
+The players' ship is one room, her Deck, that travels with them through all three acts
+(DECISIONS.md, 36):
 
 | Place | What's there |
 |---|---|
-| Deck | For observing: the sky, the sea, birds, coastlines. `sail`, the noon sight and going ashore happen here. What you see changes with where the ship is and the time of day. |
-| Cabin | For instruments and records: the chronometer, the chart table with the *Halcyon*'s chart and the ship's own track, water casks, books and the Ship's voice. |
+| Deck | The sky, the sea, birds, coastlines: what you see changes with where the ship is and the time of day. `sail`, the noon sight and going ashore happen here, and the Ship's voice is heard. Beside the wheel, the **chart house** keeps the instruments and records: the sextant, the chronometer, the chart table with the *Halcyon*'s chart, and the books. |
 
 ### Act 1: The Port
 
@@ -177,9 +177,8 @@ This is the main puzzle.
 
 - The ship reaches the charted position. **There is nothing there.** Just open sea. (Big
   moment: "the map is wrong".)
-- **Navigation:** a player takes a noon sight with the sextant on the Deck (latitude matches
-  the chart) and compares the moment of noon with the chronometer in the Cabin (longitude
-  doesn't). Two players can do it together: one calls "noon!", the other reads the clock. So the latitude can be trusted
+- **Navigation:** a player takes a noon sight with the sextant (latitude matches
+  the chart) and compares the moment of noon with the chronometer (longitude doesn't). So the latitude can be trusted
   and the longitude can't, and the fix is to sail along the same latitude. This is a real
   technique called *latitude sailing*.
 - **Nature:** a player on the Deck watches the sky at dusk: seabirds that fish at sea return to land in
@@ -252,12 +251,12 @@ journal lines are in `clues.yaml`. "(A4)" marks a condition that is designed but
 | C2 | Coral crust in the compass hinge | `examine compass`, Market | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
 | C3 | "From fishermen who came from the west" | `ask crane` about the compass (or the fishermen) | C2 in the journal (he lies until then) | Direction to search |
 | C4 | Empty sea at the charted position | Deck, on arriving at the charted position; confirmed there by the noon sight (latitude 14° S) and the chronometer (40° W), each in yellow | — | The chart is wrong, not the ship's navigation |
-| C5 | Latitude right, longitude wrong | `use sextant` on the Deck (the noon sight, a flag for the expedition), then `read chronometer` in the Cabin, at the island | the sight first; two players can share the steps. Noon (A4) | *Which* of the chart's numbers is wrong; *why* is the players' to work out (the Ship's *latitude*, *longitude*, *reckoning*) |
+| C5 | Latitude right, longitude wrong | `use sextant` (the noon sight, a flag for the expedition), then `read chronometer`, at the island | the sight first, by anyone. Noon (A4) | *Which* of the chart's numbers is wrong; *why* is the players' to work out (the Ship's *latitude*, *longitude*, *reckoning*) |
 | C6 | Birds flying west at dusk | `look sky` on the Deck, charted position | dusk (A4) | Land is to the west |
 | C7 | Ship's ribs and cannon on the reef | `look bones` at the Western Reef | low tide (A4) | Where she wrecked |
 | C8 | Oak timbers in a village hut | `look beams` in the Village | carrying the plant guide, or `examine beams` | Ship wood was reused, so the crew survived to build |
 | C9 | Goats and onions | `look goats` on the Beach, or `look shoots` at the Spring | the animal guide (goats) or the plant guide (onions): either one is enough | Europeans lived here for a while |
-| C10 | Coastline matches the chart's shape | `look coastline` on the Hilltop | carrying the *Halcyon*'s chart (from the Cabin) | This *is* the charted island, just misplaced |
+| C10 | Coastline matches the chart's shape | `look coastline` on the Hilltop | carrying the *Halcyon*'s chart (from the chart house) | This *is* the charted island, just misplaced |
 | C11 | Tui's song about the winged canoe | `ask tui` about the song | — | The crew built a boat and left |
 | C12 | Elder's account of the rescue | `ask ama` | showing respect (A4: not findable in A3) | Nobody died; the crew lived here |
 | C13 | Jonah Pike's story | `ask jonah` at the Boat Cove (about the halcyon, the wreck, the boat or the crew) | C7 + C12 (A4: free in A3) | Confirms everything; the boat sailed west |
@@ -295,7 +294,7 @@ and sailed away. The players have just solved a mystery shaped like a real one.
 - **Gates** (leaving port, the reef at low tide, reaching Jonah) are conditions checked by
   the destination room or the topic, so no exit can bypass them.
 - **Events** (tide, evening, characters moving) are Evennia Scripts.
-- **The ship** is two rooms (Deck, Cabin) that never move. The Deck's view and its `ashore`
+- **The ship** is one room, her Deck, that never moves. The Deck's view and its `ashore`
   exit change with the ship's position (Quay, positions at sea, island anchorage), which
   `sail <direction>` updates. The places the ship can reach are kept as data.
 - **Ending:** a `report` command, usable anywhere, that checks answers against the journal (DECISIONS.md, 29).

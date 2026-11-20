@@ -1,5 +1,5 @@
 # The places of Phantom Island: the Limbo prologue, the port and the island.
-# The ship's two rooms and where she can sail are in ship.yaml; the map pictures in maps.yaml.
+# The ship's Deck and where she can sail are in ship.yaml; the map pictures in maps.yaml.
 #
 # After editing, rebuild the world in the game as a builder: `batchcode build`.
 # Rebuilding updates the rooms in place, so players standing in them stay where they are.
@@ -116,7 +116,7 @@ beach:
       desc: >
         Three brown goats with clever yellow eyes. One is chewing a palm leaf and watches
         you while it chews. Nobody seems to look after them. How did goats get to an island
-        so far out? The naturalist's books in the ship's Cabin might know.
+        so far out? The naturalist's books in the ship's chart house might know.
       with:
         animal_guide:
           teaches: {island_animals: used}
@@ -198,7 +198,7 @@ forest:
       aliases: [tree, leaves, fruit]
       desc: >
         Tall smooth trunks, broad shiny leaves, and big green fruit hanging high up. The
-        plant guide in the ship's Cabin would name them.
+        plant guide in the ship's chart house would name them.
       with:
         plant_guide:
           teaches: {oak: used}
@@ -221,7 +221,7 @@ spring:
       desc: >
         Thin green shoots, planted in straight rows like a garden at home. You pull one up:
         a small white bulb, with a sharp smell that makes your eyes water. Somebody planted
-        these. The naturalist's books in the ship's Cabin might name the plant.
+        these. The naturalist's books in the ship's chart house might name the plant.
       with:
         plant_guide:
           teaches: {onions: used}
