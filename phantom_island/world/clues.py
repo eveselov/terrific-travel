@@ -16,6 +16,7 @@ from typeclasses.scripts import JournalEntry
 from world import notices, recorder
 from world.content import (
     CLUE_MARK,
+    REPORT_SETTLES,
     ChoiceSpec,
     ClueSpec,
     ConnectionSpec,
@@ -162,14 +163,30 @@ def news(owner: Any) -> list[str]:
 def open_connections() -> list[ConnectionSpec]:
     """
     The connection questions open now: those whose every group of needed clues has at
-    least one in the journal (DECISIONS.md, 22), in the content's order.
+    least one in the journal (DECISIONS.md, 22), and not yet `settled`, in the content's
+    order.
     """
     known: set[str] = found_clues()
     return [
         connection
         for connection in load_content().connections.values()
-        if groups_met(connection.needs, known)
+        if groups_met(connection.needs, known) and not settled(connection)
     ]
+
+
+def settled(connection: ConnectionSpec) -> bool:
+    """
+    Whether a connection question has been settled, so `think` no longer lists it: any of its
+    `settled` holds (a clue, a flag such as a council's step, or an answered report question).
+    """
+    expedition: Any = get_expedition()
+    for settler in connection.settled:
+        if settler.startswith(REPORT_SETTLES):
+            if settler.removeprefix(REPORT_SETTLES) in expedition.answers:
+                return True
+        elif expedition.met((settler,)):
+            return True
+    return False
 
 
 THINK_OPENING: str = (

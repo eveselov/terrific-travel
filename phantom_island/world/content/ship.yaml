@@ -50,6 +50,8 @@ sea_chart: sea_chart
 #   search     optional: true where nobody knows the true position yet. An order by
 #              position is then read as a direction: the same latitude further west is
 #              west (latitude sailing), a changed latitude north or south.
+#   suggest    optional: the Ship's topics to offer here (`ask ship`), instead of her usual
+#              `suggest` in characters.yaml: what is worth asking her at this place
 #   chart_pos  where it is on the sea chart, [x, y]
 #   map        optional: a closer map to show aboard instead of the sea chart, and
 #   map_pos    the ship's place on it
@@ -81,6 +83,7 @@ positions:
   port:
     name: Moored at the Quay
     coords: 14 S, 0 W
+    suggest: [course, chart, sextant, chronometer, advice]
     orders: >
       The crew stand ready at the ropes, waiting for your order. Where to? Give the place
       as a position, its latitude and its longitude, like this: |wsail to 10 north 25
@@ -135,6 +138,7 @@ positions:
     # of directions is given: which way to search is the players' own choice (25). The
     # decision has its council (councils.yaml, DECISIONS.md, 35).
     search: true
+    suggest: [council, birds, horizon, longitude, reckoning, advice]
     orders: >
       Open sea all round, where the chart put the island, and no island. Where now? Give the
       order as a position, |wsail to|n a latitude and a longitude (we are at 14 south, 40
@@ -236,6 +240,7 @@ positions:
   north_of_chart:
     name: A day north of the chart's position
     coords: 12 S, 40 W
+    suggest: [sextant, latitude, longitude, advice]
     orders: >
       Open sea, a day's sail north of the chart's position. You can |wsail south|n, back
       to it.
@@ -259,6 +264,7 @@ positions:
   south_of_chart:
     name: A day south of the chart's position
     coords: 16 S, 40 W
+    suggest: [sextant, latitude, longitude, advice]
     orders: >
       Open sea, a day's sail south of the chart's position. You can |wsail north|n, back
       to it.
@@ -273,6 +279,7 @@ positions:
   east_of_chart:
     name: A day east of the chart's position
     coords: 14 S, 38 W
+    suggest: [sextant, longitude, chronometer, advice]
     orders: >
       Open sea, a day's sail east of the chart's position. You can |wsail west|n, back to
       it, or |wsail home|n.
@@ -301,6 +308,7 @@ positions:
   anchorage:
     name: Anchored off the island
     coords: 14 S, 41 W
+    suggest: [tide, water, wind, witnesses, advice]
     chart_pos: [450, 290]
     map: island
     map_pos: [875, 545]

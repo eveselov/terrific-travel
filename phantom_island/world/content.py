@@ -59,6 +59,8 @@ ABOARD_WHERE: str = "aboard"  # a character's `where` for the Ship: the Deck and
 # Asking a character about themselves (`ask barnaby about yourself`): their optional `self`
 # topic, or this short default. Its words come from `topic_aliases` in characters.yaml.
 SELF_TOPIC: str = "self"
+# A connection `settled` by `report:wreck` leaves `think` once that report question is answered.
+REPORT_SETTLES: str = "report:"
 DEFAULT_SELF: str = "{name} would rather talk about other things."
 # Words that name a topic only as the whole question, never as one word of a longer one:
 # `ask ship about you` is about herself, `ask ship about how you sail` isn't.
@@ -216,6 +218,8 @@ class PositionSpec:
     routes: tuple[RouteSpec, ...]
     # Orders by position are read as a direction here: a searching position (DECISIONS.md, 34).
     search: bool = False
+    # What the Ship suggests asking about here, instead of her usual `suggest` (her topics).
+    suggest: tuple[str, ...] = ()
 
     def route(self, direction: str) -> RouteSpec | None:
         """The route in this direction, or None if the ship can't sail that way from here."""
@@ -307,6 +311,9 @@ class ConnectionSpec:
     needs: tuple[tuple[str, ...], ...]
     question: str
     ideas: tuple[str, ...] = ()  # notebook ideas that help to answer it (`think` lists them)
+    # Once any of these holds, the question is settled and leaves `think`: a clue id, a flag
+    # (a council's step), or `report:<question id>` (that report question is answered).
+    settled: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -817,6 +824,7 @@ def _position(position_id: str, value: Any) -> PositionSpec:
             for direction, item in routes_data.items()
         ),
         search=_flag(data, "search", where),
+        suggest=_words(data.get("suggest"), "suggest", where),
     )
 
 
@@ -959,6 +967,7 @@ def _connections(data: dict[str, Any], clues: dict[str, ClueSpec]) -> dict[str, 
             needs=clue_groups(needs_data, "needs", where, clues),
             question=_text(item, "question", where),
             ideas=_words(item.get("ideas"), "ideas", where),
+            settled=_words(item.get("settled"), "settled", where),
         )
     return connections
 
@@ -1623,11 +1632,40 @@ def flags_set(content: Content) -> set[str]:
 
 
 def _check_connection_ideas(content: Content) -> None:
-    """A connection's ideas are known, and each says where to `learn` it (with a notebook)."""
+    """
+    A connection's ideas are known, and each says where to `learn` it (with a notebook); what
+    settles it is a clue, a flag something sets, or a question of the report.
+    """
+    flags: set[str] = flags_set(content)
+    questions: set[str] = (
+        {question.id for question in content.report.questions} if content.report else set()
+    )
+    for connection in content.connections.values():
+        where: str = f"{CLUES_FILE}, connection {connection.id}"
+        for settler in connection.settled:
+            question_id: str = settler.removeprefix(REPORT_SETTLES)
+            known: bool = (
+                question_id in questions
+                if settler.startswith(REPORT_SETTLES)
+                else settler in content.clues or settler in flags
+            )
+            if not known:
+                raise ContentError(
+                    f"{where}: `settled` by {settler!r}, which is no clue, no flag anything "
+                    f"sets, and no `{REPORT_SETTLES}<question id>` of the report."
+                )
+    aboard: list[CharacterSpec] = [c for c in content.characters.values() if c.aboard]
+    for position in content.positions.values():
+        for topic_id in position.suggest:
+            if not any(topic_id in character.topics for character in aboard):
+                raise ContentError(
+                    f"{SHIP_FILE}, position {position.id}: `suggest` names {topic_id!r}, which "
+                    "isn't one of the Ship's topics."
+                )
     if not content.ideas:  # the notebook is optional: without one, `think` lists no ideas
         return
     for connection in content.connections.values():
-        where: str = f"{CLUES_FILE}, connection {connection.id}"
+        where = f"{CLUES_FILE}, connection {connection.id}"
         for idea_id in connection.ideas:
             idea: IdeaSpec | None = content.ideas.get(idea_id)
             if idea is None:

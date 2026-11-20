@@ -54,7 +54,7 @@ clues:
     title: Coral in the hinge
     journal: >
       There is coral grown into the compass hinge. Coral only grows under the sea: the
-      compass lay in seawater for years, not on a beach.
+      compass lay in seawater for years, not on a beach as Crane says.
   C3:
     title: Fishermen from the west
     journal: >
@@ -120,11 +120,15 @@ clues:
 #   needs     clue ids; an entry can be a list, meaning any one of those clues
 #   ideas     optional: notebook ideas (ideas.yaml) that help to answer it. `think` shows
 #             those the player has, and where to learn the others (their `learn` text)
+#   settled   optional: once any of these holds, the question is settled and leaves `think`:
+#             a clue id, a flag (a council's step, `line_settled`), or `report:<question id>`
+#             (that report question answered, `report:crew`)
 #   question  the question
 connections:
   compass_sea:
     needs: [C2, C3]
     ideas: [coral]
+    settled: [report:wreck]
     question: >
       The compass lay in the sea for years, and fishermen from the west had it. Coral grew
       in its hinge: where in the sea does coral grow? And where could a compass lie there for
@@ -132,12 +136,14 @@ connections:
   birds_range:
     needs: [C4, C6]
     ideas: [seabirds, horizon]
+    settled: [far_settled]
     question: >
       There is no land at the chart's position, yet the seabirds there fly home to land at
       dusk. How far from land do they fish? The Ship knows: |wask ship about birds|n.
   which_number:
     needs: [C4, C5]
     ideas: [longitude, sea_clocks, dead_reckoning]
+    settled: [line_settled, report:why]
     question: >
       At the chart's position the sextant and the chronometer agreed with the chart; at the
       island only the sextant does. Why could the Halcyon's master get one number right and
@@ -145,6 +151,7 @@ connections:
   two_witnesses:
     needs: [C7, [C12, C13]]
     ideas: [witnesses]
+    settled: [report:crew]
     question: >
       Old Barnaby is sure the Halcyon sank with all hands. You have seen her wreck, and
       heard what happened from the island. Which witness was there? (|wask ship about
@@ -152,6 +159,7 @@ connections:
   oak:
     needs: [C7, C8]
     ideas: [oak]
+    settled: [report:crew]
     question: >
       The ribs on the reef and the beams in the village are both oak, from the Halcyon.
       What else could her timber have been used for? Look for a place where something was
@@ -159,12 +167,14 @@ connections:
   staying:
     needs: [C8, C9]
     ideas: [onions, island_animals]
+    settled: [report:crew]
     question: >
       Ship's timber in a hut, goats and onions in the gardens: it takes time to build and
       to farm. How long did the Halcyon's people stay, and where did they go afterwards?
   white_wing:
     needs: [C11, C8]
     ideas: [songs, oak]
+    settled: [report:crew]
     question: >
       Tui's song tells of a canoe with a white wing that flew away to where the sun goes to
       sleep. What kind of boat has a white wing, which way is that, and what could it be

@@ -85,6 +85,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - The Society wants proof: an answer is only accepted once the journal holds the clues that show it. If an answer doesn't fit, or can't be proved yet, you're told why, and where you might look. That's not failing: go and look, and come back.
 - One player's answer counts for the whole expedition, and the journal shows it under the question.
 - When clues in the journal fit together, a question about them comes up in `think`. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
+- A question leaves `think` once it's settled: by a council, or by the report question it leads to.
 - `think compass` (or `think 2`, a journal number) shows only the questions about that clue.
 - Under a question you see the ideas from your notebook that help with it, and where to learn the ones you don't have yet.
 - Once all three questions are answered, the whole story is told, page by page (`report more`), with the real history behind it.

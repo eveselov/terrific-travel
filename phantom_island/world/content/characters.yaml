@@ -126,10 +126,11 @@ characters:
           "The Society wants the truth about the |wHalcyon|n, a ship that sailed from this
           harbour fifteen years ago and never came back: what happened to her, why nobody
           ever found her, and what became of her |wcrew|n. The three questions stand
-          at the top of the expedition's |wjournal|n. When you can prove the answers, send
-          me your |wreport|n. Start with the |wcompass|n on Silas Crane's stall in the
-          market, just east of here. Then take your |wship|n to the |wisland|n
-          on the Halcyon's |wchart|n."
+          at the top of the expedition's |wjournal|n; when you can prove the answers, send
+          me your |wreport|n. How you go about it is yours to decide. Talk to everyone, ask
+          about everything, and look closely at what you find. The latest news in port is a
+          |wcompass|n on Silas Crane's stall, just east of here, and your |wship|n carries the
+          Halcyon's |wchart|n."
       halcyon:
         stance: truth
         teaches: {oak: heard}

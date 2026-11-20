@@ -106,7 +106,7 @@ New topics or replies need only a `reload`; a new character, or a changed `where
    proves for the `report`. If it proves an answer, add it to that answer's `proof` in
    `report.yaml`.
 
-If the new clue fits together with another one, consider a connection question in `clues.yaml` (`connections`): the clues it `needs`, and a `question` that leads one step further, towards a question of the report, and says where the background lives. It must never state the conclusion. List the notebook `ideas` that help with it: `think` shows players which they have, and the `learn` text of the others (ideas.yaml), so every idea a connection lists needs a `learn`. Give ideas general titles ("How winds are named"): a title that sounds like a find gets mixed up with the clues.
+If the new clue fits together with another one, consider a connection question in `clues.yaml` (`connections`): the clues it `needs`, and a `question` that leads one step further, towards a question of the report, and says where the background lives. It must never state the conclusion. Say what `settled` it (a council step's flag, or `report:<question id>`), so it leaves `think` once it has done its job. List the notebook `ideas` that help with it: `think` shows players which they have, and the `learn` text of the others (ideas.yaml), so every idea a connection lists needs a `learn`. Give ideas general titles ("How winds are named"): a title that sounds like a find gets mixed up with the clues.
 
 The same clue can be revealed in several places, in different words. Finding it again adds
 the new source to the journal entry instead of a new entry, so players can compare sources.

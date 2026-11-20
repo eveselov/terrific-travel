@@ -165,6 +165,18 @@ class TestContent(TestCase):
         )
         self.assertIn("ship, topic self: players can't find it", str(error))
 
+    def test_settled_by_something_unknown_is_an_error(self) -> None:
+        error: ContentError = self._broken_copy(
+            CLUES_FILE, "settled: [far_settled]", "settled: [report:nowhere]"
+        )
+        self.assertIn("`settled` by 'report:nowhere'", str(error))
+
+    def test_the_ship_suggests_only_her_own_topics(self) -> None:
+        error: ContentError = self._broken_copy(
+            SHIP_FILE, "suggest: [tide, water,", "suggest: [goats, water,"
+        )
+        self.assertIn("`suggest` names 'goats'", str(error))
+
     def test_a_connection_idea_must_be_known_and_say_where_to_learn_it(self) -> None:
         unknown: ContentError = self._broken_copy(
             CLUES_FILE, "    ideas: [coral]", "    ideas: [nowhere]"
@@ -1774,6 +1786,17 @@ class TestConnections(DiscoveryTest):
         self.assertIn("Nothing to think about yet", self.do(self.char1, "think"))
         self.assertNotIn("Questions to think about", self.do(self.char1, "journal"))
 
+    def test_a_settled_question_leaves_think(self) -> None:
+        for clue_id in ("C4", "C6", "C7", "C8"):
+            get_expedition().add_clue(clue_id, "someone", "somewhere")
+        self.assertIn("How far from land do they fish?", self.do(self.char1, "think"))
+        get_expedition().set_flag("far_settled")  # the council's third step
+        settled: str = self.do(self.char1, "think")
+        self.assertNotIn("How far from land do they fish?", settled)
+        self.assertIn("What else could her timber", settled)
+        get_expedition().answer("crew", "someone")  # the report question it leads to
+        self.assertIn("Nothing to think about", self.do(self.char1, "think"))
+
     def test_a_question_comes_with_the_second_clue(self) -> None:
         self.at(self.char1, "market")
         self.at(self.char2, "market")
@@ -2048,6 +2071,14 @@ class TestCouncil(DiscoveryTest):
         self.assertIn("|wsail to 14 south 41 west|n", decided)
         self.assertIn("|wreport|n", decided)
         self.assertIn("The order is yours", self.do(self.char1, "council"))
+
+    def test_the_ship_suggests_what_fits_where_she_is(self) -> None:
+        here: str = self.do(self.char1, "ask ship")
+        self.assertIn("|wcouncil|n, |wbirds|n, |whorizon|n", here)
+        self.ship_at("anchorage")
+        self.assertIn("about: |wtide|n, |wwater|n", self.do(self.char1, "ask ship"))
+        self.ship_at("port")
+        self.assertIn("about: |wcourse|n, |wchart|n", self.do(self.char1, "ask ship"))
 
     def test_hints_follow_the_council(self) -> None:
         get_expedition().set_flag("sight_charted")

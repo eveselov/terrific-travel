@@ -106,7 +106,11 @@ every ending, and a player who wanders is led back towards the task (tested with
      - Barnaby says *sextant*, like the Ship: one instrument, not two (his *quadrant* topic became *sextant*, with `quadrant` an alias).
      - Barnaby's *weather* lore is gone (decoration that led nowhere, 23): *weather*, *sky* and *wind* now reach his *storm*.
      - Elder Ama no longer promises days that the game doesn't have ("Not every story is for the first day"): "A story is for those who have shown they listen."
-     - The rest of that playtest's notes wait for a discussion: Fairweather's opening, a signpost from the coral back to Crane, the Ship's suggestions by position, `think` dropping settled questions, the council and the report, one ship room instead of two, and respect and time (items 1–3).
+     - Mrs. Fairweather's *mission* invites exploring ("How you go about it is yours to decide. Talk to everyone, ask about everything...") and gives the compass as the latest news, not an order (35: exploring has no single first step).
+     - The coral's journal line (C2) says "not on a beach as Crane says": a signpost back to him, whose truth the coral unlocks.
+     - The Ship offers topics that fit where she is: a position in ship.yaml can have its own `suggest` (at the island *tide*, *water*, *wind*, *witnesses*; at the chart's position the *council* first). Her knowledge stays the same everywhere: she is a wise old ship, not a guide who changes her answers.
+     - `think` drops settled questions: a connection's optional `settled` (a clue, a flag such as a council's step, or `report:<question>` once answered) takes it out of `think`, the journal's count and the hints' news. On the island, the sea's questions are gone once the council or the report has settled them.
+     - Still to discuss from that playtest: the council and the report, one ship room instead of two, and respect and time (items 1–3).
 1. **Gates**, each with at least two ways through and a hint situation in hints.yaml (6b):
    - **Leaving port.** GAME_STORY says the ship sails once Crane admits the fishermen came from the west (C3). A second way through is not designed yet.
    - **Meeting Jonah.** GAME_STORY says after the wreck and Ama's account (C7 + C12). A second way, and where Jonah is when he is not at the cove ("Jonah's hours"), are not designed. Until then C13 is given freely.

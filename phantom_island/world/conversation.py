@@ -31,7 +31,7 @@ from world.content import (
     normalise_words,
 )
 from world.discovery import find_thing_at_hand, location_details
-from world.expedition import get_expedition
+from world.expedition import current_position, get_expedition
 from world.notebook import learn
 
 ABOUT: str = "about"
@@ -137,14 +137,27 @@ def answer(topic: TopicSpec) -> Reveal:
     return Reveal(text=topic.reply, clue=topic.clue, teaches=topic.teaches)
 
 
+def suggested(spec: CharacterSpec) -> tuple[str, ...]:
+    """
+    The topics to offer for this character: the Ship's depend on where she is, when her
+    position has its own `suggest` (ship.yaml), and everyone else's are their own.
+    """
+    if spec.aboard:
+        here: tuple[str, ...] = current_position().suggest
+        if here:
+            return here
+    return spec.suggest
+
+
 def suggestions(spec: CharacterSpec) -> str:
     """A line offering a few topics to ask this character about."""
-    if not spec.suggest:
+    offered: tuple[str, ...] = suggested(spec)
+    if not offered:
         return ""
-    topics: str = ", ".join(f"|w{topic_id}|n" for topic_id in spec.suggest)
+    topics: str = ", ".join(f"|w{topic_id}|n" for topic_id in offered)
     return (
         f"You could ask {spec.name} about: {topics}. "
-        f"(For example: |wask {spec.id} about {spec.suggest[0]}|n)"
+        f"(For example: |wask {spec.id} about {offered[0]}|n)"
     )
 
 
