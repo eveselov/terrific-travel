@@ -209,10 +209,10 @@ characters:
       Barnaby squints at you. "You'll be one of the Society's lot, then, off after the
       Halcyon at last. Your ship's waiting at the end of the quay; step |waboard|n when
       you're ready. But sit down first, if you've a mind to. I've time, and stories."
-    suggest: [expedition, halcyon, storm, weather, sailing]
+    suggest: [expedition, halcyon, storm, sailing]
     fallback: >
-      Barnaby scratches his beard. "Can't say I know aught about that. Ask me about the
-      |wweather|n, though."
+      Barnaby scratches his beard. "Can't say I know aught about that. Ask me about
+      |wthe great storm|n, though."
     topics:
       expedition:
         aliases: [ship, society, voyage]
@@ -230,6 +230,8 @@ characters:
           year myself: no ship could have lived through it. Whatever that |wcompass|n of
           Crane's is, it came off the bottom."
       storm:
+        # Barnaby's weather talk is the storm: no weather lore that leads nowhere (23).
+        aliases: [weather, sky, wind]
         stance: truth
         teaches: {winds: heard}
         reply: >
@@ -242,13 +244,6 @@ characters:
         reply: >
           "Never seen it myself. It's far out west, past where any sensible fisherman goes.
           Some of the old hands call it a phantom: here one voyage, gone the next."
-      weather:
-        aliases: [sky, wind]
-        stance: truth
-        reply: >
-          "Red sky at night, sailor's delight. Red sky in the morning, sailor's warning.
-          And mackerel sky and mares' tails make tall ships carry low sails. Learn those
-          and you'll live long at sea."
       sailing:
         aliases: [navigation, dead reckoning]
         stance: truth
@@ -256,16 +251,17 @@ characters:
         reply: >
           "In my day we found our way with a compass, a log line and a good guess. Dead
           reckoning, it's called. North and south you could trust, from the noon sun and a
-          |wquadrant|n. East and west was guesswork. Your ship has one of those new sea
+          |wsextant|n. East and west was guesswork. Your ship has one of those new sea
           clocks below, I hear. Never trusted 'em myself."
-      quadrant:
-        # The old way; the Ship explains the new one (her sextant and chronometer).
-        aliases: [latitude, longitude, sea clock, sea clocks, noon sun]
+      sextant:
+        # The same word as the Ship's, so players meet one instrument, not two (playtest
+        # 2026-11-19). Barnaby knows the old way; the Ship explains the new sea clock.
+        aliases: [quadrant, latitude, longitude, sea clock, sea clocks, noon sun]
         stance: truth
         reply: >
-          "Latitude? Noon sun, a quadrant and a steady hand: any old salt can do that.
-          Longitude's another matter. In my day it was guesswork. Ask that ship of yours:
-          she's got the clever clock."
+          "Latitude? Noon sun, a sextant and a steady hand: any old salt can do that.
+          Longitude's another matter. In my day it was guesswork. Ask that ship of yours
+          about her chronometer: that's the clever clock."
       compass:
         stance: mistaken
         reply: >
@@ -399,8 +395,8 @@ characters:
         aliases: [ship, strangers, wreck]
         stance: hiding
         reply: >
-          "Many things come from the sea. Some are fish, some are stories. Not every story
-          is for the first day."
+          "Many things come from the sea. Some are fish, some are stories. A story is for
+          those who have shown they listen."
         truth:
           needs: [respect]
           clue: C12

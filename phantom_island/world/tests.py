@@ -229,9 +229,11 @@ class TestContent(TestCase):
 
     def test_one_word_for_two_topics_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
-            CHARACTERS_FILE, "aliases: [sky, wind]", "aliases: [sky, wind, storm]"
+            CHARACTERS_FILE,
+            "aliases: [weather, sky, wind]",
+            "aliases: [weather, sky, wind, sailing]",
         )
-        self.assertIn("storm", str(error))
+        self.assertIn("sailing", str(error))
 
     def test_the_thirteen_clues_and_the_things(self) -> None:
         content: Content = read_content()
@@ -917,15 +919,15 @@ class TestAsk(WorldTest):
 
     def test_ama_still_waits_for_respect(self) -> None:
         self.at("village")
-        self.assertIn("Not every story", self.ask("ama about halcyon"))
+        self.assertIn("shown they listen", self.ask("ama about halcyon"))
 
     def test_others_in_the_room_hear_the_conversation(self) -> None:
         self.at("quay")
         with patch.object(self.char2, "msg") as mock_msg:
-            ask(self.char1, "barnaby about weather")
+            ask(self.char1, "barnaby about island")
         heard: str = texts(mock_msg)
-        self.assertIn(f"{self.char1.key} asks Old Barnaby about weather.", heard)
-        self.assertIn("Red sky at night", heard)
+        self.assertIn(f"{self.char1.key} asks Old Barnaby about island.", heard)
+        self.assertIn("call it a phantom", heard)
 
     def test_another_players_turn_is_tagged_for_the_web_client(self) -> None:
         self.at("quay")
@@ -934,7 +936,7 @@ class TestAsk(WorldTest):
         with patch.object(DefaultCharacter, "msg") as mock_msg:
             for turn in (1, 2):
                 self.char1.ndb.turn = turn
-                ask(self.char1, "barnaby about weather")
+                ask(self.char1, "barnaby about island")  # teaches nothing: no notebook line
         classes: list[str | None] = []
         for call in mock_msg.call_args_list:
             text: Any = call.kwargs["text"]
@@ -1199,7 +1201,7 @@ class TestLookingAndTheJournal(DiscoveryTest):
     def test_barnaby_answers_what_he_taught_and_points_to_the_ship(self) -> None:
         self.at(self.char1, "quay")
         told: str = self.do(self.char1, "ask barnaby about latitude")
-        self.assertIn("quadrant", told)
+        self.assertIn("a sextant and a steady hand", told)
         self.assertIn("Ask that ship of yours", told)
         self.assertNotIn("know aught", told)
 

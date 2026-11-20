@@ -86,7 +86,7 @@ plausible as it stands.
 | From a masthead a lookout sees about 20 km of open sea, a hilly island 50–70 km away | The Earth's curve: horizon ≈ 3.6 km × √(height in m); a masthead of about 30 m sees a hill of 100–200 m from 55–70 km | the Ship's *horizon*, `ideas.yaml` (*The horizon*) |
 | The Society trusted the chart; Barnaby thinks she sank | Nobody could check the longitude | Fairweather's *chart*, Barnaby's *halcyon* |
 | The last letter and a copy of the chart reached home; nothing came after | A whaler that watered at the island carried them, a week before the storm | Fairweather's *letter* ("We sail again soon"), Jonah's *letter* |
-| Barnaby found latitude with a quadrant; your ship carries a sextant and a chronometer | Hadley's "quadrant" (really an octant, 1731) was the old sailor's instrument; the sextant (1757) measures wider angles and was newer and dearer. Either gives latitude from the noon sun; only a sea clock gives longitude, so Barnaby's generation guessed it | Barnaby's *sailing* and *quadrant* (the old way), the Ship's *sextant*, *chronometer*, *longitude* (the new way) |
+| Barnaby found latitude with a sextant, like yours; your ship also carries a chronometer | The sextant (1757) gives latitude from the noon sun; only a sea clock gives longitude, so Barnaby's generation guessed it. Older sailors used Hadley's "quadrant" (really an octant, 1731), but the game says "sextant" for both, so players meet one instrument, not two (playtest 2026-11-19) | Barnaby's *sailing* and *sextant* (the old way), the Ship's *sextant*, *chronometer*, *longitude* (the new way) |
 
 Holds.
 
@@ -233,7 +233,7 @@ what gets revealed.
 | Character | Where | Role in the mystery | Knows / believes |
 |---|---|---|---|
 | **Mrs. Fairweather**, patron of the Society | Office | Gives the mission | The *Halcyon*'s plan, the chart, her last letter. Honest but knows little. |
-| **Old Barnaby**, retired sailor | Quay | **Mistaken** | Sure the *Halcyon* sank in "the great storm of '75". Right about the storm, wrong about the sinking. Good on weather and sailing lore. |
+| **Old Barnaby**, retired sailor | Quay | **Mistaken** | Sure the *Halcyon* sank in "the great storm of '75". Right about the storm, wrong about the sinking. Good on sailing lore. |
 | **Silas Crane**, trader | Market | **Hiding something** | Claims he "found the compass on the beach". The truth: he traded for it with fishermen from the west and fears being called a looter. He admits it if shown a journal clue that contradicts him (e.g. coral crust on the compass, spotted on a close look). |
 | **Elder Ama** | Village | **Holds the key, cautious** | Remembers the rescue. Talks openly only after the players show respect (asking before going to the reef, or helping with something). |
 | **Tui**, a village child | Village / Reef | **Knows the truth, not its meaning** | Plays on "the big bones in the reef", collects brass buttons, knows a song about "people from the sea who made a canoe with a white wing". Kids playing will probably love Tui most. |

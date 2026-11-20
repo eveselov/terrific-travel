@@ -99,6 +99,14 @@ every ending, and a player who wanders is led back towards the task (tested with
    - **Who you are** (built 2026-11-19): Mrs. Fairweather says first that the Society hired you to lead, as captain (24): the ship and crew are under your orders, the crew sail, you decide. Asking a character about themselves (their name, `yourself`, `you`) goes to an optional `self` topic, with a short default. Her greeting says it; the title page says "you lead it, as captain of its ship". Every character has a `self` text; "you" counts only as the whole question, so `how do you sail` still reaches *course*.
    - **Small texts** (built 2026-11-19): the *Halcyon* is introduced as a ship at its first mention; the Ship answers `sail`/`sails`/`sailing` (as *course*); her *help* topic becomes *advice* (`help`, `hint`, `stuck` stay aliases); her *expedition* ends "When you can answer one, tell the Society: type `report`."
    - **Builders** (built 2026-11-19): `record` accepts `scenarios.<name>` as well as `<name>`, like `batchcommand`. (2026-11-20) `record checkpoint [<next>]` writes the file and goes on recording, renamed; `record start <name> from <earlier>` plays an earlier scenario unrecorded and keeps its text, `Why:` lines included.
+   - **Small fixes from the playtest of 2026-11-19** (the whole game; built 2026-11-20):
+     - `read chart` ends with the order itself: `sail to 14 south 40 west`.
+     - The Cabin names the *plant guide* and *animal guide* in white.
+     - At the island the Ship says to take the guides ashore: with one in hand, you see more.
+     - Barnaby says *sextant*, like the Ship: one instrument, not two (his *quadrant* topic became *sextant*, with `quadrant` an alias).
+     - Barnaby's *weather* lore is gone (decoration that led nowhere, 23): *weather*, *sky* and *wind* now reach his *storm*.
+     - Elder Ama no longer promises days that the game doesn't have ("Not every story is for the first day"): "A story is for those who have shown they listen."
+     - The rest of that playtest's notes wait for a discussion: Fairweather's opening, a signpost from the coral back to Crane, the Ship's suggestions by position, `think` dropping settled questions, the council and the report, one ship room instead of two, and respect and time (items 1–3).
 1. **Gates**, each with at least two ways through and a hint situation in hints.yaml (6b):
    - **Leaving port.** GAME_STORY says the ship sails once Crane admits the fishermen came from the west (C3). A second way through is not designed yet.
    - **Meeting Jonah.** GAME_STORY says after the wreck and Ama's account (C7 + C12). A second way, and where Jonah is when he is not at the cove ("Jonah's hours"), are not designed. Until then C13 is given freely.

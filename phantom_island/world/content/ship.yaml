@@ -22,7 +22,8 @@ rooms:
     kind: cabin       # instruments and records
     desc: >
       A low wooden cabin under the deck. A chart table fills the middle, with a brass
-      clock fixed beside it. Books are wedged onto a shelf so they can't slide off when
+      clock fixed beside it. Two books, a |wplant guide|n and an |wanimal guide|n, are
+      wedged onto a shelf so they can't slide off when
       the ship rolls. The timbers creak here too, as if she were listening: |wask ship|n
       about the instruments.
     exits:
@@ -306,7 +307,9 @@ positions:
     ashore: beach
     deck: >
       The ship lies at anchor in a calm lagoon. A green island rises in front of you, with
-      a white beach and palm trees along the shore.
+      a white beach and palm trees along the shore. The Ship's timbers creak: "Take the
+      guides from the Cabin ashore, Captain. With a guide in your hands, you'll see more in
+      what you look at."
     cabin: >
       Through the small window you can hear waves on a beach, and birds you don't know.
     shore: >
