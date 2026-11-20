@@ -135,9 +135,9 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
 - **Late joiners**: while the ship is away, `begin` puts a new player on the Deck with a
   line about being seasick below. The journal is how they catch up.
 
-In A3 nothing waits for time yet: the Western Reef is always open, the birds are always
-there at the charted position, and noon is whenever you use the sextant. The tide, dusk and
-noon come in A4.
+Nothing waits for time (DECISIONS.md, 38): the Western Reef is always open ("you wait until
+the tide goes out" is part of its text), the birds are there at the charted position in the
+evening, and noon is whenever you use the sextant ("you wait for noon").
 
 To try it (spoilers):
 
@@ -302,5 +302,5 @@ optionally with the ship already at sea or at the island.
 
 Stage A4 (the mystery and the ending), under way: the chart's error is now 1 degree, and the
 `report` with its epilogue, the connection questions (`think`) and the hints (`hint`) are
-built. Still to come: the gates (leaving port, meeting Jonah), the tide, dusk and noon, and
-Ama's respect; C12 can't be found yet, and C13 is still given freely.
+built. Still to come: the gates (leaving port, meeting Jonah) and Ama's respect; time is told,
+not kept (DECISIONS.md, 38); C12 can't be found yet, and C13 is still given freely.

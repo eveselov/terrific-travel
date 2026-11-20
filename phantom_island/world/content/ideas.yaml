@@ -147,7 +147,7 @@ ideas:
     used: >
       You have watched the seabirds leave at dusk yourself.
 
-  # H Ama's reef · U the Ship's tide
+  # H Ama's reef · U the Ship's tide · D the bones on the Western Reef
   tides:
     area: sea_and_sky
     title: Tides
@@ -156,6 +156,8 @@ ideas:
     understood: >
       The sea rises and falls about twice a day, a little later each day. At low tide a
       reef can stand clear of the water; at high tide it is hidden, and dangerous.
+    used: >
+      You have waited for low tide yourself, and walked out over a reef.
 
   # H Barnaby's storm · U the Ship's wind
   winds:

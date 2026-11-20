@@ -175,11 +175,13 @@ reef:
     southeast: cove
   details:
     bones:
-      teaches: {coral: used}
+      # Time is told, not kept (DECISIONS.md, 38): the wait for low tide is part of the look.
+      teaches: {coral: used, tides: used}
       aliases: [big bones, shapes, ribs, wreck, cannon]
       clue: C7
       desc: >
-        You wade out carefully over the coral. The bones are curved timbers, black with age
+        You wait on the shore until the tide goes out and the reef stands clear of the
+        water. Then you wade out carefully over the coral. The bones are curved timbers, black with age
         and furred with weed, standing up in two rows. Between them lies a long lump of
         coral with a round mouth at one end: [[a ship's ribs, and a cannon, grown over with
         coral where she struck the reef]].

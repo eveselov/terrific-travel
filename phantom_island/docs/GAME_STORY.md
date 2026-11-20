@@ -108,7 +108,7 @@ five days, so they don't reliably fly home at dusk.
 | The great storm of '75: three days of wind out of the west | Winds are named for where they come from: it blew towards the east | Barnaby's *storm*, the Ship's *wind*, `ideas.yaml` (*Names of winds*) |
 | The *Halcyon* anchored off the island's west side | She had come from the east and charted the island | Jonah's *halcyon* |
 | The anchors dragged and she struck the Western Reef at night (C7, C13) | A west wind drives a ship anchored off the west side onto that shore | Jonah's *wreck*, the *bones* on the Western Reef |
-| The reef can be walked only at low tide | The ribs stand in the shallows | Ama's *reef*, the Ship's *tide* (A4: the tide gate) |
+| The reef can be walked only at low tide | The ribs stand in the shallows | Ama's *reef*, the Ship's *tide*, the reef's own text ("you wait until the tide goes out": time is told, not kept, DECISIONS.md, 38) |
 
 Holds.
 
@@ -202,7 +202,7 @@ Explore, talk, collect clues, then make the report.
 |---|---|
 | Lagoon Beach | Landing place. Goats (the animal guide: "goats aren't native to islands like this"). |
 | Village | The elder, the child, a hut built with a dark, heavy timber. |
-| Western Reef | **Only reachable at low tide.** Ship's ribs in the coral, a corroded cannon. |
+| Western Reef | **Walked at low tide** (told in the text, never waited for: DECISIONS.md, 38). Ship's ribs in the coral, a corroded cannon. |
 | Forest Path | Native trees (the plant guide names them, and they are not oak). |
 | Spring | Fresh water (refill casks). A small onion patch nearby. |
 | Hilltop | View of the whole island. With the chart, the coastline can be compared to it. |
@@ -251,9 +251,9 @@ journal lines are in `clues.yaml`. "(A4)" marks a condition that is designed but
 | C2 | Coral crust in the compass hinge | `examine compass`, Market | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
 | C3 | "From fishermen who came from the west" | `ask crane` about the compass (or the fishermen) | C2 in the journal (he lies until then) | Direction to search |
 | C4 | Empty sea at the charted position | Deck, on arriving at the charted position; confirmed there by the noon sight (latitude 14° S) and the chronometer (40° W), each in yellow | — | The chart is wrong, not the ship's navigation |
-| C5 | Latitude right, longitude wrong | `use sextant` (the noon sight, a flag for the expedition), then `read chronometer`, at the island | the sight first, by anyone. Noon (A4) | *Which* of the chart's numbers is wrong; *why* is the players' to work out (the Ship's *latitude*, *longitude*, *reckoning*) |
-| C6 | Birds flying west at dusk | `look sky` on the Deck, charted position | dusk (A4) | Land is to the west |
-| C7 | Ship's ribs and cannon on the reef | `look bones` at the Western Reef | low tide (A4) | Where she wrecked |
+| C5 | Latitude right, longitude wrong | `use sextant` (the noon sight, a flag for the expedition), then `read chronometer`, at the island | the sight first, by anyone. Noon (told: "you wait for noon") | *Which* of the chart's numbers is wrong; *why* is the players' to work out (the Ship's *latitude*, *longitude*, *reckoning*) |
+| C6 | Birds flying west at dusk | `look sky` on the Deck, charted position | dusk (the ship arrives in the evening) | Land is to the west |
+| C7 | Ship's ribs and cannon on the reef | `look bones` at the Western Reef | low tide (told: "you wait until the tide goes out") | Where she wrecked |
 | C8 | Oak timbers in a village hut | `look beams` in the Village | carrying the plant guide, or `examine beams` | Ship wood was reused, so the crew survived to build |
 | C9 | Goats and onions | `look goats` on the Beach, or `look shoots` at the Spring | the animal guide (goats) or the plant guide (onions): either one is enough | Europeans lived here for a while |
 | C10 | Coastline matches the chart's shape | `look coastline` on the Hilltop | carrying the *Halcyon*'s chart (from the chart house) | This *is* the charted island, just misplaced |
@@ -266,9 +266,13 @@ C11 or C8. Several paths reach each answer, so players can find things in differ
 
 ## World events (things that happen without the players)
 
-- **Tide:** the Western Reef opens and closes on a timer, so players may have to wait or come back.
-- **Day and evening:** the birds appear only in the evening, and the fisherman goes out in the morning.
-- **Characters move:** Tui wanders between the village and the reef; Jonah Pike is at the cove only part of the day.
+None, by decision (DECISIONS.md, 38): time is told, not kept. The tide, dusk and noon are
+part of what players read ("You wait for noon...", "You wait until the tide goes out..."),
+so nothing is ever closed because of the hour, and nobody has to wait. The first plan was a
+clock: the Western Reef opening and closing with the tide, the birds only in the evening,
+Tui moving between the village and the reef, Jonah at the cove only part of the day. It was
+dropped because the players may play online at different times, and waiting is the least
+fun part of a short session. A later adventure could make time its theme.
 
 ## What it teaches
 
@@ -291,9 +295,8 @@ and sailed away. The players have just solved a mystery shaped like a real one.
 - **Expertise** lives in objects, not in roles: instruments and books aboard the ship. Using one (`use sextant`, `read bird guide`) reveals extra description lines or a clue, for whoever uses it.
 - **Conversation:** `ask <character> about <topic>`. Each character has a topic dictionary;
   each entry has a reply, the clue it reveals, and its conditions.
-- **Gates** (leaving port, the reef at low tide, reaching Jonah) are conditions checked by
+- **Gates** (leaving port, reaching Jonah) are conditions checked by
   the destination room or the topic, so no exit can bypass them.
-- **Events** (tide, evening, characters moving) are Evennia Scripts.
 - **The ship** is one room, her Deck, that never moves. The Deck's view and its `ashore`
   exit change with the ship's position (Quay, positions at sea, island anchorage), which
   `sail <direction>` updates. The places the ship can reach are kept as data.

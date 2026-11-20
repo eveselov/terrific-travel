@@ -53,8 +53,8 @@
 # Each character has:
 #   name      shown to players
 #   aliases   other words players can use for them (`ask barnaby`, `ask sailor`)
-#   where     a place id from places.yaml, a list of them (the character will move
-#             between them from A4; until then they stand in the first), or `aboard`
+#   where     a place id from places.yaml, a list of them (they stand in the first: time is
+#             told, not kept, so nobody moves on a clock, DECISIONS.md, 38), or `aboard`
 #             (her Deck)
 #   desc      what players read when they look at them
 #   voice     how they speak: a note for the writer, and for the AI characters of phase B
