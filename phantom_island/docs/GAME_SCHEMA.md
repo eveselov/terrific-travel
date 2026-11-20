@@ -89,8 +89,12 @@ player takes it.
 
 - **It is the report's machinery, used mid-game.** A step is a question with possibilities
   and a proved right answer; what a council adds is the order of the steps, the moment and
-  place it belongs to, and the summing up. The report itself is the last and largest
-  council.
+  place it belongs to, and the summing up.
+- **The report records and signs; councils guide** (DECISIONS.md, 37). The report keeps the
+  purpose and the status, from the start, and is where the player signs an answer. A
+  council can conclude report questions: the report then shows its conclusion, and the
+  council ends by naming the command that signs it. The player still types it. A game's
+  last council is usually the one that prepares the report.
 - **Steps are the parts of the decision, each ruling something out.** At the chart's
   position: which number is wrong (so search east or west, not north or south), which side
   (west, not east), how far (near). Designing a convergence point means finding these parts

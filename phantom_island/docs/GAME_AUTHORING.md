@@ -181,6 +181,13 @@ terms (a position to sail to, not only "about a degree"). Give each step a hint 
 it can't be missed: in the place's own view (the Deck's `deck` text there, seen on arrival
 and on every `look`), not in a passage line that scrolls past.
 
+If the council answers questions of the report, list them in `concludes` (report question
+id: a short conclusion). The report shows the conclusion once the council has decided, and
+the game adds the command that signs it after the summary, so the summary itself needn't
+mention the report. A council near the end needs a reason to come back to where it is held:
+offer it in the view players see there, and in what they see of that place from nearby (the
+ship as seen from the shore).
+
 ### A hint
 
 In `hints.yaml`, situations are checked from the top, and the first that matches gives the

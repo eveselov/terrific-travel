@@ -11,6 +11,10 @@ player is shown the epilogue's first page, and `report more` turns the pages.
 
 What each player is looking at (a question, or a page of the epilogue) is kept on their
 character; what has been answered is kept in the `Expedition` script.
+
+The report records and signs; councils guide (DECISIONS.md, 37). Once a council has decided,
+the report shows its conclusion under the questions it `concludes`, with the command that
+signs it once the journal proves it. The council never answers for the captain.
 """
 
 from typing import Any
@@ -21,6 +25,7 @@ from world.content import (
     CHOICE_LETTERS,
     ChoiceSpec,
     Content,
+    CouncilSpec,
     PageSpec,
     ProofSpec,
     QuestionSpec,
@@ -170,6 +175,7 @@ def show_board(caller: Any, spec: ReportSpec) -> None:
             lines.append(f"   Answered by {answers[question.id]}: {question.right.answer}")
         else:
             lines.extend(_theory_lines(caller, question, "   "))
+            lines.extend(conclusion_lines(question, "   "))
     lines.append(
         "Answer a question with the letter of the possibility you can prove, like "
         "|wreport 1 a|n. Only what the journal proves is accepted."
@@ -193,12 +199,54 @@ def show_question(caller: Any, question: QuestionSpec) -> None:
         caller.msg("\n".join(lines))
         return
     lines.extend(_theory_lines(caller, question, "  "))
+    lines.extend(conclusion_lines(question, "  "))
     letters: str = ", ".join(
         f"|wreport {number} {CHOICE_LETTERS[index]}|n"
         for index in range(len(open_theories(question)))
     )
     lines.append(f"Pick the one you can prove: {letters}. All the questions: |wreport|n.")
     caller.msg("\n".join(lines))
+
+
+def council_decided(council: CouncilSpec) -> bool:
+    """Whether every step of a council is settled (its flags are set)."""
+    return get_expedition().met(tuple(step.sets for step in council.steps))
+
+
+def concluded(question: QuestionSpec) -> str | None:
+    """What a council that has decided concluded about a question, or None."""
+    for council in load_content().councils.values():
+        if question.id in council.concludes and council_decided(council):
+            return council.concludes[question.id]
+    return None
+
+
+def signing_command(question: QuestionSpec) -> str | None:
+    """
+    `report 2 d`, the command that answers a question with its right theory, once that theory
+    is open and the journal proves it; None until then.
+    """
+    spec: ReportSpec | None = load_content().report
+    assert spec is not None
+    theories: list[ChoiceSpec] = open_theories(question)
+    right: ChoiceSpec = question.right
+    if right not in theories or missing_proof(right) is not None:
+        return None
+    return f"report {_number(spec, question)} {CHOICE_LETTERS[theories.index(right)]}"
+
+
+def conclusion_lines(question: QuestionSpec, indent: str) -> list[str]:
+    """The council's conclusion on an unanswered question, and how to sign it, if any."""
+    conclusion: str | None = concluded(question)
+    if conclusion is None or question.id in get_expedition().answers:
+        return []
+    command: str | None = signing_command(question)
+    how: str = (
+        f" To write it in the report: |w{command}|n."
+        if command is not None
+        else " The journal can't prove it yet."
+    )
+    return [f"{indent}The council concluded: {conclusion}{how}"]
 
 
 def missing_proof(choice: ChoiceSpec) -> ProofSpec | None:

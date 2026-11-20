@@ -23,6 +23,11 @@
 #               right one has `proof`: a list of parts, each needing any one of its `clues`
 #               (clue ids or flags), with `missing`, said while it doesn't hold
 #   summary   the decision, once every step is settled, and what is left to the captain
+#   concludes optional: the report questions this council answers (report.yaml question id:
+#             the conclusion, short). Once every step is settled, the report shows it under
+#             the question, and the summary is followed by the command that writes it in
+#             the report (`report 2 d`) once the journal proves it (DECISIONS.md, 37). The
+#             council guides; the captain still signs the report.
 #
 # The game frames the texts: "<player> answers: b) ...", and a quiet line saying how to
 # answer, or that the council waits. After editing, `reload` in the game is enough.
@@ -118,5 +123,99 @@ councils:
       right and his longitude wrong. The island lies west of us, on our own latitude, about a
       degree away. We are at 14 south, 40 west, so one degree further west is 41 west. It's
       still a judgement, not a certainty, but it's the best the council can make. The order
-      is yours, Captain: |wsail to 14 south 41 west|n. And this may answer one of the
-      Society's questions too: have a look at the |wreport|n."
+      is yours, Captain: |wsail to 14 south 41 west|n. And it answers one of the Society's
+      questions too: why nobody ever found her."
+    concludes:
+      why: >
+        The chart's latitude is right, and its longitude was reckoned about a degree too far
+        east, so everyone searched in the wrong place.
+
+  # The final council (DECISIONS.md, 37): back aboard at the island, once the evidence is
+  # ashore to be found, the Society's two other questions, one part at a time.
+  island:
+    at: anchorage
+    opening: >
+      The crew gather on the Deck, and the Ship's timbers creak: "We've found the Halcyon's
+      island, Captain, and you've walked it. Now the Society's questions. Let's put together
+      what the journal knows, one thing at a time."
+    steps:
+      - id: where
+        sets: wreck_settled
+        question: >
+          "First: where did the Halcyon's voyage end?"
+        choices:
+          - text: She sank far out at sea, in the great storm of '75.
+            reply: >
+              "That's Old Barnaby's belief, and he never saw this island. A ship lost far out
+              at sea leaves nothing near land. Has the island shown you nothing of her?"
+          - text: On the island's Western Reef, in the great storm of '75.
+            right: true
+            reply: >
+              "On the reef. Her ribs are still out there, grown over with coral, and a
+              compass from her lay in that shallow water for years."
+            proof:
+              - clues: [C7, C13]
+                missing: >
+                  "Something of her is on this island, Captain. Walk out to the Western Reef
+                  at low tide, or find someone who was here when it happened. Then call the
+                  council again."
+          - text: She sailed on from the island, and was lost somewhere else.
+            reply: >
+              "Then the island would hold nothing of her. Look again at what lies on the
+              Western Reef, and what the people here remember."
+      - id: survivors
+        sets: survivors_settled
+        question: >
+          "Second: did anyone live through the wreck?"
+        choices:
+          - text: No. All hands were lost.
+            reply: >
+              "That's what they believe at home, where nobody saw it. Who on this island
+              was here when it happened?"
+          - text: Yes. The whole crew came ashore alive.
+            right: true
+            reply: >
+              "All of them. The islanders paddled out into the storm and brought them in.
+              Not one was lost."
+            proof:
+              - clues: [C12, C13]
+                missing: >
+                  "Someone here remembers that night, Captain: an elder of the village, or
+                  whoever lives at the cove. Ask them, then call the council again."
+          - text: Only a few of them.
+            reply: >
+              "Who told you of anyone lost? Ask those who were there."
+      - id: went
+        sets: crew_settled
+        question: >
+          "Third: where are they now?"
+        choices:
+          - text: They all stayed, and their children live here now.
+            reply: >
+              "Then where is everybody? Only one sailor still lives on the island."
+          - text: Most of them sailed west, in a boat they built here, and one stayed.
+            right: true
+            reply: >
+              "West, with the trade wind behind them, in a boat of the Halcyon's own oak.
+              And one of them never left."
+            proof:
+              - clues: [C11, C8, C13]
+                missing: >
+                  "Something was built on this island and sailed away, Captain. Look at what
+                  the village is built of, or listen to the children's song. Then call the
+                  council again."
+          - text: They sailed home, east, and were lost on the way.
+            reply: >
+              "East, against the trade wind, for weeks, in a little boat? Ask me about the
+              |wwind|n out here, Captain."
+    summary: >
+      The Ship's timbers creak: "So the council agrees. The Halcyon was wrecked on the
+      Western Reef in the great storm of '75. The islanders saved her whole crew, and most of
+      them sailed west in a boat they built from her oak, while one stayed. That's what the
+      Society asked, Captain. It's yours to write in the report, and yours to sign."
+    concludes:
+      wreck: >
+        She was wrecked on the island's Western Reef, in the great storm of '75.
+      crew: >
+        The islanders saved the whole crew; most sailed west in a boat they built, and one
+        stayed.

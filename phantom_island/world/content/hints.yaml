@@ -199,6 +199,19 @@ situations:
         chart up the hill and compare.
       - Aboard, |wuse sextant|n, then |wread chronometer|n.
 
+  # The final council (councils.yaml, DECISIONS.md, 37): with the evidence found, back
+  # aboard to put it together, then the report. Players who answer the report directly
+  # skip it (offered, never forced).
+  - id: island_council
+    ship: [anchorage]
+    missing: [crew_settled]
+    unanswered: crew
+    hints:
+      - The island has told you a lot. Time to put it together, aboard, with the Ship.
+      - Go back aboard and call a council. The Ship will ask the Society's questions one
+        at a time.
+      - From the Lagoon Beach, type |waboard|n, then |wcouncil|n.
+
   # --- The report -------------------------------------------------------------------------
 
   - id: report_wreck

@@ -292,7 +292,7 @@ positions:
   anchorage:
     name: Anchored off the island
     coords: 14 S, 41 W
-    suggest: [tide, water, wind, witnesses, advice]
+    suggest: [council, tide, water, wind, witnesses, advice]
     chart_pos: [450, 290]
     map: island
     map_pos: [875, 545]
@@ -300,10 +300,12 @@ positions:
     deck: >
       The ship lies at anchor in a calm lagoon. A green island rises in front of you, with
       a white beach and palm trees along the shore. The Ship's timbers creak: "Take the
-      guides from the chart house ashore, Captain. With a guide in your hands, you'll see more in
-      what you look at."
+      guides from the chart house ashore, Captain. With a guide in your hands, you'll see
+      more in what you look at. And when you've seen enough, come back aboard and call a
+      |wcouncil|n: we'll put the Society's answers together."
     shore: >
-      Your ship lies at anchor out in the lagoon.
+      Your ship lies at anchor out in the lagoon. When you've seen enough of the island, go
+      back |waboard|n and call a council with the Ship: she'll help you put it together.
     routes:
       east:
         to: charted

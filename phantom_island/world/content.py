@@ -419,6 +419,9 @@ class CouncilSpec:
     opening: str
     steps: tuple[CouncilStepSpec, ...]
     summary: str
+    # The report questions it prepares (report question id: its conclusion, short), shown
+    # in the report once it has decided: the council guides, the report records and signs.
+    concludes: dict[str, str] = dataclass_field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -1192,6 +1195,12 @@ def _councils(data: dict[str, Any]) -> dict[str, CouncilSpec]:
                 for number, step in enumerate(steps_data, start=1)
             ),
             summary=_text(item, "summary", where),
+            concludes={
+                str(question): _text({"text": text}, "text", f"{where}, concludes {question}")
+                for question, text in _mapping(
+                    item.get("concludes") or {}, f"{where}, concludes"
+                ).items()
+            },
         )
     return councils
 
@@ -1488,6 +1497,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
         where = f"{COUNCILS_FILE}, council {council.id}"
         texts.append((f"{where}, opening", council.opening, None))
         texts.append((f"{where}, summary", council.summary, None))
+        for question_id, conclusion in council.concludes.items():
+            texts.append((f"{where}, concludes {question_id}", conclusion, None))
         for council_step in council.steps:
             step_where: str = f"{where}, step {council_step.id}"
             texts.append((step_where, council_step.question, None))
@@ -1682,6 +1693,14 @@ def _check_councils(content: Content) -> None:
         where: str = f"{COUNCILS_FILE}, council {council.id}"
         if council.at not in content.positions or council.at == UNDER_WAY:
             raise ContentError(f"{where}: `at` must be a ship position, not {council.at!r}.")
+        for question_id in council.concludes:
+            if content.report is None or question_id not in {
+                question.id for question in content.report.questions
+            }:
+                raise ContentError(
+                    f"{where}: `concludes` names {question_id!r}, which is no question of the "
+                    f"report ({REPORT_FILE})."
+                )
         for step in council.steps:
             if step.sets in seen:
                 raise ContentError(f"{where}, step {step.id}: flag {step.sets!r} is set twice.")

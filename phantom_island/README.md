@@ -201,8 +201,12 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
   Ship offers a council, which asks the decision's three parts one at a time (which number
   is wrong, which side, how far), each accepted only once the journal shows it. Where it
   stands is kept in flags (`line_settled`...), so it carries on where it stopped. Orders
-  there can be positions: `sail to 14 south 45 west` is read as west. Content in
-  [world/content/councils.yaml](world/content/councils.yaml), code in `world/council.py`.
+  there can be positions: `sail to 14 south 45 west` is read as west. A second council,
+  aboard at the island, puts the Society's other two questions together (DECISIONS.md, 37).
+  A council that `concludes` report questions shows its conclusion in the report, and ends
+  by naming the command that signs it (`report 2 d`): the council guides, the report
+  records and signs. Content in [world/content/councils.yaml](world/content/councils.yaml),
+  code in `world/council.py`.
 
 - **Find first, reflect later** (DECISIONS.md, 33): a find prints the scene, then one dim,
   indented line for the journal and the notebook together (`world/notices.py`). Nothing

@@ -10,6 +10,10 @@ look, and the council waits there. A wrong choice leads back to the evidence. Th
 sums up, and the captain still gives the order: the council builds the decision, the
 captain makes it. It is offered, never forced.
 
+A council can conclude questions of the report (DECISIONS.md, 37): its summary is followed
+by the command that signs each one (`report 2 d`), or by where its conclusion waits until
+the journal can prove it. The council guides; the report records and signs.
+
 Where a council stands is derived from the flags its steps set when settled, so it carries
 on where it stopped, is shared by everyone, and starting over clears it with the flags.
 Everyone in the caller's room is at the council and hears it.
@@ -29,6 +33,7 @@ from world.content import (
 )
 from world.expedition import get_expedition
 from world.notices import quiet
+from world.report import signing_command
 
 COUNCIL: str = "council"
 NO_COUNCIL: str = (
@@ -86,6 +91,32 @@ def _missing(choice: CouncilChoiceSpec) -> ProofSpec | None:
     return None
 
 
+def summary_text(spec: CouncilSpec) -> str:
+    """
+    The council's summary, then, for each report question it concludes, how to write it in
+    the report, or that it waits there for proof, or that it's already answered.
+    """
+    report: Any = load_content().report
+    lines: list[str] = [spec.summary]
+    if report is None:
+        return spec.summary
+    answers: dict[str, str] = get_expedition().answers
+    for number, question in enumerate(report.questions, start=1):
+        if question.id not in spec.concludes:
+            continue
+        if question.id in answers:
+            lines.append(quiet(f"Question {number} of the report is already answered."))
+            continue
+        command: str | None = signing_command(question)
+        lines.append(
+            f"Write it in the report: |w{command}|n."
+            if command is not None
+            else f"The council's conclusion stands in the |wreport|n, beside question "
+            f"{number}, until the journal can prove it."
+        )
+    return "\n".join(lines)
+
+
 def _tell_room(caller: Any, text: str) -> None:
     """Everyone in the caller's room is at the council."""
     location: Any = caller.location
@@ -103,7 +134,7 @@ def council(caller: Any, args: str) -> None:
     step: CouncilStepSpec | None = current_step(spec)
     words: list[str] = args.strip().lower().replace(")", " ").split()
     if step is None:
-        caller.msg(spec.summary)
+        caller.msg(summary_text(spec))
         return
     if not words:
         opening: str = f"{spec.opening}\n" if step is spec.steps[0] else ""
@@ -129,5 +160,5 @@ def council(caller: Any, args: str) -> None:
     get_expedition().set_flag(step.sets)
     recorder.note(caller, f"Council: {spec.id} {step.id} settled")
     following: CouncilStepSpec | None = current_step(spec)
-    after: str = step_text(following) if following is not None else spec.summary
+    after: str = step_text(following) if following is not None else summary_text(spec)
     _tell_room(caller, f"{heading}\n{choice.reply}\n{after}")

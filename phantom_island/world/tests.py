@@ -172,6 +172,10 @@ class TestContent(TestCase):
         )
         self.assertIn("ship, topic self: players can't find it", str(error))
 
+    def test_a_council_concludes_only_questions_of_the_report(self) -> None:
+        error: ContentError = self._broken_copy(COUNCILS_FILE, "      why: >", "      whom: >")
+        self.assertIn("`concludes` names 'whom'", str(error))
+
     def test_settled_by_something_unknown_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
             CLUES_FILE, "settled: [far_settled]", "settled: [report:nowhere]"
@@ -180,7 +184,7 @@ class TestContent(TestCase):
 
     def test_the_ship_suggests_only_her_own_topics(self) -> None:
         error: ContentError = self._broken_copy(
-            SHIP_FILE, "suggest: [tide, water,", "suggest: [goats, water,"
+            SHIP_FILE, "suggest: [council, tide,", "suggest: [goats, tide,"
         )
         self.assertIn("`suggest` names 'goats'", str(error))
 
@@ -2080,7 +2084,7 @@ class TestCouncil(DiscoveryTest):
         here: str = self.do(self.char1, "ask ship")
         self.assertIn("|wcouncil|n, |wbirds|n, |whorizon|n", here)
         self.ship_at("anchorage")
-        self.assertIn("about: |wtide|n, |wwater|n", self.do(self.char1, "ask ship"))
+        self.assertIn("about: |wcouncil|n, |wtide|n, |wwater|n", self.do(self.char1, "ask ship"))
         self.ship_at("port")
         self.assertIn("about: |wcourse|n, |wchart|n", self.do(self.char1, "ask ship"))
 
@@ -2099,6 +2103,65 @@ class TestCouncil(DiscoveryTest):
         self.do(self.char1, "council b")
         start_over("port")
         self.assertFalse(get_expedition().met(("line_settled",)))
+
+    def test_the_report_shows_what_the_council_concluded(self) -> None:
+        self.assertNotIn("The council concluded", self.do(self.char1, "report 2"))
+        for flag in ("sight_charted", "line_settled", "side_settled", "far_settled"):
+            get_expedition().set_flag(flag)
+        decided: str = self.do(self.char1, "council")
+        self.assertIn("conclusion stands in the |wreport|n, beside question 2", decided)
+        board: str = self.do(self.char1, "report")
+        self.assertIn("The council concluded: The chart's latitude is right", board)
+        self.assertIn("The journal can't prove it yet.", board)
+        get_expedition().add_clue("C5", "someone", "Deck")  # measured at the island
+        self.assertIn("To write it in the report: |wreport 2 d|n.", self.do(self.char1, "report"))
+        self.assertIn("Write it in the report: |wreport 2 d|n.", self.do(self.char1, "council"))
+        self.do(self.char1, "report 2 d")
+        self.assertIn("already answered", self.do(self.char1, "council"))
+        self.assertNotIn("The council concluded", self.do(self.char1, "report"))
+
+
+class TestIslandCouncil(DiscoveryTest):
+    """The final council, aboard at the island: the report's other questions (37)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("anchorage")
+        self.at(self.char1, "deck")
+
+    def test_the_island_offers_its_council(self) -> None:
+        self.assertIn("call a |wcouncil|n", self.do(self.char1, "look"))
+        self.assertIn("about: |wcouncil|n", self.do(self.char1, "ask ship"))
+        self.at(self.char1, "beach")
+        self.assertIn("go back |waboard|n and call a council", self.do(self.char1, "look"))
+        for clue_id in ("C5", "C7", "C8", "C11", "C12", "C13"):  # the island's evidence
+            get_expedition().add_clue(clue_id, "someone", "somewhere")
+        self.assertIn("put it together, aboard", self.do(self.char1, "hint"))
+
+    def test_the_council_waits_for_the_island_evidence(self) -> None:
+        self.assertIn("where did the Halcyon's voyage end?", self.do(self.char1, "council"))
+        self.assertIn("Walk out to the Western Reef", self.do(self.char1, "council b"))
+        self.assertFalse(get_expedition().met(("wreck_settled",)))
+
+    def test_the_council_ends_with_the_report_to_sign(self) -> None:
+        for clue_id in ("C2", "C7", "C8", "C13"):
+            get_expedition().add_clue(clue_id, "someone", "somewhere")
+        self.assertIn("did anyone live through", self.do(self.char1, "council b"))
+        self.assertIn("where are they now?", self.do(self.char1, "council b"))
+        decided: str = self.do(self.char1, "council b")
+        self.assertIn("yours to sign", decided)
+        board: str = self.do(self.char1, "report")
+        self.assertIn("The council concluded: She was wrecked on the island's Western Reef", board)
+        signs: list[str] = [
+            line for line in decided.split("\n") if "Write it in the report" in line
+        ]
+        self.assertEqual(len(signs), 2)  # the wreck and the crew
+        for line in signs:
+            command: str = line.split("|w")[1].split("|n")[0]
+            self.do(self.char1, command)
+        self.assertIn("wreck", get_expedition().answers)
+        self.assertIn("crew", get_expedition().answers)
+        self.assertNotIn("|wcouncil|n", self.do(self.char1, "hint"))  # the council is done
 
 
 class TestSearchByPosition(DiscoveryTest):

@@ -81,7 +81,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 ## Report
 
 - `report` is your case board, anywhere, at any time: the task's three questions, and for each one the possibilities you have come across so far. New possibilities come up as the expedition finds things out. Whenever you don't know what to do next, look at it.
-- When you think you know an answer, pick its letter: `report 1 b`. `report 2` shows one question on its own.
+- When you think you know an answer, pick its letter: `report 1 b`. `report 2` shows one question on its own. Not sure? A council helps you work it out (see Council).
 - The Society wants proof: an answer is only accepted once the journal holds the clues that show it. If an answer doesn't fit, or can't be proved yet, you're told why, and where you might look. That's not failing: go and look, and come back.
 - One player's answer counts for the whole expedition, and the journal shows it under the question.
 - When clues in the journal fit together, a question about them comes up in `think`. The game won't answer these questions; working them out, together or by asking around, is what gets you to the report.
@@ -95,6 +95,8 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - When the expedition has a big decision to make aboard, the Ship will say so: call a `council`. The crew gather, and the Ship asks the questions that settle it, one at a time. Answer each with its letter: `council b`.
 - An answer only counts once the journal shows it. If it doesn't yet, the Ship tells you where to look, and the council waits: type `council` again when you're ready, and it carries on where it stopped.
 - When the council has decided, the order is still yours to give.
+- Some councils answer the Society's questions. Then the report shows what the council concluded, and the council tells you how to write it in: `report 2 d`, for example. You type it: the report is yours to sign.
+- On the island, when you've seen enough, go back aboard and call a council: the Ship helps you put the Society's answers together.
 - Playing together, everyone in the room is at the council, and anyone can answer. Talk it over first!
 - Positions can be given as orders too: `sail to 14 south 40 west`.
 
