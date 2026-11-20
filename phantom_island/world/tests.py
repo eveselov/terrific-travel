@@ -1601,6 +1601,53 @@ class TestRecorder(DiscoveryTest):
         self.assertIn("replace the existing", self.do(self.char1, "record start demo"))
         self.assertEqual((self.folder / "demo.ev").read_text(encoding="utf-8"), "# by hand\n")
 
+    def commands_in(self, name: str) -> list[str]:
+        text: str = (self.folder / f"{name}.ev").read_text(encoding="utf-8")
+        return [line for line in text.splitlines() if not line.startswith("#")]
+
+    def test_a_checkpoint_writes_and_goes_on_under_the_next_name(self) -> None:
+        self.do(self.char1, "record start one yes")
+        self.do(self.char1, "begin")
+        reply: str = self.do(self.char1, "record checkpoint two")
+        self.assertIn("Saved world/scenarios/one.ev: 1 commands", reply)
+        self.assertIn("now as 'two'", reply)
+        self.do(self.char1, "look")
+        self.do(self.char1, "record stop")
+        self.assertEqual(self.commands_in("one"), ["startover yes", "begin"])
+        self.assertEqual(self.commands_in("two"), ["startover yes", "begin", "look"])
+        self.assertIn("scenarios.two", (self.folder / "two.ev").read_text(encoding="utf-8"))
+
+    def test_a_checkpoint_asks_before_replacing_another_file(self) -> None:
+        (self.folder / "two.ev").write_text("# by hand\n", encoding="utf-8")
+        self.do(self.char1, "record start one yes")
+        self.assertIn("will replace", self.do(self.char1, "record checkpoint two"))
+        self.assertFalse((self.folder / "one.ev").exists())
+        self.assertIn("now as 'two'", self.do(self.char1, "record checkpoint two yes"))
+        self.do(self.char1, "record cancel")
+        self.assertIn("Nothing is being recorded", self.do(self.char1, "record checkpoint"))
+
+    def test_a_recording_goes_on_from_an_earlier_one(self) -> None:
+        self.do(self.char1, "record start one yes")
+        self.do(self.char1, "begin")
+        self.do(self.char1, "record stop")
+        path: Path = self.folder / "one.ev"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace("#   Why:", "#   Why: by hand", 1),
+            encoding="utf-8",
+        )
+        self.assertIn("plays scenario 'one'", self.do(self.char1, "record start two from one"))
+        reply: str = self.do(self.char1, "record start two from one yes")
+        self.assertIn("Played scenario 'one' (1 commands)", reply)
+        self.assertEqual(self.char1.location.key, "Society Office")
+        self.do(self.char1, "look")
+        self.do(self.char1, "record stop")
+        self.assertEqual(self.commands_in("two"), ["startover yes", "begin", "look"])
+        self.assertIn("#   Why: by hand", (self.folder / "two.ev").read_text(encoding="utf-8"))
+
+    def test_going_on_needs_an_earlier_scenario(self) -> None:
+        self.assertIn("There is no", self.do(self.char1, "record start two from none yes"))
+        self.assertIn("Nothing is being recorded", self.do(self.char1, "record"))
+
 
 class TestReport(DiscoveryTest):
     """The report (DECISIONS.md, 29): choices, proof from the journal, and the epilogue."""

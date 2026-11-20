@@ -856,3 +856,43 @@ At the end, the Ship sums up: "So: west along our latitude, and not far: the ter
 3. **Scope:** build the council now as the way decision 34 is done, with this one council at the chart's position, and add it to the schema as a general element? That's my recommendation.
 
 If you agree, I'll write this up as a new decision (it replaces most of 34) before building anything.
+
+# A4 Half Way
+
+**Status: A4 is about halfway.** The playtest fixes (item 0) are all built. Items 1–4 haven't been started, and each still needs design before building. Your playtest also only reached the island, so the second half of the game hasn't been played since the recent changes.
+
+**What I'd do to finish A4, in this order:**
+
+1. **Play the second half** (island → Jonah → report), with the new texts, the council and `think`, before designing anything new. The second half has the gates, the tide and Ama's respect. It's better to find out how it plays now than to design for it on paper.
+
+2. **Settle two small loose ends** while playing:
+   - **The compass's coral** (open question): how the compass lay in the sea for years if the crew gave it away straight after the rescue. It's a story decision, maybe one for the kids. Jonah's *compass* reply and GAME_STORY change with it.
+   - **The *birds_range* question in `think`**: decision 34 says the council's "how far" step replaces it. Keep it or drop it.
+
+3. **Gates (item 1).** Each needs a second way through and a hint situation:
+   - **Leaving port:** today the ship can sail before Crane confesses (C3). It's a design choice whether to enforce this gate at all, now that the council accepts the birds (C6) as proof for west.
+   - **Meeting Jonah:** after the wreck and Ama's account (C7 + C12). This also needs "Jonah's hours": where he is when he isn't at the cove.
+
+4. **Ama's respect (item 3).** The `respect` flag is currently unreachable, so C12 can't be found through Ama. That makes it the most urgent gap in A4: as built, the Jonah gate (C7 + C12) could never open. It needs two ways: asking her about the reef first, plus one more for players who went to the reef first.
+
+5. **Time (item 2): the tide, dusk and noon.** This is the biggest item, and it needs a design session first:
+   - how long a game day is in real time;
+   - what time it is when the ship arrives;
+   - whether there's a `wait` command.
+
+   Then the reef only at low tide, the birds only at dusk, the noon sight only at noon, and Tui moving with the tide. Each timed gate needs a hint situation, and waiting must stay short in a 30–60 minute session. My view: keep it simple, with a few fixed times of day and `wait` to jump to the next one. That would be enough for A4.
+
+6. **Build or drop (item 4):**
+   - **Counting the water (26):** I'd drop it, or keep it as flavour only. A countdown adds pressure that a 12-year-old's first game doesn't need.
+   - **`show <thing> to <character>` (19):** I'd build it if the gates need it. For example, showing Crane the compass's coral is a natural second way to his confession.
+
+7. **Decide the three waiting proposals:**
+   - hints prefer what's near the player;
+   - connection questions ask only "why";
+   - a neutral first reply to an unproved right theory.
+
+   They're all small. The first two are worth doing, and the third can wait for a playtest.
+
+8. **A full end-to-end scenario** (`record`, from start to report) as the A4 acceptance test. Then a final playtest with the kids.
+
+**My overall view:** the cheapest next step is item 1 on this list (play the second half), and the most urgent build is Ama's respect (item 4). Time is the one big design question left in A4. It's worth a separate discussion before any code.

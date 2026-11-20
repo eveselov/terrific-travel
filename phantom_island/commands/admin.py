@@ -64,8 +64,8 @@ class CmdRecord(Command):
     Record a scenario as you play (developers only).
 
     Usage:
-      record start <name>
-      record start <name> yes
+      record start <name> [from <earlier>] yes
+      record checkpoint [<next>]
       record stop
       record cancel
       record
@@ -76,14 +76,22 @@ class CmdRecord(Command):
     and admin commands, and lines the game didn't understand, are left out. `sail`
     is written as `sail/now`.
 
+    With `from <earlier>`, the scenario <earlier> is played first and not recorded
+    again: the new file starts with its text, your `Why:` lines included, and
+    goes on with what you type.
+
     `record stop` writes world/scenarios/<name>.ev, with what the game recorded
     after each command (new clues, notebook entries, where you are), ready to play
-    back with `batchcommand/interactive scenarios.<name>` (`record start
-    scenarios.<name>` works too). `record cancel` drops
-    the recording. `record` alone says whether one is running.
+    back with `batchcommand/interactive scenarios.<name>`. `record checkpoint
+    <next>` writes it too, then goes on recording under the name <next>: the next
+    file holds everything from the start, and nothing is replayed. `record
+    checkpoint` alone writes the file and goes on under the same name. Names may
+    be written `scenarios.<name>`. `record cancel` drops the recording (files
+    already written stay). `record` alone says whether one is running.
 
-    Without `yes` it only says what it would do, and whether it would replace a
-    scenario file of that name.
+    Without `yes`, `record start` only says what it would do, and whether it would
+    replace a scenario file of that name. A checkpoint asks for `yes` only when it
+    would replace another file.
     """
 
     key = "record"
@@ -95,6 +103,8 @@ class CmdRecord(Command):
         action: str = words[0] if words else ""
         if action == "start":
             self._start(words[1:])
+        elif action == "checkpoint":
+            self._checkpoint(words[1:])
         elif action == "stop":
             self._stop()
         elif action == "cancel":
@@ -103,28 +113,46 @@ class CmdRecord(Command):
         else:
             name: str | None = recorder.recording_name(self.caller)
             self.caller.msg(
-                f"Recording scenario '{name}'. |wrecord stop|n writes it."
+                f"Recording scenario '{name}'. |wrecord checkpoint <next>|n or "
+                "|wrecord stop|n writes it."
                 if name
                 else "Nothing is being recorded. |wrecord start <name>|n begins."
             )
 
+    def _names(self, words: list[str]) -> list[str] | None:
+        """Scenario names as typed (`scenarios.` dropped); None if one isn't a valid name."""
+        names: list[str] = [recorder.bare_name(word) for word in words]
+        return names if all(recorder.valid_name(name) for name in names) else None
+
     def _start(self, words: list[str]) -> None:
         confirmed: bool = bool(words) and words[-1] == CONFIRM
-        names: list[str] = [
-            recorder.bare_name(name) for name in (words[:-1] if confirmed else words)
-        ]
-        if len(names) != 1 or not recorder.valid_name(names[0]):
+        typed: list[str] = words[:-1] if confirmed else words
+        if len(typed) == 3 and typed[1] == "from":
+            typed = [typed[0], typed[2]]
+        names: list[str] | None = self._names(typed)
+        if names is None or len(names) not in (1, 2):
             self.caller.msg(
-                "Usage: |wrecord start <name>|n, with a name of small letters, digits and _."
+                "Usage: |wrecord start <name> [from <earlier>]|n, with names of small "
+                "letters, digits and _."
             )
             return
         name: str = names[0]
+        earlier: str | None = names[1] if len(names) == 2 else None
         if recorder.is_recording(self.caller):
             self.caller.msg(
                 f"Already recording '{recorder.recording_name(self.caller)}'. "
-                "|wrecord stop|n or |wrecord cancel|n first."
+                "|wrecord checkpoint <next>|n, |wrecord stop|n or |wrecord cancel|n first."
             )
             return
+        found: tuple[list[str], list[str]] | None = None
+        if earlier is not None:
+            found = recorder.earlier_scenario(earlier)
+            if found is None:
+                self.caller.msg(
+                    f"There is no world/scenarios/{earlier}.ev starting with "
+                    f"'{recorder.FIRST_COMMAND}' to go on from."
+                )
+                return
         path: Path = recorder.scenario_path(name)
         if not confirmed:
             replace: str = (
@@ -132,16 +160,64 @@ class CmdRecord(Command):
                 if path.exists()
                 else ""
             )
+            plays: str = f", plays scenario '{earlier}'" if earlier else ""
+            again: str = f"{name} from {earlier}" if earlier else name
             self.caller.msg(
                 "This starts a new expedition (the journal and the flags are forgotten, and "
-                f"everyone goes to Limbo), then records what you type.{replace}\n"
-                f"Type |wrecord start {name} yes|n to go ahead."
+                f"everyone goes to Limbo){plays}, then records what you type.{replace}\n"
+                f"Type |wrecord start {again} yes|n to go ahead."
             )
             return
         start_over("port")
-        recorder.begin(self.caller, name)
+        if found is None:
+            recorder.begin(self.caller, name)
+            self.caller.msg(
+                f"Recording scenario '{name}'. Type |wbegin|n to set out; "
+                "|wrecord stop|n when done."
+            )
+            return
+        commands, base = found
+        recorder.begin(self.caller, name, base)
+        recorder.pause(self.caller, True)
+        try:
+            for command in commands:
+                self.caller.execute_cmd(command)
+        finally:
+            recorder.pause(self.caller, False)
         self.caller.msg(
-            f"Recording scenario '{name}'. Type |wbegin|n to set out; |wrecord stop|n when done."
+            f"Played scenario '{earlier}' ({len(commands)} commands). Recording scenario "
+            f"'{name}' from here; |wrecord stop|n when done."
+        )
+
+    def _checkpoint(self, words: list[str]) -> None:
+        confirmed: bool = bool(words) and words[-1] == CONFIRM
+        names: list[str] | None = self._names(words[:-1] if confirmed else words)
+        if names is None or len(names) > 1:
+            self.caller.msg(
+                "Usage: |wrecord checkpoint [<next>]|n, with a name of small letters, digits and _."
+            )
+            return
+        current: str | None = recorder.recording_name(self.caller)
+        if current is None:
+            self.caller.msg("Nothing is being recorded. |wrecord start <name>|n begins.")
+            return
+        following: str = names[0] if names else current
+        path: Path = recorder.scenario_path(following)
+        if following != current and path.exists() and not confirmed:
+            self.caller.msg(
+                f"Going on as '{following}' will replace the existing "
+                f"world/scenarios/{path.name} when it is written.\n"
+                f"Type |wrecord checkpoint {following} yes|n to go ahead."
+            )
+            return
+        saved: tuple[Path, int] | None = recorder.save(self.caller)
+        if saved is None:
+            return
+        recorder.rename(self.caller, following)
+        written, count = saved
+        self.caller.msg(
+            f"Saved world/scenarios/{written.name}: {count} commands. Still "
+            f"recording, now as '{following}'."
         )
 
     def _stop(self) -> None:

@@ -253,6 +253,11 @@ The full rules are at the top of `characters.yaml` (DECISIONS.md, 23). In short:
   keeps the commands you type (only yours, and only those any player could type), and
   `record stop` writes `world/scenarios/<name>.ev`, with what the game recorded after each
   command (new clues, notebook entries, where you are) and a `Why:` line for your reasons.
+  To build a chain of scenarios, use `record checkpoint <next>` instead of `record stop`: it
+  writes the file and goes on recording as `<next>`, from where you are, without replaying
+  anything (the next file holds everything from the start). `record start <name> from
+  <earlier> yes` plays an earlier scenario first, unrecorded, and starts the new file with
+  its text, your `Why:` lines included.
 - The content check runs on every `reload` and `batchcode build`, and the tests run it too:
   `uv run evennia test --settings settings.py .` from this folder. A content mistake shows
   up as a `ContentError` naming the file and entry.
