@@ -15,9 +15,11 @@
 # A reply (or greeting, or fallback) that starts with a quote is shown as speech:
 # `Old Barnaby says: "..."`. One that starts otherwise is narration, shown as written.
 #
-# After editing, `reload` in the game (or `uv run evennia reload`) is enough for new
-# replies. Adding or removing characters, or changing names or `where`, also needs
-# `batchcode build`.
+# After editing:
+#   `batchcode build`, as a builder, for a character's `name`, `aliases`, `desc` or `where`,
+#     and for adding or removing a character: the builder copies these into the game.
+#   `reload` (or `uv run evennia reload`) is enough for everything else: greetings, topics,
+#     replies, `suggest`, `image`, `topic_aliases` are read from this file during play.
 #
 # How to write replies (DECISIONS.md, 23)
 #

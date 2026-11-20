@@ -3,7 +3,12 @@
 # The ship's Deck never moves. What players see from it, and where the `ashore` exit leads,
 # depends on where the ship is. `sail <direction>` on the Deck moves her along a route.
 #
-# After editing, rebuild the world in the game as a builder: `batchcode build`.
+# After editing:
+#   `batchcode build`, as a builder, for the Deck's `name` and `desc`, and for `ashore_exit`
+#     and `aboard_exit`: the builder copies these into the game.
+#   `reload` is enough for everything else: the Deck's `details` and all of `positions`
+#     (`deck`, `shore`, `details`, `orders`, `suggest`, `routes`...) are read from this
+#     file during play.
 
 rooms:
   # The ship is one room, her Deck (DECISIONS.md, 36). The instruments and books are kept in

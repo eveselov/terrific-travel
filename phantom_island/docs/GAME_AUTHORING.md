@@ -241,8 +241,8 @@ The full rules are at the top of `characters.yaml` (DECISIONS.md, 23). In short:
 
 | Changed | Then, in the game as a builder |
 |---|---|
-| Texts of replies, clues, ideas, details, things | `reload` |
-| Places, exits, maps; characters' or things' names or `where`; new characters or things; `ship.yaml` | `batchcode build` (rooms are updated in place; players stay where they are) |
+| Anything read during play: replies and topics, clues, ideas, hints, councils, the report, details, things' texts, everything about the ship's positions (`deck`, `shore`, routes...), maps | `reload` |
+| What the builder copies into the game: a place's name, description, exits, map position or picture; a character's or thing's name, aliases, `where` (and a character's description, a thing's `portable` or `stays`); the Deck's name and description; adding or removing a place, character or thing | `batchcode build` (rooms are updated in place; players stay where they are) |
 | A map picture or other file in `web/static/` | `reload`, then a hard refresh in the browser |
 
 - `startover`, `startover at sea`, `startover island` start a new expedition with the ship in

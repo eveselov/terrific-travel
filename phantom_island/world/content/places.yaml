@@ -1,9 +1,11 @@
 # The places of Phantom Island: the Limbo prologue, the port and the island.
 # The ship's Deck and where she can sail are in ship.yaml; the map pictures in maps.yaml.
 #
-# After editing, rebuild the world in the game as a builder: `batchcode build`.
-# Rebuilding updates the rooms in place, so players standing in them stay where they are.
-# Changing only the texts of details needs just a `reload`.
+# After editing (DECISIONS.md, 36 for removed places):
+#   `batchcode build`, as a builder, for a place's `name`, `desc`, `exits`, `map`, `map_pos`
+#     or `image`, and for adding or removing a place: the builder copies these into the
+#     game's rooms. Rooms are updated in place, so players in them stay where they are.
+#   `reload` is enough for everything in `details`: it is read from this file during play.
 #
 # Each place has:
 #   name     the room's name, shown to players (and on the map)

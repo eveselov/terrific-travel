@@ -3,6 +3,10 @@
 # Each map has a title, a picture (served from web/static/) and the picture's size in pixels.
 # Places are put on a map in places.yaml (`map`, `map_pos`); the ship in ship.yaml.
 # The pictures are placeholders for stage A1.
+#
+# After editing, `reload` is enough: maps are read from this file during play. (Where a
+# place sits on a map is in places.yaml, and needs `batchcode build`.) A new picture file in
+# web/static/ also needs a hard refresh in the browser.
 
 port:
   title: The port

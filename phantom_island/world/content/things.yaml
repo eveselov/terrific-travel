@@ -6,8 +6,11 @@
 # the books tell you what you're looking at, for whoever carries or uses them. A detail of a
 # place can show more to someone carrying a book (`with:` in places.yaml).
 #
-# After editing texts, `reload` in the game is enough. Adding or removing things, or changing
-# names or `where`, also needs `batchcode build`. Building again never takes a thing out of
+# After editing:
+#   `batchcode build`, as a builder, for a thing's `name`, `aliases`, `where`, `portable` or
+#     `stays`, and for adding or removing a thing: the builder copies these into the game.
+#   `reload` is enough for its texts (`desc`, `close`, `with`, `read`, `use`): they are read
+#     from this file during play. Building again never takes a thing out of
 # a player's hands: it is put back in its place only if it's lying somewhere else.
 # Things a player carries go back to their place when that player leaves the game, so
 # nobody can walk off with a book the others need.
