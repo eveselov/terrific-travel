@@ -258,19 +258,25 @@ def missing_proof(choice: ChoiceSpec) -> ProofSpec | None:
     return None
 
 
-def _proved_by(choice: ChoiceSpec) -> str:
-    """The journal entries that prove a choice: `(The journal: 4, 7.)`."""
+def proved_by(proof: tuple[ProofSpec, ...]) -> str:
+    """
+    The clues that proved something, by name and journal number, so every find is seen to
+    pay off (DECISIONS.md, 39): `Proved by: Nothing at the charted position (4), The
+    coastline on the chart (10).` Empty if no clue of the journal proves it (only flags).
+    """
     content: Content = load_content()
-    numbers: list[int] = []
-    for part in choice.proof:
+    found: list[tuple[int, str]] = []
+    for part in proof:
         for clue in part.clues:
             number: int | None = entry_number(clue) if clue in content.clues else None
-            if number is not None and number not in numbers:
-                numbers.append(number)
-    if not numbers:
+            if number is not None and (number, clue) not in found:
+                found.append((number, clue))
+    if not found:
         return ""
-    listed: str = ", ".join(str(number) for number in sorted(numbers))
-    return f" (Proved in the journal: {listed}.)"
+    listed: str = ", ".join(
+        f"{content.clues[clue].title} ({number})" for number, clue in sorted(found)
+    )
+    return f"Proved by: {listed}."
 
 
 def answer(caller: Any, spec: ReportSpec, question: QuestionSpec, index: int) -> None:
@@ -304,7 +310,9 @@ def answer(caller: Any, spec: ReportSpec, question: QuestionSpec, index: int) ->
     expedition.answer(question.id, str(caller.key))
     recorder.note(caller, f"Report: {question.id} answered")
     done: str = f"Question {number} is answered in the report: {choice.answer}"
-    here: str = f"{heading}\n{verdict(PROVED)}\n{choice.reply}{_proved_by(choice)}\n{done}"
+    credit: str = proved_by(choice.proof)
+    credited: str = f" ({credit})" if credit else ""
+    here: str = f"{heading}\n{verdict(PROVED)}\n{choice.reply}{credited}\n{done}"
     elsewhere: str = f"{caller.key} answered a question of the report. {done}"
     told: list[Any] = _tell_room(caller, here)
     for character in connected_characters():

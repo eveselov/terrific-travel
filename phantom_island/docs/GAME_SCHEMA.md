@@ -224,9 +224,11 @@ These are the rules the schema depends on; without them the elements are just fe
    never gives itself away by appearing. Wrong choices are what witnesses believe, or a
    natural misunderstanding, never an invented element; turning one down is gentle and
    points somewhere.
-5. **No dead ends.** Every bottleneck has at least two ways through and a hint path.
-   Hints escalate (a nudge, more direct, the exact command) and start over when the player
-   makes progress. Being stuck for long brings one gentle hint by itself.
+5. **No dead ends, one way through.** Every step has one way through, always signposted,
+   and a hint path that ends in the exact command (DECISIONS.md, 39; the first version
+   asked for two ways through every gate, and the redundancy confused more than it
+   helped). Hints escalate (a nudge, more direct, the exact command) and start over when
+   the player makes progress. Being stuck for long brings one gentle hint by itself.
 6. **Questions, not answers.** Connection questions never state the conclusion; hints for
    the report never say which choice. Understanding is tested where it matters: at the end.
 7. **Learning shows as text, not scores.** A notebook entry grows with the level reached;
@@ -245,6 +247,13 @@ These are the rules the schema depends on; without them the elements are just fe
 12. **Where exploring must converge, give it a process.** A decision that needs several
     findings at once gets a council: its parts as steps, one at a time, each supported by
     the journal, offered but never forced. A pile of clues and a hint are not enough.
+13. **One clue, one job.** Each clue proves one thing that nothing else proves, and the
+    proofs ask for exactly that clue; a later source confirms, it never replaces. When a
+    clue proves something, the game names it, so every find is seen to pay off (39).
+14. **Paths are learned.** Where the place itself is part of the mystery, a path exists for
+    players only once something or someone has shown them the way, and that moment is
+    announced (40). People who hold a key say what it takes to win it, and acknowledge
+    each step towards it, so it is earned on purpose, never by chance (41).
 
 ## Content as data
 

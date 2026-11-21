@@ -29,6 +29,8 @@ from evennia.utils.search import search_tag
 from typeclasses.scripts import Voyage
 from world.content import UNDER_WAY, Content, MapSpec, Point, PositionSpec, RouteSpec, load_content
 from world.expedition import current_position, get_expedition
+from world.paths import is_known
+from world.places import place_id_of
 
 MAP_TAG_CATEGORY: str = "map"
 MAP_LABEL: str = "Your map:"  # before the map's title in the Map pane
@@ -118,6 +120,9 @@ def places_on_map(map_key: str, here: Any) -> list[MapPlace]:
     """The rooms on a map, marking the one that is `here`."""
     places: list[MapPlace] = []
     for room in search_tag(map_key, category=MAP_TAG_CATEGORY):
+        place_id: str | None = place_id_of(room)
+        if place_id is not None and not is_known(place_id):
+            continue  # paths are learned: a hidden place isn't on the map yet (40)
         location: MapLocation | None = room_map_location(room)
         if location is None:
             continue

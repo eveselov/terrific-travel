@@ -46,8 +46,10 @@
 #     proof   the clues that prove it: a list of groups, each one needing any one of its
 #             `clues` in the journal; `missing` is the hint shown while a group isn't met
 #
-# Report needs (GAME_STORY.md, "Clues"): wreck site = C7; why not found = C4 + C5 (or C10);
-# crew = C12 or C13, plus C11 or C8.
+# One clue, one job (DECISIONS.md, 39): each part of a proof is one clue, the one that
+# proves that part (GAME_STORY.md, "The clue chain"). Wreck site = C7; why not found = C4
+# (the chart is wrong) + C10 (this is its island) + C5 (1 degree off); crew = C12 (saved) +
+# C9 (stayed a season) + C8 (built with her oak) + C11 (sailed west) + C13 (one stayed).
 #
 # The epilogue's pages: `title` and `text`. Its facts are checked against the sources on its
 # last page (DECISIONS.md, 9; GAME_STORY.md, "Sources").
@@ -91,10 +93,9 @@ questions:
           You write it down: the Halcyon was wrecked on the Western Reef, in the great storm
           of '75. Old Barnaby was right about the storm and wrong about the sinking.
         proof:
-          - clues: [C7, C13]
+          - clues: [C7]
             missing: >
-              Find the wreck itself, or someone on the island who was there when it
-              happened.
+              Find the wreck itself. Something of her must still lie where she was lost.
 
   - id: why
     choices:
@@ -131,11 +132,14 @@ questions:
             missing: >
               Sail to the position written on the chart, and see for yourselves what is
               there.
-          - clues: [C5, C10]
+          - clues: [C10]
             missing: >
-              Show that this is the chart's island, only in the wrong place: measure its
-              position with the sextant and the chronometer, or compare its coastline with
-              the chart from somewhere high.
+              Show that this is the chart's island: compare its coastline with the chart,
+              from somewhere high.
+          - clues: [C5]
+            missing: >
+              Show how far the chart is out: measure the island's position with the sextant
+              and the chronometer.
       - text: >
           Because the island moves. Phantom islands drift about the ocean, and appear and
           vanish.
@@ -164,14 +168,22 @@ questions:
           them sailed west in a boat built from the Halcyon's own oak. Their families at home
           can stop waiting for a ship, and start hoping for news from the west.
         proof:
-          - clues: [C12, C13]
+          - clues: [C12]
             missing: >
-              Find someone on the island who remembers the wreck, and hear from them what
-              happened to the crew.
-          - clues: [C11, C8]
+              Find someone on the island who remembers the night of the wreck.
+          - clues: [C9]
             missing: >
-              Look for something on the island that the crew made, or that the children
-              remember about them.
+              Look for what the crew left growing and grazing on the island: it shows how
+              long they stayed.
+          - clues: [C8]
+            missing: >
+              Look for something on the island that was built from the Halcyon herself.
+          - clues: [C11]
+            missing: >
+              Listen to what the island's children remember about the sea people.
+          - clues: [C13]
+            missing: >
+              Find the one of the crew who never left.
       - text: >
           They survived the wreck, built a boat and sailed home, east, but were lost on the
           way.

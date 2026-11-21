@@ -52,6 +52,8 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 - The start of a long name is enough: `ask fair about the chart`.
 - Anyone can be asked about themselves: `ask barnaby about yourself`, or `ask tui about you`.
 - Walk with the exit's name (`east`, `aboard`) or with `go`: `go east`, `go to the market`.
+- On the island, you only know the paths you've found or been shown. A new one is announced: "(A new path: the Village, south of the Forest Path.)", and appears on the map. Climbing somewhere high, and making friends, both help.
+- Some people only tell what they know to those who show respect. They'll say what that takes, and they'll notice when you do it: "(Elder Ama's respect: 1 of 2.)"
 
 ## Sailing
 

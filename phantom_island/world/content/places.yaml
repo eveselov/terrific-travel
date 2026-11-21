@@ -18,6 +18,11 @@
 #            forms (n, se, u...) automatically. For other aliases: `name: {to: id, aliases: [..]}`.
 #   details  optional: parts of the place that aren't objects, seen with `look <detail>`
 #            (`look beams`). Mark the word to look at in `desc` |wlike this|n.
+#   hidden_until  optional: clue ids or flags. Paths are learned (DECISIONS.md, 40): until
+#            all of them hold, the place isn't on the map, and the exits that lead to it are
+#            neither shown nor usable. When they hold, everyone is told of the new path.
+#   sets     optional: a flag set when someone arrives here (the Hilltop's view of the
+#            village smoke opens the path to the Village)
 #
 # Each detail has (things in things.yaml have the same looking fields):
 #   aliases  other words for it
@@ -109,8 +114,10 @@ beach:
   map_pos: [780, 390]
   desc: >
     A curve of white sand around a calm green lagoon. Palm trees lean over the water, and
-    a path leads inland. A few |wgoats|n are nibbling at the bushes above the beach.
+    behind them the forest begins: a narrow path climbs into it, to the northwest. A few
+    |wgoats|n are nibbling at the bushes above the beach.
   exits:
+    northwest: forest
     west: village
   details:
     goats:
@@ -130,6 +137,7 @@ beach:
 
 village:
   name: Village
+  hidden_until: [village_seen]  # its smoke, seen from the Hilltop
   map: island
   map_pos: [520, 410]
   desc: >
@@ -164,6 +172,7 @@ village:
 
 reef:
   name: Western Reef
+  hidden_until: [respect_tui]  # Tui shows the way, once you have listened to her song
   map: island
   map_pos: [170, 390]
   desc: >
@@ -197,6 +206,7 @@ forest:
     south: village
     north: hilltop
     west: spring
+    southeast: beach
   details:
     trees:
       aliases: [tree, leaves, fruit]
@@ -236,12 +246,14 @@ spring:
 
 hilltop:
   name: Hilltop
+  sets: village_seen  # the smoke: the path to the Village opens (DECISIONS.md, 40)
   map: island
   map_pos: [560, 110]
   desc: >
     From the top of the hill you can see the whole island: the lagoon in the east, the
     reef in the west, and the open ocean all around. The |wcoastline|n is spread out below
-    you like a map.
+    you like a map. South of the forest, thin smoke rises from a clearing among the trees:
+    huts, and cooking fires. People live here.
   exits:
     south: forest
   details:
@@ -260,6 +272,7 @@ hilltop:
 
 cove:
   name: Boat Cove
+  hidden_until: [cove_told]  # Elder Ama tells you where the one who stayed lives
   map: island
   map_pos: [330, 570]
   desc: >

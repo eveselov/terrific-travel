@@ -210,6 +210,11 @@ def _search_route(position: PositionSpec, here: Coords, there: Coords) -> RouteS
     return found
 
 
+def route_open(route: RouteSpec) -> bool:
+    """Whether the ship may sail this route now: what it `needs` is in the journal or set."""
+    return not route.needs or bool(get_expedition().met(route.needs))
+
+
 def sail(caller: Any, text: str, now: bool = False) -> bool:
     """
     Give the ship an order. Returns True if she set off. With `now`, the whole passage is
@@ -225,6 +230,9 @@ def sail(caller: Any, text: str, now: bool = False) -> bool:
     found: RouteSpec | str = find_route(position, text)
     if isinstance(found, str):
         caller.msg(found)
+        return False
+    if not route_open(found):
+        caller.msg(found.refused or "Not yet, Captain.")  # a gate (leaving port, DECISIONS 39)
         return False
     left_behind: list[Any] = crew_ashore()
     if left_behind:

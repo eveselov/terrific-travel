@@ -33,7 +33,7 @@ from world.content import (
 )
 from world.expedition import get_expedition
 from world.notices import quiet
-from world.report import signing_command
+from world.report import proved_by, signing_command
 
 COUNCIL: str = "council"
 NO_COUNCIL: str = (
@@ -161,4 +161,6 @@ def council(caller: Any, args: str) -> None:
     recorder.note(caller, f"Council: {spec.id} {step.id} settled")
     following: CouncilStepSpec | None = current_step(spec)
     after: str = step_text(following) if following is not None else summary_text(spec)
-    _tell_room(caller, f"{heading}\n{choice.reply}\n{after}")
+    credit: str = proved_by(choice.proof)
+    credited: str = f"\n{quiet(credit)}" if credit else ""
+    _tell_room(caller, f"{heading}\n{choice.reply}{credited}\n{after}")

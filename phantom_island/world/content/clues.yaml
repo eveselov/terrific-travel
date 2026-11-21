@@ -103,8 +103,8 @@ clues:
   C12:
     title: Elder Ama's account
     journal: >
-      Elder Ama says her people brought the whole crew of the wrecked ship ashore alive.
-      They lived in the village for a season, built a boat, and most of them left.
+      Elder Ama says her people paddled out into the storm and brought the whole crew of
+      the wrecked ship ashore, alive.
   C13:
     title: Jonah Pike's story
     journal: >
@@ -149,7 +149,7 @@ connections:
       island only the sextant does. Why could the Halcyon's master get one number right and
       the other wrong? |wask ship about longitude|n, or ask someone who sailed with him.
   two_witnesses:
-    needs: [C7, [C12, C13]]
+    needs: [C7, C12]
     ideas: [witnesses]
     settled: [report:crew]
     question: >

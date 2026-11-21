@@ -148,6 +148,7 @@ class Reveal:
     text: str
     clue: str | None
     teaches: Teaching = ()
+    sets: str | None = None  # a flag to remember once it is said (a truth's mark of respect)
 
 
 @dataclass(frozen=True)
@@ -180,6 +181,10 @@ class PlaceSpec:
     image: str | None
     exits: tuple[ExitSpec, ...]
     details: dict[str, LookSpec]
+    # Paths are learned (DECISIONS.md, 40): the place, its exits and its map marker exist for
+    # players only once all of these clues or flags hold.
+    hidden_until: tuple[str, ...] = ()
+    sets: str | None = None  # a flag set when someone arrives here (the Hilltop's view)
 
 
 @dataclass(frozen=True)
@@ -196,6 +201,8 @@ class RouteSpec:
     text: str  # shown at once, as she sets off
     passage: tuple[str, ...]  # shown one after another while she sails; the last one arrives
     teaches: Teaching = ()  # for the notebook: `used` for whoever gave the order
+    needs: tuple[str, ...] = ()  # clues or flags before she sails this way (leaving port, 39)
+    refused: str | None = None  # what the Ship says to the order until then
 
 
 @dataclass(frozen=True)
@@ -523,6 +530,20 @@ class TruthSpec:
     reply: str
     clue: str | None
     teaches: Teaching = ()
+    sets: str | None = None  # a flag to remember once this reply is given (a mark of respect)
+
+
+@dataclass(frozen=True)
+class TrustSpec:
+    """
+    What it takes to win a character over (DECISIONS.md, 41): the flags (`marks`) set by
+    what players do. Each mark is acknowledged with the progress, `label: 1 of 2`, and the
+    last one with `won`.
+    """
+
+    label: str
+    marks: tuple[str, ...]
+    won: str
 
 
 @dataclass(frozen=True)
@@ -556,6 +577,7 @@ class CharacterSpec:
     topics: dict[str, TopicSpec]
     image: str | None = None  # URL of their picture for the Focus pane, if there is one
     voice: str | None = None  # how they speak: for the writer and the AI characters (phase B)
+    trust: "TrustSpec | None" = None  # what it takes to win them over (Ama's respect, 41)
 
     @property
     def words(self) -> tuple[str, ...]:
@@ -764,6 +786,8 @@ def _place(place_id: str, value: Any, file: str) -> PlaceSpec:
         image=_optional_text(data, "image", where),
         exits=tuple(_exit(key, item, f"{where}, exit {key}") for key, item in exits_data.items()),
         details=_details(data.get("details"), where),
+        hidden_until=_words(data.get("hidden_until"), "hidden_until", where),
+        sets=_optional_text(data, "sets", where),
     )
 
 
@@ -786,6 +810,8 @@ def _route(direction: str, value: Any, where: str) -> RouteSpec:
         text=_text(data, "text", where),
         passage=tuple(line.strip() for line in passage),
         teaches=_teaches(data, where),
+        needs=_words(data.get("needs"), "needs", where),
+        refused=_text(data, "refused", where) if data.get("needs") else None,
     )
 
 
@@ -861,6 +887,7 @@ def _truth(value: Any, where: str) -> TruthSpec | None:
         reply=_text(data, "reply", where),
         clue=_optional_text(data, "clue", where),
         teaches=_teaches(data, where),
+        sets=_optional_text(data, "sets", where),
     )
 
 
@@ -923,7 +950,18 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
         image=_optional_text(data, "image", where),
         voice=_optional_text(data, "voice", where),
         topics=topics,
+        trust=_trust(data.get("trust"), f"{where}, trust"),
     )
+
+
+def _trust(value: Any, where: str) -> "TrustSpec | None":
+    if value is None:
+        return None
+    data: dict[str, Any] = _mapping(value, where)
+    marks: tuple[str, ...] = _words(data.get("marks"), "marks", where)
+    if len(marks) < 1:
+        raise ContentError(f"{where}: `marks` must name at least one flag.")
+    return TrustSpec(label=_text(data, "label", where), marks=marks, won=_text(data, "won", where))
 
 
 def _default_self(name: str, shared: dict[str, tuple[str, ...]]) -> TopicSpec:
@@ -1462,6 +1500,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             texts.append((route_where, route.text, None))
             if route.order:
                 texts.append((f"{route_where}, order", route.order, None))
+            if route.refused:
+                texts.append((f"{route_where}, refused", route.refused, None))
             for number, line in enumerate(route.passage, start=1):
                 texts.append((f"{route_where}, passage {number}", line, None))
         for detail in position.details.values():
@@ -1521,6 +1561,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             ("fallback", character.fallback),
         ):
             texts.append((f"{where}, {field}", text, None))
+        if character.trust is not None:
+            texts.append((f"{where}, trust, won", character.trust.won, None))
         for topic in character.topics.values():
             texts.append((f"{where}, topic {topic.id}", topic.reply, topic.clue))
             if topic.truth is not None:
@@ -1631,6 +1673,13 @@ def flags_set(content: Content) -> set[str]:
         for topic in character.topics.values()
         if topic.sets is not None
     }
+    flags.update(
+        topic.truth.sets
+        for character in content.characters.values()
+        for topic in character.topics.values()
+        if topic.truth is not None and topic.truth.sets is not None
+    )
+    flags.update(place.sets for place in content.places.values() if place.sets is not None)
     flags.update(step.sets for council in content.councils.values() for step in council.steps)
     for thing in content.things.values():
         for action in (thing.read, thing.use):
@@ -1670,6 +1719,21 @@ def _check_connection_ideas(content: Content) -> None:
                     f"{SHIP_FILE}, position {position.id}: `suggest` names {topic_id!r}, which "
                     "isn't one of the Ship's topics."
                 )
+    for place in content.places.values():
+        _check_needs(f"{PLACES_FILE}, {place.id}, hidden_until", place.hidden_until, content, flags)
+    for character in content.characters.values():
+        if character.trust is not None:
+            _check_needs(
+                f"{CHARACTERS_FILE}, {character.id}, trust", character.trust.marks, content, flags
+            )
+    for position in content.positions.values():
+        for route in position.routes:
+            _check_needs(
+                f"{SHIP_FILE}, position {position.id}, route {route.direction}, needs",
+                route.needs,
+                content,
+                flags,
+            )
     if not content.ideas:  # the notebook is optional: without one, `think` lists no ideas
         return
     for connection in content.connections.values():

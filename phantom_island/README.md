@@ -302,5 +302,8 @@ optionally with the ship already at sea or at the island.
 
 Stage A4 (the mystery and the ending), under way: the chart's error is now 1 degree, and the
 `report` with its epilogue, the connection questions (`think`) and the hints (`hint`) are
-built. Still to come: the gates (leaving port, meeting Jonah) and Ama's respect; time is told,
-not kept (DECISIONS.md, 38); C12 can't be found yet, and C13 is still given freely.
+built. So are the gates: the ship leaves port once Crane has confessed (C3), and on the
+island paths are learned (DECISIONS.md, 40): the Village from the Hilltop, the Reef through
+Tui, the Cove through Elder Ama, whose respect is named, taught and acknowledged (41). One
+clue, one job (39): each answer needs the clues that prove it, and names them. Time is told,
+not kept (38). Still to decide: the water casks and `show <thing> to <character>`.

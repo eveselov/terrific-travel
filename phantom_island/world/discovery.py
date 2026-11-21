@@ -37,7 +37,7 @@ from world.content import (
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.notebook import learn
-from world.places import all_things
+from world.places import all_things, place_id_of
 
 VERBS: tuple[str, ...] = ("read", "use")
 
@@ -129,7 +129,15 @@ def look_at(caller: Any, text: str, close: bool = False) -> bool:
 
 
 def notice_surroundings(caller: Any) -> None:
-    """After the caller saw their room: on the Deck, the view may reveal a clue (C4)."""
+    """
+    After the caller saw their room: a place may set a flag when someone arrives (the
+    Hilltop's view of the village smoke, DECISIONS.md, 40); on the Deck, the view may reveal
+    a clue (C4).
+    """
+    place_id: str | None = place_id_of(caller.location) if caller.location is not None else None
+    place: PlaceSpec | None = load_content().places.get(place_id) if place_id else None
+    if place is not None and place.sets is not None:
+        get_expedition().set_flag(place.sets)
     if isinstance(caller.location, Deck):
         position: PositionSpec = current_position()
         if position.clue is not None:

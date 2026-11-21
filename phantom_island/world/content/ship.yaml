@@ -104,6 +104,13 @@ positions:
       west:
         teaches: {positions: used, latitude_sailing: understood}
         to: charted
+        # Leaving port (DECISIONS.md, 39): the ship sails once Crane has said where the
+        # compass came from. One way through: the coral (C2) makes him admit it (C3).
+        needs: [C3]
+        refused: >
+          The Ship's timbers creak. "Three weeks across an empty ocean, Captain, on the word
+          of one old chart? Find out first where that compass really came from. Silas Crane
+          in the Market knows more than he says."
         names: [island, chart, chart position, charted position, halcyon island]
         order: >
           The Ship's timbers creak, almost like a voice. "Fourteen degrees South, forty

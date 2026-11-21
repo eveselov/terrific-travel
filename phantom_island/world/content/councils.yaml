@@ -81,7 +81,7 @@ councils:
               "West. That's what the journal says, and whatever told it, birds or fishermen,
               knows this sea better than the chart does."
             proof:
-              - clues: [C6, C3]
+              - clues: [C6]
                 missing: >
                   "Something here knows where land is. Watch the |wsky|n at dusk,
                   Captain, and call the council again."
@@ -154,11 +154,10 @@ councils:
               "On the reef. Her ribs are still out there, grown over with coral, and a
               compass from her lay in that shallow water for years."
             proof:
-              - clues: [C7, C13]
+              - clues: [C7]
                 missing: >
-                  "Something of her is on this island, Captain. Walk out to the Western Reef
-                  at low tide, or find someone who was here when it happened. Then call the
-                  council again."
+                  "Something of her is on this island, Captain: on the Western Reef. Walk out
+                  there, and look. Then call the council again."
           - text: She sailed on from the island, and was lost somewhere else.
             reply: >
               "Then the island would hold nothing of her. Look again at what lies on the
@@ -178,17 +177,39 @@ councils:
               "All of them. The islanders paddled out into the storm and brought them in.
               Not one was lost."
             proof:
-              - clues: [C12, C13]
+              - clues: [C12]
                 missing: >
-                  "Someone here remembers that night, Captain: an elder of the village, or
-                  whoever lives at the cove. Ask them, then call the council again."
+                  "Someone here remembers that night, Captain: the eldest of the village.
+                  Win her trust, hear it from her, then call the council again."
           - text: Only a few of them.
             reply: >
               "Who told you of anyone lost? Ask those who were there."
+      - id: stayed
+        sets: stayed_settled
+        question: >
+          "Third: how long did they stay?"
+        choices:
+          - text: A few days, until the storm was over.
+            reply: >
+              "A few days? Then who planted what grows here, and whose animals graze above
+              the beach?"
+          - text: A season or more, long enough to plant and to farm.
+            right: true
+            reply: >
+              "Long enough to plant onions by the spring, and to leave their goats behind.
+              Sailors carry both, and plant and keep them where they stay a while."
+            proof:
+              - clues: [C9]
+                missing: >
+                  "Look at what grows by the spring, Captain, and what grazes above the
+                  beach, with the guides from my chart house. Then call the council again."
+          - text: All their lives. They never left.
+            reply: >
+              "Then where are they? Only one sailor lives on the island now."
       - id: went
         sets: crew_settled
         question: >
-          "Third: where are they now?"
+          "Last: where are they now?"
         choices:
           - text: They all stayed, and their children live here now.
             reply: >
@@ -199,11 +220,18 @@ councils:
               "West, with the trade wind behind them, in a boat of the Halcyon's own oak.
               And one of them never left."
             proof:
-              - clues: [C11, C8, C13]
+              - clues: [C8]
                 missing: >
-                  "Something was built on this island and sailed away, Captain. Look at what
-                  the village is built of, or listen to the children's song. Then call the
-                  council again."
+                  "Something was built from the Halcyon herself, Captain. Look closely at
+                  what the village is built of. Then call the council again."
+              - clues: [C11]
+                missing: >
+                  "The children remember how they left, Captain. Listen to Tui's song. Then
+                  call the council again."
+              - clues: [C13]
+                missing: >
+                  "And one of them never left, Captain. Find him, and hear it from him. Then
+                  call the council again."
           - text: They sailed home, east, and were lost on the way.
             reply: >
               "East, against the trade wind, for weeks, in a little boat? Ask me about the

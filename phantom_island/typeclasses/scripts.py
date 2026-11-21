@@ -231,10 +231,13 @@ class Expedition(Script):
         """
         sighting: Sighting = Sighting(finder=finder, place=place, source=source)
         if not self.has_clue(clue_id):
-            self.db.journal = [
-                *(self.db.journal or []),
-                {"clue": clue_id, **_sighting_data(sighting), "also": []},
-            ]
+            from world.paths import watching  # paths depend on the journal (DECISIONS.md, 40)
+
+            with watching():
+                self.db.journal = [
+                    *(self.db.journal or []),
+                    {"clue": clue_id, **_sighting_data(sighting), "also": []},
+                ]
             return True
         updated: list[dict[str, Any]] = []
         for data in self.db.journal or []:
@@ -254,9 +257,12 @@ class Expedition(Script):
         return [str(flag) for flag in self.db.flags or []]
 
     def set_flag(self, flag: str) -> None:
-        """Remember a flag for the whole expedition."""
+        """Remember a flag for the whole expedition; a path it opens is announced (40)."""
         if flag not in self.flags:
-            self.db.flags = [*self.flags, flag]
+            from world.paths import watching
+
+            with watching():
+                self.db.flags = [*self.flags, flag]
 
     def met(self, needs: tuple[str, ...]) -> bool:
         """Whether every clue id or flag in `needs` has been found or set."""

@@ -198,15 +198,18 @@ This is the main puzzle.
 
 Explore, talk, collect clues, then make the report.
 
+Paths are learned (DECISIONS.md, 40): players can only go where something or someone has
+shown them the way, in this order.
+
 | Place | What's there |
 |---|---|
-| Lagoon Beach | Landing place. Goats (the animal guide: "goats aren't native to islands like this"). |
-| Village | The elder, the child, a hut built with a dark, heavy timber. |
-| Western Reef | **Walked at low tide** (told in the text, never waited for: DECISIONS.md, 38). Ship's ribs in the coral, a corroded cannon. |
+| Lagoon Beach | Landing place. Goats (the animal guide: "goats aren't native to islands like this"). A path climbs into the forest. |
+| Village | Seen first as smoke, from the Hilltop. The elder, the child, a hut built with a dark, heavy timber. |
+| Western Reef | Tui leads you there, once you have listened to her song with respect. **Walked at low tide** (told in the text, never waited for: DECISIONS.md, 38). Ship's ribs in the coral, a corroded cannon. |
 | Forest Path | Native trees (the plant guide names them, and they are not oak). |
 | Spring | Fresh water (refill casks). A small onion patch nearby. |
-| Hilltop | View of the whole island. With the chart, the coastline can be compared to it. |
-| Boat Cove | Old wood chips, a slipway, a carved board. Jonah Pike is often here. |
+| Hilltop | View of the whole island, and smoke from a village. With the chart, the coastline can be compared to it. |
+| Boat Cove | Elder Ama tells you where it is, once she respects you. Old wood chips, a slipway. Jonah Pike lives here. |
 
 **Ending:** anywhere, at any moment, a player can `report` what happened (DECISIONS.md, 29).
 The report asks three questions one at a time, the same ones that stand at the top of the
@@ -234,8 +237,8 @@ what gets revealed.
 | **Mrs. Fairweather**, patron of the Society | Office | Gives the mission | The *Halcyon*'s plan, the chart, her last letter. Honest but knows little. |
 | **Old Barnaby**, retired sailor | Quay | **Mistaken** | Sure the *Halcyon* sank in "the great storm of '75". Right about the storm, wrong about the sinking. Good on sailing lore. |
 | **Silas Crane**, trader | Market | **Hiding something** | Claims he "found the compass on the beach". The truth: he traded for it with fishermen from the west and fears being called a looter. He admits it if shown a journal clue that contradicts him (e.g. coral crust on the compass, spotted on a close look). |
-| **Elder Ama** | Village | **Holds the key, cautious** | Remembers the rescue. Talks openly only after the players show respect (asking before going to the reef, or helping with something). |
-| **Tui**, a village child | Village / Reef | **Knows the truth, not its meaning** | Plays on "the big bones in the reef", collects brass buttons, knows a song about "people from the sea who made a canoe with a white wing". Kids playing will probably love Tui most. |
+| **Elder Ama** | Village | **Holds the key, cautious** | Remembers the rescue. Tells it only to strangers who show respect, a rule she and Tui both name: ask about her people, and listen to the child (DECISIONS.md, 41). Then she tells where the one who stayed lives. |
+| **Tui**, a village child | Village | **Knows the truth, not its meaning** | Plays on "the big bones in the reef", collects brass buttons, knows a song about "people from the sea who made a canoe with a white wing". Kids playing will probably love Tui most. |
 | **Jonah Pike**, the *Halcyon*'s carpenter | Boat Cove | **Final witness** | Knows almost everything, including the direction the boat sailed. Only met late (after the reef and the elder), so he confirms the story rather than solving it. |
 | **The Ship** (named by the kids) | Always aboard | **Hint-giver and explainer** | The players' own ship, with "a mind of her own". Gives hints that get more direct when the players seem stuck, and explains the instruments and the science when asked. A natural first AI character later. |
 
@@ -243,26 +246,48 @@ what gets revealed.
 
 Any player can find any clue. The "Needs" column says what it takes. Where it is built
 (stage A3), each clue lives in the content files under `world/content/` (`clue: C<n>`); the
-journal lines are in `clues.yaml`. "(A4)" marks a condition that is designed but not built yet.
+journal lines are in `clues.yaml`.
 
 | ID | Clue | Found by | Needs | Shows |
 |---|---|---|---|---|
 | C1 | Compass engraved HALCYON | `look compass`, Market | — | The ship didn't vanish without a trace |
 | C2 | Coral crust in the compass hinge | `examine compass`, Market | a close look | It has been in seawater, not just "on a beach" (breaks Crane's lie) |
-| C3 | "From fishermen who came from the west" | `ask crane` about the compass (or the fishermen) | C2 in the journal (he lies until then) | Direction to search |
+| C3 | "From fishermen who came from the west" | `ask crane` about the compass (or the fishermen) | C2 in the journal (he lies until then) | Where to look, west: the ship sails once it's known (the port's gate) |
 | C4 | Empty sea at the charted position | Deck, on arriving at the charted position; confirmed there by the noon sight (latitude 14° S) and the chronometer (40° W), each in yellow | — | The chart is wrong, not the ship's navigation |
 | C5 | Latitude right, longitude wrong | `use sextant` (the noon sight, a flag for the expedition), then `read chronometer`, at the island | the sight first, by anyone. Noon (told: "you wait for noon") | *Which* of the chart's numbers is wrong; *why* is the players' to work out (the Ship's *latitude*, *longitude*, *reckoning*) |
 | C6 | Birds flying west at dusk | `look sky` on the Deck, charted position | dusk (the ship arrives in the evening) | Land is to the west |
 | C7 | Ship's ribs and cannon on the reef | `look bones` at the Western Reef | low tide (told: "you wait until the tide goes out") | Where she wrecked |
 | C8 | Oak timbers in a village hut | `look beams` in the Village | carrying the plant guide, or `examine beams` | Ship wood was reused, so the crew survived to build |
-| C9 | Goats and onions | `look goats` on the Beach, or `look shoots` at the Spring | the animal guide (goats) or the plant guide (onions): either one is enough | Europeans lived here for a while |
+| C9 | Goats and onions | `look goats` on the Beach, or `look shoots` at the Spring | the animal guide (goats) or the plant guide (onions) | The crew lived here a season or more |
 | C10 | Coastline matches the chart's shape | `look coastline` on the Hilltop | carrying the *Halcyon*'s chart (from the chart house) | This *is* the charted island, just misplaced |
-| C11 | Tui's song about the winged canoe | `ask tui` about the song | — | The crew built a boat and left |
-| C12 | Elder's account of the rescue | `ask ama` | showing respect (A4: not findable in A3) | Nobody died; the crew lived here |
-| C13 | Jonah Pike's story | `ask jonah` at the Boat Cove (about the halcyon, the wreck, the boat or the crew) | C7 + C12 (A4: free in A3) | Confirms everything; the boat sailed west |
+| C11 | Tui's song about the winged canoe | `ask tui` about the song | — (heard again after the respect rule, it is the second mark of respect, and Tui shows the way to the reef) | A boat with a white wing sailed west |
+| C12 | Elder's account of the rescue | `ask ama` about the Halcyon or the crew | her respect, both marks (DECISIONS.md, 41) | The islanders saved them all |
+| C13 | Jonah Pike's story | `ask jonah` at the Boat Cove (about the halcyon, the wreck, the boat or the crew) | the way to the Cove, from Ama | Confirms everything, and adds what nobody else knows: one of them stayed |
 
-**Report needs:** wreck site = C7; why not found = C4 + C5 (or C10); crew = C12 or C13, plus
-C11 or C8. Several paths reach each answer, so players can find things in different orders.
+### The clue chain: one clue, one job
+
+Each clue proves one thing that no other clue proves (DECISIONS.md, 39), and the report and
+the councils ask for exactly that clue. A later source that repeats a fact confirms it; it
+never replaces it. Jonah, met last, confirms the island's story and adds one fact of his own.
+
+| Clue | Its one job | Where it counts |
+|---|---|---|
+| C1 the compass | Something of the Halcyon survived | starts the port |
+| C2 the coral | It lay in shallow sea for years, so Crane is lying | makes Crane admit C3 |
+| C3 the fishermen | Where to look: west | the gate out of port |
+| C4 the empty sea | The chart is wrong | report *why*; the sea council |
+| C6 the terns | Land is near, to the west | the sea council: which side, how far |
+| C10 the coastline | This is the chart's island | report *why* |
+| C5 the measurement | It is 1 degree off | report *why* |
+| C7 the wreck | Where she was lost | report *wreck*; the island council |
+| C12 Ama's account | The islanders saved them all | report *crew*; the island council |
+| C9 goats and onions | They stayed a season or more | report *crew*; the island council |
+| C8 the oak beams | They built with her timber | report *crew*; the island council |
+| C11 Tui's song | A boat with a white wing sailed west | report *crew*; the island council |
+| C13 Jonah | Confirms all, and: one of them stayed | report *crew*; the island council |
+
+**Report needs:** wreck = C7; why not found = C4 + C10 + C5; crew = C12 + C9 + C8 + C11 +
+C13. One way to each answer: the game is one path, played once (DECISIONS.md, 39).
 
 ## World events (things that happen without the players)
 

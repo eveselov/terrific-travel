@@ -58,6 +58,7 @@ from world.discovery import return_stray_things, return_things_home
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
 from world.maps import SHIP_LABEL, MapPlace, MapView, render_map_html
+from world.paths import hidden_places
 from world.places import (
     PLACE_TAG_CATEGORY,
     find_inhabitant,
@@ -75,6 +76,7 @@ from world.ship import (
     moor_ship,
     normalise_direction,
     resume_voyage,
+    route_open,
     sail,
     sail_on,
 )
@@ -344,7 +346,7 @@ class TestContent(TestCase):
         self.assertIn("question wreck", str(error))
 
     def test_proof_with_an_unknown_clue_is_an_error(self) -> None:
-        error: ContentError = self._broken_copy(REPORT_FILE, "clues: [C7, C13]", "clues: [C7, C99]")
+        error: ContentError = self._broken_copy(REPORT_FILE, "clues: [C7]", "clues: [C99]")
         self.assertIn("C99", str(error))
 
 
@@ -425,6 +427,10 @@ class WorldTest(EvenniaTest):
         clock: Any = patch("world.ship.later", side_effect=lambda _s, step, *args: step(*args))
         clock.start()
         self.addCleanup(clock.stop)
+        # Crane's confession opens the port (DECISIONS.md, 39); TestLeavingPort tests it.
+        gates: Any = patch("world.ship.route_open", return_value=True)
+        gates.start()
+        self.addCleanup(gates.stop)
 
     def exits_from(self, place_id: str) -> dict[str, Any]:
         return {exit_obj.key: exit_obj for exit_obj in self.rooms[place_id].exits}
@@ -774,6 +780,7 @@ class TestMapsAndFocus(WorldTest):
         self.assertIn("track", self.rooms["deck"].map_text())
 
     def test_map_command_describes_the_map_in_words(self) -> None:
+        get_expedition().set_flag("village_seen")  # the Village is a learned path (40)
         self.char1.move_to(self.rooms["village"], quiet=True)
         with patch.object(self.char1, "msg") as mock_msg:
             self.char1.execute_cmd("map")
@@ -946,7 +953,7 @@ class TestAsk(WorldTest):
 
     def test_ama_still_waits_for_respect(self) -> None:
         self.at("village")
-        self.assertIn("shown they listen", self.ask("ama about halcyon"))
+        self.assertIn("shows |wrespect|n first", self.ask("ama about halcyon"))
 
     def test_others_in_the_room_hear_the_conversation(self) -> None:
         self.at("quay")
@@ -1737,7 +1744,7 @@ class TestReport(DiscoveryTest):
         with patch.object(self.char2, "msg") as elsewhere:
             heard: str = self.do(self.char1, "report 1 d")
         self.assertIn("wrecked on the Western Reef", heard)
-        self.assertIn("Proved in the journal: 1.", heard)
+        self.assertIn("Proved by: A wreck on the Western Reef (1).", heard)
         self.assertEqual(get_expedition().answers, {"wreck": self.char1.key})
         self.assertIn("answered a question of the report", texts(elsewhere))
         journal: str = self.do(self.char2, "journal")
@@ -1745,7 +1752,7 @@ class TestReport(DiscoveryTest):
         self.assertIn("Answered by", self.do(self.char1, "report"))
 
     def test_questions_can_be_answered_in_any_order(self) -> None:
-        self.find("C12", "C11")
+        self.find("C12", "C9", "C8", "C11", "C13")
         self.assertIn("question 3 of 3", self.do(self.char1, "report 3"))
         self.do(self.char1, "report b")
         self.assertEqual(list(get_expedition().answers), ["crew"])
@@ -1754,13 +1761,15 @@ class TestReport(DiscoveryTest):
     def test_every_part_of_the_proof_is_needed(self) -> None:
         self.find("C4")
         heard: str = self.do(self.char1, "report 2 d")
-        self.assertIn("chart's island, only in the wrong place", heard)
+        self.assertIn("compare its coastline with the chart", heard)
         self.find("C10")
+        self.assertIn("measure the island's position", self.do(self.char1, "report 2 d"))
+        self.find("C5")  # one clue, one job (39): each part of the proof is its own clue
         self.do(self.char1, "report 2 d")
         self.assertIn("why", get_expedition().answers)
 
     def test_the_epilogue_follows_the_last_answer(self) -> None:
-        self.find("C7", "C4", "C5", "C13", "C8")
+        self.find("C7", "C4", "C10", "C5", "C12", "C9", "C8", "C11", "C13")
         self.do(self.char1, "report 1 e")
         self.do(self.char1, "report 2 d")
         with patch.object(self.char2, "msg") as elsewhere:
@@ -1823,10 +1832,10 @@ class TestConnections(DiscoveryTest):
         self.assertNotIn("(new)", self.do(self.char2, "think"))
         self.assertNotIn("1 new", self.do(self.char2, "journal"))
 
-    def test_an_entry_of_needs_can_be_any_of_several_clues(self) -> None:
+    def test_a_question_opens_with_all_its_clues(self) -> None:
         get_expedition().add_clue("C7", "someone", "Western Reef")
         self.assertNotIn("Which witness", self.do(self.char1, "think"))
-        get_expedition().add_clue("C13", "someone", "Boat Cove")
+        get_expedition().add_clue("C12", "someone", "Village")
         self.assertIn("Which witness", self.do(self.char1, "think"))
 
     def test_think_about_one_clue(self) -> None:
@@ -1917,7 +1926,7 @@ class TestHints(DiscoveryTest):
         get_expedition().set_flag("sight_charted")
         self.assertIn("talked over", self.do(self.char1, "hint"))
         self.ship_at("anchorage")
-        self.assertIn("Somebody lives here", self.do(self.char1, "hint"))
+        self.assertIn("From somewhere high", self.do(self.char1, "hint"))
 
     def test_a_complete_report_says_so(self) -> None:
         for question in ("wreck", "why", "crew"):
@@ -2068,11 +2077,11 @@ class TestCouncil(DiscoveryTest):
         again: str = self.do(self.char2, "council")
         self.assertNotIn("The crew gather on the Deck", again)  # the opening is said once
         self.assertIn("Second: east or west?", again)
-        self.assertIn("Watch the |wsky|n", self.do(self.char2, "council b"))  # no C3, no C6
-        get_expedition().add_clue("C3", "someone", "Market")  # Crane's fishermen will do
-        self.assertIn("Third: how far west?", self.do(self.char2, "council b"))
-        self.assertIn("look at the |wsky|n", self.do(self.char2, "council b").lower())  # C6
-        get_expedition().add_clue("C6", "someone", "Deck")
+        self.assertIn("Watch the |wsky|n", self.do(self.char2, "council b"))  # no C6 yet
+        get_expedition().add_clue("C6", "someone", "Deck")  # the terns, and only they (39)
+        side: str = self.do(self.char2, "council b")
+        self.assertIn("Third: how far west?", side)
+        self.assertIn("Proved by: Birds flying west at dusk", side)
         decided: str = self.do(self.char2, "council b")
         self.assertIn("a day's sail", decided)
         self.assertIn("The order is yours, Captain", decided)
@@ -2113,6 +2122,7 @@ class TestCouncil(DiscoveryTest):
         board: str = self.do(self.char1, "report")
         self.assertIn("The council concluded: The chart's latitude is right", board)
         self.assertIn("The journal can't prove it yet.", board)
+        get_expedition().add_clue("C10", "someone", "Hilltop")  # the island's coastline
         get_expedition().add_clue("C5", "someone", "Deck")  # measured at the island
         self.assertIn("To write it in the report: |wreport 2 d|n.", self.do(self.char1, "report"))
         self.assertIn("Write it in the report: |wreport 2 d|n.", self.do(self.char1, "council"))
@@ -2134,19 +2144,22 @@ class TestIslandCouncil(DiscoveryTest):
         self.assertIn("about: |wcouncil|n", self.do(self.char1, "ask ship"))
         self.at(self.char1, "beach")
         self.assertIn("go back |waboard|n and call a council", self.do(self.char1, "look"))
-        for clue_id in ("C5", "C7", "C8", "C11", "C12", "C13"):  # the island's evidence
+        for flag in ("village_seen", "respect_rule", "respect_ama", "respect_tui"):
+            get_expedition().set_flag(flag)
+        for clue_id in ("C5", "C7", "C8", "C9", "C10", "C11", "C12", "C13"):  # the evidence
             get_expedition().add_clue(clue_id, "someone", "somewhere")
         self.assertIn("put it together, aboard", self.do(self.char1, "hint"))
 
     def test_the_council_waits_for_the_island_evidence(self) -> None:
         self.assertIn("where did the Halcyon's voyage end?", self.do(self.char1, "council"))
-        self.assertIn("Walk out to the Western Reef", self.do(self.char1, "council b"))
+        self.assertIn("on the Western Reef. Walk out there", self.do(self.char1, "council b"))
         self.assertFalse(get_expedition().met(("wreck_settled",)))
 
     def test_the_council_ends_with_the_report_to_sign(self) -> None:
-        for clue_id in ("C2", "C7", "C8", "C13"):
+        for clue_id in ("C2", "C7", "C12", "C9", "C8", "C11", "C13"):
             get_expedition().add_clue(clue_id, "someone", "somewhere")
         self.assertIn("did anyone live through", self.do(self.char1, "council b"))
+        self.assertIn("how long did they stay?", self.do(self.char1, "council b"))
         self.assertIn("where are they now?", self.do(self.char1, "council b"))
         decided: str = self.do(self.char1, "council b")
         self.assertIn("yours to sign", decided)
@@ -2199,3 +2212,104 @@ class TestSearchByPosition(DiscoveryTest):
     def test_elsewhere_an_unknown_position_is_still_unknown(self) -> None:
         self.ship_at("port")
         self.assertIn("nothing there worth sailing to", str(self.route("to 14 south 45 west")))
+
+
+class TestLeavingPort(WorldTest):
+    """The port's gate: the ship sails once Crane has said where the compass came from (39)."""
+
+    def test_the_ship_waits_for_cranes_confession(self) -> None:
+        self.char1.move_to(self.rooms["deck"], quiet=True)
+        with patch("world.ship.route_open", side_effect=route_open):
+            with patch.object(self.char1, "msg") as mock_msg:
+                self.assertFalse(sail(self.char1, "to 14 south 40 west"))
+            self.assertIn("Silas Crane", texts(mock_msg))
+            self.assertEqual(current_position().id, "port")
+            get_expedition().add_clue("C3", "someone", "Market")
+            self.assertTrue(sail(self.char1, "to 14 south 40 west"))
+
+
+class TestLearnedPaths(DiscoveryTest):
+    """On the island, a path exists once something or someone has shown it (40)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("anchorage")
+
+    def exits_here(self, character: Character) -> str:
+        return self.do(character, "look")
+
+    def test_from_the_beach_only_the_forest_path(self) -> None:
+        self.at(self.char1, "beach")
+        seen: str = self.exits_here(self.char1)
+        self.assertIn("northwest", seen)
+        self.assertNotIn("west,", seen.replace("northwest", ""))
+        self.assertIn("no path that way", self.do(self.char1, "west"))
+        self.assertEqual(self.char1.location, self.rooms["beach"])
+        on_map: str = self.do(self.char1, "map")
+        self.assertIn("Forest Path", on_map)
+        self.assertNotIn("Village", on_map)
+        self.assertNotIn("Western Reef", on_map)
+
+    def test_the_hilltop_shows_the_village(self) -> None:
+        self.at(self.char1, "forest")
+        arrived: str = self.do(self.char1, "north")  # up to the Hilltop: smoke from a village
+        self.assertIn("A new path: the Village, ", arrived)
+        self.at(self.char1, "forest")
+        self.do(self.char1, "south")
+        self.assertEqual(self.char1.location, self.rooms["village"])
+        self.assertNotIn("Western Reef", self.do(self.char1, "map"))  # not shown yet
+
+    def test_starting_over_hides_the_paths_again(self) -> None:
+        get_expedition().set_flag("village_seen")
+        start_over("port")
+        self.assertIn("village", hidden_places())
+
+
+class TestRespect(DiscoveryTest):
+    """Elder Ama's respect: named, taught and acknowledged, never by chance (41)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("anchorage")
+        get_expedition().set_flag("village_seen")
+        self.at(self.char1, "village")
+
+    def test_nothing_counts_before_the_rule_is_known(self) -> None:
+        heard: str = self.do(self.char1, "ask ama about village")
+        self.assertNotIn("That is respect", heard)
+        self.assertNotIn("respect: 1 of 2", heard)
+        self.assertFalse(get_expedition().met(("respect_ama",)))
+
+    def test_the_rule_is_named_by_tui_and_by_ama(self) -> None:
+        self.assertIn("|wrespect|n", self.do(self.char1, "ask tui"))
+        self.assertIn(
+            "Ask her about our village first", self.do(self.char1, "ask tui about respect")
+        )
+        self.assertTrue(get_expedition().met(("respect_rule",)))
+        start_over("port")
+        self.ship_at("anchorage")
+        get_expedition().set_flag("village_seen")
+        self.at(self.char1, "village")
+        self.assertIn("shows |wrespect|n first", self.do(self.char1, "ask ama about halcyon"))
+        self.assertTrue(get_expedition().met(("respect_rule",)))
+
+    def test_two_marks_win_her_trust_and_the_way_to_jonah(self) -> None:
+        self.do(self.char1, "ask tui about respect")
+        first: str = self.do(self.char1, "ask ama about village")
+        self.assertIn("That is respect", first)
+        self.assertIn("Elder Ama's respect: 1 of 2.", first)
+        second: str = self.do(self.char1, "ask tui about song")
+        self.assertIn("I'll show you the way to the big bones", second)
+        self.assertIn("Elder Ama's respect: 2 of 2. She trusts you now.", second)
+        self.assertIn("A new path: the Western Reef", second)
+        story: str = self.do(self.char1, "ask ama about halcyon")
+        self.assertIn("|ybrought the whole |wcrew|n|y ashore", story)
+        self.assertIn("A new path: the Boat Cove", story)
+        self.assertIn("Old Jonah lives by the |wcove|n", self.do(self.char1, "ask tui about jonah"))
+
+    def test_before_her_respect_ama_keeps_her_story(self) -> None:
+        self.do(self.char1, "ask tui about respect")
+        self.do(self.char1, "ask ama about village")
+        self.assertNotIn("C12", [entry.clue for entry in get_expedition().journal])
+        self.assertIn("shows |wrespect|n first", self.do(self.char1, "ask ama about halcyon"))
+        self.assertIn("for her to tell", self.do(self.char1, "ask tui about jonah"))

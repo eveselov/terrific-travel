@@ -118,8 +118,8 @@ situations:
     missing: [side_settled]
     hints:
       - East or west? Something out here knows where land is.
-      - Watch the seabirds at dusk from the Deck, and remember where Crane's fishermen came
-        from. Then go on with the council.
+      - Watch the seabirds from the Deck in the evening. Which way do they fly home? Then
+        go on with the council.
       - On the Deck, |wlook sky|n. Then |wcouncil|n again.
 
   - id: council_far
@@ -148,55 +148,98 @@ situations:
 
   # --- Act 3: the island ------------------------------------------------------------------
 
+  # One way through, always signposted (DECISIONS.md, 39): paths are learned (40) and
+  # Elder Ama's respect is earned on purpose (41), in this order.
   - id: go_ashore
     ship: [anchorage]
-    missing: [C7, C8, C9, C10, C11, C12, C13]
+    missing: [village_seen]
     hints:
-      - An island at last. Somebody lives here, and they may know something.
-      - Go ashore and walk inland from the beach, to the village.
-      - On the Deck, type |washore|n, then go |wwest|n to the Village.
+      - An island at last. From somewhere high, you could see all of it.
+      - Go ashore, follow the path up through the forest to the Hilltop, and look around.
+      - On the Deck, type |washore|n. Then |wnorthwest|n, and |wnorth|n to the Hilltop.
 
-  - id: song
+  - id: village
     ship: [anchorage]
-    missing: [C11]
+    missing: [respect_rule]
     hints:
-      - The village children remember things the grown-ups don't talk about.
-      - Ask Tui in the Village about the song.
+      - Smoke rose from a village. Its people may know what happened here.
+      - Walk down to the Village, south of the Forest Path, and talk to the people there.
+      - In the Village, type |wask tui about respect|n.
+
+  - id: respect_ama
+    ship: [anchorage]
+    missing: [respect_ama]
+    hints:
+      - Elder Ama expects respect from strangers, before she tells them anything.
+      - Show her respect. Ask Elder Ama about her people and her village.
+      - In the Village, type |wask ama about village|n.
+
+  - id: respect_tui
+    ship: [anchorage]
+    missing: [respect_tui]
+    hints:
+      - Elder Ama watches how strangers treat the village children.
+      - Listen to Tui's song, all the way through.
       - In the Village, type |wask tui about song|n.
+
+  - id: reef
+    ship: [anchorage]
+    missing: [C7]
+    hints:
+      - Tui showed you the way to the big bones, out on the Western Reef.
+      - Walk out to the Western Reef, west of the Village, and look at what lies there.
+      - On the Western Reef, type |wlook bones|n.
+
+  - id: ama_story
+    ship: [anchorage]
+    missing: [C12]
+    hints:
+      - Elder Ama trusts you now. Ask her what you came to ask.
+      - Ask Elder Ama about the Halcyon, the ship on the reef.
+      - In the Village, type |wask ama about halcyon|n.
+
+  - id: jonah
+    ship: [anchorage]
+    missing: [C13]
+    hints:
+      - Elder Ama told you where the one who stayed lives.
+      - Find Jonah Pike at the Boat Cove, southwest of the Village, and ask him about the
+        Halcyon.
+      - At the Boat Cove, type |wask jonah about halcyon|n.
 
   - id: beams
     ship: [anchorage]
     missing: [C8]
     hints:
       - One of the village huts is built with an unusual timber.
-      - Look closely at the beams of the hut in the Village. The plant guide helps too.
+      - Look closely at the beams of the big hut in the Village. The plant guide helps too.
       - In the Village, type |wexamine beams|n.
 
-  - id: reef
+  - id: stayed
     ship: [anchorage]
-    missing: [C7, C13]
+    missing: [C9]
     hints:
-      - Elder Ama said the Western Reef keeps old things, and Tui plays with big bones out
-        there.
-      - Walk out to the Western Reef, west of the Village, and look at what lies there.
-      - On the Western Reef, type |wlook bones|n.
+      - Some things on this island don't belong on an island like this.
+      - Take the guides from the chart house, and look at what grows by the Spring and
+        what grazes above the Lagoon Beach.
+      - Carry the animal guide (|wget animal guide|n), and on the Lagoon Beach, type
+        |wlook goats|n.
 
-  - id: jonah
+  - id: coastline
     ship: [anchorage]
-    missing: [C13]
+    missing: [C10]
     hints:
-      - Tui spoke of old Jonah, who makes boats and talks like you.
-      - Find Jonah Pike at the Boat Cove, southwest of the Village, and ask him about the
-        Halcyon.
-      - At the Boat Cove, type |wask jonah about halcyon|n.
+      - Is this really the island on the Halcyon's chart?
+      - Take the Halcyon's chart up to the Hilltop, and compare it with the coastline.
+      - Carry the chart (|wget chart|n, in the chart house), and on the Hilltop, type
+        |wlook coastline|n.
 
   - id: position
     ship: [anchorage]
-    missing: [C5, C10]
+    missing: [C5]
     hints:
-      - Is this really the island on the Halcyon's chart, and where exactly is it?
-      - Measure the island's position with the sextant and the chronometer, or take the
-        chart up the hill and compare.
+      - And where exactly is this island? The chart's numbers are about to be tested.
+      - Measure the island's position with the sextant, then the chronometer.
       - Aboard, |wuse sextant|n, then |wread chronometer|n.
 
   # The final council (councils.yaml, DECISIONS.md, 37): with the evidence found, back

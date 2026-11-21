@@ -64,6 +64,9 @@
 #   suggest   topics offered to players who don't know what to ask
 #   fallback  the polite reply for any topic the character doesn't know
 #   topics    topic id: what they say about it
+#   trust     optional: what it takes to win them over (DECISIONS.md, 41): `marks`, the flags
+#             set by what players do, a `label` for the progress shown with each mark
+#             ("Elder Ama's respect: 1 of 2.") and `won`, said with the last one
 #
 # Each topic has:
 #   reply     what the character says
@@ -84,6 +87,7 @@
 #             players do; the flags come in A4)
 #     reply   what they say then
 #     clue    the clue that reply reveals
+#     sets    optional: a flag to remember once that reply is given (a mark of `trust`)
 
 topic_aliases:
   halcyon: [the halcyon, ship halcyon, lost ship]
@@ -371,9 +375,16 @@ characters:
     greeting: >
       The elder looks at you for a long moment. "Strangers from the sea, again. Sit with
       me."
-    suggest: [village, island, reef, halcyon, tui]
+    suggest: [halcyon, village, island, reef, tui]
     fallback: >
       Elder Ama keeps weaving. "That is not something I can tell you about."
+    # Respect is named, taught and acknowledged (DECISIONS.md, 41): the rule is told first
+    # (by Tui, or by Ama when asked about the ship too soon), and only what players do
+    # after knowing it counts, so nobody earns it by chance.
+    trust:
+      label: Elder Ama's respect
+      marks: [respect_ama, respect_tui]
+      won: She trusts you now. Ask her what you came for.
     topics:
       village:
         aliases: [people, home]
@@ -382,13 +393,20 @@ characters:
           "Our people have lived here for more generations than I can count on my fingers
           and toes. The lagoon gives us fish, the forest gives us wood, and the |wreef|n
           keeps the big waves away."
+        truth:
+          needs: [respect_rule]
+          sets: respect_ama
+          reply: >
+            Elder Ama looks up from her net. "You ask about my people before you ask for
+            what you want. That is respect." She weaves on. "Our people have lived here for
+            more generations than I can count. The lagoon gives us fish, the forest gives
+            us wood, and the |wreef|n keeps the big waves away."
       island:
         stance: truth
         reply: >
           "It is small, but it has all we need. Water at the spring, gardens, the forest.
           Climb the hill and you will see all of it at once."
       reef:
-        # A4 idea: asking about the reef before going there counts as respect.
         stance: truth
         teaches: {tides: heard}
         reply: >
@@ -397,17 +415,20 @@ characters:
       halcyon:
         aliases: [ship, strangers, wreck]
         stance: hiding
+        sets: respect_rule  # the rule, told when strangers ask for what they want first
         reply: >
-          "Many things come from the sea. Some are fish, some are stories. A story is for
-          those who have shown they listen."
+          "You ask about strangers before you ask about us. A stranger who wants our
+          stories shows |wrespect|n first: ask about our people, and be kind to our
+          children. Then ask me again."
         truth:
-          needs: [respect]
+          needs: [respect_ama, respect_tui]
           clue: C12
+          sets: cove_told
           reply: >
             "Fifteen winters ago a great storm threw a ship onto the western reef. Our
             people paddled out into the storm and [[brought the whole |wcrew|n ashore,
-            alive]]. They lived with us for a season and learned our songs. Then most of
-            them went away again, over the sea to the west."
+            alive]]. What they did after, the one who stayed can tell you better than I.
+            He lives at the Boat Cove, southwest of the village. His name is Jonah."
       tui:
         aliases: [child, grandchild]
         stance: truth
@@ -424,14 +445,25 @@ characters:
           living. Listen to what it says, not only to the tune."
       crew:
         stance: hiding
+        sets: respect_rule
         reply: >
-          "Ask me again when we know each other better."
+          "Those are strangers' stories. Show |wrespect|n first: ask about our people, and
+          be kind to our children."
         truth:
-          needs: [respect]
+          needs: [respect_ama, respect_tui]
           clue: C12
+          sets: cove_told
           reply: >
-            "[[They built a boat at the cove, with wood from their broken ship]] and rope
-            from our trees. One of them stayed. He still lives among us."
+            "Our people paddled out into the storm and [[brought every one of them ashore,
+            alive]]. The rest of their story belongs to the one who stayed. He lives at the
+            Boat Cove, southwest of the village: Jonah. Tell him I sent you."
+      respect:
+        aliases: [rule, rules, manners]
+        stance: truth
+        reply: >
+          "Respect is shown, not said. Ask about the people who live here, not only about
+          what you came for. And be kind to our children: Tui is watching you, and so am
+          I."
       self:
         hidden: true
         stance: truth
@@ -452,8 +484,9 @@ characters:
       A child of about ten, barefoot, with a little bag on a string around the neck that
       clinks when Tui moves.
     greeting: >
-      "Hello! Are you from a ship? Do you want to see my |wbuttons|n?"
-    suggest: [buttons, bones, song, goats]
+      "Hello! Are you from a ship? Grandmother says strangers must show |wrespect|n. Do
+      you want to see my |wbuttons|n?"
+    suggest: [respect, buttons, bones, song, goats]
     fallback: >
       Tui shrugs. "Don't know. Do you want to hear my |wsong|n instead?"
     topics:
@@ -482,6 +515,23 @@ characters:
            their big canoe broke on the reef.
            They [[made a new canoe with a white wing
            and flew away to where the sun goes to sleep]]."
+        truth:
+          # Listening to the child, once you know the rule: the second mark of respect,
+          # and the way to the reef (DECISIONS.md, 40 and 41).
+          needs: [respect_rule]
+          sets: respect_tui
+          clue: C11
+          teaches: {songs: heard}
+          reply: >
+            Tui sings:
+
+            "People came out of the sea,
+             their big canoe broke on the reef.
+             They [[made a new canoe with a white wing
+             and flew away to where the sun goes to sleep]]."
+
+            Tui beams. "You listened to the whole song! Grandmother saw. Come on, I'll show
+            you the way to the big bones, out on the Western Reef!"
       goats:
         aliases: [goat]
         stance: truth
@@ -490,10 +540,23 @@ characters:
           everything! Even my hat, once."
       jonah:
         aliases: [pike, carpenter, cove]
-        stance: truth
+        stance: hiding
         reply: >
-          "Old Jonah lives by the |wcove|n. He makes boats, and he talks funny, like you.
-          He's nice. He made me a whistle."
+          "Old Jonah? He's nice, and he talks funny, like you. He made me a whistle. Where
+          he lives? Grandmother says that's for her to tell."
+        truth:
+          needs: [cove_told]
+          reply: >
+            "Old Jonah lives by the |wcove|n. He makes boats, and he talks funny, like you.
+            He's nice. He made me a whistle."
+      respect:
+        aliases: [grandmother, ama, elder, rule, rules]
+        stance: truth
+        sets: respect_rule
+        reply: >
+          "Grandmother is the oldest in the whole village! She says strangers must show
+          respect. Ask her about our village first, not about your ship. And listen to my
+          |wsong|n! Then she tells you stories."
       self:
         hidden: true
         stance: truth

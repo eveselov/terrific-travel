@@ -25,6 +25,7 @@ from world.content import (
     Content,
     Reveal,
     TopicSpec,
+    TrustSpec,
     TruthSpec,
     find_look,
     load_content,
@@ -133,7 +134,7 @@ def answer(topic: TopicSpec) -> Reveal:
     """What a character says about a topic now: the truth, once its `needs` are met."""
     truth: TruthSpec | None = topic.truth
     if truth is not None and get_expedition().met(truth.needs):
-        return Reveal(text=truth.reply, clue=truth.clue, teaches=truth.teaches)
+        return Reveal(text=truth.reply, clue=truth.clue, teaches=truth.teaches, sets=truth.sets)
     return Reveal(text=topic.reply, clue=topic.clue, teaches=topic.teaches)
 
 
@@ -257,6 +258,35 @@ def _say_to_room(caller: Any, mine: str, theirs: str, reply: str) -> None:
         caller.msg(reply)
 
 
+def trust_progress(flag: str) -> str | None:
+    """
+    The quiet line acknowledging a mark of someone's trust (DECISIONS.md, 41): `Elder Ama's
+    respect: 1 of 2.`, or what it means once it's won. None if the flag is no such mark.
+    """
+    expedition: Any = get_expedition()
+    for spec in load_content().characters.values():
+        trust: TrustSpec | None = spec.trust
+        if trust is None or flag not in trust.marks:
+            continue
+        done: int = sum(1 for mark in trust.marks if expedition.met((mark,)))
+        line: str = f"{trust.label}: {done} of {len(trust.marks)}."
+        return line + (f" {trust.won}" if done == len(trust.marks) else "")
+    return None
+
+
+def _remember(caller: Any, flag: str) -> None:
+    """Set a flag a reply sets; a new mark of trust is acknowledged to the room."""
+    expedition: Any = get_expedition()
+    if expedition.met((flag,)):
+        return
+    expedition.set_flag(flag)
+    progress: str | None = trust_progress(flag)
+    if progress is not None and caller.location is not None:
+        for character in caller.location.contents_get(content_type="character"):
+            if not isinstance(character, Inhabitant):
+                notices.tell(character, notices.quiet(progress))
+
+
 def _lines(*lines: str) -> str:
     return "\n".join(line for line in lines if line)
 
@@ -370,9 +400,10 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
     _say_to_room(caller, mine, theirs, speech(spec, said.text))
     if rest:
         caller.msg(_one_at_a_time(rest))
-    if topic.sets is not None:
-        get_expedition().set_flag(topic.sets)
     with notices.together():
+        for flag in (topic.sets, said.sets):
+            if flag is not None:
+                _remember(caller, flag)
         if said.clue is not None:
             discover(said.clue, caller, spec.name)
         learn(caller, said.teaches, spec.name, _players_here(caller))

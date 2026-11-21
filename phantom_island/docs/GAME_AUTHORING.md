@@ -75,6 +75,12 @@ Add the place to `places.yaml` with a `name`, `desc`, `map` and `map_pos`, and g
 Exits go one way: add the way back from the other place too. Compass directions get their
 short forms (`se`) automatically. Then `batchcode build`.
 
+A place players must discover first gets `hidden_until:` (DECISIONS.md, 40): the clues or
+flags that show the way there. Until they hold, the place isn't on the map and the exits to
+it are neither shown nor usable; when they hold, everyone is told of the new path. Something
+in the story must set that flag (a topic's or truth's `sets`, or a place's `sets`, set on
+arrival: the Hilltop shows the Village), and a hint situation must point to it.
+
 ### A character, or a topic
 
 In `characters.yaml`: `where` they stand, a `voice` (how they speak), a `greeting`, a few
@@ -84,6 +90,11 @@ hiding). A reply that starts with a quote is shown as speech (`Old Barnaby says:
 - Words every character should understand the same way (`the storm`, `old chart`) go in
   `topic_aliases` at the top of the file; asking several witnesses about the same word and
   comparing is the historian's lesson.
+- A character who must be won over gets `trust:` (DECISIONS.md, 41): the `marks` (flags
+  set by what players do), a `label` for the progress shown with each mark, and `won`.
+  Name the rule in their own words, and in someone else's, and set each mark from a
+  `truth` whose `needs` include the flag that the rule was told (`respect_rule`), so
+  nothing counts by chance.
 - Give each character a `self` topic (`hidden: true`): what they say when asked about
   themselves (`yourself`, `who are you`). A little character, and now and then a useful
   pointer (Barnaby was at sea the year of the storm). Without one, a short default.
