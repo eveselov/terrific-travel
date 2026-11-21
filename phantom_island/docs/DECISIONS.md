@@ -138,5 +138,4 @@ every ending, and a player who wanders is led back towards the task (tested with
 ## Open questions
 
 - Checkpoints: needed when the game goes to the co-designers; which commands, and what is saved? (from 7)
-- The compass's coral (2026-11-16): coral grows only under water, over years (C2), but Jonah says the crew gave the compass to a fisherman's family straight after the rescue. How did it lie in the sea for years? For example: it went down with the wreck and was found on the reef years later, or the family's canoe lost it on the reef. Jonah's *compass* and "The truth" (6) change with the answer; the epilogue already only says it "travelled from island to island".
 - The spoiler-free questions for the kids at the end of [GAME_STORY.md](GAME_STORY.md).

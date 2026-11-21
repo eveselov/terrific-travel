@@ -59,8 +59,9 @@ The game keeps this as data. Characters reveal parts of it; they never make up n
    happened to them after that is unknown, and the game leaves it open.
 5. The ship's carpenter, **Jonah Pike**, stayed. He married into the village and still lives
    there, 15 years later.
-6. As a gift, the crew left the ship's compass with a fisherman's family. Years later it
-   was traded from island to island and reached the port. That's the hook.
+6. The ship's compass went down with the wreck and lay on the reef for fifteen years, where
+   coral grew over it. Last year island boys found it at low tide, and it was traded from
+   island to island, eastward, until it reached the port. That's the hook.
 7. Goats and a patch of European onions are still on the island, left by the crew.
 
 ## Facts that depend on each other
@@ -119,7 +120,7 @@ Holds.
 | Crane says it washed up on a beach after last winter's storm | His lie | Crane's *compass*, *beach*, *storm* |
 | A coral crust has grown in its hinge (C2) | Coral takes years under water, not one winter on a beach; it is built by tiny sea animals in warm, clear, shallow water, and grows over anything lying on a reef | `things.yaml` (compass, `examine`; the animal guide), `ideas.yaml` (*Coral*) |
 | The *Halcyon* was lost fifteen years ago, in the great storm of '75 | — (the truth) | Barnaby's *storm*, Fairweather's *halcyon* |
-| Once C2 is found he admits fishermen from the west traded it to him (C3) | It came from island to island, eastward | Crane's *compass* and *fishermen* (truth) |
+| Once C2 is found he admits fishermen from the west traded it to him (C3) | It lay on the reef with the wreck, was found last year and came from island to island, eastward | Crane's *compass* and *fishermen* (truth) |
 
 Holds as a lie: the dates and the coral contradict him, which is the point.
 
@@ -136,7 +137,7 @@ Holds as a lie: the dates and the coral contradict him, which is the point.
 | Most of the crew sailed west, Jonah stayed | West led to the trading routes; he had married into the village | Jonah's *crew* |
 | They sailed west, not home to the east | Out here the trade wind blows from the east (south-east) all year: the voyage out had it behind (Day 4), going home is slower against it, and a small boat can't beat into it for weeks | Jonah's *home*, the voyage's Day 4, the Ship's *home* route |
 | The crew's families in the port still wait for news | Most of the crew came from this port; nobody ever came home, and the boat that sailed west was never heard of | Fairweather's *crew* |
-| The compass reached the port through fishermen from the west (C3) | The crew left it as a gift; it was traded from island to island, eastward to the port | Crane's *compass* (truth), *fishermen* |
+| The compass reached the port through fishermen from the west (C3) | It went down with the wreck and lay on the reef for fifteen years (the coral, C2); island boys found it at low tide last year, and it was traded from island to island, eastward to the port | Crane's *compass* (truth), *fishermen*, Jonah's *compass* |
 
 Holds.
 
