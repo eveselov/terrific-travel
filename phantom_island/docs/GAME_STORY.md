@@ -12,7 +12,7 @@ don't show it to the players.
 > last month a trader in the port began selling a brass compass with one word engraved on
 > it: HALCYON.
 >
-> Now the Society sends a new expedition, and you lead it, as captain of its ship. She
+> Now the Society sends an expedition, and you lead it, as captain of its ship. She
 > carries the tools of two sciences: the navigator's
 > sextant, clock and charts, which read the sun, the stars and the sea, and the naturalist's
 > books, which read plants, animals, birds and the land. Your job: find out what really
