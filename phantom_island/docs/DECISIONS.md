@@ -114,7 +114,7 @@ every ending, and a player who wanders is led back towards the task (tested with
      - Elder Ama no longer promises days that the game doesn't have ("Not every story is for the first day"): "A story is for those who have shown they listen."
      - Mrs. Fairweather's *mission* invites exploring ("How you go about it is yours to decide. Talk to everyone, ask about everything...") and gives the compass as the latest news, not an order (35: exploring has no single first step).
      - The coral's journal line (C2) says "not on a beach as Crane says": a signpost back to him, whose truth the coral unlocks.
-     - The Ship offers topics that fit where she is: a position in ship.yaml can have its own `suggest` (at the island *tide*, *water*, *wind*, *witnesses*; at the chart's position the *council* first). Her knowledge stays the same everywhere: she is a wise old ship, not a guide who changes her answers.
+     - The Ship offers topics that fit where she is: a position in ship.yaml can have its own `suggest` (at the island *tide*, *wind*, *witnesses*; at the chart's position the *council* first). Her knowledge stays the same everywhere: she is a wise old ship, not a guide who changes her answers.
      - `think` drops settled questions: a connection's optional `settled` (a clue, a flag such as a council's step, or `report:<question>` once answered) takes it out of `think`, the journal's count and the hints' news. On the island, the sea's questions are gone once the council or the report has settled them.
      - **One ship room (36)** (built 2026-11-20): the Deck with its chart house; no Cabin, no `up` and `down`.
      - **The report records and signs; councils guide (37)** (built 2026-11-20): council conclusions in the report, the command to sign them, and a final council aboard at the island.
@@ -123,8 +123,8 @@ every ending, and a player who wanders is led back towards the task (tested with
 2. **Time: the tide, dusk and noon** (decided 2026-11-20, 38): told, not kept. No clock and no waiting; the reef's low tide is in its text, like the noon sight's noon (built 2026-11-20).
 3. **Ama's respect** (built 2026-11-21, 41): named, taught and acknowledged, in two marks.
 4. **Promised elsewhere, to build or drop:**
-   - counting the water (26);
-   - `show <thing> to <character>` (19).
+   - counting the water (26): **dropped** (2026-11-21). A supply that runs down is a clock (38), it can't end badly (no dead ends), and it does no job on the path (39). The casks, the Ship's *water* topic and the Spring stay as background;
+   - `show <thing> to <character>` (19): **waiting for the final playtest** (2026-11-21). It would only be the one way to Crane's confession (not a second way, 39); decided by whether his giving in feels like the players' own act.
 
 **After A4** (agreed 2026-11-18):
 - **Dead reckoning in depth**, as optional depth the puzzle doesn't need: a log line and sandglass in the chart house and the ship's log book; how speed was measured in knots, and why a few miles a day unnoticed add up to the Halcyon's 1 degree in three weeks (at 14° S a degree of longitude is about 58 nautical miles). Historical numbers to be checked against sources first (9).

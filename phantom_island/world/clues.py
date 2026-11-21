@@ -242,12 +242,18 @@ def think_text(owner: Any, word: str = "") -> str:
     compass`), each with the notebook ideas that help; the owner's new ones are marked.
     """
     opened: list[ConnectionSpec] = open_connections()
+    content: Content = load_content()
     if not opened:
+        known: set[str] = found_clues()
+        if any(groups_met(connection.needs, known) for connection in content.connections.values()):
+            return (
+                "Nothing left to puzzle over: every question the journal has raised is "
+                "settled. If new clues fit together, a new question comes up here."
+            )
         return (
             "Nothing to think about yet. When two clues in the journal fit together, a "
             "question about them comes up here."
         )
-    content: Content = load_content()
     wanted: str = " ".join(word.lower().split())
     if wanted:
         opened = [connection for connection in opened if _about(connection, wanted, content)]

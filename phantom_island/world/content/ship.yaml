@@ -304,7 +304,7 @@ positions:
   anchorage:
     name: Anchored off the island
     coords: 14 S, 41 W
-    suggest: [council, tide, water, wind, witnesses, advice]
+    suggest: [council, tide, wind, witnesses, advice]
     chart_pos: [450, 290]
     map: island
     map_pos: [875, 545]

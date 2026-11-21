@@ -18,6 +18,7 @@ from typing import Any
 from world import notices
 from world.content import Content, PlaceSpec, load_content
 from world.expedition import connected_characters, get_expedition
+from world.places import place_id_of
 
 NO_PATH: str = "There's no path that way that you know of."
 
@@ -40,15 +41,42 @@ def is_known(place_id: str) -> bool:
     return bool(get_expedition().met(place.hidden_until))
 
 
-def _way_in(content: Content, place_id: str, hidden: set[str]) -> str:
-    """Where the new path starts: `west of the Village`, from a place already known."""
-    for other in content.places.values():
-        if other.id in hidden or other.id == place_id:
-            continue
-        for exit_spec in other.exits:
-            if exit_spec.to == place_id:
-                return f", {exit_spec.key} of the {other.name}"
-    return ""
+def _distances(content: Content, start: str | None, hidden: set[str]) -> dict[str, int]:
+    """How many steps each known place is from `start`, walking known paths only."""
+    if start is None or start not in content.places:
+        return {}
+    steps: dict[str, int] = {start: 0}
+    frontier: list[str] = [start]
+    while frontier:
+        following: list[str] = []
+        for place_id in frontier:
+            for exit_spec in content.places[place_id].exits:
+                if exit_spec.to in hidden or exit_spec.to in steps:
+                    continue
+                if exit_spec.to in content.places:
+                    steps[exit_spec.to] = steps[place_id] + 1
+                    following.append(exit_spec.to)
+        frontier = following
+    return steps
+
+
+def _way_in(content: Content, place_id: str, hidden: set[str], start: str | None = None) -> str:
+    """
+    Where the new path starts: `, south of the Forest Path`, from the known place nearest to
+    `start` (where the listener stands), or the first one in the content when none is near.
+    """
+    ways: list[tuple[str, str]] = [
+        (other.id, f", {exit_spec.key} of the {other.name}")
+        for other in content.places.values()
+        if other.id not in hidden and other.id != place_id
+        for exit_spec in other.exits
+        if exit_spec.to == place_id
+    ]
+    if not ways:
+        return ""
+    steps: dict[str, int] = _distances(content, start, hidden)
+    nearest: tuple[str, str] = min(ways, key=lambda way: steps.get(way[0], len(content.places)))
+    return nearest[1]
 
 
 def announce(before: set[str]) -> None:
@@ -58,12 +86,13 @@ def announce(before: set[str]) -> None:
     if not opened:
         return
     content: Content = load_content()
-    for place_id in opened:
-        line: str = notices.quiet(
-            f"A new path: the {content.places[place_id].name}{_way_in(content, place_id, hidden)}."
-        )
-        for character in connected_characters():
-            notices.tell(character, line)
+    for character in connected_characters():
+        start: str | None = place_id_of(character.location) if character.location else None
+        for place_id in opened:
+            way: str = _way_in(content, place_id, hidden, start)
+            notices.tell(
+                character, notices.quiet(f"A new path: the {content.places[place_id].name}{way}.")
+            )
 
 
 @contextmanager

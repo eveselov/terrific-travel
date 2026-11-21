@@ -1812,7 +1812,7 @@ class TestConnections(DiscoveryTest):
         self.assertNotIn("How far from land do they fish?", settled)
         self.assertIn("What else could her timber", settled)
         get_expedition().answer("crew", "someone")  # the report question it leads to
-        self.assertIn("Nothing to think about", self.do(self.char1, "think"))
+        self.assertIn("Nothing left to puzzle over", self.do(self.char1, "think"))
 
     def test_a_question_comes_with_the_second_clue(self) -> None:
         self.at(self.char1, "market")
@@ -2253,7 +2253,8 @@ class TestLearnedPaths(DiscoveryTest):
     def test_the_hilltop_shows_the_village(self) -> None:
         self.at(self.char1, "forest")
         arrived: str = self.do(self.char1, "north")  # up to the Hilltop: smoke from a village
-        self.assertIn("A new path: the Village, ", arrived)
+        # Named from the known place nearest to the listener: the Hilltop is above the forest.
+        self.assertIn("A new path: the Village, south of the Forest Path.", arrived)
         self.at(self.char1, "forest")
         self.do(self.char1, "south")
         self.assertEqual(self.char1.location, self.rooms["village"])
