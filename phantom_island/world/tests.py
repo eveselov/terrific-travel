@@ -2093,7 +2093,7 @@ class TestCouncil(DiscoveryTest):
         here: str = self.do(self.char1, "ask ship")
         self.assertIn("|wcouncil|n, |wbirds|n, |whorizon|n", here)
         self.ship_at("anchorage")
-        self.assertIn("about: |wcouncil|n, |wtide|n, |wwater|n", self.do(self.char1, "ask ship"))
+        self.assertIn("about: |wcouncil|n, |wtide|n, |wwind|n", self.do(self.char1, "ask ship"))
         self.ship_at("port")
         self.assertIn("about: |wcourse|n, |wchart|n", self.do(self.char1, "ask ship"))
 
