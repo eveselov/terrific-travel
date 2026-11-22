@@ -79,7 +79,8 @@ things:
     desc: >
       A brass instrument shaped like a slice of pie, with a small telescope, mirrors and a
       curved scale, kept in its box in the chart house. Navigators |wuse|n it at noon to
-      measure how high the sun stands above the horizon. Ask the Ship about the |wsextant|n
+      measure how high the sun stands above the horizon. Ask the Good Hope about the
+      |wsextant|n
       to learn more.
     use:
       teaches: {latitude: used}
@@ -142,7 +143,8 @@ things:
       The chronometer is screwed into its box, and the box is screwed to the ship. It
       stays where it is. (And it really should: moving it would spoil its timekeeping.)
     desc: >
-      A fat brass clock in a wooden box, fixed beside the chart table in the chart house. It keeps the time
+      A fat brass clock in a wooden box, fixed beside the chart table in the chart house.
+      It keeps the time
       of the home port, all voyage long. You can |wread|n it.
     read:
       text: >
@@ -164,8 +166,9 @@ things:
             home time: 160 minutes after noon at home. Four minutes for every degree makes
             [[40 degrees West: the longitude on the Halcyon's chart. Both of the chart's
             numbers check out. You are exactly where the chart puts the island, and there is
-            no island.]] So one of the chart's two numbers must be wrong. Which one would you trust?
-            The Ship knows how each is measured: |wask ship about latitude|n, |wask ship
+            no island.]] So one of the chart's two numbers must be wrong. Which one would
+            you trust?
+            The Good Hope knows how each is measured: |wask hope about latitude|n, |wask hope
             about longitude|n.
           otherwise: &no_sight >
             The chronometer ticks steadily, keeping home time. On its own it can't say
@@ -229,7 +232,8 @@ things:
       text: >
         In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
         large figures: Latitude 14 degrees South, longitude 40 degrees West of
-        home.|/Give it to the crew as your order: |wsail to 14 south 40 west|n. The coastline is
+        home.|/Give it to the crew as your order: |wsail to 14 south 40 west|n. The
+        coastline is
         drawn with care: round in the east with a lagoon, a hill in the middle, a long reef
         down the west side, and a little cove in the south, like a hook.
 
@@ -264,6 +268,7 @@ things:
       text: >
         You leaf through it. Few land animals ever reach islands far out in the ocean on
         their own: birds fly there, lizards drift on logs. Goats never do. Sailors carry
-        goats on ships for milk and meat, and sometimes leave a few ashore. Coral is built by
+        goats on ships for milk and meat, and sometimes leave a few ashore. Coral is built
+        by
         tiny sea animals, in warm, clear, shallow water; over the years it grows into reefs,
         and over anything that lies on them.

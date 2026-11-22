@@ -135,7 +135,8 @@ characters:
           at the top of the expedition's |wjournal|n; when you can prove the answers, send
           me your |wreport|n. How you go about it is yours to decide. Talk to everyone, ask
           about everything, and look closely at what you find. The latest news in port is a
-          |wcompass|n on Silas Crane's stall, just east of here, and your |wship|n carries the
+          |wcompass|n on Silas Crane's stall, just east of here, and your |wship|n carries
+          the
           Halcyon's |wchart|n."
       halcyon:
         stance: truth
@@ -149,8 +150,10 @@ characters:
       chart:
         stance: mistaken
         reply: >
-          "The Halcyon's chart is the |wSociety|n's most precious paper, so the original stays
-          locked away here. A fair copy is waiting for you in your ship's chart house. The island
+          "The Halcyon's chart is the |wSociety|n's most precious paper, so the original
+          stays
+          locked away here. A fair copy is waiting for you in your ship's chart house. The
+          island
           is drawn on it, with its latitude and longitude written beside it. The Halcyon's
           master was a careful man; I have never had reason to doubt it."
       letter:
@@ -178,7 +181,8 @@ characters:
         aliases: [captain, command, orders]
         stance: truth
         reply: >
-          "The Society has hired a sound ship and a good crew. Where your ship sails is for
+          "The Society has hired a sound ship, the Good Hope, and a good crew. Where your
+          ship sails is for
           you to decide: you lead this expedition, and the crew will follow your orders. Your
           ship lies at the quay, south-east of here."
       crew:
@@ -311,7 +315,8 @@ characters:
           clue: C3
           reply: >
             Crane looks at the coral in the hinge and sighs. "All right. I didn't find it.
-            I traded for it with [[|wfishermen|n who sailed in from the west]], a long way out.
+            I traded for it with [[|wfishermen|n who sailed in from the west]], a long way
+            out.
             I kept quiet because people would call me a wreck looter. I'm not. I paid fair."
       beach:
         stance: hiding
@@ -603,21 +608,24 @@ characters:
         clue: C13
         reply: >
           "Wind out of the west, and the anchors dragged. [[The Halcyon struck the reef in
-          the night.]] If the islanders hadn't come out in their canoes, we'd all have drowned.
+          the night.]] If the islanders hadn't come out in their canoes, we'd all have
+          drowned.
           [[Not one of us was lost.]]"
       boat:
         aliases: [canoe, white wing]
         stance: truth
         clue: C13
         reply: >
-          "[[We built the boat right here, from the Halcyon's own oak]], with rope from island
+          "[[We built the boat right here, from the Halcyon's own oak]], with rope from
+          island
           fibre and a sail of patched canvas. A white wing, the children call it."
       crew:
         aliases: [west, the others]
         stance: truth
         clue: C13
         reply: >
-          "[[Most of them sailed west in the boat]], to reach the trading routes, not |whome|n.
+          "[[Most of them sailed west in the boat]], to reach the trading routes, not
+          |whome|n.
           I never heard what became of them. I stayed. I'd married by then, and this was
           home now."
       home:
@@ -626,7 +634,8 @@ characters:
         teaches: {winds: understood}
         reply: >
           "Home lies east, and out here the trade wind blows from the east, day after day.
-          Beat against it for weeks in a little boat we built ourselves? We'd have run out of
+          Beat against it for weeks in a little boat we built ourselves? We'd have run out
+          of
           water first. Going west, the wind was behind us all the way."
       chart:
         aliases: [longitude, position]
@@ -655,16 +664,17 @@ characters:
   # --- The ship -------------------------------------------------------------------------
 
   ship:
-    # The name is the kids' to choose (GAME_STORY.md, questions for the kids).
-    name: the Ship
-    aliases: [ship, boat]
+    # The Good Hope: the expedition's ship, sent with the families' hope (2026-11-21).
+    name: the Good Hope
+    aliases: [hope, good hope, ship, boat]
     where: aboard
     voice: >
       Warm, patient, a teacher: she explains how things work (the sun, clocks, birds,
       tides) in clear steps, and asks questions back instead of giving answers. A ship's
       pride and a little humour. Never tells the solution, only how to find it.
     desc: >
-      You can't look at the Ship: you're standing on her. But sometimes her timbers creak
+      You can't look at the Good Hope: you're standing on her. But sometimes her timbers
+      creak
       in a way that sounds almost like a voice.
     greeting: >
       The timbers creak, and somehow it sounds like a voice. "You called? Ask me about
@@ -672,7 +682,7 @@ characters:
       instruments in the chart house, and the |wwater|n casks."
     suggest: [course, sextant, chronometer, latitude, longitude, birds, advice]
     fallback: >
-      The Ship creaks thoughtfully. "That's beyond what a ship knows. Try me on
+      The Good Hope creaks thoughtfully. "That's beyond what a ship knows. Try me on
       navigation, or on the sea and the sky."
     topics:
       sextant:
@@ -820,5 +830,6 @@ characters:
         hidden: true  # a surprise for whoever thinks of asking her name
         stance: truth
         reply: >
-          "My name? That's for my crew to decide. Choose well; I'll be wearing it for a
-          long time."
+          "My name? The Good Hope. I've worn it for many years, and sailors say a ship
+          grows into her name. On this voyage I mean to: the families on the quay are
+          hoping too."

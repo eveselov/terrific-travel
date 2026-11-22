@@ -139,7 +139,7 @@ connections:
     settled: [far_settled]
     question: >
       There is no land at the chart's position, yet the seabirds there fly home to land at
-      dusk. How far from land do they fish? The Ship knows: |wask ship about birds|n.
+      dusk. How far from land do they fish? The Good Hope knows: |wask hope about birds|n.
   which_number:
     needs: [C4, C5]
     ideas: [longitude, sea_clocks, dead_reckoning]
@@ -147,14 +147,14 @@ connections:
     question: >
       At the chart's position the sextant and the chronometer agreed with the chart; at the
       island only the sextant does. Why could the Halcyon's master get one number right and
-      the other wrong? |wask ship about longitude|n, or ask someone who sailed with him.
+      the other wrong? |wask hope about longitude|n, or ask someone who sailed with him.
   two_witnesses:
     needs: [C7, C12]
     ideas: [witnesses]
     settled: [report:crew]
     question: >
       Old Barnaby is sure the Halcyon sank with all hands. You have seen her wreck, and
-      heard what happened from the island. Which witness was there? (|wask ship about
+      heard what happened from the island. Which witness was there? (|wask hope about
       witnesses|n)
   oak:
     needs: [C7, C8]

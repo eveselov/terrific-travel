@@ -992,7 +992,8 @@ class TestAsk(WorldTest):
     def test_the_ship_is_silent_ashore(self) -> None:
         self.at("quay")
         self.assertIn("can only hear you when you're aboard", self.ask("ship about longitude"))
-        self.assertNotIn("the Ship", [listener.spec.name for listener in listeners(self.char1)])
+        names: list[str] = [listener.spec.name for listener in listeners(self.char1)]
+        self.assertNotIn("the Good Hope", names)
 
     def test_the_ask_command_is_available(self) -> None:
         self.at("quay")
@@ -1511,7 +1512,7 @@ class TestNotebook(DiscoveryTest):
         self.at(self.char1, "deck")
         self.do(self.char1, "ask ship about latitude")
         page: str = self.do(self.char1, "notebook sources")
-        self.assertIn("heard: Old Barnaby; understood: the Ship", page)
+        self.assertIn("heard: Old Barnaby; understood: the Good Hope", page)
         self.assertIn(f"Also in the notebook of {self.char2.key}", page)
 
     def test_how_to_read_it_is_said_until_it_is_opened(self) -> None:
@@ -1917,7 +1918,7 @@ class TestHints(DiscoveryTest):
 
     def test_aboard_the_ship_speaks(self) -> None:
         self.at(self.char1, "deck")
-        self.assertIn("The Ship creaks", self.do(self.char1, "hint"))
+        self.assertIn("The Good Hope creaks", self.do(self.char1, "hint"))
 
     def test_the_situation_follows_the_state_of_play(self) -> None:
         self.ship_at("charted")

@@ -241,7 +241,7 @@ what gets revealed.
 | **Elder Ama** | Village | **Holds the key, cautious** | Remembers the rescue. Tells it only to strangers who show respect, a rule she and Tui both name: ask about her people, and listen to the child (DECISIONS.md, 41). Then she tells where the one who stayed lives. |
 | **Tui**, a village child | Village | **Knows the truth, not its meaning** | Plays on "the big bones in the reef", collects brass buttons, knows a song about "people from the sea who made a canoe with a white wing". Kids playing will probably love Tui most. |
 | **Jonah Pike**, the *Halcyon*'s carpenter | Boat Cove | **Final witness** | Knows almost everything, including the direction the boat sailed. Only met late (after the reef and the elder), so he confirms the story rather than solving it. |
-| **The Ship** (named by the kids) | Always aboard | **Hint-giver and explainer** | The players' own ship, with "a mind of her own". Gives hints that get more direct when the players seem stuck, and explains the instruments and the science when asked. A natural first AI character later. |
+| **The Good Hope**, the expedition's ship (named 2026-11-21) | Always aboard | **Hint-giver and explainer** | The players' own ship, with "a mind of her own". Gives hints that get more direct when the players seem stuck, and explains the instruments and the science when asked. A natural first AI character later. |
 
 ## Clues (the authoritative table)
 
@@ -354,7 +354,7 @@ onions on long voyages; the masthead horizon distances (the Ship's *horizon*).
 
 ## Questions for the kids (spoiler-free)
 
-1. What is our ship called, and does she really have a mind of her own?
+1. Does our ship, the *Good Hope*, really have a mind of her own?
 2. How scary should storms and wrecks be?
 
 ## Open questions for the author

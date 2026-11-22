@@ -15,8 +15,8 @@ class CmdAsk(Command):
       ask about <something>
 
     Asking someone without a topic greets them, and they suggest a few things to ask about.
-    Words shown in white in their answers are often worth asking about too. Aboard the
-    ship, you can always ask the Ship herself.
+    Words shown in white in their answers are often worth asking about too. Aboard, you
+    can always ask the ship herself, the Good Hope: ask hope.
 
     ask about <something> (or ask him, her or them about ...) asks the person you spoke
     to last, if they're still here, or the only person here. The start of a long name is

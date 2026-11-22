@@ -38,7 +38,7 @@ from world.report import proved_by, signing_command
 COUNCIL: str = "council"
 NO_COUNCIL: str = (
     "There's nothing to hold a council about here. When the expedition has a big decision "
-    "to make aboard, the Ship will say so."
+    "to make aboard, the Good Hope will say so."
 )
 WAITS: str = f"The council waits: |w{COUNCIL}|n carries on where it stopped."
 

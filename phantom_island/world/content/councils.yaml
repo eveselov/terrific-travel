@@ -36,7 +36,8 @@ councils:
   charted:
     at: charted
     opening: >
-      The crew gather on the Deck, and the Ship's timbers creak: "Open sea, Captain, where
+      The crew gather on the Deck, and the Good Hope's timbers creak: "Open sea, Captain,
+      where
       the chart put the island. So the chart is wrong somewhere. Let's settle it, one thing
       at a time."
     steps:
@@ -54,7 +55,8 @@ councils:
             right: true
             reply: >
               "Yes. Without a sea clock, longitude is only a reckoning, and small errors add
-              up. His latitude was right, so the island lies on our own latitude: east of us,
+              up. His latitude was right, so the island lies on our own latitude: east of
+              us,
               or west."
             proof:
               - clues: [sight_charted]
@@ -64,7 +66,8 @@ councils:
                   Then call the council again."
           - text: Both of them.
             reply: >
-              "Our |wsextant|n agrees with his latitude: that one he measured, every noon. Is
+              "Our |wsextant|n agrees with his latitude: that one he measured, every noon.
+              Is
               there one he could only guess?"
       - id: side
         sets: side_settled
@@ -73,7 +76,8 @@ councils:
         choices:
           - text: East.
             reply: >
-              "East is the way we came: three weeks of empty sea behind us. Is there anything
+              "East is the way we came: three weeks of empty sea behind us. Is there
+              anything
               in the journal that points the other way?"
           - text: West.
             right: true
@@ -92,18 +96,21 @@ councils:
       - id: far
         sets: far_settled
         question: >
-          "Third: how far west? Out here, one degree of longitude is about 107 kilometres, or
+          "Third: how far west? Out here, one degree of longitude is about 107 kilometres,
+          or
           67 miles. Think of how far from land the terns fish, and how far my lookout can
           see."
         choices:
           - text: Less than half a degree.
             reply: >
-              "Then my lookout would see it from the masthead. Ask me about the |whorizon|n if
+              "Then my lookout would see it from the masthead. Ask me about the |whorizon|n
+              if
               you doubt it."
           - text: About one degree.
             right: true
             reply: >
-              "About one degree. Further than my lookout can see, so we see nothing, but well
+              "About one degree. Further than my lookout can see, so we see nothing, but
+              well
               within a tern's flight home, so they fish here. Close, Captain: a day's sail."
             proof:
               - clues: [C6]
@@ -113,14 +120,16 @@ councils:
           - text: Ten degrees or more.
             reply: >
               "Then why are terns fishing all round us? Ask me how far they go from land:
-              |wask ship about birds|n."
+              |wask hope about birds|n."
           - text: There's no way to tell.
             reply: >
-              "There is: the terns and the horizon together. |wask ship about birds|n, and
+              "There is: the terns and the horizon together. |wask hope about birds|n, and
               about the |whorizon|n."
     summary: >
-      The Ship's timbers creak: "So the council agrees. The Halcyon's master had his latitude
-      right and his longitude wrong. The island lies west of us, on our own latitude, about a
+      The Good Hope's timbers creak: "So the council agrees. The Halcyon's master had his
+      latitude
+      right and his longitude wrong. The island lies west of us, on our own latitude, about
+      a
       degree away. We are at 14 south, 40 west, so one degree further west is 41 west. It's
       still a judgement, not a certainty, but it's the best the council can make. The order
       is yours, Captain: |wsail to 14 south 41 west|n. And it answers one of the Society's
@@ -135,7 +144,8 @@ councils:
   island:
     at: anchorage
     opening: >
-      The crew gather on the Deck, and the Ship's timbers creak: "We've found the Halcyon's
+      The crew gather on the Deck, and the Good Hope's timbers creak: "We've found the
+      Halcyon's
       island, Captain, and you've walked it. Now the Society's questions. Let's put together
       what the journal knows, one thing at a time."
     steps:
@@ -146,7 +156,8 @@ councils:
         choices:
           - text: She sank far out at sea, in the great storm of '75.
             reply: >
-              "That's Old Barnaby's belief, and he never saw this island. A ship lost far out
+              "That's Old Barnaby's belief, and he never saw this island. A ship lost far
+              out
               at sea leaves nothing near land. Has the island shown you nothing of her?"
           - text: On the island's Western Reef, in the great storm of '75.
             right: true
@@ -156,7 +167,8 @@ councils:
             proof:
               - clues: [C7]
                 missing: >
-                  "Something of her is on this island, Captain: on the Western Reef. Walk out
+                  "Something of her is on this island, Captain: on the Western Reef. Walk
+                  out
                   there, and look. Then call the council again."
           - text: She sailed on from the island, and was lost somewhere else.
             reply: >
@@ -237,8 +249,9 @@ councils:
               "East, against the trade wind, for weeks, in a little boat? Ask me about the
               |wwind|n out here, Captain."
     summary: >
-      The Ship's timbers creak: "So the council agrees. The Halcyon was wrecked on the
-      Western Reef in the great storm of '75. The islanders saved her whole crew, and most of
+      The Good Hope's timbers creak: "So the council agrees. The Halcyon was wrecked on the
+      Western Reef in the great storm of '75. The islanders saved her whole crew, and most
+      of
       them sailed west in a boat they built from her oak, while one stayed. That's what the
       Society asked, Captain. It's yours to write in the report, and yours to sign."
     concludes:

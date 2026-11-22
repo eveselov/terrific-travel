@@ -15,7 +15,7 @@ Phantom Island is a mystery to solve together, in words and pictures:
 
 - The expedition is all the players together: one team, sent out by the Society to find out what happened to the lost ship *Halcyon*.
 - You join it by typing `begin` on the title page (Limbo). Mrs. Fairweather, in the Society Office, explains the task. You are the expedition's captain: the crew sail the ship, and you decide where she goes and what to look into. Playing together, everyone is a captain.
-- You lead the expedition and command its ship: the crew follow your orders, and the ship goes where you decide (`sail` on the Deck). The ship herself has a voice and gives advice: `ask ship`.
+- You lead the expedition and command its ship: the crew follow your orders, and the ship goes where you decide (`sail` on the Deck). The ship, the *Good Hope*, has a voice of her own and gives advice: `ask hope` (or `ask ship`).
 - The expedition has its own ship and one shared journal. Where the ship is, and what has been found, is the same for every player.
 - One player alone is a whole expedition; more players simply share the work.
 
@@ -25,7 +25,7 @@ This is what makes Phantom Island different: its details are not random. Distanc
 
 - If two things don't seem to fit, one of them is wrong, and finding out which one is often a clue in itself.
 - Things that look like scenery may matter: a word in a description, the direction of a wind, what a plant is doing on an island.
-- You don't have to dig deep to finish the adventure. But if you want to know *why* something is so, the knowledge is there: ask the Ship, read the books, use the instruments.
+- You don't have to dig deep to finish the adventure. But if you want to know *why* something is so, the knowledge is there: ask the Good Hope, read the books, use the instruments.
 
 ## The screen
 
@@ -47,7 +47,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 ## Talking and moving
 
-- `ask <someone>` greets them, and they suggest things to ask about. `ask <someone> about <something>` asks. `about` is always needed for a topic, so `ask ship` always means the Ship, never a question about ships.
+- `ask <someone>` greets them, and they suggest things to ask about. `ask <someone> about <something>` asks. `about` is always needed for a topic, so `ask ship` (or `ask hope`) always means the Good Hope, never a question about ships.
 - After that, `ask about <something>` (or `ask him`, `her`, `them about …`) goes on talking to the same person, as long as they're still there. With only one person around, `ask about …` is enough from the start.
 - The start of a long name is enough: `ask fair about the chart`.
 - Anyone can be asked about themselves: `ask barnaby about yourself`, or `ask tui about you`.
@@ -59,10 +59,10 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 - Orders are given on the Deck with `sail`. On its own, `sail` tells you where the ship is and what you can order there.
 - A place at sea is a position: two numbers, the **latitude** (how far north or south) and the **longitude** (how far east or west). The island's position is written on the *Halcyon*'s chart in the chart house, on the Deck: `read chart`, and `examine chart` for a closer look.
-- Give the position as your order: `sail to <latitude> <longitude>`, for example `sail to 10 north 25 east`. The Ship repeats the order and explains the course before she sets off.
+- Give the position as your order: `sail to <latitude> <longitude>`, for example `sail to 10 north 25 east`. The Good Hope repeats the order and explains the course before she sets off.
 - Out at sea, where no chart helps, you can also sail by direction (`sail west`), or simply `sail home`.
 - A voyage takes a few moments of real time: a few lines tell the days at sea while the ship moves along the chart in the Map pane. Nothing needs doing meanwhile: the crew sail her.
-- Not sure where to go? `ask ship about course`.
+- Not sure where to go? `ask hope about course`.
 
 ## Notebook
 
@@ -94,18 +94,18 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 ## Council
 
-- When the expedition has a big decision to make aboard, the Ship will say so: call a `council`. The crew gather, and the Ship asks the questions that settle it, one at a time. Answer each with its letter: `council b`.
-- An answer only counts once the journal shows it. If it doesn't yet, the Ship tells you where to look, and the council waits: type `council` again when you're ready, and it carries on where it stopped.
+- When the expedition has a big decision to make aboard, the Good Hope will say so: call a `council`. The crew gather, and the Good Hope asks the questions that settle it, one at a time. Answer each with its letter: `council b`.
+- An answer only counts once the journal shows it. If it doesn't yet, the Good Hope tells you where to look, and the council waits: type `council` again when you're ready, and it carries on where it stopped.
 - When the council has decided, the order is still yours to give.
 - Some councils answer the Society's questions. Then the report shows what the council concluded, and the council tells you how to write it in: `report 2 d`, for example. You type it: the report is yours to sign.
-- On the island, when you've seen enough, go back aboard and call a council: the Ship helps you put the Society's answers together.
+- On the island, when you've seen enough, go back aboard and call a council: the Good Hope helps you put the Society's answers together.
 - Playing together, everyone in the room is at the council, and anyone can answer. Talk it over first!
 - Positions can be given as orders too: `sail to 14 south 40 west`.
 
 ## Hints
 
 - Stuck? Type `hint`, anywhere. The first hint is a gentle nudge; type `hint` again for a clearer one, and a third time for exactly what to type. When the expedition finds something new, the hints start gently again.
-- Aboard, the Ship gives the hint. Ashore, you think it over with the journal.
+- Aboard, the Good Hope gives the hint. Ashore, you think it over with the journal.
 - If nothing new has been found for a while, a hint comes by itself, once.
 
 ## General Tips

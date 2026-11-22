@@ -17,11 +17,13 @@ rooms:
     name: Deck
     kind: deck        # where `sail` works and the sea and sky are seen
     desc: >
-      The deck of your expedition's ship: masts and rigging overhead, and the wheel at the
+      The deck of the Good Hope, your expedition's ship: masts and rigging overhead, and
+      the wheel at the
       stern. Beside the wheel stands a small |wchart house|n, where the instruments and
       books are kept out of the spray. The crew stand ready at the ropes, waiting for the
       expedition's orders: |wsail|n shows where she can go. Now and then her timbers creak
-      almost like a voice. The ship herself listens: |wask ship|n anything about the sea,
+      almost like a voice. The Good Hope herself listens: |wask hope|n anything about the
+      sea,
       the sky and the instruments.
     details:
       chart house:
@@ -29,7 +31,8 @@ rooms:
         desc: >
           A little wooden hut on deck, with a door that faces the wheel. Inside, a chart
           table, the brass |wchronometer|n fixed beside it, the |wsextant|n in its box, the
-          Halcyon's |wchart|n, and two books wedged onto a shelf so they can't slide off when
+          Halcyon's |wchart|n, and two books wedged onto a shelf so they can't slide off
+          when
           the ship rolls: a |wplant guide|n and an |wanimal guide|n.
 
 # The exit from the Deck to the shore, and the one back from the shore to the Deck.
@@ -99,7 +102,8 @@ positions:
       The ship is moored at the quay. Sailors carry the last barrels aboard, and the
       harbour opens to the west, towards the ocean.
     shore: >
-      The expedition's ship is moored at the end of the quay, her sails neatly furled.
+      The Good Hope, the expedition's ship, is moored at the end of the quay, her sails
+      neatly furled.
     routes:
       west:
         teaches: {positions: used, latitude_sailing: understood}
@@ -108,12 +112,13 @@ positions:
         # compass came from. One way through: the coral (C2) makes him admit it (C3).
         needs: [C3]
         refused: >
-          The Ship's timbers creak. "Three weeks across an empty ocean, Captain, on the word
+          The Good Hope's timbers creak. "Three weeks across an empty ocean, Captain, on
+          the word
           of one old chart? Find out first where that compass really came from. Silas Crane
           in the Market knows more than he says."
         names: [island, chart, chart position, charted position, halcyon island]
         order: >
-          The Ship's timbers creak, almost like a voice. "Fourteen degrees South, forty
+          The Good Hope's timbers creak, almost like a voice. "Fourteen degrees South, forty
           degrees West: the island on the Halcyon's chart. Look at the chart: our own
           harbour lies at fourteen South too, on the same line of latitude. So the course
           is due west. We check our latitude by the sun every noon, and sail on until my
@@ -134,7 +139,7 @@ positions:
             Day 17. Each day, noon out here comes a little later by the home clock in the
             chart house: four minutes later for every degree the ship has sailed west.
           - >
-            Day 21. The Ship's timbers creak: "This is the place on the chart, by my
+            Day 21. The Good Hope's timbers creak: "This is the place on the chart, by my
             reckoning. But don't take my word for it: check it yourselves. Take a noon sight
             with the |wsextant|n, then read my |wchronometer|n."
 
@@ -149,14 +154,17 @@ positions:
     orders: >
       Open sea all round, where the chart put the island, and no island. Where now? Give the
       order as a position, |wsail to|n a latitude and a longitude (we are at 14 south, 40
-      west), or |wsail home|n. The Ship creaks: "A big decision, Captain. Check my reckoning
+      west), or |wsail home|n. The Good Hope creaks: "A big decision, Captain. Check my
+      reckoning
       with the |wsextant|n and my |wchronometer|n first. Then call a |wcouncil|n, and we'll
       settle it one thing at a time."
     chart_pos: [560, 290]
     deck: >
       Open sea in every direction. According to the Halcyon's old chart, the island should
-      be right here. [[There is nothing but water, all the way to the |whorizon|n.]] High above,
-      seabirds wheel in the evening |wsky|n. The Ship's timbers creak: "No island, Captain.
+      be right here. [[There is nothing but water, all the way to the |whorizon|n.]] High
+      above,
+      seabirds wheel in the evening |wsky|n. The Good Hope's timbers creak: "No island,
+      Captain.
       Before we search, call a |wcouncil|n, and we'll settle where to look, one thing at a
       time."
     clue: C4
@@ -173,7 +181,7 @@ positions:
         teaches: {latitude_sailing: used}
         to: anchorage
         order: >
-          "West it is," the Ship creaks. "On past the end of the chart, along the same
+          "West it is," the Good Hope creaks. "On past the end of the chart, along the same
           latitude."
         text: >
           The ship turns west and sails on, beyond the place where the chart put the
@@ -191,44 +199,47 @@ positions:
       north:
         to: north_of_chart
         order: >
-          "North it is," the Ship creaks. "A day's sail, and we'll see."
+          "North it is," the Good Hope creaks. "A day's sail, and we'll see."
         text: >
           The ship turns north and sails on.
         passage:
           - >
             Morning. Nothing ahead but sea. A lookout climbs to the masthead.
           - >
-            Evening, and still nothing in sight. The water casks are a day lighter. The Ship creaks: "A day north of the chart's position. The |wsextant|n
+            Evening, and still nothing in sight. The water casks are a day lighter. The
+            Good Hope creaks: "A day north of the chart's position. The |wsextant|n
             will tell you how far we've come from the chart's latitude."
       south:
         to: south_of_chart
         order: >
-          "South it is," the Ship creaks. "A day's sail, and we'll see."
+          "South it is," the Good Hope creaks. "A day's sail, and we'll see."
         text: >
           The ship turns south and sails on.
         passage:
           - >
             Morning. Nothing ahead but sea. A lookout climbs to the masthead.
           - >
-            Evening, and still nothing in sight. The water casks are a day lighter. The Ship creaks: "A day south of the chart's position. The |wsextant|n
+            Evening, and still nothing in sight. The water casks are a day lighter. The
+            Good Hope creaks: "A day south of the chart's position. The |wsextant|n
             will tell you how far we've come from the chart's latitude."
       east:
         to: east_of_chart
         order: >
-          "East it is," the Ship creaks. "Back the way we came, for a day."
+          "East it is," the Good Hope creaks. "Back the way we came, for a day."
         text: >
           The ship turns east and sails back along her own wake.
         passage:
           - >
             Morning. Nothing ahead but sea. A lookout climbs to the masthead.
           - >
-            Evening, and still nothing in sight. The water casks are a day lighter. The Ship creaks: "A day east of the chart's position. We sailed
+            Evening, and still nothing in sight. The water casks are a day lighter. The
+            Good Hope creaks: "A day east of the chart's position. We sailed
             through these very waters on our way out, remember?"
       home:
         to: port
         names: [port, harbour, harbor]
         order: >
-          "Home it is," the Ship creaks. "It will be slower going back: the wind is
+          "Home it is," the Good Hope creaks. "It will be slower going back: the wind is
           against us."
         text: >
           The ship turns for home.
@@ -259,7 +270,7 @@ positions:
           - >
             A day's sail over an empty sea.
           - >
-            The Ship creaks: "Back at the chart's position: fourteen South, forty West."
+            The Good Hope creaks: "Back at the chart's position: fourteen South, forty West."
 
   south_of_chart:
     name: A day south of the chart's position
@@ -290,7 +301,7 @@ positions:
         to: port
         names: [port, harbour, harbor]
         order: >
-          "Home it is," the Ship creaks. "It will be slower going back: the wind is
+          "Home it is," the Good Hope creaks. "It will be slower going back: the wind is
           against us."
         text: >
           The ship turns for home.
@@ -311,13 +322,14 @@ positions:
     ashore: beach
     deck: >
       The ship lies at anchor in a calm lagoon. A green island rises in front of you, with
-      a white beach and palm trees along the shore. The Ship's timbers creak: "Take the
+      a white beach and palm trees along the shore. The Good Hope's timbers creak: "Take the
       guides from the chart house ashore, Captain. With a guide in your hands, you'll see
       more in what you look at. And when you've seen enough, come back aboard and call a
       |wcouncil|n: we'll put the Society's answers together."
     shore: >
       Your ship lies at anchor out in the lagoon. When you've seen enough of the island, go
-      back |waboard|n and call a council with the Ship: she'll help you put it together.
+      back |waboard|n and call a council with the Good Hope: she'll help you put it
+      together.
     routes:
       east:
         to: charted

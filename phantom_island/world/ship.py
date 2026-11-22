@@ -51,13 +51,13 @@ STILL_SAILING: str = (
     "The ship is under way. There's nothing to do until she gets there: the crew sail her. "
     "Watch the sea, or go below."
 )
-ALREADY_THERE: str = 'The Ship creaks, amused. "We\'re there already: {where}. Look around!"'
+ALREADY_THERE: str = 'The Good Hope creaks, amused. "We\'re there already: {where}. Look around!"'
 NO_SUCH_PLACE: str = (
-    'The Ship creaks doubtfully. "{where}? I know of nothing there worth sailing to. The '
+    'The Good Hope creaks doubtfully. "{where}? I know of nothing there worth sailing to. The '
     "island's position is written on the Halcyon's chart, in the chart house: |wread chart|n.\""
 )
 BOTH_NUMBERS: str = (
-    "The Ship creaks. \"Both numbers at once? Then we'd be searching blind. Keep one of "
+    "The Good Hope creaks. \"Both numbers at once? Then we'd be searching blind. Keep one of "
     'them, Captain, the one we can trust, and change the other."'
 )
 NOT_A_POSITION: str = (

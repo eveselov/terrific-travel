@@ -47,9 +47,9 @@ class CmdCouncil(Command):
       council
       council <letter>
 
-    The crew gather, and the Ship asks the questions that settle the decision,
+    The crew gather, and the Good Hope asks the questions that settle the decision,
     one at a time. Answer each with the letter of your choice (council b). An
-    answer counts once the journal shows it; if it doesn't yet, the Ship says
+    answer counts once the journal shows it; if it doesn't yet, the Good Hope says
     where to look, and the council carries on where it stopped. When it has
     decided, the order is still yours to give.
     """

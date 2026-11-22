@@ -27,7 +27,7 @@
 
 push_after: 10
 voices:
-  aboard: 'The Ship creaks: "{hint}"'
+  aboard: 'The Good Hope creaks: "{hint}"'
   ashore: "You leaf through the journal, and think. {hint}"
 
 situations:
@@ -108,7 +108,7 @@ situations:
     hints:
       - Both of the chart's numbers check out by the ship's reckoning, and still no island.
         A big decision like this is best talked over, one question at a time.
-      - Call a council aboard. The Ship will ask the questions; the first is which of the
+      - Call a council aboard. The Good Hope will ask the questions; the first is which of the
         chart's numbers could be wrong.
       - Type |wcouncil|n. Latitude was measured by the noon sun every day; longitude was a
         reckoning.
@@ -128,9 +128,9 @@ situations:
     hints:
       - How far? Terns fish a long way from land, but not without limit, and a lookout sees
         far, but not without limit.
-      - Ask the Ship how far terns fish, and how far a lookout sees. Then work it out in
+      - Ask the Good Hope how far terns fish, and how far a lookout sees. Then work it out in
         degrees, and go on with the council.
-      - "|wask ship about birds|n and |wask ship about horizon|n, then |wcouncil|n again."
+      - "|wask hope about birds|n and |wask hope about horizon|n, then |wcouncil|n again."
 
   - id: which_way
     ship: [charted]
@@ -250,8 +250,8 @@ situations:
     missing: [crew_settled]
     unanswered: crew
     hints:
-      - The island has told you a lot. Time to put it together, aboard, with the Ship.
-      - Go back aboard and call a council. The Ship will ask the Society's questions one
+      - The island has told you a lot. Time to put it together, aboard, with the Good Hope.
+      - Go back aboard and call a council. The Good Hope will ask the Society's questions one
         at a time.
       - From the Lagoon Beach, type |waboard|n, then |wcouncil|n.
 

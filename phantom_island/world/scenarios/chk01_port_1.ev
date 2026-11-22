@@ -1,0 +1,116 @@
+# SPOILERS. Phantom Island scenario 'port_1', recorded by Admin on 2026-11-21.
+#
+# Play it as a builder, with nobody else playing:
+#   batchcommand/interactive scenarios.port_1   (ss: next command, qq: stop)
+# The notes after each command are what the game recorded. Fill in the reasons
+# after 'Why:' if you want this to be an annotated scenario, like island.ev.
+# Keep a '#' line after every command: it ends the command.
+#
+startover yes
+# A new expedition: the ship in port, the journal and notebooks empty, you in Limbo.
+begin
+#   Now in: Society Office
+#   Why:
+look window
+#   Why:
+look harbor
+#   Why:
+look charts
+#   Why:
+look bookshelves
+#   Why:
+look street
+#   Why:
+ask fairweather
+#   Why:
+ask about mission
+#   Why:
+ask about journal
+#   Why:
+ask about halcyon
+#   Notebook: new Oak and island trees
+#   Why:
+ask about letter
+#   Why:
+ask about crew
+#   Why:
+ask about chart
+#   Why:
+ask about society
+#   Why:
+ask about island
+#   Why:
+look chart
+#   Why:
+ask about mission
+#   Why:
+ask about journal
+#   Why:
+ask about compass
+#   Why:
+journal
+#   Why:
+report
+#   Why:
+go east
+#   Why:
+east
+#   Now in: Market
+#   Why:
+look stall
+#   Why:
+look compass
+#   Journal: new C1, The Halcyon's compass
+#   Why:
+journal
+#   Why:
+examine compass
+#   Journal: new C2, Coral in the hinge
+#   Notebook: new Coral
+#   Why:
+ask crane
+#   Why:
+ask about compass
+#   Journal: new C3, Fishermen from the west
+#   Think: compass_sea
+#   Why:
+ask about halcyon
+#   Why:
+ask about trade
+#   Why:
+l
+#   Why:
+go southwest
+#   Why:
+southwest
+#   Now in: Quay
+#   Why:
+look hope
+#   Why:
+look ship
+#   Why:
+l
+#   Why:
+ask barnaby
+#   Why:
+ask about halcyon
+#   Why:
+ask about storm
+#   Notebook: new How winds are named
+#   Why:
+ask about island
+#   Why:
+ask about compass
+#   Why:
+ask about sailing
+#   Notebook: new Latitude, Longitude, Dead reckoning, Sea clocks
+#   Why:
+ask about sextant
+#   Why:
+ask about latitude
+#   Why:
+ask about longitude
+#   Why:
+aboard
+#   Now in: Deck
+#   Why:

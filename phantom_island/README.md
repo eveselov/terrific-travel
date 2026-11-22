@@ -92,7 +92,7 @@ The characters of the story stand in their places, and rooms list them under
   suggests asking about *chart* next;
 - `ask` is for the story's characters. Another player gets a pointer to `say`, and
   something to look at (`ask beams`) gets a pointer to `look beams`;
-- aboard, `ask ship about longitude` asks the Ship herself;
+- aboard, `ask hope about longitude` (or `ask ship`) asks the ship herself, the Good Hope;
 - everyone in the room hears the conversation.
 
 Who is where (as admin, `teleport Village` and so on gets you there quickly): Mrs. Fairweather in

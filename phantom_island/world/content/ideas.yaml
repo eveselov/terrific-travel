@@ -71,7 +71,7 @@ ideas:
   longitude:
     area: navigation
     title: Longitude
-    learn: "|wask ship about longitude|n"
+    learn: "|wask hope about longitude|n"
     heard: >
       How far east or west you are. Old sailors could only guess it.
     understood: >
@@ -85,7 +85,7 @@ ideas:
   sea_clocks:
     area: navigation
     title: Sea clocks
-    learn: "|wask ship about chronometer|n"
+    learn: "|wask hope about chronometer|n"
     heard: >
       Some ships now carry a clock that keeps the time of home all voyage long. Not every
       old sailor trusts one.
@@ -98,7 +98,7 @@ ideas:
   dead_reckoning:
     area: navigation
     title: Dead reckoning
-    learn: "|wask ship about reckoning|n"
+    learn: "|wask hope about reckoning|n"
     heard: >
       Working out where you are from your heading, your speed and how long you have
       sailed.
@@ -139,7 +139,7 @@ ideas:
   seabirds:
     area: sea_and_sky
     title: How seabirds show land
-    learn: "|wask ship about birds|n"
+    learn: "|wask hope about birds|n"
     understood: >
       White terns and noddies fish at sea all day and fly home to land to sleep: white terns
       from as far as a hundred miles out, noddies from nearer. At dusk, the way they fly
@@ -174,7 +174,7 @@ ideas:
   horizon:
     area: sea_and_sky
     title: How far a lookout sees
-    learn: "|wask ship about horizon|n"
+    learn: "|wask hope about horizon|n"
     understood: >
       The Earth is round, so the sea curves away out of sight. From a masthead a lookout
       sees about 20 kilometres of open sea, and a hilly island perhaps 50 to 70 kilometres
@@ -185,7 +185,8 @@ ideas:
     area: sea_and_sky
     title: Fresh water at sea
     understood: >
-      Sea water can't be drunk. A ship carries fresh water in casks, the crew drink from them
+      Sea water can't be drunk. A ship carries fresh water in casks, the crew drink from
+      them
       every day, and they must be filled again at a spring ashore.
 
   # --- Nature -------------------------------------------------------------------------------
@@ -245,7 +246,7 @@ ideas:
   witnesses:
     area: people
     title: Comparing witnesses
-    learn: "|wask ship about witnesses|n"
+    learn: "|wask hope about witnesses|n"
     heard: >
       People don't always tell the truth, so compare what they say.
     understood: >

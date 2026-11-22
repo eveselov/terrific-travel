@@ -181,7 +181,7 @@ class CmdHint(Command):
 
     The first hint is a gentle nudge. Type hint again for a clearer one, and a
     third time for exactly what to type. Once the expedition finds something new,
-    the hints start gently again. Aboard, the Ship gives the hint; anywhere else,
+    the hints start gently again. Aboard, the Good Hope gives the hint; anywhere else,
     you think it over with the journal.
     """
 
