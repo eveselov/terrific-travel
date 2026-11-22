@@ -7,7 +7,7 @@ from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
 from typeclasses.rooms import Room
 from world.clues import journal_sources_text, journal_text, think_text
-from world.discovery import act, look_at, notice_surroundings, show_focus_for
+from world.discovery import act, look_at, nothing_more, notice_surroundings, show_focus_for
 from world.hints import hint
 from world.notebook import READ_IT, notebook_text, sources_text
 
@@ -68,6 +68,12 @@ class CmdLook(DefaultCmdLook):
             return
         if look_at(caller, text):  # a thing or a detail of the room
             return
+        # Named in the description but with no detail of its own: no "Could not find".
+        if not caller.search(text, quiet=True):
+            plain: str | None = nothing_more(caller, text)
+            if plain is not None:
+                self.msg(plain)
+                return
         # Anything else (a character, an exit...): as Evennia's own look does, then the
         # Focus pane follows what was looked at.
         target: Any = caller.search(text)

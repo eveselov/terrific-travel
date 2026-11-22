@@ -61,6 +61,12 @@ Two colours carry meaning (DECISIONS.md, 20). Never use them for decoration.
   content check enforces it, and also that every topic can be found: in `suggest`, white in
   one of the character's own texts, or marked `hidden: true` (a surprise for whoever thinks
   of asking, like the Good Hope's name).
+- **Plain still answers** (playtest 2026-11-22): anything a description names, white or not,
+  can be looked at. Give it a short detail in `details` (aliases for the other words that
+  name it), a line or two of flavour or of real knowledge, never a clue nobody points to.
+  What slips through gets a safety net: a word that appears in the room's text answers
+  "no more to it than you've seen", not "Could not find". The ship herself, seen from the
+  shore she lies off, is `from_shore` in `ship.yaml`.
 - **Yellow, `[[like this]]`:** a clue's fact. The text needs a `clue:` beside it, and only
   the fact itself is marked, never a whole reply. Only true facts: a mistaken or lying
   reply stays plain, so spotting it is the player's job. The check fails on a `clue:`

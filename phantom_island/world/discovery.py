@@ -14,6 +14,7 @@ together share a noon sight.
 from typing import Any
 
 from evennia.objects.objects import DefaultCharacter
+from evennia.utils.ansi import strip_ansi
 
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
@@ -33,6 +34,7 @@ from world.content import (
     find_look,
     load_content,
     match_words,
+    normalise_words,
 )
 from world.expedition import current_position, get_expedition
 from world.focus import render_focus_html
@@ -78,7 +80,26 @@ def location_details(caller: Any) -> list[LookSpec]:
         details.extend(place.details.values())
     if isinstance(location, Deck):
         details.extend(current_position().details.values())
+    elif content.from_shore is not None and place is not None:
+        if current_position().ashore == place.id:  # the ship lies off this shore
+            details.append(content.from_shore)
     return details
+
+
+def nothing_more(caller: Any, text: str) -> str | None:
+    """
+    The safety net for `look` (playtest 2026-11-22): something the room's description names
+    but that has no detail of its own isn't "not found". It answers that there's nothing
+    more to see, or None if the description doesn't name it.
+    """
+    location: Any = caller.location
+    wanted: str = normalise_words(text)
+    if not isinstance(location, Room) or not wanted:
+        return None
+    seen: str = normalise_words(strip_ansi(location.get_display_desc(caller)))
+    if f" {wanted} " not in f" {seen} ":
+        return None
+    return f"You take a good look at the {wanted}, but there's no more to it than you've seen."
 
 
 def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:

@@ -34,11 +34,45 @@ rooms:
           Halcyon's |wchart|n, and two books wedged onto a shelf so they can't slide off
           when
           the ship rolls: a |wplant guide|n and an |wanimal guide|n.
+      ship:
+        aliases: [hope, good hope, boat]
+        desc: >
+          You can't see the Good Hope whole: you're standing on her. Now and then her
+          timbers creak, almost like a voice. She listens: |wask hope|n.
+      masts:
+        aliases: [mast, rigging, sails, sail, canvas]
+        desc: >
+          Tall masts of pine, a web of ropes between them, and canvas sails that the crew
+          set and furl at your order. Right at the top of the mainmast is the lookout's
+          perch, the masthead.
+      wheel:
+        aliases: [stern, helm, helmsman]
+        desc: >
+          A big wooden wheel with worn spokes, at the back of the ship. A sailor stands at
+          it all day and all night, steering the course you give.
+      crew:
+        aliases: [sailors, men, ropes, rope]
+        desc: >
+          Weather-beaten sailors, quick at the ropes and slow to complain. They do the
+          sailing; where she goes is yours to say: |wsail|n.
+      timbers:
+        aliases: [timber, planks, plank, boards]
+        desc: >
+          Thick oak planks, scrubbed pale with sand and seawater. Oak is the shipwrights'
+          wood: heavy, hard, and it lasts. Now and then they creak, almost like a voice.
 
 # The exit from the Deck to the shore, and the one back from the shore to the Deck.
 # They only exist while the ship is at a position with `ashore`.
 ashore_exit: {key: ashore, aliases: [land]}
 aboard_exit: {key: aboard, aliases: [board, ship]}
+
+# The ship herself, seen from the shore she lies off (`look ship` on the Quay or the Lagoon
+# Beach): written like a detail in places.yaml, under the id `ship`.
+from_shore:
+  aliases: [hope, good hope, boat]
+  desc: >
+    The Good Hope: a sturdy old sailing ship, broad in the beam, her hull black with tar and
+    her name in white letters across the stern. When you're ready, go |waboard|n.
 
 # Where the ship is when the game begins.
 start: port
@@ -101,6 +135,17 @@ positions:
     deck: >
       The ship is moored at the quay. Sailors carry the last barrels aboard, and the
       harbour opens to the west, towards the ocean.
+    details:
+      barrels:
+        aliases: [barrel, sailors, stores]
+        desc: >
+          Salt beef, ship's biscuit and fresh water for many weeks at sea, rolled up the
+          plank and down into the hold, one barrel at a time.
+      harbour:
+        aliases: [harbor, ocean, quay, port]
+        desc: >
+          The harbour mouth opens to the west. Beyond it lies the ocean, and somewhere far
+          out in it, the Halcyon's island.
     shore: >
       The Good Hope, the expedition's ship, is moored at the end of the quay, her sails
       neatly furled.
@@ -169,6 +214,11 @@ positions:
       time."
     clue: C4
     details:
+      horizon:
+        aliases: [sea, water, ocean]
+        desc: >
+          Water meets sky in a clean, empty line all round the ship. How far away is that
+          line? |wask hope about horizon|n.
       sky:
         teaches: {seabirds: used}
         aliases: [birds, seabirds, terns, white terns, evening, dusk]
@@ -260,6 +310,12 @@ positions:
     chart_pos: [560, 200]
     deck: >
       Open sea in every direction, and no island anywhere. The wind hums in the rigging.
+    details: &open_sea
+      sea:
+        aliases: [water, waves, horizon, wind, rigging]
+        desc: >
+          Grey-blue waves in long rows, the wind humming in the rigging, and an empty
+          horizon all round. Nothing to steer by but the sun and the instruments.
     routes:
       south: &back_to_chart
         to: charted
@@ -282,6 +338,7 @@ positions:
     chart_pos: [560, 380]
     deck: >
       Open sea in every direction, and no island anywhere. The wind hums in the rigging.
+    details: *open_sea
     routes:
       north: *back_to_chart
 
@@ -295,6 +352,7 @@ positions:
     chart_pos: [660, 290]
     deck: >
       Open sea in every direction, and no island anywhere. The wind hums in the rigging.
+    details: *open_sea
     routes:
       west: *back_to_chart
       home:
@@ -326,6 +384,12 @@ positions:
       guides from the chart house ashore, Captain. With a guide in your hands, you'll see
       more in what you look at. And when you've seen enough, come back aboard and call a
       |wcouncil|n: we'll put the Society's answers together."
+    details:
+      island:
+        aliases: [beach, palms, palm trees, lagoon, shore]
+        desc: >
+          Green hills under a blue sky, a white beach, and palm trees leaning over the
+          water. Somewhere in there are the answers the Society wants. Go |washore|n.
     shore: >
       Your ship lies at anchor out in the lagoon. When you've seen enough of the island, go
       back |waboard|n and call a council with the Good Hope: she'll help you put it
@@ -348,3 +412,9 @@ positions:
     deck: >
       The ship is under way, leaning a little in the wind. Spray comes over the bow, and
       the crew are busy at the ropes. All around, the sea stretches to the horizon.
+    details:
+      sea:
+        aliases: [spray, bow, waves, horizon, water]
+        desc: >
+          The bow lifts and falls, throwing up spray that tastes of salt. The waves run on
+          ahead of you, all the way to the horizon.

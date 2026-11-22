@@ -2320,3 +2320,32 @@ class TestRespect(DiscoveryTest):
         self.assertNotIn("C12", [entry.clue for entry in get_expedition().journal])
         self.assertIn("shows |wrespect|n first", self.do(self.char1, "ask ama about halcyon"))
         self.assertIn("for her to tell", self.do(self.char1, "ask tui about jonah"))
+
+
+class TestEverythingMentioned(DiscoveryTest):
+    """What a description names can be looked at (playtest 2026-11-22)."""
+
+    def test_the_office_window_shows_the_harbour(self) -> None:
+        self.at(self.char1, "office")
+        self.assertIn("the Good Hope, waiting for you", self.do(self.char1, "look window"))
+        self.assertIn("carts rattling", self.do(self.char1, "look street"))
+
+    def test_the_ship_can_be_seen_from_the_quay(self) -> None:
+        self.at(self.char1, "quay")
+        for name in ("ship", "hope", "good hope"):
+            self.assertIn("sturdy old sailing ship", self.do(self.char1, f"look {name}"), name)
+        self.do(self.char1, "aboard")
+        self.assertEqual(self.char1.location, self.rooms["deck"])  # the exit still works
+
+    def test_the_ship_is_seen_only_where_she_lies(self) -> None:
+        self.at(self.char1, "office")
+        self.assertNotIn("sturdy old sailing ship", self.do(self.char1, "look ship"))
+
+    def test_a_named_thing_without_a_detail_still_answers(self) -> None:
+        self.at(self.char1, "quay")
+        self.assertIn("no more to it than you've seen", self.do(self.char1, "look stone"))
+        self.assertNotIn("no more to it", self.do(self.char1, "look dragon"))
+
+    def test_aboard_the_ship_is_underfoot(self) -> None:
+        self.at(self.char1, "deck")
+        self.assertIn("you're standing on her", self.do(self.char1, "look hope"))

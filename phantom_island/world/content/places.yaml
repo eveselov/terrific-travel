@@ -76,6 +76,35 @@ office:
   exits:
     southeast: quay
     east: market
+  details:
+    window:
+      aliases: [harbour, harbor, view]
+      desc: >
+        Below the window the harbour is busy: fishing boats coming in, a merchant ship
+        unloading, gulls over the water. At the end of the quay lies a ship with her sails
+        furled: the Good Hope, waiting for you.
+    bookshelves:
+      aliases: [bookshelf, shelves, shelf, books]
+      desc: >
+        Rows of logbooks and journals from every voyage the Society could get hold of, each
+        with a year on its spine. Someone has checked them all: the margins are full of
+        small notes in red ink.
+    charts:
+      aliases: [chart, rolled-up charts, rolls]
+      desc: >
+        Charts of coasts and seas, rolled up and tied with ribbon. Far out in the oceans many
+        of them are still blank, where nobody has looked yet. The Halcyon's chart isn't
+        among them: its fair copy is in your ship's chart house.
+    desk:
+      aliases: [papers, pile, inkpot, ink]
+      desc: >
+        A wide desk covered in letters, lists and accounts, in neat piles that Mrs.
+        Fairweather keeps straightening. An inkpot, a quill, and a little brass bell.
+    street:
+      aliases: [road, carts]
+      desc: >
+        From up here you hear carts rattling over the cobbles, and the shouting from the
+        market next door.
 
 market:
   name: Market
@@ -88,6 +117,17 @@ market:
     west: office
     southwest: quay
   details:
+    goods:
+      aliases: [fish, rope, spices, lamps, odd things, things]
+      desc: >
+        Silver fish on wet boards, coils of rope, sacks of pepper and cinnamon, brass lamps,
+        and odd things that ships bring home from far away: a carved paddle, a shell as big
+        as your head, a feather cloak nobody can explain.
+    traders:
+      aliases: [trader, prices, noise, square]
+      desc: >
+        Everyone here is selling something, and saying so as loudly as they can. "Fresh
+        today!" "Cheapest in the port!" "Straight off the ship!"
     stall:
       aliases: [stalls, crowd, table]
       desc: >
@@ -105,6 +145,27 @@ quay:
   exits:
     northwest: office
     northeast: market
+  details:
+    barrels:
+      aliases: [barrel, stores, supplies]
+      desc: >
+        Barrels of salt beef, ship's biscuit and fresh water, waiting to be carried aboard.
+        Some have GOOD HOPE chalked on the lid.
+    rope:
+      aliases: [ropes, coils, coil]
+      desc: >
+        Thick hemp rope, coiled neatly in big rings and smelling of tar. Old Barnaby sits on
+        one of them as if it were his own armchair.
+    gulls:
+      aliases: [gull, scraps, birds]
+      desc: >
+        Grey and white gulls, loud and greedy, squabbling over fish heads. Gulls keep close
+        to the coast: sailors say that far out on the open ocean you won't see one.
+    harbour:
+      aliases: [harbor, water, ships, boats]
+      desc: >
+        Ships at anchor, fishing boats coming and going, and beyond the harbour mouth the
+        open ocean, stretching away to the west.
 
 # --- The island -------------------------------------------------------------------------
 
@@ -120,6 +181,21 @@ beach:
     northwest: forest
     west: village
   details:
+    lagoon:
+      aliases: [water, sand, beach]
+      desc: >
+        Warm, clear water over white sand, so still that you can see small fish over the
+        bottom. Out in the lagoon your ship rides at anchor.
+    palms:
+      aliases: [palm, palm trees, palm tree]
+      desc: >
+        Tall, bending trunks with a crown of long leaves at the top, and a few coconuts
+        hanging under them. Nothing like the trees at home.
+    path:
+      aliases: [forest, narrow path]
+      desc: >
+        A narrow path climbs from the sand into the forest, to the northwest. Somebody walks
+        here often: it is trodden smooth.
     goats:
       aliases: [goat, bushes]
       desc: >
@@ -150,6 +226,16 @@ village:
     north: forest
     southwest: cove
   details:
+    huts:
+      aliases: [roofs, roof, leaves, earth, open space]
+      desc: >
+        Small round huts of light poles, with roofs of woven palm leaves that hang down
+        almost to the ground. The open space between them is swept clean.
+    fire:
+      aliases: [smoke, cooking fire]
+      desc: >
+        A low fire in a ring of stones, with something wrapped in leaves cooking in the
+        ashes. It smells wonderful.
     beams:
       aliases: [beam, timbers, timber, hut, big hut, wood]
       desc: >
@@ -183,6 +269,12 @@ reef:
     east: village
     southeast: cove
   details:
+    coral:
+      aliases: [reef, waves, edge, water, shallows]
+      desc: >
+        The water over the reef is shallow and very clear, and the coral in it is every
+        colour: pink, yellow, purple, branching like little trees. Further out, the waves
+        break white over the reef's edge.
     bones:
       # Time is told, not kept (DECISIONS.md, 38): the wait for low tide is part of the look.
       teaches: {coral: used, tides: used}
@@ -208,6 +300,11 @@ forest:
     west: spring
     southeast: beach
   details:
+    birds:
+      aliases: [bird, calls]
+      desc: >
+        You hear them all around, whistling and chattering, but they stay hidden in the
+        leaves high above you.
     trees:
       aliases: [tree, leaves, fruit]
       desc: >
@@ -230,6 +327,11 @@ spring:
   exits:
     east: forest
   details:
+    water:
+      aliases: [spring, stream, rocks, moss]
+      desc: >
+        You cup your hands and drink. The water is cold and sweet, far better than anything
+        from a ship's cask.
     shoots:
       aliases: [shoot, patch, rows, garden]
       desc: >
@@ -257,6 +359,16 @@ hilltop:
   exits:
     south: forest
   details:
+    smoke:
+      aliases: [clearing, huts, fires, cooking fires, people]
+      desc: >
+        Thin smoke rising from a clearing south of the forest. You can make out the roofs of
+        huts. The forest path should lead down that way.
+    ocean:
+      aliases: [sea, open ocean, lagoon, reef]
+      desc: >
+        Open ocean all round, empty to the horizon. Inside the reef, the lagoon is pale green,
+        and your ship lies in it, very small from up here.
     coastline:
       aliases: [coast, shape, view, shore]
       desc: >
@@ -282,6 +394,11 @@ cove:
     northeast: village
     northwest: reef
   details:
+    rocks:
+      aliases: [rock, arms, sand, water]
+      desc: >
+        Two long arms of dark rock almost close the cove off from the sea. Inside them the
+        water is calm: a good place to build a boat, and to launch it.
     slipway:
       aliases: [logs, chips, wood chips]
       desc: >

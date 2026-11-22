@@ -642,6 +642,8 @@ class Content:
     connections: dict[str, ConnectionSpec] = dataclass_field(default_factory=dict)
     hints: HintsSpec | None = None
     councils: dict[str, CouncilSpec] = dataclass_field(default_factory=dict)
+    # The ship herself, seen from where she lies (`look ship` on the Quay, ship.yaml).
+    from_shore: LookSpec | None = None
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck`)."""
@@ -758,6 +760,15 @@ def _look(look_id: str, data: dict[str, Any], aliases: tuple[str, ...], where: s
             for thing_id, item in extras_data.items()
         },
     )
+
+
+def _from_shore(value: Any) -> LookSpec | None:
+    """The ship as seen from the shore she lies off: a detail of that place (ship.yaml)."""
+    if value is None:
+        return None
+    where: str = f"{SHIP_FILE}, from_shore"
+    data: dict[str, Any] = _mapping(value, where)
+    return _look("ship", data, _aliases(data.get("aliases"), where), where)
 
 
 def _details(value: Any, where: str) -> dict[str, LookSpec]:
@@ -1488,6 +1499,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
         texts.append((f"place {place.id}", place.desc, None))
         for detail in place.details.values():
             texts.extend(_look_texts(f"place {place.id}, detail {detail.id}", detail))
+    if content.from_shore is not None:
+        texts.extend(_look_texts(f"{SHIP_FILE}, from_shore", content.from_shore))
     for position in content.positions.values():
         where: str = f"position {position.id}"
         texts.append((f"{where}, deck", position.deck, position.clue))
@@ -1960,6 +1973,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         connections=_connections(clues_data, clues),
         hints=_hints(hints_data),
         councils=_councils(councils_data),
+        from_shore=_from_shore(ship_data.get("from_shore")),
     )
     _check(content)
     return content
