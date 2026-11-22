@@ -2062,7 +2062,7 @@ class TestCouncil(DiscoveryTest):
         self.at(self.char2, "deck")
 
     def test_no_council_elsewhere(self) -> None:
-        self.ship_at("port")
+        self.ship_at("north_of_chart")
         self.assertIn("nothing to hold a council about", self.do(self.char1, "council"))
         self.ship_at("charted")
         self.at(self.char1, "quay")
@@ -2090,7 +2090,7 @@ class TestCouncil(DiscoveryTest):
 
     def test_the_right_choice_waits_for_its_evidence(self) -> None:
         heard: str = self.do(self.char1, "council b")
-        self.assertIn("take a noon sight", heard)
+        self.assertIn("|wuse sextant|n", heard)
         self.assertIn("The council waits", heard)
         self.assertFalse(get_expedition().met(("line_settled",)))
 
@@ -2422,3 +2422,45 @@ class TestCouncilIsNeverLost(DiscoveryTest):
         self.do(self.char1, "council b")
         heard: str = self.do(self.char1, "use sextant")
         self.assertLess(heard.index("You use the sextant"), heard.index("council was waiting"))
+
+
+class TestPortCouncil(DiscoveryTest):
+    """The crew meet the captain, and a first, short council before leaving port."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("port")
+
+    def test_the_crew_welcome_each_player_once(self) -> None:
+        self.at(self.char1, "quay")
+        first: str = self.do(self.char1, "aboard")
+        self.assertIn("Thomas Rowe, Captain, your mate", first)
+        self.do(self.char1, "ashore")
+        self.assertNotIn("Thomas Rowe", self.do(self.char1, "aboard"))
+
+    def test_the_council_needs_the_chart_read(self) -> None:
+        self.at(self.char1, "deck")
+        self.assertIn("|wread chart|n", self.do(self.char1, "council a"))
+        self.do(self.char1, "read chart")
+        heard: str = self.do(self.char1, "council")
+        self.assertIn("takes up its answer again", heard)
+        self.assertIn("Second: three weeks", heard)
+
+    def test_the_council_waits_for_cranes_confession(self) -> None:
+        self.at(self.char1, "deck")
+        get_expedition().set_flag("chart_read")
+        self.do(self.char1, "council a")
+        self.assertIn("Silas Crane says he found it", self.do(self.char1, "council b"))
+        self.at(self.char1, "market")
+        with patch.object(self.char1, "msg") as mock_msg:
+            get_expedition().add_clue("C3", "someone", "Market")
+        self.assertIn("council was waiting for. Back |waboard|n", texts(mock_msg))
+
+    def test_the_council_ends_with_the_exact_order(self) -> None:
+        self.at(self.char1, "deck")
+        get_expedition().set_flag("chart_read")
+        get_expedition().add_clue("C3", "someone", "Market")
+        self.do(self.char1, "council a")
+        decided: str = self.do(self.char1, "council b")
+        self.assertIn("|wsail to 14 south 40 west|n", decided)
+        self.assertIn("Not just 'west'", decided)

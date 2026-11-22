@@ -84,7 +84,8 @@ situations:
   - id: sail_out
     ship: [port]
     hints:
-      - The Society's task waits at the island on the Halcyon's chart. Time to sail.
+      - The Society's task waits at the island on the Halcyon's chart. Time to sail. Not
+        sure how? Call a council aboard.
       - The island's position is written on the Halcyon's chart, in the ship's chart
         house. Read it, then give the order.
       - Go |waboard|n, |wread chart|n, and type |wsail to 14 south 40 west|n.

@@ -229,6 +229,7 @@ things:
         writing: "Position fixed by our |wreckoning|n." (What is that? |wask hope about reckoning|n.)
     read:
       teaches: {positions: heard}
+      sets: chart_read  # the port council's first step needs the chart's position read
       text: >
         In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
         large figures: Latitude 14 degrees South, longitude 40 degrees West of

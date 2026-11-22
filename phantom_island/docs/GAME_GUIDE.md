@@ -94,7 +94,7 @@ The web client has three panes. Everything in Map and Focus is also told in the 
 
 ## Council
 
-- When the expedition has a big decision to make aboard, the Good Hope will say so: call a `council`. The crew gather, and the Good Hope asks the questions that settle it, one at a time. Answer each with its letter: `council b`.
+- When the expedition has a big decision to make aboard, the Good Hope or the crew will say so: call a `council`. The first one comes before you leave port. The crew gather, and the Good Hope asks the questions that settle it, one at a time. Answer each with its letter: `council b`.
 - An answer only counts once the journal shows it. If it doesn't yet, the Good Hope tells you where to look, and the council waits. Go and look: wherever you are, you'll hear the moment the council has what it waited for. Then type `council` again: it says what it has agreed so far, takes up your answer, and carries on. While a council is sitting, the Deck shows how far it has got.
 - When the council has decided, the order is still yours to give.
 - Some councils answer the Society's questions. Then the report shows what the council concluded, and the council tells you how to write it in: `report 2 d`, for example. You type it: the report is yours to sign.

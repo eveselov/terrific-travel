@@ -170,7 +170,10 @@ Get the mission, find the first real clue, and set sail.
 Sailing from the Deck starts Act 2.
 
 **Gate:** the players must learn from the trader that the compass came "from fishermen
-who sailed in from the west". Then the ship can leave.
+who sailed in from the west". Then the ship can leave. Coming aboard for the first time,
+the players meet the crew, and the mate offers a first, short council (2026-11-22): where
+do we sail to (the chart's island, once the chart is read), and is it worth three weeks of
+sea (yes, once Crane has confessed). It ends with the exact order.
 
 ### Act 2: At Sea
 
@@ -242,6 +245,7 @@ what gets revealed.
 | **Tui**, a village child | Village | **Knows the truth, not its meaning** | Plays on "the big bones in the reef", collects brass buttons, knows a song about "people from the sea who made a canoe with a white wing". Kids playing will probably love Tui most. |
 | **Jonah Pike**, the *Halcyon*'s carpenter | Boat Cove | **Final witness** | Knows almost everything, including the direction the boat sailed. Only met late (after the reef and the elder), so he confirms the story rather than solving it. |
 | **The Good Hope**, the expedition's ship (named 2026-11-21) | Always aboard | **Hint-giver and explainer** | The players' own ship, with "a mind of her own". Gives hints that get more direct when the players seem stuck, and explains the instruments and the science when asked. A natural first AI character later. |
+| **The crew** (2026-11-22): **Mr. Thomas Rowe**, the mate; **Ned Tarrant**, the bosun; **Kit Lowe**, the youngest aboard, about twelve | Aboard; heard in councils | **The council's voices** | Rowe is careful, keeps the log and trusts nothing he hasn't checked ("Steady, Captain"): he weighs the evidence, and says what a right answer still needs. Tarrant is big, loud, salty, kind and superstitious: he objects bluntly to wrong answers and cheers loudest. Kit asks the plain questions and notices things. Not askable yet. Threads for later: Rowe as the teacher of dead reckoning (log line and sandglass); Tarrant's superstitions against the science; Kit's father may have been one of the Halcyon's crew, if the kids want it (not decided, and it would touch "The truth"). Kit can be a boy or a girl: the kids' choice, so the texts use no pronoun for Kit. |
 
 ## Clues (the authoritative table)
 

@@ -21,7 +21,10 @@
 #     agreed    what the council has agreed once it is settled, short and lower case: said
 #               when the council is called again ("Agreed so far: the island lies west")
 #     choices   two to five; exactly one has `right: true`. Each has `text` and `reply`
-#               (said once it is chosen: why not, or, for the right one, why yes); the
+#               (said once it is chosen: why not, or, for the right one, why yes; said by
+#               the crew, 2026-11-22: Mr. Rowe the mate weighs the evidence, Ned Tarrant
+#               the bosun objects bluntly and cheers loudest, young Kit asks the plain
+#               questions; the Good Hope asks the questions, opens and sums up); the
 #               right one has `proof`: a list of parts, each needing any one of its `clues`
 #               (clue ids or flags), with `missing`, said while it doesn't hold
 #   summary   the decision, once every step is settled, and what is left to the captain
@@ -35,13 +38,82 @@
 # answer, or that the council waits. After editing, `reload` in the game is enough.
 
 councils:
+  # The first council (2026-11-22): before leaving port, two quick steps that teach how a
+  # council works, and the port's gate in the crew's voice (C3, DECISIONS.md, 39).
+  port:
+    at: port
+    opening: >
+      The crew gather on the Deck: Mr. Rowe with his logbook, Ned Tarrant still bellowing
+      at the men with the barrels, and Kit at the front, all ears. The Good Hope's timbers
+      creak: "A council before we cast off, Captain? Good. Two things to settle, and then
+      the order is yours."
+    steps:
+      - id: destination
+        sets: destination_settled
+        agreed: we sail for the island on the Halcyon's chart
+        question: >
+          "First: where do we sail to?"
+        choices:
+          - text: To the island on the Halcyon's chart.
+            right: true
+            reply: >
+              Ned Tarrant nods. "Aye, that's a place a ship can steer for." Mr. Rowe opens
+              his logbook. "Its latitude and longitude are written on the chart. That's
+              where we're bound."
+            proof:
+              - clues: [chart_read]
+                missing: >
+                  Mr. Rowe nods. "Aye, Captain, but where is it, exactly? Its position is
+                  written on the chart, in the chart house: |wread chart|n. Then call the
+                  council again."
+          - text: To wherever Crane's fishermen came from.
+            reply: >
+              Kit frowns. "But 'many days to the west' isn't a place, is it? You can't steer
+              for that. Isn't there somewhere written down?"
+          - text: Nowhere yet. We stay in port.
+            reply: >
+              Ned Tarrant groans. "Stay in port? With the barrels stowed and the wind fair?
+              The Society didn't hire us to sit on the quay, Captain!"
+      - id: worth
+        sets: worth_settled
+        agreed: something of the Halcyon really is out there
+        question: >
+          "Second: three weeks across an empty ocean, on the word of one old chart. Is there
+          anything that says something of the Halcyon is out there to be found?"
+        choices:
+          - text: Nothing at all. We go on hope.
+            reply: >
+              Mr. Rowe shakes his head. "Steady, Captain. The sea is wide, and hope won't fill
+              the water casks. Has nothing in this port come from out there?"
+          - text: Yes. Her compass came back, from somewhere out there.
+            right: true
+            reply: >
+              Kit grins, and Ned Tarrant claps his hands. "That's the stuff!" Mr. Rowe nods.
+              "Her compass came in with fishermen from the west. Something of her survived
+              out there, and that's worth three weeks of sea."
+            proof:
+              - clues: [C3]
+                missing: >
+                  Mr. Rowe nods. "Aye, but Silas Crane says he found it on a beach, right here.
+                  Find out where it really came from, Captain: he knows more than he says.
+                  Then call the council again."
+          - text: The chart says so, and that's enough.
+            reply: >
+              Kit asks: "But the chart was drawn fifteen years ago. Nobody has seen her
+              since. Is there anything newer?"
+    summary: >
+      The crew cheer, and Ned Tarrant is already shouting for the lines. The Good Hope's
+      timbers creak: "So the council agrees: we sail for the island on the Halcyon's chart.
+      Not just 'west', Captain: give the order as a position, its latitude and its
+      longitude, just as the chart writes them: |wsail to 14 south 40 west|n."
+
   charted:
     at: charted
     opening: >
-      The crew gather on the Deck, and the Good Hope's timbers creak: "Open sea, Captain,
-      where
-      the chart put the island. So the chart is wrong somewhere. Let's settle it, one thing
-      at a time."
+      The crew gather on the Deck once more: Mr. Rowe with his logbook, Ned Tarrant with
+      his arms folded, and Kit squeezing in at the front. The Good Hope's
+      timbers creak: "Open sea, Captain, where the chart put the island. So the chart is
+      wrong somewhere. Let's settle it, one thing at a time."
     steps:
       - id: line
         sets: line_settled
@@ -52,26 +124,26 @@ councils:
         choices:
           - text: The latitude, north or south.
             reply: >
-              "The noon sun gave the Halcyon's master his latitude every day, and our |wsextant|n agrees with
-              his chart. Which number had he no way to check?"
+              Mr. Rowe shakes his head. "Steady, Captain. The noon sun gave the Halcyon's
+              master his latitude every day, and our |wsextant|n agrees with his chart.
+              Which number had he no way to check?"
           - text: The longitude, east or west.
             right: true
             reply: >
-              "Yes. Without a sea clock, longitude is only a reckoning, and small errors add
-              up. His latitude was right, so the island lies on our own latitude: east of
-              us,
-              or west."
+              Ned Tarrant slaps the rail. "Aye, that's it!" Mr. Rowe nods slowly. "Without
+              a sea clock, longitude is only a reckoning, and small errors add up. His
+              latitude was right, so the island lies on our own latitude: east of us, or
+              west."
             proof:
               - clues: [sight_charted]
                 missing: >
-                  "Before we blame the chart, check my reckoning, Captain: take a noon sight
-                  with the |wsextant|n, then read my |wchronometer|n.
-                  Then call the council again."
+                  Mr. Rowe raises a hand. "Aye, that sounds right, Captain. But before we
+                  blame the chart, let's be sure where we are ourselves: |wuse sextant|n,
+                  then |wread chronometer|n. Then call the council again."
           - text: Both of them.
             reply: >
-              "Our |wsextant|n agrees with the Halcyon's master on the latitude: that one he measured, every noon.
-              Is
-              there one he could only guess?"
+              Kit frowns. "Both? But our |wsextant|n agrees with him about the latitude.
+              He measured that one every noon, didn't he? Is there one he could only guess?"
       - id: side
         sets: side_settled
         agreed: the island lies west of the chart's position
@@ -80,23 +152,25 @@ councils:
         choices:
           - text: East.
             reply: >
-              "East is the way we came: three weeks of empty sea behind us. Is there
-              anything
-              in the journal that points the other way?"
+              Ned Tarrant snorts. "East? Blow me down, Captain, east is where we came from:
+              three weeks of empty sea, and not a twig of land. Is there anything in the
+              journal that points the other way?"
           - text: West.
             right: true
             reply: >
-              "West. That's what the journal says, and whatever told it, birds or fishermen,
-              knows this sea better than the chart does."
+              Kit whoops, and Ned Tarrant laughs. "West it is!" Mr. Rowe taps his logbook.
+              "That's what the journal says, and the birds know this sea better than any
+              chart."
             proof:
               - clues: [C6]
                 missing: >
-                  "Something here knows where land is. Watch the |wsky|n at dusk,
-                  Captain, and call the council again."
+                  Mr. Rowe nods. "West sounds right to me too, Captain, but we don't know it
+                  yet. Something here knows where land is. Watch the |wsky|n at dusk, and
+                  call the council again."
           - text: There's no way to tell.
             reply: >
-              "Is there not? Something here knows where land is, and somebody in port knew
-              where the compass came from."
+              Kit points up. "But the birds, Captain! They must live somewhere. Can't they
+              tell us?"
       - id: far
         sets: far_settled
         agreed: it lies about one degree further west
@@ -108,29 +182,32 @@ councils:
         choices:
           - text: Less than half a degree.
             reply: >
-              "Then my lookout would see it from the masthead. Ask me about the |whorizon|n
-              if
-              you doubt it."
+              Ned Tarrant shakes his head. "Half a degree? Then the lookout would see it
+              from the masthead, by thunder, and he sees nothing. Ask the Good Hope how far
+              a lookout sees: |wask hope about horizon|n."
           - text: About one degree.
             right: true
             reply: >
-              "About one degree. Further than my lookout can see, so we see nothing, but
-              well
-              within a tern's flight home, so they fish here. Close, Captain: a day's sail."
+              The crew cheer, and Mr. Rowe smiles for the first time. "About one degree.
+              Further than the lookout can see, so we see nothing, but well within a tern's
+              flight home, so they fish here. Close, Captain: a day's sail."
             proof:
               - clues: [C6]
                 missing: >
-                  "Have you watched the terns here at dusk? Look at the |wsky|n,
-                  Captain, and call the council again."
+                  Mr. Rowe rubs his chin. "That fits the numbers, Captain, but have you
+                  watched the terns here at dusk? Look at the |wsky|n, and call the council
+                  again."
           - text: Ten degrees or more.
             reply: >
-              "Then why are terns fishing all round us? Ask me how far they go from land:
-              |wask hope about birds|n."
+              Kit looks up at the birds. "Ten degrees? Then why are the terns fishing all
+              round us? Ask the Good Hope how far they go from land: |wask hope about
+              birds|n."
           - text: There's no way to tell.
             reply: >
-              "There is: the terns and the horizon together. |wask hope about birds|n, and
-              about the |whorizon|n."
+              Mr. Rowe opens his logbook. "There is a way, Captain: the terns and the
+              horizon together. |wask hope about birds|n, and |wask hope about horizon|n."
     summary: >
+      The crew cheer, and Ned Tarrant is already shouting for the sails.
       The Good Hope's timbers creak: "So the council agrees. The Halcyon's master had his
       latitude
       right and his longitude wrong. The island lies west of us, on our own latitude, about
@@ -149,10 +226,11 @@ councils:
   island:
     at: anchorage
     opening: >
-      The crew gather on the Deck, and the Good Hope's timbers creak: "We've found the
-      Halcyon's
-      island, Captain, and you've walked it. Now the Society's questions. Let's put together
-      what the journal knows, one thing at a time."
+      The crew gather on the Deck again: Mr. Rowe with his logbook open, Ned Tarrant
+      sunburnt and cheerful, and Kit, who has been staring at the island all day. The Good
+      Hope's timbers creak: "We've found the Halcyon's island, Captain, and you've walked
+      it. Now the Society's questions. Let's put together what the journal knows, one thing
+      at a time."
     steps:
       - id: where
         sets: wreck_settled
@@ -162,24 +240,25 @@ councils:
         choices:
           - text: She sank far out at sea, in the great storm of '75.
             reply: >
-              "That's Old Barnaby's belief, and he never saw this island. A ship lost far
-              out
-              at sea leaves nothing near land. Has the island shown you nothing of her?"
+              Ned Tarrant shakes his head. "That's Old Barnaby's yarn, and he never saw this
+              island. A ship lost far out at sea leaves nothing near land. Has the island
+              shown you nothing of her?"
           - text: On the island's Western Reef, in the great storm of '75.
             right: true
             reply: >
-              "On the reef. Her ribs are still out there, grown over with coral, and a
-              compass from her lay in that shallow water for years."
+              Kit gasps, and the crew murmur: "Aye." Mr. Rowe nods. "On the reef. Her ribs
+              are still out there, grown over with coral, and her compass lay in that
+              shallow water for years."
             proof:
               - clues: [C7]
                 missing: >
-                  "Something of her is on this island, Captain: on the Western Reef. Walk
-                  out
-                  there, and look. Then call the council again."
+                  Mr. Rowe nods. "It may well be, Captain, but we haven't seen it. Something
+                  of her is on this island: on the Western Reef. Walk out there, and look.
+                  Then call the council again."
           - text: She sailed on from the island, and was lost somewhere else.
             reply: >
-              "Then the island would hold nothing of her. Look again at what lies on the
-              Western Reef, and what the people here remember."
+              Kit frowns. "Then why would anything of her be here? What's out on the
+              Western Reef, then? And what do the people here remember?"
       - id: survivors
         sets: survivors_settled
         agreed: her whole crew came ashore alive
@@ -188,21 +267,24 @@ councils:
         choices:
           - text: No. All hands were lost.
             reply: >
-              "That's what they believe at home, where nobody saw it. Who on this island
-              was here when it happened?"
+              Mr. Rowe closes his logbook. "That's what they believe at home, where nobody
+              saw it. Who on this island was here when it happened?"
           - text: Yes. The whole crew came ashore alive.
             right: true
             reply: >
-              "All of them. The islanders paddled out into the storm and brought them in.
-              Not one was lost."
+              Ned Tarrant whoops and throws his hat in the air. "All of them! Not one man
+              lost!" Mr. Rowe smiles. "The islanders paddled out into the storm and brought
+              them in."
             proof:
               - clues: [C12]
                 missing: >
-                  "Someone here remembers that night, Captain: the eldest of the village.
-                  Win her trust, hear it from her, then call the council again."
+                  Mr. Rowe nods. "I'd like to believe it, Captain, but we must hear it from
+                  someone who was there: the eldest of the village. Win her trust, hear it
+                  from her, then call the council again."
           - text: Only a few of them.
             reply: >
-              "Who told you of anyone lost? Ask those who were there."
+              Kit asks: "Who told us about anyone lost? Shouldn't we ask the people who were
+              there?"
       - id: stayed
         sets: stayed_settled
         agreed: they stayed a season or more
@@ -211,21 +293,24 @@ councils:
         choices:
           - text: A few days, until the storm was over.
             reply: >
-              "A few days? Then who planted what grows here, and whose animals graze above
-              the beach?"
+              Ned Tarrant laughs. "A few days? Then who planted what grows here, and whose
+              goats are those above the beach?"
           - text: A season or more, long enough to plant and to farm.
             right: true
             reply: >
-              "Long enough to plant onions by the spring, and to leave their goats behind.
-              Sailors carry both, and plant and keep them where they stay a while."
+              Ned Tarrant grins. "Onions and goats! Sailors' stores, every one." Mr. Rowe
+              nods. "Long enough to plant onions by the spring, and to leave their goats
+              behind. Sailors carry both, and plant and keep them where they stay a while."
             proof:
               - clues: [C9]
                 missing: >
-                  "Look at what grows by the spring, Captain, and what grazes above the
-                  beach, with the guides from my chart house. Then call the council again."
+                  Mr. Rowe nods. "That sounds right, Captain, but let's have proof. Look at
+                  what grows by the spring, and what grazes above the beach, with the guides
+                  from the chart house. Then call the council again."
           - text: All their lives. They never left.
             reply: >
-              "Then where are they? Only one sailor lives on the island now."
+              Kit looks around. "Then where are they all? Only one sailor lives on the
+              island now."
       - id: went
         sets: crew_settled
         agreed: most of them sailed west in a boat they built, and one stayed
@@ -234,30 +319,35 @@ councils:
         choices:
           - text: They all stayed, and their children live here now.
             reply: >
-              "Then where is everybody? Only one sailor still lives on the island."
+              Mr. Rowe shakes his head. "Then where is everybody? Only one sailor still
+              lives on the island."
           - text: Most of them sailed west, in a boat they built here, and one stayed.
             right: true
             reply: >
-              "West, with the trade wind behind them, in a boat of the Halcyon's own oak.
-              And one of them never left."
+              The whole crew cheer, and Ned Tarrant thumps the mast. "West, by thunder, in a
+              boat of her own oak!" Mr. Rowe adds quietly: "With the trade wind behind
+              them. And one of them never left."
             proof:
               - clues: [C8]
                 missing: >
-                  "Something was built from the Halcyon herself, Captain. Look closely at
-                  what the village is built of. Then call the council again."
+                  Mr. Rowe nods. "It could be, Captain, but built out of what? Something
+                  was built from the Halcyon herself. Look closely at what the village is
+                  built of. Then call the council again."
               - clues: [C11]
                 missing: >
-                  "The children remember how they left, Captain. Listen to Tui's song. Then
-                  call the council again."
+                  Kit pipes up. "The children here would remember how they left, Captain!
+                  Listen to Tui's song. Then call the council again."
               - clues: [C13]
                 missing: >
-                  "And one of them never left, Captain. Find him, and hear it from him. Then
-                  call the council again."
+                  Mr. Rowe taps his logbook. "And one of them never left, Captain. Find him,
+                  and hear it from him. Then call the council again."
           - text: They sailed home, east, and were lost on the way.
             reply: >
-              "East, against the trade wind, for weeks, in a little boat? Ask me about the
-              |wwind|n out here, Captain."
+              Ned Tarrant snorts. "East, against the trade wind, for weeks, in a little
+              boat? Not even I would try that. Ask the Good Hope about the wind out here:
+              |wask hope about wind|n."
     summary: >
+      The crew cheer until the gulls fly up from the reef.
       The Good Hope's timbers creak: "So the council agrees. The Halcyon was wrecked on the
       Western Reef in the great storm of '75. The islanders saved her whole crew, and most
       of

@@ -645,6 +645,8 @@ class Content:
     councils: dict[str, CouncilSpec] = dataclass_field(default_factory=dict)
     # The ship herself, seen from where she lies (`look ship` on the Quay, ship.yaml).
     from_shore: LookSpec | None = None
+    # What each player sees the first time they come aboard: the crew (ship.yaml).
+    welcome: str | None = None
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck`)."""
@@ -1307,8 +1309,15 @@ def _action(value: Any, where: str) -> ActionSpec | None:
     data: dict[str, Any] = _mapping(value, where)
     only_in: str | None = _optional_text(data, "only_in", where)
     at_data: dict[str, Any] = _mapping(data.get("at") or {}, f"{where}, at")
+    plain: Reveal = _reveal(data, "text", where)
     return ActionSpec(
-        default=_reveal(data, "text", where),
+        # `sets`: a flag remembered whenever it's done (reading the chart: `chart_read`)
+        default=Reveal(
+            text=plain.text,
+            clue=plain.clue,
+            teaches=plain.teaches,
+            sets=_optional_text(data, "sets", where),
+        ),
         only_in=only_in,
         elsewhere=_text(data, "elsewhere", where) if only_in else None,
         at={key: _step(item, f"{where}, at {key}") for key, item in at_data.items()},
@@ -1503,6 +1512,8 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             texts.extend(_look_texts(f"place {place.id}, detail {detail.id}", detail))
     if content.from_shore is not None:
         texts.extend(_look_texts(f"{SHIP_FILE}, from_shore", content.from_shore))
+    if content.welcome is not None:
+        texts.append((f"{SHIP_FILE}, welcome", content.welcome, None))
     for position in content.positions.values():
         where: str = f"position {position.id}"
         texts.append((f"{where}, deck", position.deck, position.clue))
@@ -1700,6 +1711,8 @@ def flags_set(content: Content) -> set[str]:
         for action in (thing.read, thing.use):
             if action is not None:
                 flags.update(step.sets for step in action.at.values() if step.sets)
+                if action.default.sets is not None:
+                    flags.add(action.default.sets)
     return flags
 
 
@@ -1988,6 +2001,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         hints=_hints(hints_data),
         councils=_councils(councils_data),
         from_shore=_from_shore(ship_data.get("from_shore")),
+        welcome=_optional_text(ship_data, "welcome", SHIP_FILE),
     )
     _check(content)
     return content

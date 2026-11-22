@@ -20,7 +20,7 @@ from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
 from typeclasses.things import Thing
 from world import notices
-from world.clues import discover, show_marks
+from world.clues import discover, show_marks, unseen
 from world.content import (
     ActionSpec,
     CharacterSpec,
@@ -149,6 +149,9 @@ def look_at(caller: Any, text: str, close: bool = False) -> bool:
     return False
 
 
+WELCOME_KEY: str = "aboard:welcome"  # `seen` once a player has met the crew
+
+
 def notice_surroundings(caller: Any) -> None:
     """
     After the caller saw their room: a place may set a flag when someone arrives (the
@@ -160,6 +163,10 @@ def notice_surroundings(caller: Any) -> None:
     if place is not None and place.sets is not None:
         get_expedition().set_flag(place.sets)
     if isinstance(caller.location, Deck):
+        welcome: str | None = load_content().welcome
+        if welcome is not None and unseen(caller, [WELCOME_KEY]):  # the crew, once
+            caller.msg(show_marks(welcome))
+            get_expedition().mark_seen(caller.id, [WELCOME_KEY])
         position: PositionSpec = current_position()
         if position.clue is not None:
             discover(position.clue, caller)
@@ -171,6 +178,8 @@ def _outcome(caller: Any, action: ActionSpec) -> Reveal:
     if isinstance(caller.location, ShipRoom):
         step = action.at.get(current_position().id)
     if step is None:
+        if action.default.sets is not None:
+            get_expedition().set_flag(action.default.sets)
         return action.default
     if not get_expedition().met(step.needs):
         return Reveal(text=step.otherwise or step.text, clue=None)

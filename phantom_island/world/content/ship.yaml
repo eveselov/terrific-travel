@@ -53,8 +53,10 @@ rooms:
       crew:
         aliases: [sailors, men, ropes, rope]
         desc: >
-          Weather-beaten sailors, quick at the ropes and slow to complain. They do the
-          sailing; where she goes is yours to say: |wsail|n.
+          Weather-beaten sailors, quick at the ropes and slow to complain. Mr. Rowe the
+          mate keeps the log, Ned Tarrant the bosun keeps everyone else busy, and young
+          Kit, the youngest aboard, keeps asking questions. They do the sailing; where she
+          goes is yours to say: |wsail|n.
       timbers:
         aliases: [timber, planks, plank, boards]
         desc: >
@@ -73,6 +75,16 @@ from_shore:
   desc: >
     The Good Hope: a sturdy old sailing ship, broad in the beam, her hull black with tar and
     her name in white letters across the stern. When you're ready, go |waboard|n.
+
+# What each player sees the first time they come aboard (after the Deck): the crew, who
+# speak in councils (councils.yaml). `reload` is enough after editing it.
+welcome: >
+  A tall man with a logbook under his arm touches his hat. "Thomas Rowe, Captain, your
+  mate. The ship is ready to sail when you are." Behind him a big, sunburnt sailor is
+  bellowing at the men stowing the last barrels: Ned Tarrant, the bosun. And the youngest
+  aboard, a sailor of about twelve called Kit, is peering in at the chart house door.|/Mr.
+  Rowe follows your glance. "Where we sail is yours to decide, Captain. Give the order when
+  you know. And if you're not sure, call a |wcouncil|n: that's what the crew are here for."
 
 # Where the ship is when the game begins.
 start: port
