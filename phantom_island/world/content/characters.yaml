@@ -60,9 +60,12 @@
 #   voice     how they speak: a note for the writer, and for the AI characters of phase B
 #   image     optional: URL of their picture, shown in the Focus pane when someone looks at
 #             them (without one, a card with their name)
-#   greeting  the reply to `ask <character>` with no topic; the `suggest` topics follow it
+#   greeting  the reply to `ask <character>` with no topic. It names the `suggest` topics in
+#             white, in the character's own words (the content check enforces it); the
+#             game adds no list, only the Good Hope's (her topics change with where she is)
 #   suggest   topics offered to players who don't know what to ask
-#   fallback  the polite reply for any topic the character doesn't know
+#   fallback  the polite reply for any topic the character doesn't know; name a topic or
+#             two in white there too, so nobody is left without a next question
 #   topics    topic id: what they say about it
 #   trust     optional: what it takes to win them over (DECISIONS.md, 41): `marks`, the flags
 #             set by what players do, a `label` for the progress shown with each mark
@@ -117,12 +120,14 @@ characters:
     greeting: >
       "Ah, Captain, you've come. The Society has hired a ship, the Good Hope, and a crew for this
       expedition, and put them under your orders: the crew do the sailing, and you decide
-      where to go and what to look into. Sit down. There is a great deal to tell, and very
-      little of it is certain."
+      where to go and what to look into. Sit down. I shall tell you of your |wmission|n, of
+      the |wHalcyon|n and her |wchart|n, and of her master's last |wletter|n. There is a
+      great deal to tell, and very little of it is certain."
     suggest: [mission, halcyon, chart, letter]
     fallback: >
       Mrs. Fairweather frowns politely. "I'm afraid that is outside my knowledge. The
-      Society deals in charts and letters, not gossip."
+      Society deals in charts and letters, not gossip. Ask me about your |wmission|n, or
+      the |wHalcyon|n."
     topics:
       mission:
         aliases: [expedition, job, task]
@@ -131,13 +136,30 @@ characters:
         reply: >
           "The Society wants the truth about the |wHalcyon|n, a ship that sailed from this
           harbour fifteen years ago and never came back: what happened to her, why nobody
-          ever found her, and what became of her |wcrew|n. The three questions stand
-          at the top of the expedition's |wjournal|n; when you can prove the answers, send
-          me your |wreport|n. How you go about it is yours to decide. Talk to everyone, ask
+          ever found her, and what became of her |wcrew|n. Those are the Society's three
+          questions. Your expedition will keep a |wjournal|n of everything you find, with
+          the questions written at the top, and when you can prove the answers, you will
+          send me your |wreport|n. How you go about it is yours to decide. Talk to everyone, ask
           about everything, and look closely at what you find. The latest news in port is a
           |wcompass|n on Silas Crane's stall, just east of here, and your |wship|n carries
           the
           Halcyon's |wchart|n."
+      journal:
+        aliases: [diary, notes, log]
+        stance: truth
+        reply: >
+          "Every good expedition keeps a journal. Yours has the Society's three questions at
+          the top, and under them everything you find: what it was, where, and who told
+          you. Read it whenever you like: |wjournal|n. Remember: what isn't in the journal
+          can't prove anything."
+      report:
+        aliases: [answers, proof]
+        stance: truth
+        reply: >
+          "When you believe you know what happened, answer the Society's questions in your
+          report, one at a time: |wreport|n. Choose the answer you believe, and the Society
+          will check it against your journal. If the proof isn't there yet, you'll be told
+          what's missing, so you can go and find it. You may try at any time."
       halcyon:
         stance: truth
         teaches: {oak: heard}
@@ -217,9 +239,11 @@ characters:
       A retired sailor with a white beard and a pipe that has gone out, sitting on a coil
       of rope as if he owns the quay.
     greeting: >
-      Barnaby squints at you. "You'll be one of the Society's lot, then, off after the
-      Halcyon at last. Your ship's waiting at the end of the quay; step |waboard|n when
-      you're ready. But sit down first, if you've a mind to. I've time, and stories."
+      Barnaby squints at you. "You'll be one of the Society's lot, then, off on this
+      |wexpedition|n after the |wHalcyon|n at last. Your ship's waiting at the end of the
+      quay; step |waboard|n when you're ready. But sit down first, if you've a mind to.
+      I've time, and stories: of |wthe great storm|n, and of |wsailing|n in my day, mark my
+      words."
     suggest: [expedition, halcyon, storm, sailing]
     fallback: >
       Barnaby scratches his beard. "Can't say I know aught about that. Ask me about
@@ -300,10 +324,11 @@ characters:
       knives and curiosities. His eyes follow your hands.
     greeting: >
       Crane spreads his arms over his stall. "Everything on this table is honestly come by.
-      What can I do for you, friend?"
+      Fine goods, fair |wtrade|n. You'll be wanting the |wcompass|n, I expect: everybody
+      does, since they read the word |wHalcyon|n on it. What can I do for you, friend?"
     suggest: [compass, trade, halcyon]
     fallback: >
-      Crane shrugs. "Not my line of business, friend."
+      Crane shrugs. "Not my line of business, friend. Now, that |wcompass|n..."
     topics:
       compass:
         stance: hiding
@@ -379,10 +404,13 @@ characters:
       fingers. Everyone who passes greets her first.
     greeting: >
       The elder looks at you for a long moment. "Strangers from the sea, again. Sit with
-      me."
+      me." She goes on weaving. "You will have come about the ship, the |wHalcyon|n.
+      Everyone from the sea does. This is my |wvillage|n, on our |wisland|n. My
+      granddaughter |wTui|n plays out on the |wreef|n."
     suggest: [halcyon, village, island, reef, tui]
     fallback: >
-      Elder Ama keeps weaving. "That is not something I can tell you about."
+      Elder Ama keeps weaving. "That is not something I can tell you about. Ask me about
+      my |wvillage|n."
     # Respect is named, taught and acknowledged (DECISIONS.md, 41): the rule is told first
     # (by Tui, or by Ama when asked about the ship too soon), and only what players do
     # after knowing it counts, so nobody earns it by chance.
@@ -490,7 +518,8 @@ characters:
       clinks when Tui moves.
     greeting: >
       "Hello! Are you from a ship? Grandmother says strangers must show |wrespect|n. Do
-      you want to see my |wbuttons|n?"
+      you want to see my |wbuttons|n? I found them near the big |wbones|n. I know a
+      |wsong|n, too, and I know all the |wgoats|n by name!"
     suggest: [respect, buttons, bones, song, goats]
     fallback: >
       Tui shrugs. "Don't know. Do you want to hear my |wsong|n instead?"
@@ -581,11 +610,13 @@ characters:
       A weathered man with grey hair tied back, shaping a plank with an adze. He dresses
       like the islanders, but his face is sunburnt the way only a sailor's gets.
     greeting: >
-      He puts down his adze. "Well. I wondered if anyone would ever come looking."
+      He puts down his adze. "Well. I wondered if anyone would ever come looking. You'll
+      want to hear about the |wHalcyon|n, I suppose: the |wwreck|n, the |wcrew|n, the
+      |wboat|n we built. Even the old |wcompass|n. Sit down; it's a long story."
     suggest: [halcyon, wreck, boat, crew, compass]
     fallback: >
       Jonah rubs his chin. "Fifteen years here, and I've forgotten more about that than
-      I ever knew."
+      I ever knew. Ask me about the |wHalcyon|n, though: that I remember."
     topics:
       self:
         hidden: true

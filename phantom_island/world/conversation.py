@@ -19,7 +19,7 @@ from typing import Any
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import ShipRoom
 from world import notices
-from world.clues import discover, show_marks
+from world.clues import discover, show_marks, unseen
 from world.content import (
     CharacterSpec,
     Content,
@@ -150,16 +150,30 @@ def suggested(spec: CharacterSpec) -> tuple[str, ...]:
     return spec.suggest
 
 
+ASKED_KEY: str = "ask:topic"  # `seen` once a player has asked someone about a topic
+
+
 def suggestions(spec: CharacterSpec) -> str:
-    """A line offering a few topics to ask this character about."""
+    """
+    The Good Hope's line offering a few topics, which change with where she is. Everyone
+    else names their topics in white in their own greeting (playtest 2026-11-22).
+    """
     offered: tuple[str, ...] = suggested(spec)
-    if not offered:
+    if not offered or not spec.aboard:
         return ""
     topics: str = ", ".join(f"|w{topic_id}|n" for topic_id in offered)
     return (
         f"You could ask {spec.name} about: {topics}. "
-        f"(For example: |wask {spec.id} about {offered[0]}|n)"
+        f"(For example: |wask {spec.aliases[0] if spec.aliases else spec.id} about {offered[0]}|n)"
     )
+
+
+def ask_example(caller: Any, spec: CharacterSpec) -> str:
+    """How to ask about a white word, until the player has asked someone about a topic."""
+    offered: tuple[str, ...] = suggested(spec)
+    if spec.aboard or not offered or not unseen(caller, [ASKED_KEY]):
+        return ""
+    return notices.quiet(f"To ask about a white word: |wask {spec.id} about {offered[0]}|n.")
 
 
 def _who_is_here(caller: Any) -> str:
@@ -379,6 +393,9 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
             line for line in (speech(spec, spec.greeting), suggestions(spec)) if line
         )
         _say_to_room(caller, f"You greet {spec.name}.", f"{asker} greets {spec.name}.", lines)
+        example: str = ask_example(caller, spec)
+        if example:
+            caller.msg(example)
         return None
 
     topic: TopicSpec | None = spec.topic(what)
@@ -391,12 +408,15 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
     mine: str = f"You ask {spec.name} about {what}."
     theirs: str = f"{asker} asks {spec.name} about {what}."
     if topic is None:
-        _say_to_room(caller, mine, theirs, f"{speech(spec, spec.fallback)}\n{suggestions(spec)}")
+        offer: str = suggestions(spec)
+        said_back: str = speech(spec, spec.fallback) + (f"\n{offer}" if offer else "")
+        _say_to_room(caller, mine, theirs, said_back)
         hint = _look_hint(caller, what)
         if hint:
             caller.msg(hint)
         return None
     said: Reveal = answer(topic)
+    get_expedition().mark_seen(caller.id, [ASKED_KEY])
     _say_to_room(caller, mine, theirs, speech(spec, said.text))
     if rest:
         caller.msg(_one_at_a_time(rest))

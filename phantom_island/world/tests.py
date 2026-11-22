@@ -872,17 +872,37 @@ class TestAsk(WorldTest):
         self.ask("ama")
         self.assertIn("Elder Ama", self.ask("them about halcyon").split("\n")[0])
 
-    def test_an_unknown_topic_gives_the_fallback_and_suggestions(self) -> None:
+    def test_an_unknown_topic_gives_the_fallback_in_their_own_words(self) -> None:
         self.at("quay")
         heard: str = self.ask("barnaby about pirates")
         self.assertIn("Can't say I know aught", heard)
-        self.assertIn("You could ask Old Barnaby about", heard)
+        self.assertIn("|wthe great storm|n", heard)
+        self.assertNotIn("You could ask", heard)  # no list from the game (playtest 2026-11-22)
 
     def test_asking_with_no_topic_greets_and_suggests(self) -> None:
         self.at("market")
         heard: str = self.ask("crane")
         self.assertIn("honestly come by", heard)
-        self.assertIn("ask crane about compass", heard)
+        self.assertIn("|wcompass|n", heard)
+        self.assertNotIn("You could ask", heard)
+        self.assertIn("ask crane about compass", heard)  # how to ask, until the first time
+
+    def test_the_example_stops_once_someone_has_been_asked(self) -> None:
+        self.at("market")
+        self.ask("crane about trade")
+        self.assertNotIn("ask crane about compass", self.ask("crane"))
+
+    def test_the_good_hope_still_offers_what_fits_where_she_is(self) -> None:
+        self.at("deck")
+        heard: str = self.ask("hope")
+        self.assertIn("You could ask the Good Hope about", heard)
+        self.assertIn("ask hope about", heard)
+
+    def test_fairweather_explains_the_journal_and_the_report(self) -> None:
+        self.at("office")
+        self.assertIn("|wjournal|n", self.ask("fairweather about mission"))
+        self.assertIn("can't prove anything", self.ask("fairweather about journal"))
+        self.assertIn("check it against your journal", self.ask("fairweather about report"))
 
     def test_with_one_person_here_the_name_can_be_left_out(self) -> None:
         self.at("quay")

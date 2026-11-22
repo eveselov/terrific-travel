@@ -1883,6 +1883,18 @@ def _check_white_words(character: CharacterSpec) -> None:
     their texts, or deliberately `hidden`.
     """
     where: str = f"{CHARACTERS_FILE}, {character.id}"
+    if not character.aboard:  # topics are offered in the greeting, in their own voice
+        greeted: set[str] = set()
+        for word in WHITE_WORD.findall(character.greeting):
+            found: TopicSpec | None = character.topic(word)
+            if found is not None:
+                greeted.add(found.id)
+        for topic_id in character.suggest:
+            if topic_id not in greeted:
+                raise ContentError(
+                    f"{where}, greeting: suggested topic {topic_id!r} isn't white in the "
+                    "greeting. Name it there, in their own words."
+                )
     reachable: set[str] = set(character.suggest)
     for which, text in _character_texts(character):
         for word in WHITE_WORD.findall(text):

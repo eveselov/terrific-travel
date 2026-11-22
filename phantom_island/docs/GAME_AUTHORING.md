@@ -90,8 +90,10 @@ arrival: the Hilltop shows the Village), and a hint situation must point to it.
 ### A character, or a topic
 
 In `characters.yaml`: `where` they stand, a `voice` (how they speak), a `greeting`, a few
-topics to `suggest`, and a polite `fallback`. Each topic needs a `stance` (truth, mistaken,
-hiding). A reply that starts with a quote is shown as speech (`Old Barnaby says: "..."`).
+topics to `suggest`, and a polite `fallback`. The greeting names the suggested topics in
+white, in the character's own words, and the game adds no list of its own (playtest
+2026-11-22); only the Good Hope's topics come as a list, since they change with where she
+is. Each topic needs a `stance` (truth, mistaken, hiding). A reply that starts with a quote is shown as speech (`Old Barnaby says: "..."`).
 
 - Words every character should understand the same way (`the storm`, `old chart`) go in
   `topic_aliases` at the top of the file; asking several witnesses about the same word and
