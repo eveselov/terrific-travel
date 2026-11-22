@@ -345,6 +345,9 @@ def _addressee(caller: Any, who: str, what: str) -> Listener | str:
     here: list[Listener] = listeners(caller)
     if len(here) == 1:
         return here[0]
+    aboard: list[Listener] = [listener for listener in here if listener.spec.aboard]
+    if aboard:  # with the crew on the Deck too, an unnamed question is for the Good Hope
+        return aboard[0]
     hint: str = _look_hint(caller, what)
     if not here:
         return _lines("There is nobody here to talk to.", hint)

@@ -277,6 +277,18 @@ class TestContent(TestCase):
         error: ContentError = self._broken_copy(THINGS_FILE, "[[HALCYON]]", "HALCYON")
         self.assertIn("marks no part", str(error))
 
+    def test_the_crew_give_no_clues(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE, "        teaches: {dead_reckoning: heard}", "        clue: C4"
+        )
+        self.assertIn("personality, not plot", str(error))
+
+    def test_the_crew_teach_only_heard(self) -> None:
+        error: ContentError = self._broken_copy(
+            CHARACTERS_FILE, "teaches: {dead_reckoning: heard}", "teaches: {dead_reckoning: used}"
+        )
+        self.assertIn("only as `heard`", str(error))
+
     def test_a_mark_without_a_clue_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
             PLACES_FILE, "One |wstall|n draws", "One [[|wstall|n]] draws"
@@ -360,11 +372,15 @@ class TestCharacterContent(TestCase):
         found: TopicSpec | None = self.characters[character_id].topic(text)
         return found.id if found else None
 
-    def test_the_seven_characters(self) -> None:
+    def test_the_ten_characters(self) -> None:
         self.assertEqual(
             set(self.characters),
-            {"fairweather", "barnaby", "crane", "ama", "tui", "jonah", "ship"},
+            {"fairweather", "barnaby", "crane", "ama", "tui", "jonah", "ship"}
+            | {"rowe", "tarrant", "kit"},  # the crew, on the Deck
         )
+        for crew_id in ("rowe", "tarrant", "kit"):
+            self.assertTrue(self.characters[crew_id].crew, crew_id)
+            self.assertEqual(self.characters[crew_id].places, ("deck",))
         self.assertTrue(self.characters["ship"].aboard)
         self.assertEqual(self.characters["ship"].places, ())
         self.assertEqual(self.characters["tui"].places, ("village", "reef"))
@@ -2464,3 +2480,33 @@ class TestPortCouncil(DiscoveryTest):
         decided: str = self.do(self.char1, "council b")
         self.assertIn("|wsail to 14 south 40 west|n", decided)
         self.assertIn("Not just 'west'", decided)
+
+
+class TestCrew(DiscoveryTest):
+    """The crew can be talked to on the Deck: personality, not plot (2026-11-22)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("port")
+        self.at(self.char1, "deck")
+
+    def test_the_crew_stand_on_the_deck(self) -> None:
+        self.assertIn("logbook under his arm", self.do(self.char1, "look rowe"))
+        self.assertIn("carved wooden fish", self.do(self.char1, "look bosun"))
+
+    def test_each_names_their_topics(self) -> None:
+        self.assertIn("|wlog|n", self.do(self.char1, "ask rowe"))
+        self.assertIn("|wluck|n", self.do(self.char1, "ask ned"))
+        self.assertIn("|wsong|n", self.do(self.char1, "ask kit"))
+
+    def test_they_teach_a_little(self) -> None:
+        self.assertIn("counted in knots", self.do(self.char1, "ask rowe about log"))
+        self.assertIn("albatross", self.do(self.char1, "ask tarrant about luck"))
+        self.assertIn("Some songs tell", self.do(self.char1, "ask kit about song"))
+
+    def test_on_the_mystery_they_defer(self) -> None:
+        self.assertIn("I won't guess", self.do(self.char1, "ask rowe about halcyon"))
+        self.assertIn("|wask hope|n", self.do(self.char1, "ask kit about pirates"))
+
+    def test_an_unnamed_question_aboard_is_for_the_good_hope(self) -> None:
+        self.assertIn("The sextant measures", self.do(self.char1, "ask about sextant"))

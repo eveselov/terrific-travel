@@ -579,6 +579,7 @@ class CharacterSpec:
     image: str | None = None  # URL of their picture for the Focus pane, if there is one
     voice: str | None = None  # how they speak: for the writer and the AI characters (phase B)
     trust: "TrustSpec | None" = None  # what it takes to win them over (Ama's respect, 41)
+    crew: bool = False  # one of the ship's crew: personality, not plot (checked)
 
     @property
     def words(self) -> tuple[str, ...]:
@@ -965,6 +966,7 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
         voice=_optional_text(data, "voice", where),
         topics=topics,
         trust=_trust(data.get("trust"), f"{where}, trust"),
+        crew=_flag(data, "crew", where),
     )
 
 
@@ -1860,7 +1862,8 @@ def _check_characters(content: Content) -> None:
         where: str = f"{CHARACTERS_FILE}, {character.id}"
         for place_id in character.places:
             place: PlaceSpec | None = content.places.get(place_id)
-            if place is None or place.kind != "room" or place.id == LIMBO_ID:
+            on_deck: bool = character.crew and place is not None and place.kind == "deck"
+            if place is None or (place.kind != "room" and not on_deck) or place.id == LIMBO_ID:
                 raise ContentError(
                     f"{where}: `where` must be places on land or {ABOARD_WHERE}, not {place_id!r}."
                 )
@@ -1876,6 +1879,7 @@ def _check_characters(content: Content) -> None:
                     )
                 owner[word] = topic.id
         _check_white_words(character)
+        _check_crew(character)
 
 
 def _character_texts(character: CharacterSpec) -> list[tuple[str, str]]:
@@ -1889,6 +1893,30 @@ def _character_texts(character: CharacterSpec) -> list[tuple[str, str]]:
         if topic.truth is not None:
             texts.append((f"topic {topic.id}, truth", topic.truth.reply))
     return texts
+
+
+def _check_crew(character: CharacterSpec) -> None:
+    """
+    The crew bring personality, not plot (2026-11-22): no clues, no flags, no hidden truths,
+    no trust to win, and ideas taught only as `heard`. The path stays one way through (39).
+    """
+    if not character.crew:
+        return
+    where: str = f"{CHARACTERS_FILE}, {character.id}"
+    if character.trust is not None:
+        raise ContentError(f"{where}: one of the crew has no `trust` to win.")
+    for topic in character.topics.values():
+        if topic.clue is not None or topic.sets is not None or topic.truth is not None:
+            raise ContentError(
+                f"{where}, topic {topic.id}: the crew give no clues, set no flags and hide "
+                "no truths: personality, not plot."
+            )
+        for idea, level in topic.teaches:
+            if level != "heard":
+                raise ContentError(
+                    f"{where}, topic {topic.id}: the crew teach ideas only as `heard` "
+                    f"({idea}: {level})."
+                )
 
 
 def _check_white_words(character: CharacterSpec) -> None:

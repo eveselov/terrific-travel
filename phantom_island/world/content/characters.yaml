@@ -70,6 +70,10 @@
 #   trust     optional: what it takes to win them over (DECISIONS.md, 41): `marks`, the flags
 #             set by what players do, a `label` for the progress shown with each mark
 #             ("Elder Ama's respect: 1 of 2.") and `won`, said with the last one
+#   crew      optional: true for one of the ship's crew, who stand on the Deck (`where:
+#             deck`). Personality, not plot: the content check allows them no clues, flags,
+#             hidden truths or trust, and ideas only as `heard`. Aboard, a question with no
+#             name still goes to the Good Hope.
 #
 # Each topic has:
 #   reply     what the character says
@@ -691,6 +695,192 @@ characters:
           else. Fifteen years it lay out there on the reef, and last year the boys found it
           at low tide, all grown over. It went east with the traders. Funny: the old compass
           went home, and I never did."
+
+  # --- The crew ---------------------------------------------------------------------------
+  # Personality, not plot (2026-11-22): `crew: true` keeps them plot-neutral. The content
+  # check allows them no clues, no flags, no hidden truths and no trust, and they teach
+  # ideas only as `heard`. On the mystery they defer to the journal and the Good Hope; their
+  # mistakes stay on side matters (Tarrant's luck). They speak in councils too.
+
+  rowe:
+    name: Mr. Rowe
+    aliases: [rowe, mate, thomas rowe, mr rowe, the mate]
+    where: deck
+    crew: true
+    voice: >
+      Careful, quiet and exact: short, plain sentences, numbers where he has them, "Steady,
+      Captain". Trusts what he has checked and written down, and says so when he doesn't
+      know.
+    desc: >
+      A tall, quiet man in a blue coat, with a logbook under his arm and a pencil behind
+      his ear. He looks at everything twice.
+    greeting: >
+      Mr. Rowe touches his hat. "Captain. I keep the ship's |wlog|n, if you want to know
+      how fast we go, and I can tell you how we |wreckon|n our way at sea. Or ask me about
+      the |wship|n herself."
+    suggest: [log, reckoning, ship]
+    fallback: >
+      Mr. Rowe considers. "I couldn't say, Captain, not for certain. The Good Hope knows
+      more than I do: |wask hope|n. Or ask me about the |wlog|n."
+    topics:
+      log:
+        aliases: [logbook, log line, speed, knots]
+        stance: truth
+        teaches: {dead_reckoning: heard}
+        reply: >
+          "Every hour we throw the log: a little board on a long line, with a knot tied
+          every few fathoms. We count the knots that run out while a small sandglass
+          empties, and that's our speed. That's why a ship's speed is still counted in
+          knots. Speed, heading and the hours sailed, it all goes in my logbook."
+      reckoning:
+        aliases: [reckon, dead reckoning, position, where we are]
+        stance: truth
+        teaches: {sea_clocks: heard}
+        reply: >
+          "From the log I work out where we are: so fast, this way, for so long. A good
+          reckoning drifts a little every day all the same. The sun puts it right at noon,
+          north and south; the Good Hope's sea clock does the rest. I trust that clock,
+          Captain. Old Barnaby on the quay never would."
+      ship:
+        aliases: [good hope, hope, vessel, her]
+        stance: truth
+        reply: >
+          "She's old, Captain, but sound: oak from keel to rail. She creaks when she's
+          thinking, the men say." He almost smiles. "I wouldn't know about that."
+      halcyon:
+        hidden: true  # players think of asking about her themselves
+        stance: truth
+        reply: >
+          "I never sailed with her, Captain, and I won't guess. What we find goes in the
+          |wjournal|n. That's what I'd go by."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "Thomas Rowe, from this port. Twenty years at sea, mate for the last six. My
+          father kept a log too. I like a thing written down."
+
+  tarrant:
+    name: Ned Tarrant
+    aliases: [tarrant, ned, bosun, boatswain, ned tarrant, the bosun]
+    where: deck
+    crew: true
+    voice: >
+      Big, loud, salty and kind: "Blow me down", "by thunder", laughs at himself. Full of
+      sailors' superstitions and sure of every one of them, but never about the mystery:
+      there he admits he doesn't know.
+    desc: >
+      A big, sunburnt man with arms like ropes and a voice that carries from bow to stern.
+      A little carved wooden fish hangs on a cord round his neck.
+    greeting: >
+      Ned Tarrant grins down at you. "Captain! Ned Tarrant, bosun, at your service. Need a
+      |wrope|n spliced, or a |wknot|n tied? Want to know about sea |wluck|n? Or the
+      |wweather|n out here?"
+    suggest: [ropes, luck, weather]
+    fallback: >
+      Ned Tarrant scratches his head. "Blow me down, Captain, that's past me. Ask the Good
+      Hope: |wask hope|n. Or ask me about sea |wluck|n!"
+    topics:
+      ropes:
+        aliases: [rope, knot, knots, splice, rigging]
+        stance: truth
+        reply: >
+          "A ship's held together by rope, Captain: miles of it, and every sailor knows his
+          knots. A reef knot to join two lines, a bowline for a loop that won't slip. Learn
+          the bowline, my old bosun used to say, and you'll never drown for want of a knot."
+      luck:
+        # Tarrant's mistakes are sailors' superstitions, never the mystery (crew: true).
+        aliases: [superstitions, superstition, charm, fish, whistle, albatross, friday]
+        stance: mistaken
+        reply: >
+          "Never whistle on deck, Captain, or you'll whistle up a gale. Never sail on a
+          Friday. And never, ever harm an albatross: worst luck there is." He touches the
+          carved fish round his neck. "And this keeps me from drowning. Hasn't failed me
+          yet!"
+      weather:
+        aliases: [wind, winds, sky, trade wind]
+        stance: truth
+        teaches: {winds: heard}
+        reply: >
+          "Out here the trade wind blows from the south-east, steady as a clock, month
+          after month. Named for where it comes from, mind: a south-east wind blows from
+          the south-east. Rough weather comes, but this is a kind sea, mostly."
+      barnaby:
+        hidden: true
+        aliases: [old barnaby, old sailor]
+        stance: truth
+        reply: >
+          "Old Barnaby? Sailed with him when I was a lad. Best seaman I ever knew, and the
+          last to believe anything new. He'll tell you a sea clock is witchcraft!" He
+          laughs.
+      halcyon:
+        hidden: true
+        stance: truth
+        reply: >
+          "Lost with all hands, they say at home. I don't know, Captain. I just hope we find
+          something to tell those families."
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "Ned Tarrant, bosun, born on the quay. Went to sea at eleven, younger than Kit.
+          Thirty years, and never once wrecked." He touches his fish. "Never."
+
+  kit:
+    name: Kit
+    aliases: [kit, kit lowe, youngest, ship's boy]
+    where: deck
+    crew: true
+    voice: >
+      About twelve: eager, curious, quick to notice things and to ask questions back. Short
+      bursts of words, a lot of exclamation marks. No pronoun for Kit in narration: the
+      kids may decide whether Kit is a boy or a girl.
+    desc: >
+      The youngest aboard: about twelve, quick and sunburnt, in a shirt a size too big.
+      Kit seems to be everywhere at once, and always has a question.
+    greeting: >
+      "Captain! Are we really going to find out about the Halcyon? I've never been this
+      far out! Do you want to hear about |whome|n? Or what I do on the |wship|n? I know a
+      |wsong|n, too!"
+    suggest: [home, ship, song]
+    fallback: >
+      Kit thinks hard. "I don't know! Ask the Good Hope, she knows everything: |wask
+      hope|n. Or shall I sing you my |wsong|n?"
+    topics:
+      home:
+        aliases: [mother, family, port]
+        stance: truth
+        reply: >
+          "Home's up the hill behind the market. My mother keeps a lamp in the window while
+          the ships are out. I promised to bring her a shell from the other side of the
+          ocean."
+      ship:
+        aliases: [work, job, youngest, deck, masthead, good hope]
+        stance: truth
+        teaches: {oak: heard}
+        reply: >
+          "I scrub the deck, fetch and carry, and climb to the masthead to keep a lookout.
+          Mr. Rowe is teaching me the log, and Ned teaches me knots. The carpenter says
+          she's oak, every plank. Oak's what good ships are made of!"
+      song:
+        aliases: [shanty, sing, songs, mary]
+        stance: truth
+        teaches: {songs: heard}
+        reply: >
+          Kit sings, loud and a little out of tune: "Oh, the Mary sailed for Lisbon, and
+          the Mary sailed for Spain, and the Mary came home a-limping with her mainmast
+          cracked in twain!" Kit grins. "That one's true! Ned was aboard her. Some songs
+          tell of things that really happened."
+      halcyon:
+        hidden: true
+        stance: truth
+        reply: >
+          "Everyone at home has a story about her. I just want to know which one's true!"
+      self:
+        hidden: true
+        stance: truth
+        reply: >
+          "I'm Kit. Kit Lowe! This is my first long voyage."
 
   # --- The ship -------------------------------------------------------------------------
 
