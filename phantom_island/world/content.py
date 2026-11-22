@@ -407,6 +407,7 @@ class CouncilStepSpec:
     question: str
     choices: tuple[CouncilChoiceSpec, ...]
     sets: str
+    agreed: str  # what the council has agreed once it is settled: "the island lies west"
 
     @property
     def right(self) -> CouncilChoiceSpec:
@@ -1224,6 +1225,7 @@ def _council_step(value: Any, where: str) -> CouncilStepSpec:
         question=_text(item, "question", where),
         choices=choices,
         sets=_text(item, "sets", where),
+        agreed=_text(item, "agreed", where),
     )
 
 

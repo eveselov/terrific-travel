@@ -199,24 +199,26 @@ def act(caller: Any, verb: str, text: str) -> bool:
         caller.msg(show_marks(action.elsewhere or f"You can't {verb} the {spec.name} here."))
         return False
 
-    outcome: Reveal = _outcome(caller, action)
-    caller.msg(f"You {verb} the {spec.name}.")
-    text_shown: str = show_marks(outcome.text)
-    if location is not None:
-        location.msg_contents(
-            f"{caller.key} {verb}s the {spec.name}.", exclude=[caller], from_obj=caller
-        )
-        location.msg_contents(text_shown, from_obj=caller)
-    else:
-        caller.msg(text_shown)
-    watching: list[Any] = []
-    if location is not None:
-        watching = [
-            c
-            for c in location.contents_get(content_type="character")
-            if c is not caller and not isinstance(c, Inhabitant)
-        ]
+    # One `together()` for the whole action: what a flag it sets makes happen (a path, a
+    # council's proof) is told after the scene, not before it.
     with notices.together():
+        outcome: Reveal = _outcome(caller, action)
+        caller.msg(f"You {verb} the {spec.name}.")
+        text_shown: str = show_marks(outcome.text)
+        if location is not None:
+            location.msg_contents(
+                f"{caller.key} {verb}s the {spec.name}.", exclude=[caller], from_obj=caller
+            )
+            location.msg_contents(text_shown, from_obj=caller)
+        else:
+            caller.msg(text_shown)
+        watching: list[Any] = []
+        if location is not None:
+            watching = [
+                c
+                for c in location.contents_get(content_type="character")
+                if c is not caller and not isinstance(c, Inhabitant)
+            ]
         if outcome.clue is not None:
             discover(outcome.clue, caller, f"the {spec.name}")
         learn(caller, outcome.teaches, f"the {spec.name}", watching)

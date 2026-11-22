@@ -17,12 +17,21 @@ the journal can prove it. The council guides; the report records and signs.
 Where a council stands is derived from the flags its steps set when settled, so it carries
 on where it stopped, is shared by everyone, and starting over clears it with the flags.
 Everyone in the caller's room is at the council and hears it.
+
+A council is never lost track of (playtest 2026-11-22): it is open from the moment the
+ship reaches its position until it has decided, and players may leave it for anything
+else. A right answer that waits for its proof is remembered (a `proposed:` flag); the
+moment the proof comes in, everyone hears that the council can carry on, wherever they
+are. Called again, the council says what it has agreed so far, takes up a waiting answer
+whose proof has come in, and asks the next question. The Deck shows where it stands.
 """
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from typing import Any
 
 from typeclasses.rooms import ShipRoom
-from world import recorder
+from world import notices, recorder
 from world.content import (
     CHOICE_LETTERS,
     CouncilChoiceSpec,
@@ -31,7 +40,7 @@ from world.content import (
     ProofSpec,
     load_content,
 )
-from world.expedition import get_expedition
+from world.expedition import connected_characters, get_expedition
 from world.notices import quiet
 from world.report import proved_by, signing_command
 
@@ -40,7 +49,15 @@ NO_COUNCIL: str = (
     "There's nothing to hold a council about here. When the expedition has a big decision "
     "to make aboard, the Good Hope will say so."
 )
-WAITS: str = f"The council waits: |w{COUNCIL}|n carries on where it stopped."
+WAITS: str = (
+    f"The council waits for that. You'll hear when it's done; then |w{COUNCIL}|n carries on "
+    "where it stopped."
+)
+PROPOSED: str = "proposed:"  # + a step's flag: its right answer waits for its proof
+READY_ABOARD: str = f"That's what the council was waiting for: |w{COUNCIL}|n carries on."
+READY_ASHORE: str = (
+    f"That's what the council was waiting for. Back |waboard|n, |w{COUNCIL}|n carries on."
+)
 
 
 def council_here(caller: Any) -> CouncilSpec | None:
@@ -54,6 +71,69 @@ def council_here(caller: Any) -> CouncilSpec | None:
         if spec.at == expedition.ship_position:
             return spec
     return None
+
+
+def open_council() -> CouncilSpec | None:
+    """The council at the ship's position that hasn't decided yet, wherever players are."""
+    expedition: Any = get_expedition()
+    if expedition.voyage is not None:
+        return None
+    for spec in load_content().councils.values():
+        if spec.at == expedition.ship_position and current_step(spec) is not None:
+            return spec
+    return None
+
+
+def _proposed(step: CouncilStepSpec) -> bool:
+    return bool(get_expedition().met((PROPOSED + step.sets,)))
+
+
+def ready_step() -> CouncilStepSpec | None:
+    """The open council's step whose right answer waited for its proof, now that it holds."""
+    spec: CouncilSpec | None = open_council()
+    step: CouncilStepSpec | None = current_step(spec) if spec is not None else None
+    if step is None or not _proposed(step) or _missing(step.right) is not None:
+        return None
+    return step
+
+
+@contextmanager
+def watching() -> Iterator[None]:
+    """Tell everyone when what the council waits for comes in while the body runs."""
+    before: CouncilStepSpec | None = ready_step()
+    yield
+    after: CouncilStepSpec | None = ready_step()
+    if after is None or after == before:
+        return
+    for character in connected_characters():
+        aboard: bool = isinstance(character.location, ShipRoom)
+        notices.tell(character, READY_ABOARD if aboard else READY_ASHORE)
+
+
+def status_line() -> str:
+    """Where the open council stands, for the Deck, once it has begun."""
+    spec: CouncilSpec | None = open_council()
+    step: CouncilStepSpec | None = current_step(spec) if spec is not None else None
+    if spec is None or step is None:
+        return ""
+    agreed: int = spec.steps.index(step)
+    if agreed == 0 and not _proposed(step):
+        return ""
+    return quiet(
+        f"The council is sitting: {agreed} of {len(spec.steps)} questions agreed. "
+        f"|w{COUNCIL}|n carries on where it stopped."
+    )
+
+
+def _again(spec: CouncilSpec, step: CouncilStepSpec) -> str:
+    """Where the council stands when it is called again: what it agreed, what is left."""
+    done: tuple[CouncilStepSpec, ...] = spec.steps[: spec.steps.index(step)]
+    if not done:
+        return ""
+    agreed: str = "; ".join(settled.agreed for settled in done)
+    left: int = len(spec.steps) - len(done)
+    still: str = "one question" if left == 1 else f"{left} questions"
+    return f"The council sits again. Agreed so far: {agreed}. Still to settle: {still}."
 
 
 def current_step(spec: CouncilSpec) -> CouncilStepSpec | None:
@@ -137,8 +217,25 @@ def council(caller: Any, args: str) -> None:
         caller.msg(summary_text(spec))
         return
     if not words:
-        opening: str = f"{spec.opening}\n" if step is spec.steps[0] else ""
-        _tell_room(caller, f"{caller.key} calls a council.\n{opening}{step_text(step)}")
+        if ready_step() is step:  # the answer it waited for, now proved
+            taken: str = CHOICE_LETTERS[step.choices.index(step.right)]
+            resumed: str = (
+                f"{caller.key} calls the council. The proof is in, so it takes up its answer "
+                f"again: {taken}) {step.right.text}"
+            )
+            _settle(caller, spec, step, step.right, resumed)
+            return
+        again: str = _again(spec, step)
+        intro: str = again or (spec.opening if step is spec.steps[0] else "")
+        waiting: ProofSpec | None = _missing(step.right) if _proposed(step) else None
+        lines: list[str] = [f"{caller.key} calls the council.", intro]
+        lines.append(step_text(step))
+        if waiting is not None:
+            favoured: str = CHOICE_LETTERS[step.choices.index(step.right)]
+            lines.append(f"The council already favours {favoured}) {step.right.text}")
+            lines.append(waiting.missing)
+            lines.append(quiet(WAITS))
+        _tell_room(caller, "\n".join(line for line in lines if line))
         return
     letter: str = words[0]
     if len(letter) != 1 or letter not in CHOICE_LETTERS[: len(step.choices)]:
@@ -154,9 +251,21 @@ def council(caller: Any, args: str) -> None:
         return
     missing: ProofSpec | None = _missing(choice)
     if missing is not None:
+        get_expedition().set_flag(PROPOSED + step.sets)
         recorder.note(caller, f"Council: {spec.id} {step.id}, not proved yet")
         _tell_room(caller, f"{heading}\n{missing.missing}\n{quiet(WAITS)}")
         return
+    _settle(caller, spec, step, choice, heading)
+
+
+def _settle(
+    caller: Any,
+    spec: CouncilSpec,
+    step: CouncilStepSpec,
+    choice: CouncilChoiceSpec,
+    heading: str,
+) -> None:
+    """The council agrees on `choice`, and moves on to the next step or sums up."""
     get_expedition().set_flag(step.sets)
     recorder.note(caller, f"Council: {spec.id} {step.id} settled")
     following: CouncilStepSpec | None = current_step(spec)

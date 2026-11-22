@@ -132,7 +132,11 @@ class ShipRoom(Room):
         return ship_map_location(current_position(), load_content())
 
     def situation_text(self) -> str:
-        return self.position_text(current_position())
+        from world.council import status_line  # late: the council needs the ship's rooms
+
+        seen: str = self.position_text(current_position())
+        status: str = status_line()
+        return f"{seen}\n{status}" if status else seen
 
 
 class Deck(ShipRoom):

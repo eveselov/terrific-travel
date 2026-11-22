@@ -18,6 +18,8 @@
 #     id        a short name
 #     question  what the Ship asks (in her voice, with the quotes)
 #     sets      the flag remembered once the step is settled (hints can use it)
+#     agreed    what the council has agreed once it is settled, short and lower case: said
+#               when the council is called again ("Agreed so far: the island lies west")
 #     choices   two to five; exactly one has `right: true`. Each has `text` and `reply`
 #               (said once it is chosen: why not, or, for the right one, why yes); the
 #               right one has `proof`: a list of parts, each needing any one of its `clues`
@@ -43,6 +45,7 @@ councils:
     steps:
       - id: line
         sets: line_settled
+        agreed: the chart's longitude is wrong, and its latitude right
         question: >
           "First: the chart gives two numbers. Which one could the Halcyon's master have got
           wrong without knowing it?"
@@ -71,6 +74,7 @@ councils:
               there one he could only guess?"
       - id: side
         sets: side_settled
+        agreed: the island lies west of the chart's position
         question: >
           "Second: east or west?"
         choices:
@@ -95,6 +99,7 @@ councils:
               where the compass came from."
       - id: far
         sets: far_settled
+        agreed: it lies about one degree further west
         question: >
           "Third: how far west? Out here, one degree of longitude is about 107 kilometres,
           or
@@ -151,6 +156,7 @@ councils:
     steps:
       - id: where
         sets: wreck_settled
+        agreed: the Halcyon was wrecked on the island's Western Reef
         question: >
           "First: where did the Halcyon's voyage end?"
         choices:
@@ -176,6 +182,7 @@ councils:
               Western Reef, and what the people here remember."
       - id: survivors
         sets: survivors_settled
+        agreed: her whole crew came ashore alive
         question: >
           "Second: did anyone live through the wreck?"
         choices:
@@ -198,6 +205,7 @@ councils:
               "Who told you of anyone lost? Ask those who were there."
       - id: stayed
         sets: stayed_settled
+        agreed: they stayed a season or more
         question: >
           "Third: how long did they stay?"
         choices:
@@ -220,6 +228,7 @@ councils:
               "Then where are they? Only one sailor lives on the island now."
       - id: went
         sets: crew_settled
+        agreed: most of them sailed west in a boat they built, and one stayed
         question: >
           "Last: where are they now?"
         choices:

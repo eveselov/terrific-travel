@@ -231,9 +231,11 @@ class Expedition(Script):
         """
         sighting: Sighting = Sighting(finder=finder, place=place, source=source)
         if not self.has_clue(clue_id):
-            from world.paths import watching  # paths depend on the journal (DECISIONS.md, 40)
+            # Paths depend on the journal (DECISIONS.md, 40), and so do councils' proofs.
+            from world.council import watching as council_watching
+            from world.paths import watching
 
-            with watching():
+            with watching(), council_watching():
                 self.db.journal = [
                     *(self.db.journal or []),
                     {"clue": clue_id, **_sighting_data(sighting), "also": []},
@@ -259,9 +261,10 @@ class Expedition(Script):
     def set_flag(self, flag: str) -> None:
         """Remember a flag for the whole expedition; a path it opens is announced (40)."""
         if flag not in self.flags:
+            from world.council import watching as council_watching
             from world.paths import watching
 
-            with watching():
+            with watching(), council_watching():
                 self.db.flags = [*self.flags, flag]
 
     def met(self, needs: tuple[str, ...]) -> bool:

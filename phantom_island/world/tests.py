@@ -2369,3 +2369,56 @@ class TestEverythingMentioned(DiscoveryTest):
     def test_aboard_the_ship_is_underfoot(self) -> None:
         self.at(self.char1, "deck")
         self.assertIn("you're standing on her", self.do(self.char1, "look hope"))
+
+
+class TestCouncilIsNeverLost(DiscoveryTest):
+    """A council left for something else is picked up again (playtest 2026-11-22)."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+
+    def test_the_proof_coming_in_is_announced(self) -> None:
+        self.do(self.char1, "council b")  # right, but the sight isn't taken yet
+        with patch.object(self.char1, "msg") as mock_msg:
+            get_expedition().set_flag("sight_charted")
+        self.assertIn("That's what the council was waiting for", texts(mock_msg))
+
+    def test_nothing_is_announced_before_the_council_waits_for_it(self) -> None:
+        with patch.object(self.char1, "msg") as mock_msg:
+            get_expedition().set_flag("sight_charted")
+        self.assertNotIn("council was waiting", texts(mock_msg))
+
+    def test_called_again_it_takes_up_its_answer_once_proved(self) -> None:
+        self.do(self.char1, "council b")
+        get_expedition().set_flag("sight_charted")
+        heard: str = self.do(self.char1, "council")
+        self.assertIn("takes up its answer again: b) The longitude", heard)
+        self.assertIn("Second: east or west?", heard)
+        self.assertTrue(get_expedition().met(("line_settled",)))
+
+    def test_called_again_it_says_what_it_still_waits_for(self) -> None:
+        self.do(self.char1, "council b")
+        heard: str = self.do(self.char1, "council")
+        self.assertIn("already favours b) The longitude", heard)
+        self.assertIn("The council waits", heard)
+
+    def test_called_again_it_says_what_is_agreed(self) -> None:
+        get_expedition().set_flag("sight_charted")
+        self.do(self.char1, "council b")
+        heard: str = self.do(self.char1, "council")
+        self.assertIn("Agreed so far: the chart's longitude is wrong", heard)
+        self.assertIn("Still to settle: 2 questions", heard)
+        self.assertNotIn("Open sea, Captain", heard)  # the opening is said once
+
+    def test_the_deck_shows_where_the_council_stands(self) -> None:
+        self.assertNotIn("The council is sitting", self.do(self.char1, "look"))
+        get_expedition().set_flag("sight_charted")
+        self.do(self.char1, "council b")
+        self.assertIn("The council is sitting: 1 of 3", self.do(self.char1, "look"))
+
+    def test_the_announcement_comes_after_the_scene(self) -> None:
+        self.do(self.char1, "council b")
+        heard: str = self.do(self.char1, "use sextant")
+        self.assertLess(heard.index("You use the sextant"), heard.index("council was waiting"))
