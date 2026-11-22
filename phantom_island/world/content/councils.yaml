@@ -49,7 +49,7 @@ councils:
         choices:
           - text: The latitude, north or south.
             reply: >
-              "The noon sun gave him his latitude every day, and our |wsextant|n agrees with
+              "The noon sun gave the Halcyon's master his latitude every day, and our |wsextant|n agrees with
               his chart. Which number had he no way to check?"
           - text: The longitude, east or west.
             right: true
@@ -66,7 +66,7 @@ councils:
                   Then call the council again."
           - text: Both of them.
             reply: >
-              "Our |wsextant|n agrees with his latitude: that one he measured, every noon.
+              "Our |wsextant|n agrees with the Halcyon's master on the latitude: that one he measured, every noon.
               Is
               there one he could only guess?"
       - id: side

@@ -97,7 +97,7 @@ situations:
     hints:
       - No island where the chart puts it. First make sure the ship is really at the
         chart's position.
-      - Take a noon sight with the sextant, then read the chronometer.
+      - Measure the noon sun's height with the sextant, then read the chronometer.
       - On the Deck, |wuse sextant|n, then |wread chronometer|n.
 
   # The decision at the chart's position follows its council (councils.yaml, DECISIONS.md,

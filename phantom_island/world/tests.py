@@ -279,7 +279,7 @@ class TestContent(TestCase):
 
     def test_a_mark_without_a_clue_is_an_error(self) -> None:
         error: ContentError = self._broken_copy(
-            PLACES_FILE, "Traders call out", "[[Traders]] call out"
+            PLACES_FILE, "One |wstall|n draws", "One [[|wstall|n]] draws"
         )
         self.assertIn("no `clue`", str(error))
 
@@ -1058,6 +1058,11 @@ class TestThings(DiscoveryTest):
         self.assertIn("Looking is free", self.do(self.char1, "get compass"))
         self.assertEqual(self.thing("compass").location, self.rooms["market"])
 
+    def test_watching_is_looking(self) -> None:
+        self.at(self.char1, "market")
+        self.do(self.char1, "look compass")  # the first look notes the clue in the journal
+        self.assertEqual(self.do(self.char1, "watch compass"), self.do(self.char1, "look compass"))
+
     def test_books_can_be_carried(self) -> None:
         self.at(self.char1, "deck")
         self.do(self.char1, "get plant guide")
@@ -1290,7 +1295,7 @@ class TestAtSea(DiscoveryTest):
     def test_at_the_charted_position_the_measurements_confirm_the_empty_sea(self) -> None:
         self.ship_at("charted")
         self.at(self.char2, "deck")
-        self.assertIn("Take a noon sight", self.do(self.char2, "read chronometer"))
+        self.assertIn("Measure the noon", self.do(self.char2, "read chronometer"))
         self.at(self.char1, "deck")
         self.do(self.char1, "look")  # the empty sea: C4
         self.assertIn("|yLatitude 14 degrees South", self.do(self.char1, "use sextant"))

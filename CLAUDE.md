@@ -56,5 +56,8 @@ players can play too.
 7. **Claude does not stage, commit or push.** Only edit files and leave them as uncommitted
    changes; the maintainer runs `git add`, `git commit` and `git push`. Creating or switching
    branches, or other history changes (reset, rebase, amend), also need an explicit request.
+8. **No reflowing.** Edit only the words that change, so the diff shows only real changes.
+   If an edit makes one line far too long, break just that line. Rewrap existing text
+   (content YAML, docs, comments) only on an explicit request.
 
 Hardware and run notes are in [BUILD.md](BUILD.md).

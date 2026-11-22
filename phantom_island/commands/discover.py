@@ -42,6 +42,7 @@ class CmdLook(DefaultCmdLook):
     Usage:
       look
       look <something>
+      watch <something>
 
     Words shown in white in a description are worth a look, or a question. Some things show
     more to someone carrying the right book or chart.
@@ -52,6 +53,7 @@ class CmdLook(DefaultCmdLook):
       look beams
     """
 
+    aliases = ["l", "ls", "watch"]  # `watch sky`, as the texts say (playtest 2026-11-22)
     help_category = "General"
 
     def func(self) -> None:

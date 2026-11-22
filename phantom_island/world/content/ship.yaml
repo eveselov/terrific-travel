@@ -140,8 +140,8 @@ positions:
             chart house: four minutes later for every degree the ship has sailed west.
           - >
             Day 21. The Good Hope's timbers creak: "This is the place on the chart, by my
-            reckoning. But don't take my word for it: check it yourselves. Take a noon sight
-            with the |wsextant|n, then read my |wchronometer|n."
+            reckoning. But don't take my word for it: check it yourselves: |wuse sextant|n,
+            then |wread chronometer|n."
 
   charted:
     name: The charted position

@@ -172,7 +172,7 @@ things:
             about longitude|n.
           otherwise: &no_sight >
             The chronometer ticks steadily, keeping home time. On its own it can't say
-            where you are: you also need the moment of noon out here. Take a noon sight
+            where you are: you also need the moment of noon out here. Measure the noon sun
             first: |wuse sextant|n.
         north_of_chart:
           teaches: {longitude: used}
@@ -222,20 +222,20 @@ things:
     close:
       teaches: {positions: understood, dead_reckoning: heard}
       text: >
-        You spread the chart out flat. Our own coast runs down its right-hand edge. Thin
+        You spread the chart out flat. The coast of home runs down its right-hand edge. Thin
         ruled lines cross the paper: the ones from side to side are lines of latitude, and
         one of them runs straight from our harbour to the island. So the island lies
         exactly as far south as home, only far to the west. Beside the island, in small
-        writing: "Position fixed by our |wreckoning|n."
+        writing: "Position fixed by our |wreckoning|n." (What is that? |wask hope about reckoning|n.)
     read:
       teaches: {positions: heard}
       text: >
         In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
         large figures: Latitude 14 degrees South, longitude 40 degrees West of
-        home.|/Give it to the crew as your order: |wsail to 14 south 40 west|n. The
+        home.|/The
         coastline is
         drawn with care: round in the east with a lagoon, a hill in the middle, a long reef
-        down the west side, and a little cove in the south, like a hook.
+        down the west side, and a little cove in the south, like a hook.|/To sail there, give the crew the order: |wsail to 14 south 40 west|n.
 
   plant_guide:
     name: plant guide

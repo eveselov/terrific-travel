@@ -115,7 +115,7 @@ characters:
       The patron of the Society: a tall woman in a grey coat, with ink on her fingers and
       a pile of papers she keeps straightening.
     greeting: >
-      "Ah, Captain, you've come. The Society has hired a ship and a crew for this
+      "Ah, Captain, you've come. The Society has hired a ship, the Good Hope, and a crew for this
       expedition, and put them under your orders: the crew do the sailing, and you decide
       where to go and what to look into. Sit down. There is a great deal to tell, and very
       little of it is certain."
@@ -170,7 +170,7 @@ characters:
         reply: >
           "I have not held it myself: Mr Crane will not let it out of his hands. He says he
           found it on a beach. I should like to know how a compass comes to lie on a beach
-          for fifteen years. Do look at it closely."
+          for fifteen years. Do look at it closely: |wexamine compass|n."
       island:
         stance: truth
         reply: >
@@ -689,9 +689,9 @@ characters:
         stance: truth
         teaches: {latitude: understood}
         reply: >
-          "The sextant measures how high the sun stands above the horizon. It lives in the
-          chart house: use it at noon, when the sun is highest. Look the height up in the
-          tables, and you have your |wlatitude|n."
+          "The sextant measures how high the sun stands above the horizon, when used at
+          noon, with the sun at its highest. Look the height up in the
+          tables, and you have your |wlatitude|n. It lives in the chart house. To find our latitude: |wuse sextant|n."
       chronometer:
         aliases: [clock, sea clock]
         stance: truth
@@ -706,8 +706,8 @@ characters:
         teaches: {latitude: understood}
         reply: >
           "Latitude is how far north or south you are. The higher the noon sun stands, the
-          nearer you are to the equator. Sailors have measured it well for centuries: take
-          the |wsextant|n at noon."
+          nearer you are to the equator. Sailors have measured it well for centuries, with
+          the sextant (|wuse sextant|n)."
       longitude:
         stance: truth
         teaches: {longitude: understood}
@@ -750,8 +750,8 @@ characters:
         teaches: {winds: understood}
         reply: >
           "A wind is named for where it comes from, not where it goes. A west wind blows
-          out of the west, towards the east, and pushes anything afloat eastwards. So when
-          someone tells you of a wind, ask yourself: which way did it push?"
+          from the west and pushes anything afloat to the
+          east: the opposite way to its name."
       horizon:
         aliases: [masthead, lookout, how far]
         stance: truth
@@ -785,7 +785,7 @@ characters:
         teaches: {tides: understood}
         reply: >
           "The sea rises and falls about twice a day, a little later each day. At low tide
-          a reef can stand clear of the water. At high tide it's hidden, and dangerous."
+          the rocks and reefs near a shore can stand clear of the water. At high tide they're hidden, and dangerous."
       water:
         aliases: [casks, drink]
         stance: truth
