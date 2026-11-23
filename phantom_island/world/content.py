@@ -580,6 +580,7 @@ class CharacterSpec:
     voice: str | None = None  # how they speak: for the writer and the AI characters (phase B)
     trust: "TrustSpec | None" = None  # what it takes to win them over (Ama's respect, 41)
     crew: bool = False  # one of the ship's crew: personality, not plot (checked)
+    busy: str | None = None  # a crew member's answer while `crew_talk` is off
 
     @property
     def words(self) -> tuple[str, ...]:
@@ -648,6 +649,8 @@ class Content:
     from_shore: LookSpec | None = None
     # What each player sees the first time they come aboard: the crew (ship.yaml).
     welcome: str | None = None
+    # Whether the crew can be talked to (characters.yaml): off, they speak only in councils.
+    crew_talk: bool = False
 
     def place_of_kind(self, kind: str) -> PlaceSpec:
         """The one place of this kind (`deck`)."""
@@ -967,6 +970,7 @@ def _character(character_id: str, value: Any, shared: dict[str, tuple[str, ...]]
         topics=topics,
         trust=_trust(data.get("trust"), f"{where}, trust"),
         crew=_flag(data, "crew", where),
+        busy=_optional_text(data, "busy", where),
     )
 
 
@@ -1888,6 +1892,8 @@ def _character_texts(character: CharacterSpec) -> list[tuple[str, str]]:
         ("greeting", character.greeting),
         ("fallback", character.fallback),
     ]
+    if character.busy is not None:
+        texts.append(("busy", character.busy))
     for topic in character.topics.values():
         texts.append((f"topic {topic.id}", topic.reply))
         if topic.truth is not None:
@@ -1903,6 +1909,8 @@ def _check_crew(character: CharacterSpec) -> None:
     if not character.crew:
         return
     where: str = f"{CHARACTERS_FILE}, {character.id}"
+    if character.busy is None:
+        raise ContentError(f"{where}: one of the crew needs `busy`, said while crew_talk is off.")
     if character.trust is not None:
         raise ContentError(f"{where}: one of the crew has no `trust` to win.")
     for topic in character.topics.values():
@@ -2019,6 +2027,7 @@ def read_content(directory: Path = CONTENT_DIR) -> Content:
         ashore_exit=_exit_name(ship_data, "ashore_exit"),
         aboard_exit=_exit_name(ship_data, "aboard_exit"),
         characters=_characters(characters_data),
+        crew_talk=_flag(characters_data, "crew_talk", CHARACTERS_FILE),
         clues=clues,
         things=_things(things_data),
         areas=areas,

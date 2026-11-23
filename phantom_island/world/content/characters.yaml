@@ -96,6 +96,12 @@
 #     clue    the clue that reply reveals
 #     sets    optional: a flag to remember once that reply is given (a mark of `trust`)
 
+# Whether players can talk to the crew on the Deck (2026-11-23). Off, the crew still
+# welcome the players and speak in councils, and `ask` gets their `busy` answer. Talk
+# that leads nowhere can look like a lead (DECISIONS.md, 39), so it stays off for the
+# kids' first games; on, for trying it out. `reload` is enough after changing it.
+crew_talk: false
+
 topic_aliases:
   halcyon: [the halcyon, ship halcyon, lost ship]
   compass: [brass compass, halcyon compass]
@@ -719,6 +725,9 @@ characters:
       how fast we go, and I can tell you how we |wreckon|n our way at sea. Or ask me about
       the |wship|n herself."
     suggest: [log, reckoning, ship]
+    busy: >
+      Mr. Rowe looks up from his logbook. "Later, Captain, if you'll forgive me. I'll have
+      my say in |wcouncil|n."
     fallback: >
       Mr. Rowe considers. "I couldn't say, Captain, not for certain. The Good Hope knows
       more than I do: |wask hope|n. Or ask me about the |wlog|n."
@@ -777,6 +786,9 @@ characters:
       |wrope|n spliced, or a |wknot|n tied? Want to know about sea |wluck|n? Or the
       |wweather|n out here?"
     suggest: [ropes, luck, weather]
+    busy: >
+      Ned Tarrant is bellowing at the men at the ropes. "In council, Captain!" he roars over
+      his shoulder. "I'll have my say there!"
     fallback: >
       Ned Tarrant scratches his head. "Blow me down, Captain, that's past me. Ask the Good
       Hope: |wask hope|n. Or ask me about sea |wluck|n!"
@@ -828,21 +840,22 @@ characters:
 
   kit:
     name: Kit
-    aliases: [kit, kit lowe, youngest, ship's boy]
+    aliases: [kit, kit lowe, youngest]
     where: deck
     crew: true
     voice: >
       About twelve: eager, curious, quick to notice things and to ask questions back. Short
-      bursts of words, a lot of exclamation marks. No pronoun for Kit in narration: the
-      kids may decide whether Kit is a boy or a girl.
+      bursts of words, a lot of exclamation marks. Kit is a girl (2026-11-23).
     desc: >
       The youngest aboard: about twelve, quick and sunburnt, in a shirt a size too big.
-      Kit seems to be everywhere at once, and always has a question.
+      She seems to be everywhere at once, and always has a question.
     greeting: >
       "Captain! Are we really going to find out about the Halcyon? I've never been this
       far out! Do you want to hear about |whome|n? Or what I do on the |wship|n? I know a
       |wsong|n, too!"
     suggest: [home, ship, song]
+    busy: >
+      Kit waves down at you from the rigging. "In council, Captain! I'll have my say there!"
     fallback: >
       Kit thinks hard. "I don't know! Ask the Good Hope, she knows everything: |wask
       hope|n. Or shall I sing you my |wsong|n?"
@@ -863,14 +876,13 @@ characters:
           Mr. Rowe is teaching me the log, and Ned teaches me knots. The carpenter says
           she's oak, every plank. Oak's what good ships are made of!"
       song:
+        # Just a song: nothing to do with Tui's (no idea taught, 2026-11-23).
         aliases: [shanty, sing, songs, mary]
         stance: truth
-        teaches: {songs: heard}
         reply: >
           Kit sings, loud and a little out of tune: "Oh, the Mary sailed for Lisbon, and
           the Mary sailed for Spain, and the Mary came home a-limping with her mainmast
-          cracked in twain!" Kit grins. "That one's true! Ned was aboard her. Some songs
-          tell of things that really happened."
+          cracked in twain!" Kit grins. "Ned taught me that one!"
       halcyon:
         hidden: true
         stance: truth

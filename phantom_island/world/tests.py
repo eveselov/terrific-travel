@@ -2483,12 +2483,15 @@ class TestPortCouncil(DiscoveryTest):
 
 
 class TestCrew(DiscoveryTest):
-    """The crew can be talked to on the Deck: personality, not plot (2026-11-22)."""
+    """With `crew_talk` on, the crew can be talked to: personality, not plot (2026-11-22)."""
 
     def setUp(self) -> None:
         super().setUp()
         self.ship_at("port")
         self.at(self.char1, "deck")
+        talk: Any = patch("world.conversation.crew_talk", return_value=True)
+        talk.start()
+        self.addCleanup(talk.stop)
 
     def test_the_crew_stand_on_the_deck(self) -> None:
         self.assertIn("logbook under his arm", self.do(self.char1, "look rowe"))
@@ -2502,7 +2505,7 @@ class TestCrew(DiscoveryTest):
     def test_they_teach_a_little(self) -> None:
         self.assertIn("counted in knots", self.do(self.char1, "ask rowe about log"))
         self.assertIn("albatross", self.do(self.char1, "ask tarrant about luck"))
-        self.assertIn("Some songs tell", self.do(self.char1, "ask kit about song"))
+        self.assertIn("Ned taught me that one", self.do(self.char1, "ask kit about song"))
 
     def test_on_the_mystery_they_defer(self) -> None:
         self.assertIn("I won't guess", self.do(self.char1, "ask rowe about halcyon"))
@@ -2510,3 +2513,28 @@ class TestCrew(DiscoveryTest):
 
     def test_an_unnamed_question_aboard_is_for_the_good_hope(self) -> None:
         self.assertIn("The sextant measures", self.do(self.char1, "ask about sextant"))
+
+
+class TestCrewTalkOff(DiscoveryTest):
+    """With `crew_talk` off (the default), the crew have their say in councils only."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.ship_at("port")
+        self.at(self.char1, "deck")
+
+    def test_off_by_default(self) -> None:
+        self.assertFalse(load_content().crew_talk)
+
+    def test_the_crew_answer_that_they_speak_in_council(self) -> None:
+        self.assertIn("I'll have my say", self.do(self.char1, "ask kit"))
+        self.assertIn("I'll have my say", self.do(self.char1, "ask rowe about log"))
+        self.assertNotIn("counted in knots", self.do(self.char1, "ask rowe about log"))
+
+    def test_they_are_still_on_the_deck(self) -> None:
+        self.assertIn("logbook under his arm", self.do(self.char1, "look rowe"))
+
+    def test_only_the_good_hope_is_offered_to_talk_to(self) -> None:
+        heard: str = self.do(self.char1, "ask")
+        self.assertIn("the Good Hope", heard)
+        self.assertNotIn("Kit", heard)

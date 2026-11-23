@@ -60,4 +60,22 @@ players can play too.
    If an edit makes one line far too long, break just that line. Rewrap existing text
    (content YAML, docs, comments) only on an explicit request.
 
+## Design rules (Phantom Island)
+
+Learned the hard way, in playtests. Check every new character, topic, detail, clue or text
+against them before proposing it, and say so when an idea bends one.
+
+1. **One way, one job** ([DECISIONS.md](phantom_island/docs/DECISIONS.md), 39). Each step
+   of the path has one way through, signposted, with hints down to the exact command. Each
+   clue proves one thing, and later sources only confirm it. **Nothing that leads nowhere
+   may look like a lead:** extra talk, extra sources or extra puzzles make players wonder
+   what they missed ("why did I work so hard on the others?"). Flavour is welcome only
+   where it plainly can't be taken for a lead: short, plain (not white), not about the
+   mystery. Anything chattier (the crew's talk, 2026-11-23) goes behind a switch, off by
+   default, until a playtest shows kids take it as flavour.
+2. **This game is one path, played once** (39). Wandering, side quests and open-world play
+   may suit other games, or come after the ending, but are never mixed into the path.
+3. **What players can't know isn't there** (40, 41): paths are learned, and conditions
+   such as respect are named, taught and acknowledged, never met by chance.
+
 Hardware and run notes are in [BUILD.md](BUILD.md).

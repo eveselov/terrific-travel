@@ -82,9 +82,11 @@ welcome: >
   A tall man with a logbook under his arm touches his hat. "Thomas Rowe, Captain, your
   mate. The ship is ready to sail when you are." Behind him a big, sunburnt sailor is
   bellowing at the men stowing the last barrels: Ned Tarrant, the bosun. And the youngest
-  aboard, a sailor of about twelve called Kit, is peering in at the chart house door.|/Mr.
+  aboard, a girl of about twelve called Kit, is peering in at the chart house door.|/Mr.
   Rowe follows your glance. "Where we sail is yours to decide, Captain. Give the order when
-  you know. And if you're not sure, call a |wcouncil|n: that's what the crew are here for."
+  you know. And if you're not sure, call a |wcouncil|n: that's what the crew are here for.
+  We're sailors, not scholars: for the Society's questions, you'll want the |wjournal|n
+  and the Good Hope."
 
 # Where the ship is when the game begins.
 start: port

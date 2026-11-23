@@ -176,8 +176,15 @@ def ask_example(caller: Any, spec: CharacterSpec) -> str:
     return notices.quiet(f"To ask about a white word: |wask {spec.id} about {offered[0]}|n.")
 
 
+def crew_talk() -> bool:
+    """Whether the crew can be talked to (`crew_talk` in characters.yaml, 2026-11-23)."""
+    return load_content().crew_talk
+
+
 def _who_is_here(caller: Any) -> str:
-    here: list[Listener] = listeners(caller)
+    here: list[Listener] = [
+        listener for listener in listeners(caller) if crew_talk() or not listener.spec.crew
+    ]
     if not here:
         return "There is nobody here to talk to."
     names: str = ", ".join(f"|w{listener.spec.name}|n" for listener in here)
@@ -389,6 +396,9 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
         listener = found
 
     spec: CharacterSpec = listener.spec
+    if spec.crew and not crew_talk():  # off: they have their say in councils only
+        caller.msg(speech(spec, spec.busy or f"{spec.name} is busy."))
+        return None
     caller.ndb.last_asked = spec.id
     asker: str = caller.get_display_name(caller)
     if not what:
