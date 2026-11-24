@@ -4,7 +4,8 @@ for players until its clues or flags hold. Until then the exits that lead to it 
 shown nor usable (`typeclasses.exits.Exit.access`), and the map leaves it out. A path is
 opened by the story: a view from the Hilltop, a child leading the way, an elder telling where
 someone lives. That moment is announced to everyone in the expedition in a quiet line, with
-where the new path starts, and from then on the place is there for everyone: what is known
+where the new path starts and the map sent again, and from then on the place is there for
+everyone: what is known
 is the expedition's, like the journal.
 
 Nothing is stored: whether a place is known follows from the flags and the journal, so
@@ -91,6 +92,9 @@ def announce(before: set[str]) -> None:
         for place_id in opened:
             way: str = _way_in(content, place_id, hidden, start)
             notices.tell(character, f"A new path: the {content.places[place_id].name}{way}.")
+        send_map: Any = getattr(character.location, "send_map", None)
+        if send_map is not None:  # the new place is on the map at once (playtest 2026-11-24)
+            send_map(character)
 
 
 @contextmanager

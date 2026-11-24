@@ -110,9 +110,13 @@ class Room(ObjectParent, DefaultRoom):
 
         Text-only clients ignore these messages, so this is safe to call for any viewer.
         """
+        self.send_map(viewer)
+        viewer.msg(focus=render_focus_html(self.key, self.image_url))
+
+    def send_map(self, viewer: "Character") -> None:
+        """Send this room's map to a viewer's web client (again, when a new path opens)."""
         view: MapView | None = self.map_view()
         viewer.msg(map=render_map_html(view) if view is not None else render_no_map_html())
-        viewer.msg(focus=render_focus_html(self.key, self.image_url))
 
 
 class ShipRoom(Room):

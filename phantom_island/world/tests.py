@@ -786,6 +786,16 @@ class TestMapsAndFocus(WorldTest):
         self.assertIn(f"{SHIP_LABEL} (Deck)", map_html)
         self.assertIn('font-weight="bold" fill="#1d2b36">Deck', map_html)
 
+    def test_a_new_path_is_on_the_map_at_once(self) -> None:
+        # Playtest 2026-11-24: the Village appeared only after the next move.
+        get_expedition().move_ship("anchorage")
+        self.char1.move_to(self.rooms["forest"], quiet=True)
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.go(self.char1, "north")
+        maps: list[Any] = sent(mock_msg, "map")
+        self.assertNotIn(">Village<", maps[0])
+        self.assertIn(">Village<", maps[-1])
+
     def test_at_sea_the_deck_shows_the_sea_chart_with_the_track(self) -> None:
         get_expedition().move_ship("charted")
         view: MapView | None = self.rooms["deck"].map_view()
