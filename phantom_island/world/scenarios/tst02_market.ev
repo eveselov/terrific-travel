@@ -1,0 +1,79 @@
+# SPOILERS. Phantom Island scenario 'tst02_market', recorded by Admin on 2026-11-23.
+#
+# Play it as a builder, with nobody else playing:
+#   batchcommand/interactive scenarios.tst02_market   (ss: next command, qq: stop)
+# The notes after each command are what the game recorded. Fill in the reasons
+# after 'Why:' if you want this to be an annotated scenario, like island.ev.
+# Keep a '#' line after every command: it ends the command.
+#
+startover yes
+# A new expedition: the ship in port, the journal and notebooks empty, you in Limbo.
+begin
+#   Now in: Society Office
+#   Why:
+look street
+#   Why:
+look bookshelves
+#   Why:
+look harbour
+#   Why:
+look ship
+#   Why:
+l
+#   Why:
+ask Fairweather
+#   Why:
+ask about expedition
+#   Why:
+ask about mission
+#   Why:
+ask about ship
+#   Why:
+ask about chart
+#   Why:
+ask about society
+#   Why:
+ask about island
+#   Why:
+ask about compass
+#   Why:
+examine compass
+#   Why:
+ask about halcyon
+#   Notebook: new Oak and island trees
+#   Why:
+ask about crew
+#   Why:
+go east
+#   Why:
+east
+#   Now in: Market
+#   Why:
+look stall
+#   Why:
+look compass
+#   Journal: new C1, The Halcyon's compass
+#   Why:
+examine compass
+#   Journal: new C2, Coral in the hinge
+#   Notebook: new Coral
+#   Why:
+ask about coral
+#   Why:
+ask about compass
+#   Journal: new C3, Fishermen from the west
+#   Think: compass_sea
+#   Why:
+ask about fishermen
+#   Journal: again C3, Fishermen from the west
+#   Why:
+ask about canoe
+#   Why:
+ask crane
+#   Why:
+ask about halcyon
+#   Why:
+journal
+#   Why:
+ask about trade
+#   Why:

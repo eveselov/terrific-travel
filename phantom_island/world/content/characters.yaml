@@ -68,8 +68,10 @@
 #             two in white there too, so nobody is left without a next question
 #   topics    topic id: what they say about it
 #   trust     optional: what it takes to win them over (DECISIONS.md, 41): `marks`, the flags
-#             set by what players do, a `label` for the progress shown with each mark
-#             ("Elder Ama's respect: 1 of 2.") and `won`, said with the last one
+#             set by what players do, each with what earns it, a `label` for the progress
+#             shown with each mark ("Elder Ama's respect: 1 of 2. Still to do: ...") and
+#             `won`, said with the last one. The progress also follows a refusal that waits
+#             on it, once a mark is earned (playtest 2026-11-24)
 #   crew      optional: true for one of the ship's crew, who stand on the Deck (`where:
 #             deck`). Personality, not plot: the content check allows them no clues, flags,
 #             hidden truths or trust, and ideas only as `heard`. Aboard, a question with no
@@ -95,6 +97,8 @@
 #     reply   what they say then
 #     clue    the clue that reply reveals
 #     sets    optional: a flag to remember once that reply is given (a mark of `trust`)
+#   meanwhile optional, before the truth: a list of `needs` and `reply`; the first whose
+#             needs hold replaces `reply`, so a refusal names only what is still to do
 
 # Whether players can talk to the crew on the Deck (2026-11-23). Off, the crew still
 # welcome the players and speak in councils, and `ask` gets their `busy` answer. Talk
@@ -426,7 +430,9 @@ characters:
     # after knowing it counts, so nobody earns it by chance.
     trust:
       label: Elder Ama's respect
-      marks: [respect_ama, respect_tui]
+      marks:
+        respect_ama: ask Elder Ama about her village
+        respect_tui: ask Tui about her song
       won: She trusts you now. Ask her what you came for.
     topics:
       village:
@@ -463,6 +469,16 @@ characters:
           "You ask about strangers before you ask about us. A stranger who wants our
           stories shows |wrespect|n first: ask about our people, and be kind to our
           children. Then ask me again."
+        meanwhile:  # what is still to do, once some respect is shown (playtest 2026-11-24)
+          - needs: [respect_ama]
+            reply: >
+              "You asked about my people. That was well done. Now be kind to our children:
+              Tui wants to sing you her song: |wask tui about song|n. Listen to it, and then
+              ask me again."
+          - needs: [respect_tui]
+            reply: >
+              "Tui says you listened to her whole song. That was kind. Now ask about us, about
+              my |wvillage|n, before you ask about strangers. Then ask me again."
         truth:
           needs: [respect_ama, respect_tui]
           clue: C12
@@ -492,6 +508,14 @@ characters:
         reply: >
           "Those are strangers' stories. Show |wrespect|n first: ask about our people, and
           be kind to our children."
+        meanwhile:
+          - needs: [respect_ama]
+            reply: >
+              "You asked about my people. Now listen to Tui's song (|wask tui about song|n),
+              and then ask me again."
+          - needs: [respect_tui]
+            reply: >
+              "You listened to Tui. Now ask about my |wvillage|n, and then ask me again."
         truth:
           needs: [respect_ama, respect_tui]
           clue: C12
@@ -500,6 +524,23 @@ characters:
             "Our people paddled out into the storm and [[brought every one of them ashore,
             alive]]. The rest of their story belongs to the one who stayed. He lives at the
             Boat Cove, southwest of the village: Jonah. Tell him I sent you."
+      jonah:
+        # Tui sends players here ("Grandmother says that's for her to tell", playtest
+        # 2026-11-24). The way to the Cove still comes with the Halcyon's story (C12).
+        aliases: [pike, cove, boat cove, carpenter]
+        hidden: true
+        stance: hiding
+        reply: >
+          "Jonah's story begins with the ship. When you have shown respect, ask me about the
+          |wHalcyon|n."
+        meanwhile:
+          - needs: [respect_ama, respect_tui]
+            reply: >
+              "Jonah's story begins with the ship. Ask me about the |wHalcyon|n first."
+        truth:
+          needs: [cove_told]
+          reply: >
+            "Jonah lives at the Boat Cove, southwest of the village. Tell him I sent you."
       respect:
         aliases: [rule, rules, manners]
         stance: truth
@@ -601,6 +642,17 @@ characters:
           "Grandmother is the oldest in the whole village! She says strangers must show
           respect. Ask her about our village first, not about your ship. And listen to my
           |wsong|n! Then she tells you stories."
+        meanwhile:  # the song heard before the rule doesn't count (41): say so (2026-11-24)
+          - needs: [respect_tui]
+            reply: >
+              "You listened to my whole song, and Grandmother saw! Ask her about our village
+              too, if you haven't yet. Then she tells you stories."
+          - needs: [C11]
+            reply: >
+              "Grandmother is the oldest in the whole village! She says strangers must show
+              respect. Ask her about our village first, not about your ship. And you heard
+              my song before you knew, so it didn't count! Ask me for my |wsong|n again.
+              Then she tells you stories."
       self:
         hidden: true
         stance: truth

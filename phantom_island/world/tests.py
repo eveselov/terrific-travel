@@ -2354,8 +2354,49 @@ class TestRespect(DiscoveryTest):
         self.do(self.char1, "ask tui about respect")
         self.do(self.char1, "ask ama about village")
         self.assertNotIn("C12", [entry.clue for entry in get_expedition().journal])
-        self.assertIn("shows |wrespect|n first", self.do(self.char1, "ask ama about halcyon"))
+        refusal: str = self.do(self.char1, "ask ama about halcyon")
+        self.assertIn("You asked about my people", refusal)  # only what is still to do
+        self.assertIn("Still to do: ask Tui about her song.", refusal)
         self.assertIn("for her to tell", self.do(self.char1, "ask tui about jonah"))
+
+    def test_the_song_before_the_rule_is_asked_for_again(self) -> None:
+        # The playtest of 2026-11-24: the song, then the rule, then the village.
+        self.do(self.char1, "ask tui about song")
+        told: str = self.do(self.char1, "ask tui about respect")
+        self.assertIn("it didn't count", told)
+        self.assertIn(
+            "Still to do: ask Tui about her song.", self.do(self.char1, "ask ama about village")
+        )
+        self.assertIn("Listen to it", self.do(self.char1, "ask ama about halcyon"))
+        self.assertIn("2 of 2", self.do(self.char1, "ask tui about song"))
+        self.assertIn("and Grandmother saw", self.do(self.char1, "ask tui about respect"))
+
+    def test_the_song_first_then_the_village_is_named(self) -> None:
+        self.do(self.char1, "ask tui about respect")
+        self.do(self.char1, "ask tui about song")
+        refusal: str = self.do(self.char1, "ask ama about halcyon")
+        self.assertIn("Tui says you listened", refusal)
+        self.assertIn("Still to do: ask Elder Ama about her village.", refusal)
+
+    def test_progress_is_one_quiet_line(self) -> None:
+        self.do(self.char1, "ask tui about respect")
+        self.assertNotIn("(  (", self.do(self.char1, "ask ama about village"))
+        self.assertNotIn("(  (", self.do(self.char1, "ask tui about song"))
+
+    def test_ama_answers_about_jonah(self) -> None:
+        self.assertIn("When you have shown respect", self.do(self.char1, "ask ama about jonah"))
+        self.do(self.char1, "ask tui about respect")
+        self.do(self.char1, "ask ama about village")
+        self.do(self.char1, "ask tui about song")
+        self.assertIn(
+            "Ask me about the |wHalcyon|n first", self.do(self.char1, "ask ama about jonah")
+        )
+        self.do(self.char1, "ask ama about halcyon")
+        self.assertIn("Tell him I sent you", self.do(self.char1, "ask ama about jonah"))
+
+    def test_the_reef_from_the_hilltop_shows_no_way_down(self) -> None:
+        self.at(self.char1, "hilltop")
+        self.assertIn("can't see a way", self.do(self.char1, "look reef"))
 
 
 class TestEverythingMentioned(DiscoveryTest):

@@ -90,9 +90,7 @@ def announce(before: set[str]) -> None:
         start: str | None = place_id_of(character.location) if character.location else None
         for place_id in opened:
             way: str = _way_in(content, place_id, hidden, start)
-            notices.tell(
-                character, notices.quiet(f"A new path: the {content.places[place_id].name}{way}.")
-            )
+            notices.tell(character, f"A new path: the {content.places[place_id].name}{way}.")
 
 
 @contextmanager

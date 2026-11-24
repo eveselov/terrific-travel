@@ -201,7 +201,7 @@ beach:
       desc: >
         Three brown goats with clever yellow eyes. One is chewing a palm leaf and watches
         you while it chews. Nobody seems to look after them. How did goats get to an island
-        so far out? The naturalist's books in the ship's chart house might know.
+        so far out? The animal guide in the ship's chart house might know.
       with:
         animal_guide:
           teaches: {island_animals: used}
@@ -337,7 +337,7 @@ spring:
       desc: >
         Thin green shoots, planted in straight rows like a garden at home. You pull one up:
         a small white bulb, with a sharp smell that makes your eyes water. Somebody planted
-        these. The naturalist's books in the ship's chart house might name the plant.
+        these. The plant guide in the ship's chart house might name the plant.
       with:
         plant_guide:
           teaches: {onions: used}
@@ -365,10 +365,16 @@ hilltop:
         Thin smoke rising from a clearing south of the forest. You can make out the roofs of
         huts. The forest path should lead down that way.
     ocean:
-      aliases: [sea, open ocean, lagoon, reef]
+      aliases: [sea, open ocean, lagoon]
       desc: >
         Open ocean all round, empty to the horizon. Inside the reef, the lagoon is pale green,
         and your ship lies in it, very small from up here.
+    reef:
+      aliases: [western reef, surf]
+      desc: >
+        A long line of white surf down the west side of the island, where the waves break on
+        the reef. Thick forest lies between it and you: from up here, you can't see a way
+        down to it.
     coastline:
       aliases: [coast, shape, view, shore]
       desc: >

@@ -535,16 +535,29 @@ class TruthSpec:
 
 
 @dataclass(frozen=True)
+class MeanwhileSpec:
+    """
+    What a character says about a topic once some of its `needs` are met, but not yet the
+    truth's (playtest 2026-11-24): Elder Ama's refusal names only the respect still to show.
+    """
+
+    needs: tuple[str, ...]
+    reply: str
+
+
+@dataclass(frozen=True)
 class TrustSpec:
     """
     What it takes to win a character over (DECISIONS.md, 41): the flags (`marks`) set by
-    what players do. Each mark is acknowledged with the progress, `label: 1 of 2`, and the
-    last one with `won`.
+    what players do, each with what players do to earn it (`todo`). Each mark is
+    acknowledged with the progress and what is still to do, `label: 1 of 2. Still to do:
+    ...`, and the last one with `won`.
     """
 
     label: str
     marks: tuple[str, ...]
     won: str
+    todo: dict[str, str] = dataclass_field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -560,6 +573,7 @@ class TopicSpec:
     teaches: Teaching = ()
     hidden: bool = False  # found only by asking: never suggested, needs no white word
     sets: str | None = None  # a flag to remember once it is asked (`briefed`)
+    meanwhile: tuple[MeanwhileSpec, ...] = ()  # the first whose needs are met replaces `reply`
 
 
 @dataclass(frozen=True)
@@ -925,7 +939,24 @@ def _topic(topic_id: str, value: Any, shared: dict[str, tuple[str, ...]], where:
         teaches=_teaches(data, where),
         hidden=_flag(data, "hidden", where),
         sets=_optional_text(data, "sets", where),
+        meanwhile=_meanwhile(data.get("meanwhile"), f"{where}, meanwhile"),
     )
+
+
+def _meanwhile(value: Any, where: str) -> tuple[MeanwhileSpec, ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise ContentError(f"{where}: must be a list of `needs` and `reply`.")
+    replies: list[MeanwhileSpec] = []
+    for number, item in enumerate(value, start=1):
+        item_where: str = f"{where} {number}"
+        data: dict[str, Any] = _mapping(item, item_where)
+        needs: tuple[str, ...] = _words(data.get("needs"), "needs", item_where)
+        if not needs:
+            raise ContentError(f"{item_where}: `needs` must name at least one clue or flag.")
+        replies.append(MeanwhileSpec(needs=needs, reply=_text(data, "reply", item_where)))
+    return tuple(replies)
 
 
 def _flag(data: dict[str, Any], name: str, where: str) -> bool:
@@ -978,10 +1009,16 @@ def _trust(value: Any, where: str) -> "TrustSpec | None":
     if value is None:
         return None
     data: dict[str, Any] = _mapping(value, where)
-    marks: tuple[str, ...] = _words(data.get("marks"), "marks", where)
-    if len(marks) < 1:
-        raise ContentError(f"{where}: `marks` must name at least one flag.")
-    return TrustSpec(label=_text(data, "label", where), marks=marks, won=_text(data, "won", where))
+    todo_data: dict[str, Any] = _mapping(data.get("marks") or {}, f"{where}, marks")
+    if not todo_data:
+        raise ContentError(f"{where}: `marks` must name at least one flag, with what earns it.")
+    todo: dict[str, str] = {mark: _text(todo_data, mark, f"{where}, marks") for mark in todo_data}
+    return TrustSpec(
+        label=_text(data, "label", where),
+        marks=tuple(todo),
+        won=_text(data, "won", where),
+        todo=todo,
+    )
 
 
 def _default_self(name: str, shared: dict[str, tuple[str, ...]]) -> TopicSpec:
@@ -1595,8 +1632,14 @@ def all_texts(content: Content) -> list[tuple[str, str, str | None]]:
             texts.append((f"{where}, {field}", text, None))
         if character.trust is not None:
             texts.append((f"{where}, trust, won", character.trust.won, None))
+            for mark, todo in character.trust.todo.items():
+                texts.append((f"{where}, trust, marks, {mark}", todo, None))
         for topic in character.topics.values():
             texts.append((f"{where}, topic {topic.id}", topic.reply, topic.clue))
+            for number, meanwhile in enumerate(topic.meanwhile, start=1):
+                texts.append(
+                    (f"{where}, topic {topic.id}, meanwhile {number}", meanwhile.reply, None)
+                )
             if topic.truth is not None:
                 texts.append(
                     (f"{where}, topic {topic.id}, truth", topic.truth.reply, topic.truth.clue)
@@ -1844,6 +1887,9 @@ def _check_things(content: Content) -> None:
                 )
                 where: str = f"{CHARACTERS_FILE}, {character.id}, topic {topic.id}"
                 _check_needs(where, clue_needs, content, flags)
+            for number, meanwhile in enumerate(topic.meanwhile, start=1):
+                where = f"{CHARACTERS_FILE}, {character.id}, topic {topic.id}, meanwhile {number}"
+                _check_needs(where, meanwhile.needs, content, flags)
     for thing in content.things.values():
         where = f"{THINGS_FILE}, {thing.id}"
         start: PlaceSpec | None = content.places.get(thing.where)
@@ -1898,6 +1944,8 @@ def _character_texts(character: CharacterSpec) -> list[tuple[str, str]]:
         texts.append((f"topic {topic.id}", topic.reply))
         if topic.truth is not None:
             texts.append((f"topic {topic.id}, truth", topic.truth.reply))
+        for number, meanwhile in enumerate(topic.meanwhile, start=1):
+            texts.append((f"topic {topic.id}, meanwhile {number}", meanwhile.reply))
     return texts
 
 
@@ -1914,7 +1962,7 @@ def _check_crew(character: CharacterSpec) -> None:
     if character.trust is not None:
         raise ContentError(f"{where}: one of the crew has no `trust` to win.")
     for topic in character.topics.values():
-        if topic.clue is not None or topic.sets is not None or topic.truth is not None:
+        if topic.clue or topic.sets or topic.truth or topic.meanwhile:
             raise ContentError(
                 f"{where}, topic {topic.id}: the crew give no clues, set no flags and hide "
                 "no truths: personality, not plot."

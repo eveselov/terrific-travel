@@ -1,0 +1,46 @@
+# SPOILERS. Phantom Island scenario 'tst01_fairweather', recorded by Admin on 2026-11-23.
+#
+# Play it as a builder, with nobody else playing:
+#   batchcommand/interactive scenarios.tst01_fairweather   (ss: next command, qq: stop)
+# The notes after each command are what the game recorded. Fill in the reasons
+# after 'Why:' if you want this to be an annotated scenario, like island.ev.
+# Keep a '#' line after every command: it ends the command.
+#
+startover yes
+# A new expedition: the ship in port, the journal and notebooks empty, you in Limbo.
+begin
+#   Now in: Society Office
+#   Why:
+look street
+#   Why:
+look bookshelves
+#   Why:
+look harbour
+#   Why:
+look ship
+#   Why:
+l
+#   Why:
+ask Fairweather
+#   Why:
+ask about expedition
+#   Why:
+ask about mission
+#   Why:
+ask about ship
+#   Why:
+ask about chart
+#   Why:
+ask about society
+#   Why:
+ask about island
+#   Why:
+ask about compass
+#   Why:
+examine compass
+#   Why:
+ask about halcyon
+#   Notebook: new Oak and island trees
+#   Why:
+ask about crew
+#   Why:

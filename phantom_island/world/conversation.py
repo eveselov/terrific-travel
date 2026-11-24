@@ -133,8 +133,12 @@ def speech(spec: CharacterSpec, text: str) -> str:
 def answer(topic: TopicSpec) -> Reveal:
     """What a character says about a topic now: the truth, once its `needs` are met."""
     truth: TruthSpec | None = topic.truth
-    if truth is not None and get_expedition().met(truth.needs):
+    expedition: Any = get_expedition()
+    if truth is not None and expedition.met(truth.needs):
         return Reveal(text=truth.reply, clue=truth.clue, teaches=truth.teaches, sets=truth.sets)
+    for meanwhile in topic.meanwhile:  # part of the way there (playtest 2026-11-24)
+        if expedition.met(meanwhile.needs):
+            return Reveal(text=meanwhile.reply, clue=topic.clue, teaches=topic.teaches)
     return Reveal(text=topic.reply, clue=topic.clue, teaches=topic.teaches)
 
 
@@ -284,15 +288,40 @@ def trust_progress(flag: str) -> str | None:
     The quiet line acknowledging a mark of someone's trust (DECISIONS.md, 41): `Elder Ama's
     respect: 1 of 2.`, or what it means once it's won. None if the flag is no such mark.
     """
-    expedition: Any = get_expedition()
     for spec in load_content().characters.values():
         trust: TrustSpec | None = spec.trust
         if trust is None or flag not in trust.marks:
             continue
-        done: int = sum(1 for mark in trust.marks if expedition.met((mark,)))
-        line: str = f"{trust.label}: {done} of {len(trust.marks)}."
-        return line + (f" {trust.won}" if done == len(trust.marks) else "")
+        return _progress(trust)
     return None
+
+
+def _progress(trust: TrustSpec) -> str:
+    """`Elder Ama's respect: 1 of 2. Still to do: ...`, or what it means once it's won."""
+    expedition: Any = get_expedition()
+    left: list[str] = [mark for mark in trust.marks if not expedition.met((mark,))]
+    line: str = f"{trust.label}: {len(trust.marks) - len(left)} of {len(trust.marks)}."
+    if not left:
+        return f"{line} {trust.won}"
+    todo: list[str] = [trust.todo[mark] for mark in left if mark in trust.todo]
+    return f"{line} Still to do: {'; '.join(todo)}." if todo else line
+
+
+def waiting_on_trust(spec: CharacterSpec, topic: TopicSpec) -> str | None:
+    """
+    The progress line after a refusal that waits on someone's trust, once some of it is
+    earned (playtest 2026-11-24), so a refusal never sounds as if nothing counted.
+    """
+    trust: TrustSpec | None = spec.trust
+    truth: TruthSpec | None = topic.truth
+    expedition: Any = get_expedition()
+    if trust is None or truth is None or expedition.met(truth.needs):
+        return None
+    if not any(mark in truth.needs for mark in trust.marks):
+        return None
+    if not any(expedition.met((mark,)) for mark in trust.marks):
+        return None
+    return _progress(trust)
 
 
 def _remember(caller: Any, flag: str) -> None:
@@ -305,7 +334,7 @@ def _remember(caller: Any, flag: str) -> None:
     if progress is not None and caller.location is not None:
         for character in caller.location.contents_get(content_type="character"):
             if not isinstance(character, Inhabitant):
-                notices.tell(character, notices.quiet(progress))
+                notices.tell(character, progress)
 
 
 def _lines(*lines: str) -> str:
@@ -429,8 +458,11 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
             caller.msg(hint)
         return None
     said: Reveal = answer(topic)
+    waiting: str | None = waiting_on_trust(spec, topic)
     get_expedition().mark_seen(caller.id, [ASKED_KEY])
     _say_to_room(caller, mine, theirs, speech(spec, said.text))
+    if waiting is not None:
+        caller.msg(notices.quiet(waiting))
     if rest:
         caller.msg(_one_at_a_time(rest))
     with notices.together():
