@@ -180,6 +180,7 @@ they mean: a kid sees colours too, and working out what they mean is part of pla
 
 | File | What it is |
 |---|---|
+| [DESIGN.md](DESIGN.md) | how it is built and why: read it before the code |
 | [playtester.py](playtester.py) | the command line, login and reset, the game loop |
 | [telnet.py](telnet.py) | a small telnet client (Python 3.13 has no `telnetlib`) |
 | [screen.py](screen.py) | the game's output as text, colours as tags |
