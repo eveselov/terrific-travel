@@ -1,0 +1,19 @@
+# Phantom Island as the playtester reaches it. Nothing in this file is shown to the
+# player agent: it is only how to connect, start over and notice the end.
+
+title = "Phantom Island"
+host = "localhost"
+port = 4010  # telnet (DECISIONS.md, 4)
+
+# Typed by the admin account (PLAYTESTER_ADMIN_NAME) before the player logs in.
+reset = ["startover yes"]
+
+# The run is finished when the game shows one of these (the epilogue's last page).
+end_texts = ["That is the end of the story."]
+
+# Counted in the report as hints asked for.
+hint_commands = ["hint", "stuck"]
+
+# A voyage is told one line every 3 seconds (world/ship.py, STEP_SECONDS), so the
+# game has finished answering only after a longer silence.
+quiet_seconds = 4.0

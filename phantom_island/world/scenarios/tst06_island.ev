@@ -1,0 +1,285 @@
+# SPOILERS. Phantom Island scenario 'tst06_island', recorded by Admin on 2026-11-24.
+#
+# Play it as a builder, with nobody else playing:
+#   batchcommand/interactive scenarios.tst06_island   (ss: next command, qq: stop)
+# The notes after each command are what the game recorded. Fill in the reasons
+# after 'Why:' if you want this to be an annotated scenario, like island.ev.
+# Keep a '#' line after every command: it ends the command.
+#
+startover yes
+# A new expedition: the ship in port, the journal and notebooks empty, you in Limbo.
+begin
+#   Now in: Society Office
+#   Why:
+look street
+#   Why:
+look bookshelves
+#   Why:
+look harbour
+#   Why:
+look ship
+#   Why:
+l
+#   Why:
+ask Fairweather
+#   Why:
+ask about expedition
+#   Why:
+ask about mission
+#   Why:
+ask about ship
+#   Why:
+ask about chart
+#   Why:
+ask about society
+#   Why:
+ask about island
+#   Why:
+ask about compass
+#   Why:
+examine compass
+#   Why:
+ask about halcyon
+#   Notebook: new Oak and island trees
+#   Why:
+ask about crew
+#   Why:
+go east
+#   Why:
+east
+#   Now in: Market
+#   Why:
+look stall
+#   Why:
+look compass
+#   Journal: new C1, The Halcyon's compass
+#   Why:
+examine compass
+#   Journal: new C2, Coral in the hinge
+#   Notebook: new Coral
+#   Why:
+ask about coral
+#   Why:
+ask about compass
+#   Journal: new C3, Fishermen from the west
+#   Think: compass_sea
+#   Why:
+ask about fishermen
+#   Journal: again C3, Fishermen from the west
+#   Why:
+ask about canoe
+#   Why:
+ask crane
+#   Why:
+ask about halcyon
+#   Why:
+journal
+#   Why:
+ask about trade
+#   Why:
+go southwest
+#   Why:
+southwest
+#   Now in: Quay
+#   Why:
+ask about good hope
+#   Why:
+ask barnaby
+#   Why:
+ask about expedition
+#   Why:
+ask about halcyon
+#   Why:
+ask about compass
+#   Why:
+ask about sailing
+#   Notebook: new Latitude, Longitude, Dead reckoning, Sea clocks
+#   Why:
+ask about sextant
+#   Why:
+ask about latitude
+#   Why:
+ask about longitude
+#   Why:
+ask about chronometer
+#   Why:
+ask about storm
+#   Notebook: new How winds are named
+#   Why:
+ask about island
+#   Why:
+journal
+#   Why:
+ask about wind
+#   Why:
+aboard
+#   Now in: Deck
+#   Why:
+look chart
+#   Why:
+examine chart
+#   Notebook: new Positions and charts
+#   Why:
+read chard
+#   Why:
+read chart
+#   Why:
+council
+#   Why:
+council a
+#   Council: port destination settled
+#   Why:
+council c
+#   Council: port worth c, turned down
+#   Why:
+council b
+#   Council: port worth settled
+#   Why:
+sail/now to 14 south 40 west
+#   Notebook: new Sailing along a latitude; grew Positions and charts
+#   Journal: new C4, Nothing at the charted position
+#   Why:
+journal
+#   Why:
+read chart
+#   Why:
+examine chart
+#   Why:
+ask hope about reckoning
+#   Notebook: grew Dead reckoning
+#   Why:
+ask about chronometer
+#   Notebook: grew Sea clocks
+#   Why:
+notebook
+#   Why:
+l
+#   Journal: again C4, Nothing at the charted position
+#   Why:
+ask hope
+#   Why:
+ask hope about wind
+#   Notebook: grew How winds are named
+#   Why:
+ask hope about tide
+#   Notebook: new Tides
+#   Why:
+ask hope about water
+#   Notebook: new Fresh water at sea
+#   Why:
+ask hope about horizon
+#   Notebook: new How far a lookout sees
+#   Why:
+ask hope about council
+#   Why:
+council
+#   Why:
+council a
+#   Council: charted line a, turned down
+#   Why:
+council c
+#   Council: charted line c, turned down
+#   Why:
+council b
+#   Council: charted line, not proved yet
+#   Why:
+use sextant
+#   Journal: again C4, Nothing at the charted position
+#   Notebook: grew Latitude
+#   Why:
+read chronometer
+#   Journal: again C4, Nothing at the charted position
+#   Notebook: grew Longitude
+#   Why:
+council
+#   Council: charted line settled
+#   Why:
+council a
+#   Council: charted side a, turned down
+#   Why:
+council c
+#   Council: charted side c, turned down
+#   Why:
+ask chip about birds
+#   Why:
+ask ship about bird
+#   Why:
+look sky
+#   Journal: new C6, Birds flying west at dusk
+#   Think: birds_range
+#   Notebook: new How seabirds show land
+#   Why:
+council
+#   Why:
+council b
+#   Council: charted side settled
+#   Why:
+council a
+#   Council: charted far a, turned down
+#   Why:
+council c
+#   Council: charted far c, turned down
+#   Why:
+council d
+#   Council: charted far d, turned down
+#   Why:
+council b
+#   Council: charted far settled
+#   Why:
+journal
+#   Why:
+notebook
+#   Why:
+l
+#   Journal: again C4, Nothing at the charted position
+#   Why:
+sail/now to 14 south 41 west
+#   Notebook: grew Sailing along a latitude
+#   Why:
+ashore
+#   Now in: Lagoon Beach
+#   Why:
+look goats
+#   Why:
+aboard
+#   Now in: Deck
+#   Why:
+take animal guide
+#   Why:
+take plant guide
+#   Why:
+take chart
+#   Why:
+ashore
+#   Now in: Lagoon Beach
+#   Why:
+look goats
+#   Journal: new C9, Goats and onions
+#   Notebook: new How animals reach islands
+#   Why:
+go northwest
+#   Why:
+northwest
+#   Now in: Forest Path
+#   Why:
+look trees
+#   Notebook: grew Oak and island trees
+#   Why:
+go north
+#   Why:
+north
+#   Now in: Hilltop
+#   Why:
+look island
+#   Why:
+look lagoon
+#   Why:
+look coastline
+#   Journal: new C10, The coastline on the chart
+#   Why:
+look reef
+#   Why:
+examine chart
+#   Why:
+l
+#   Why:

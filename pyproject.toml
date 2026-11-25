@@ -7,6 +7,8 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"  # Evennia 6.x requires Python 3.12+
 dependencies = [
+    # The Claude API, for the player agent in playtester/.
+    "anthropic>=2.14.0",
     "evennia>=6.1,<7",
     # Story content files (characters, clues...) that co-designers can edit.
     "pyyaml>=6.0",
@@ -43,7 +45,7 @@ line-length = 100
 target-version = "py312"
 # Every game folder at the root is an Evennia game dir, which Evennia puts on sys.path, so its
 # packages (typeclasses, world...) are first-party. List each game here, and llm_lab.
-src = ["game", "phantom_island", "llm_lab"]
+src = ["game", "phantom_island", "llm_lab", "playtester"]
 # Each game's settings.py is a star import of Evennia's defaults by design.
 extend-exclude = ["*/server/conf/settings.py"]
 

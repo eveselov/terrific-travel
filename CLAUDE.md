@@ -36,6 +36,9 @@ players can play too.
 - `llm_lab/` is not a game: a standalone program for trying small local language models
   (Qwen3) as game characters, run in-process with `transformers` (see its README). It has its
   own `mypy.ini` and imports top-level like a game folder.
+- `playtester/` is not a game either: a player agent (Claude, through the API) that plays a
+  running game over telnet as a kid persona would, knowing only its screens, and writes a
+  report (see its README). Same layout as `llm_lab/`.
 - Evennia CLI commands, mypy and tests run from inside a game folder (or `llm_lab/`); ruff
   runs from the repo root and covers everything.
 
