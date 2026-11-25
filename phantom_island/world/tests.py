@@ -13,12 +13,14 @@ from typing import Any
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from evennia.commands.default.help import CmdHelp
 from evennia.objects.objects import DefaultCharacter
 from evennia.utils.create import create_object
 from evennia.utils.test_resources import EvenniaTest
 
 import world.content
-from typeclasses.characters import Character
+from commands.default_cmdsets import CharacterCmdSet
+from typeclasses.characters import Character, put_back_text
 from typeclasses.exits import Exit
 from typeclasses.inhabitants import Inhabitant
 from typeclasses.rooms import Deck, Room, ShipRoom
@@ -2589,3 +2591,86 @@ class TestCrewTalkOff(DiscoveryTest):
         heard: str = self.do(self.char1, "ask")
         self.assertIn("the Good Hope", heard)
         self.assertNotIn("Kit", heard)
+
+
+class TestPlaytestFixes(DiscoveryTest):
+    """What the playtester's runs of 2026-11-25 showed, fixed."""
+
+    def at_the_island(self) -> None:
+        self.ship_at("charted")
+        self.ship_at("anchorage")
+        self.at(self.char1, "deck")
+
+    def test_the_ship_stays_at_the_island(self) -> None:
+        self.at_the_island()
+        for order in ("sail", "sail east", "sail to 14 south 40 west", "sail home"):
+            heard: str = self.do(self.char1, order)
+            self.assertIn("here she stays", heard, order)
+        self.assertIn("there already", self.do(self.char1, "sail to 14 south 41 west"))
+        self.assertEqual(current_position().id, "anchorage")
+
+    def test_the_chart_read_at_the_island_gives_no_order_to_sail(self) -> None:
+        self.at_the_island()
+        heard: str = self.do(self.char1, "read chart")
+        self.assertIn("like a hook", heard)
+        self.assertNotIn("sail to 14 south 40 west", heard)
+
+    def test_get_guides_takes_both(self) -> None:
+        self.at_the_island()
+        self.do(self.char1, "get guides")
+        self.assertEqual(self.thing("plant_guide").location, self.char1)
+        self.assertEqual(self.thing("animal_guide").location, self.char1)
+
+    def test_the_chart_house_is_looked_at_not_the_chart(self) -> None:
+        self.at_the_island()
+        heard: str = self.do(self.char1, "look chart house")
+        self.assertIn("plant guide", heard)
+        self.assertNotIn("fair copy", heard)
+        self.assertIn("fair copy", self.do(self.char1, "look chart"))
+
+    def test_the_chart_house_is_not_a_place_to_go(self) -> None:
+        self.at_the_island()
+        for order in ("enter chart house", "go into the chart house"):
+            self.assertIn("|wlook chart house|n", self.do(self.char1, order), order)
+        self.assertIn("You can't go 'hilltop'", self.do(self.char1, "go hilltop"))
+
+    def test_the_deck_says_what_is_new_first(self) -> None:
+        self.at_the_island()
+        seen: str = self.rooms["deck"].return_appearance(self.char1)
+        self.assertLess(seen.index("calm lagoon"), seen.index("masts and rigging"))
+
+    def test_the_title_page_hint_names_begin(self) -> None:
+        expedition: Any = get_expedition()
+        expedition.db.flags = [flag for flag in expedition.flags if flag != "briefed"]
+        heard: str = " ".join(self.do(self.char1, "hint") for _ in range(3))
+        self.assertIn("|wbegin|n", heard)
+
+    def test_players_help_leaves_out_evennias_own_commands(self) -> None:
+        commands: dict[str, Any] = {cmd.key: cmd for cmd in CharacterCmdSet().commands}
+        helper: CmdHelp = CmdHelp()
+        player: Any = self.char2  # an ordinary player; char1 is a Developer
+        self.assertTrue(helper.can_list_topic(commands["journal"], player))
+        self.assertFalse(helper.can_list_topic(commands["setdesc"], player))
+        self.assertTrue(helper.can_list_topic(commands["setdesc"], self.char1))
+        self.assertTrue(commands["setdesc"].access(player, "cmd"))  # it still works
+
+    def test_talk_to_greets_like_ask(self) -> None:
+        self.at(self.char1, "office")
+        heard: str = self.do(self.char1, "talk to fairweather")
+        self.assertIn("Fairweather", heard)
+        self.assertNotIn("not available", heard)
+
+    def test_the_final_council_names_the_report(self) -> None:
+        summary: str = load_content().councils["island"].summary
+        self.assertTrue(summary.strip().endswith("Type |wreport|n to send it to the Society."))
+
+    def test_a_returning_player_hears_what_was_put_back(self) -> None:
+        self.at(self.char2, "deck")
+        self.thing("plant_guide").move_to(self.char2, quiet=True)
+        self.char2.at_post_unpuppet()
+        self.assertEqual(self.thing("plant_guide").location, self.rooms["deck"])
+        self.assertEqual(list(self.char2.db.put_back), [["plant guide", "Deck"]])
+        self.assertEqual(
+            put_back_text(self.char2.db.put_back),
+            "While you were away, these went back where they belong: the plant guide (Deck).",
+        )

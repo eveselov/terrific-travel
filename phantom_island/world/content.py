@@ -292,6 +292,11 @@ def match_words[T](text: str, candidates: Sequence[tuple[T, tuple[str, ...]]]) -
     return found[0] if len(found) == 1 else None
 
 
+def names_whole(text: str, words: tuple[str, ...]) -> bool:
+    """True if `text` is one of `words` as a whole (`chart house`), not just one word of it."""
+    return normalise_words(text) in words
+
+
 def find_look(text: str, looks: Sequence[LookSpec]) -> LookSpec | None:
     """The detail (or thing's look) a player means, or None."""
     return match_words(text, [(look, look.words) for look in looks])

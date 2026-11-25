@@ -6,6 +6,7 @@ from evennia.commands.default.general import CmdGet as DefaultCmdGet
 from evennia.commands.default.general import CmdLook as DefaultCmdLook
 
 from typeclasses.rooms import Room
+from typeclasses.things import Thing
 from world.clues import journal_sources_text, journal_text, think_text
 from world.discovery import act, look_at, nothing_more, notice_surroundings, show_focus_for
 from world.hints import hint
@@ -29,10 +30,43 @@ class CmdGet(DefaultCmdGet):
     Examples:
       get sextant
       take chart
+      get guides
     """
 
     aliases = ["grab", "take", "pick up"]
     help_category = "General"
+
+    def func(self) -> None:
+        """As Evennia's get, and a plural (`get guides`) takes every one of them here."""
+        group: list[Any] = self.plural_group()
+        if not group:
+            super().func()
+            return
+        for obj in group:
+            self.args = str(obj.key)
+            super().func()
+
+    def plural_group(self) -> list[Any]:
+        """
+        The things here a plural means, when nothing is called by that word itself: `get
+        guides` takes the plant guide and the animal guide (playtest 2026-11-25).
+        """
+        caller: Any = self.caller
+        words: list[str] = [w for w in self.args.lower().split() if w not in ("the", "both", "all")]
+        if not words or not words[-1].endswith("s") or caller.location is None:
+            return []
+        if caller.search(self.args, location=caller.location, quiet=True):
+            return []
+        kind: str = " ".join([*words[:-1], words[-1][:-1]])  # `guides` -> `guide`
+        found: list[Any] = []
+        for obj in caller.location.contents:
+            if not isinstance(obj, Thing) or obj.spec is None or not obj.spec.portable:
+                continue
+            names: list[str] = [str(obj.key).lower()]
+            names.extend(str(alias).lower() for alias in obj.aliases.all())
+            if any(name.endswith(kind) for name in names):
+                found.append(obj)
+        return found
 
 
 class CmdLook(DefaultCmdLook):

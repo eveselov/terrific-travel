@@ -94,15 +94,19 @@ class Room(ObjectParent, DefaultRoom):
 
     def get_display_desc(self, looker: Any, **kwargs: Any) -> str:
         """
-        The description, followed by what depends on the ship's position.
+        The description and what depends on the ship's position, in `join_desc`'s order.
 
         Paragraphs are separated with Evennia's `|/` line break: `format_appearance` squeezes
         blank lines out of the text, but `|/` only becomes a line break after that.
         """
         desc: str = super().get_display_desc(looker, **kwargs)
         extra: str = self.situation_text()
-        text: str = f"{desc}\n\n{extra}" if extra else desc
+        text: str = self.join_desc(desc, extra) if extra else desc
         return text.replace("\n\n", "\n|/")
+
+    def join_desc(self, desc: str, extra: str) -> str:
+        """The room's own description, then what depends on the ship's position."""
+        return f"{desc}\n\n{extra}"
 
     def send_visuals(self, viewer: "Character") -> None:
         """
@@ -141,6 +145,13 @@ class ShipRoom(Room):
         seen: str = self.position_text(current_position())
         status: str = status_line()
         return f"{seen}\n{status}" if status else seen
+
+    def join_desc(self, desc: str, extra: str) -> str:
+        """
+        What is seen from the ship here first, then the ship herself: the Deck's own text
+        never changes, and a player who skims stopped before the news (playtest 2026-11-25).
+        """
+        return f"{extra}\n\n{desc}"
 
 
 class Deck(ShipRoom):

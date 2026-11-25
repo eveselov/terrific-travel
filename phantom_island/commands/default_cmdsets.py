@@ -14,6 +14,8 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 """
 
+from typing import Any
+
 from evennia import default_cmds
 
 from .admin import CmdRecord, CmdStartOver
@@ -30,7 +32,47 @@ from .discover import (
 )
 from .explore import CmdGo, CmdMap
 from .report import CmdCouncil, CmdReport
-from .talk import CmdAsk
+from .talk import CmdAsk, CmdTalk
+
+# Evennia's own commands a player of this game has no use for (playtest 2026-11-25: `help`
+# listed them, and each looked like something to try). They still work, and builders still
+# see them in `help`; players' `help` leaves them out.
+BUILDERS_HELP_ONLY: frozenset[str] = frozenset(
+    {
+        "access",
+        "nick",
+        "setdesc",
+        "pose",
+        "whisper",
+        "charcreate",
+        "chardelete",
+        "ic",
+        "ooc",
+        "quell",
+        "sessions",
+        "style",
+        "option",
+        "color",
+        "channel",
+        "about",
+        "time",
+    }
+)
+
+
+def hide_from_players_help(cmdset: Any) -> None:
+    """
+    Give the commands in BUILDERS_HELP_ONLY a `view` lock, so only builders see them.
+
+    A command's locks are read from `lock_storage`, which Evennia fills once per class from
+    `locks`: this instance gets both, and its lock handler is reset to read them.
+    """
+    for cmd in cmdset.commands:
+        if cmd.key in BUILDERS_HELP_ONLY and "view:" not in cmd.lock_storage:
+            locks: str = f"{cmd.lock_storage};view:perm(Builder)"
+            cmd.locks = locks
+            cmd.lock_storage = locks
+            cmd.lockhandler.reset()
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -53,6 +95,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdMap())
         self.add(CmdGo())
         self.add(CmdAsk())
+        self.add(CmdTalk())
         self.add(CmdLook())
         self.add(CmdGet())
         self.add(CmdExamine())
@@ -66,6 +109,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdCouncil())
         self.add(CmdStartOver())
         self.add(CmdRecord())
+        hide_from_players_help(self)
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
@@ -86,6 +130,7 @@ class AccountCmdSet(default_cmds.AccountCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
+        hide_from_players_help(self)
 
 
 class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
@@ -126,3 +171,4 @@ class SessionCmdSet(default_cmds.SessionCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
+        hide_from_players_help(self)

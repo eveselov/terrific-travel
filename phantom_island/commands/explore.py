@@ -3,6 +3,8 @@
 from typing import Any
 
 from typeclasses.rooms import Room
+from world.content import LookSpec, find_look, names_whole
+from world.discovery import find_thing_at_hand, location_details
 
 from .command import Command
 
@@ -15,7 +17,7 @@ class CmdGo(Command):
       go <exit>
 
     The same as typing the exit's name: go east is east, go aboard is aboard.
-    look lists the exits of the place you are in.
+    look lists the exits of the place you are in. enter works too.
 
     Examples:
       go east
@@ -23,13 +25,14 @@ class CmdGo(Command):
     """
 
     key = "go"
-    aliases = ["walk"]
+    aliases = ["walk", "enter"]
     locks = "cmd:all()"
     help_category = "General"
 
     def func(self) -> None:
         caller: Any = self.caller
-        words: list[str] = [w for w in self.args.lower().split() if w not in ("to", "the")]
+        ignored: tuple[str, ...] = ("to", "the", "in", "into", "inside")
+        words: list[str] = [w for w in self.args.lower().split() if w not in ignored]
         wanted: str = " ".join(words)
         location: Any = caller.location
         exits: list[Any] = list(location.exits) if location is not None else []
@@ -45,7 +48,22 @@ class CmdGo(Command):
             if wanted in names:
                 caller.execute_cmd(str(exit_obj.key))
                 return
+        if _here_to_look_at(caller, wanted):
+            # Something here, not a way out (playtest 2026-11-25: `enter chart house`).
+            caller.msg(
+                f"That isn't a place you can go into, but you can look at it: |wlook {wanted}|n."
+            )
+            return
         caller.msg(f"You can't go '{wanted}' from here. " + _exits_line(exits))
+
+
+def _here_to_look_at(caller: Any, wanted: str) -> bool:
+    """True if `wanted` names, as a whole, a thing at hand or a detail of this place."""
+    thing: Any = find_thing_at_hand(caller, wanted)
+    if thing is not None and thing.spec is not None and names_whole(wanted, thing.spec.look.words):
+        return True
+    detail: LookSpec | None = find_look(wanted, location_details(caller))
+    return detail is not None and names_whole(wanted, detail.words)
 
 
 def _exits_line(exits: list[Any]) -> str:

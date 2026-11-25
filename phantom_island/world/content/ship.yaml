@@ -116,7 +116,8 @@ sea_chart: sea_chart
 #   details    optional: what can be seen from the Deck here with `look <detail>`, written
 #              like the details in places.yaml
 #   shore      what players on the shore see of the ship (only with `ashore`)
-#   routes     the ways she can sail from here, by direction (`sail west`). Each has:
+#   routes     optional: the ways she can sail from here, by direction (`sail west`). With
+#              none, every order gets the `orders` text: she stays. Each route has:
 #     to         the position she sails to
 #     names      optional: other words for the order (`sail to the island`, `sail home`)
 #     order      optional: what the Ship says when given this order, heard aboard
@@ -388,6 +389,12 @@ positions:
     name: Anchored off the island
     coords: 14 S, 41 W
     suggest: [council, tide, wind, witnesses, advice]
+    # No routes: the ship stays (playtest 2026-11-25). Everything the Society asked about is
+    # here, and sailing back to the empty charted position led players nowhere (39).
+    orders: >
+      The Good Hope rides at anchor, and here she stays: everything the Society asked about
+      is on this island. Go |washore|n and look. When you've seen enough, call a |wcouncil|n
+      aboard, and when the council agrees, send the Society your |wreport|n.
     chart_pos: [450, 290]
     map: island
     map_pos: [875, 545]
@@ -395,7 +402,7 @@ positions:
     deck: >
       The ship lies at anchor in a calm lagoon. A green island rises in front of you, with
       a white beach and palm trees along the shore. The Good Hope's timbers creak: "Take the
-      guides from the chart house ashore, Captain. With a guide in your hands, you'll see
+      guides from the chart house ashore, Captain (|wget guides|n). With a guide in your hands, you'll see
       more in what you look at. And when you've seen enough, come back aboard and call a
       |wcouncil|n: we'll put the Society's answers together."
     details:
@@ -408,17 +415,6 @@ positions:
       Your ship lies at anchor out in the lagoon. When you've seen enough of the island, go
       back |waboard|n and call a council with the Good Hope: she'll help you put it
       together.
-    routes:
-      east:
-        to: charted
-        names: [chart position, charted position]
-        text: >
-          The anchor comes up and the island falls behind you as the ship sails east.
-        passage:
-          - >
-            The island sinks below the horizon behind you.
-          - >
-            By evening there is only sea again, where the chart put the island.
 
   under_way:
     name: Under way

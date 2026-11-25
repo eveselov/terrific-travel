@@ -170,9 +170,11 @@ def find_route(position: PositionSpec, text: str) -> RouteSpec | str:
         words = words[1:]
     order: str = " ".join(words)
     coords: Coords | None = parse_coords(order)
+    if coords is not None and position.coords == coords:
+        return ALREADY_THERE.format(where=coords_text(coords))
+    if not position.routes:  # she stays here (the island, playtest 2026-11-25): say why
+        return sailing_options(position)
     if coords is not None:
-        if position.coords == coords:
-            return ALREADY_THERE.format(where=coords_text(coords))
         for route in position.routes:
             if content.positions[route.to].coords == coords:
                 return route

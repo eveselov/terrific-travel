@@ -45,6 +45,9 @@ limbo:
     trader in the port began selling a brass compass with one word engraved on it: HALCYON.
 
 
+    Type |wbegin|n to start, or read on first.
+
+
     Now the Society sends an expedition, and you lead it, as captain of its ship. She carries the tools of two sciences: the navigator's
     sextant, clock and charts, which read the sun, the stars and the sea, and the naturalist's
     books, which read plants, animals, birds and the land. Your job: find out what really
@@ -58,9 +61,6 @@ limbo:
 
     When you know what happened, and can prove it, send your |wreport|n to the Society. You
     can try it at any time.
-
-
-    Type |wbegin|n to start.
   exits:
     begin: {to: office, aliases: [start]}
 

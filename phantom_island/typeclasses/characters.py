@@ -100,15 +100,31 @@ class Character(ObjectParent, DefaultCharacter):
         notice_surroundings(self)
 
     def at_post_puppet(self, **kwargs: Any) -> None:
-        """On entering the game, also fill the Map and Focus panes for this location."""
+        """
+        On entering the game, also fill the Map and Focus panes for this location, and say
+        what went back to its place while the player was away.
+        """
         self.show_location_visuals()
         super().at_post_puppet(**kwargs)
+        put_back: list[Any] = list(self.db.put_back or [])
+        if put_back:
+            self.msg(f"|x({put_back_text(put_back)})|n")
+            self.db.put_back = None
 
     def at_post_unpuppet(self, account: Any = None, session: Any = None, **kwargs: Any) -> None:
         """
         On leaving the game, put back the things this character carries, so the others can
-        still find the books and the chart (DECISIONS.md, 6b: no dead ends).
+        still find the books and the chart (DECISIONS.md, 6b: no dead ends). The player is
+        told at their return (playtest 2026-11-25: they remembered carrying them).
         """
         super().at_post_unpuppet(account=account, session=session, **kwargs)
         if not self.sessions.count():
-            return_things_home(self)
+            returned: list[Any] = return_things_home(self)
+            if returned:
+                self.db.put_back = [[str(thing.key), str(thing.home.key)] for thing in returned]
+
+
+def put_back_text(put_back: list[Any]) -> str:
+    """`While you were away, ...`: the things put back, each with the place it went to."""
+    things: str = ", ".join(f"the {name} ({place})" for name, place in put_back)
+    return f"While you were away, these went back where they belong: {things}."

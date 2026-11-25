@@ -125,6 +125,17 @@ every ending, and a player who wanders is led back towards the task (tested with
 4. **Promised elsewhere, to build or drop:**
    - counting the water (26): **dropped** (2026-11-21). A supply that runs down is a clock (38), it can't end badly (no dead ends), and it does no job on the path (39). The casks, the Ship's *water* topic and the Spring stay as background;
    - `show <thing> to <character>` (19): **waiting for the final playtest** (2026-11-21). It would only be the one way to Crane's confession (not a second way, 39); decided by whether his giving in feels like the players' own act.
+5. **Fixes from the playtester's runs of 2026-11-25** (the player agent in `playtester/`, two whole playthroughs; built 2026-11-25):
+   - **The ship stays at the island** (39): the anchorage has no routes, and every order there is answered "here she stays" (go ashore, call the council, send the report). Sailing back to the empty charted position, led there by the chart's own order, was the clearest way to get lost. Read at the island, the chart leaves out its "To sail there" line. The council at sea stays a helper, not a requirement: sailing west on the birds' word is still fine.
+   - **`get guides`** takes both guides, and the Ship says it at the island; a plural takes every portable thing of that kind here.
+   - **`look chart house`** shows the chart house, with the guides on its shelf: a whole name now wins over one word of another (it showed the chart). `go`/`enter` the chart house points to `look` instead of "you can't go".
+   - **The Deck says what is new first**, then the ship herself: her description never changes, and a skimming player stopped before the news.
+   - **The final council ends with `report`**, on its own line.
+   - **The start:** "Type `begin` to start" is near the top of the title page, and the first hints name `begin`.
+   - **Hints say what is missing:** the island's first hint is about the Village's trust, not only its place (a player who had been there read it as done).
+   - **Players' `help`** leaves out Evennia's own commands they have no use for (`charcreate`, `quell`, `setdesc`...); builders still see them.
+   - **Coming back:** a player who left with something in hand is told at their return that it went back to its place (21).
+   - **`talk to <someone>`** greets as `ask` does (not listed in `help`).
 
 **After A4** (agreed 2026-11-18):
 - **Dead reckoning in depth**, as optional depth the puzzle doesn't need: a log line and sandglass in the chart house and the ship's log book; how speed was measured in knots, and why a few miles a day unnoticed add up to the Halcyon's 1 degree in three weeks (at 14° S a degree of longitude is about 58 nautical miles). Historical numbers to be checked against sources first (9).

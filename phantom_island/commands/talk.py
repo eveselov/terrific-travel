@@ -14,7 +14,8 @@ class CmdAsk(Command):
       ask <someone> about <something>
       ask about <something>
 
-    Asking someone without a topic greets them, and they suggest a few things to ask about.
+    Asking someone without a topic greets them, and they suggest a few things to ask about
+    (talk to <someone> does the same).
     Words shown in white in their answers are often worth asking about too. Aboard, you
     can always ask the ship herself, the Good Hope: ask hope.
 
@@ -35,3 +36,27 @@ class CmdAsk(Command):
 
     def func(self) -> None:
         ask(self.caller, self.args)
+
+
+class CmdTalk(Command):
+    """
+    Talk to someone: the same as ask.
+
+    Usage:
+      talk to <someone>
+      talk to <someone> about <something>
+
+    Kids type it first (playtest 2026-11-25), so it greets as ask does. It isn't listed
+    in help: ask is the one command to learn.
+    """
+
+    key = "talk"
+    aliases = ["speak", "chat"]
+    locks = "cmd:all()"
+    auto_help = False
+
+    def func(self) -> None:
+        words: list[str] = self.args.split()
+        if words and words[0].lower() in ("to", "with"):
+            words = words[1:]
+        ask(self.caller, " ".join(words))

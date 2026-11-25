@@ -52,8 +52,8 @@ situations:
     missing: [briefed]
     hints:
       - The Society called you here. Mrs. Fairweather will tell you what it wants.
-      - Ask Mrs. Fairweather about the mission, in the Society Office.
-      - In the Society Office, type |wask fairweather about mission|n.
+      - Ask Mrs. Fairweather about the mission, in the Society Office. (Still on the title page? Type |wbegin|n.)
+      - Type |wbegin|n if you're still on the title page. Then, in the Society Office, type |wask fairweather about mission|n.
 
   - id: compass
     ship: [port]
@@ -163,8 +163,8 @@ situations:
     ship: [anchorage]
     missing: [respect_rule]
     hints:
-      - Smoke rose from a village. Its people may know what happened here.
-      - Walk down to the Village, south of the Forest Path, and talk to the people there.
+      - The people of the Village know this island, but they don't tell strangers much until they trust them.
+      - In the Village, south of the Forest Path, ask Tui how a stranger earns respect there.
       - In the Village, type |wask tui about respect|n.
 
   - id: respect_ama

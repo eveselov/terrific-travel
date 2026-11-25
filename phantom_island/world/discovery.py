@@ -34,6 +34,7 @@ from world.content import (
     find_look,
     load_content,
     match_words,
+    names_whole,
     normalise_words,
 )
 from world.expedition import current_position, get_expedition
@@ -139,10 +140,15 @@ def look_at(caller: Any, text: str, close: bool = False) -> bool:
     (for characters, exits and anything else).
     """
     thing: Thing | None = find_thing_at_hand(caller, text)
+    detail: LookSpec | None = find_look(text, location_details(caller))
+    # A whole name wins over one word of another: `chart house` is the chart house, not the
+    # chart (playtest 2026-11-25: the guides on its shelf were never seen).
+    if thing is not None and detail is not None and thing.spec is not None:
+        if names_whole(text, detail.words) and not names_whole(text, thing.spec.look.words):
+            thing = None
     if thing is not None and thing.spec is not None:
         show_look(caller, thing.spec.look, close, thing.spec.name)
         return True
-    detail: LookSpec | None = find_look(text, location_details(caller))
     if detail is not None:
         show_look(caller, detail, close, detail.id)
         return True

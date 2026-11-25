@@ -237,6 +237,15 @@ things:
         coastline is
         drawn with care: round in the east with a lagoon, a hill in the middle, a long reef
         down the west side, and a little cove in the south, like a hook.|/To sail there, give the crew the order: |wsail to 14 south 40 west|n.
+      at:
+        # At the island, no order to sail away (playtest 2026-11-25: it led back to sea).
+        anchorage:
+          text: >
+            In the master's careful hand: "Island, found by the Halcyon, 1775."|/Beside it, in
+            large figures: Latitude 14 degrees South, longitude 40 degrees West of
+            home.|/The coastline is drawn with care: round in the east with a lagoon, a hill in
+            the middle, a long reef down the west side, and a little cove in the south, like a
+            hook.
 
   plant_guide:
     name: plant guide
