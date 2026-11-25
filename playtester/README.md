@@ -59,7 +59,7 @@ the run; the report is still written.
 | Option | What it does |
 |---|---|
 | `--persona <key>` | who plays: a file in `personas/` (default `max`) |
-| `--model <id>` | `claude-opus-5-5` (default), `claude-sonnet-5-5`, `claude-haiku-5-5`... the same key works for all |
+| `--model <id>` | `claude-opus-5-5` (default), `claude-sonnet-5-5`, `claude-haiku-5-5`... the same key works for all. Or a local model: `qwen3-0.6b`, `qwen3-1.7b`, `qwen3-4b` (see below) |
 | `--turns <n>` | most turns to play in this run (200) |
 | `--max-cost <dollars>` | stop this run once its estimated cost reaches this much (5; `0` for no limit). Checked before each turn, so a run can go over by one turn and the talk afterwards |
 | `--reset` | start the game over and a new playthrough with fresh memory; without it, the persona's last playthrough carries on (see below) |
@@ -72,6 +72,32 @@ the run; the report is still written.
 1 to 4 cents a turn (Sam about 1, Max 2, Lena 4: longer attention and memory mean more
 text sent); Sonnet 5.5 about half that; Haiku 5.5 well under a cent. The printed figure is an
 estimate; the Console's Usage page has the real one. Set a spend limit there.
+
+### Local models
+
+`--model qwen3-0.6b` (or `qwen3-1.7b`, `qwen3-4b`) plays with a Qwen3 model in this
+process, with `transformers`, as in `llm_lab/` ([local.py](local.py)): no API key and no
+cost. It gets the same prompts and the same kid limits as Claude, so the reports compare.
+
+- **The cost shown** is what the same tokens would cost on the cheapest Claude model
+  (Haiku 5.5), labelled "as the cheapest Claude model would cost; locally: free": the
+  saving. `--max-cost` counts that figure too.
+- **No structured output.** The model is asked for a JSON object and its answer is read
+  leniently; an answer that still can't be read is asked for once more, then the kid just
+  types `look`. The console and the report count those turns ("unreadable").
+- **Thinking:** personas with `effort` above `low` (Lena) let the model think first, which
+  is slower.
+- **Where it runs:** the GPU in fp16 when the weights fit in its free memory, otherwise the
+  CPU in fp32. On this PC (GTX 1650, 4 GB) only 0.6B fits; 1.7B runs on the CPU at about
+  100 seconds a turn, and 4B would be slower still (and needs about 16 GB of RAM).
+- **The first use** of a size downloads it into the Hugging Face cache (4B is about 8 GB);
+  `HF_HUB_OFFLINE=1` keeps to the cache.
+
+A first test (2026-11-25), one screen of the Society Office as Max: 0.6B answered in valid
+JSON but typed nonsense (`type <screen> and press enter`), about 25 seconds a turn on the
+GPU; 1.7B typed sensible commands (`help`, `look around`). For finding problems in the
+game, the small models are much weaker players than Claude; they are useful for trying
+the playtester itself at no cost.
 
 ### Progress
 
@@ -159,6 +185,7 @@ they mean: a kid sees colours too, and working out what they mean is part of pla
 | [screen.py](screen.py) | the game's output as text, colours as tags |
 | [kid.py](kid.py) | the persona's limits: attention, boredom, memory, typos |
 | [brain.py](brain.py) | the prompts and the Claude call, one structured answer per turn |
+| [local.py](local.py) | the same on a local Qwen3, its JSON answer read leniently |
 | [report.py](report.py) | the Markdown report |
 | [state.py](state.py) | the kid's memory between runs, and when the game was last started over |
 | [profiles.py](profiles.py) | reading `personas/*.toml` and `games/*.toml` |

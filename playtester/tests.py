@@ -257,3 +257,44 @@ class ProfileTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LocalAnswerTests(unittest.TestCase):
+    """Reading a local model's answer (local.py), without loading a model."""
+
+    def test_the_json_in_an_answer_is_read(self) -> None:
+        from local import read_move
+
+        answer = (
+            "<think>Hmm, the office.</think>Sure! Here it is:\n"
+            '{"thought": "A desk!", "command": "look desk\nlook", "feeling": "Curious", '
+            '"noticed": "", "hard_words": ["Society"], "notes": ["an office", "a desk"], '
+            '"howto": "look works", "quit": "false"}'
+        )
+        move = read_move(answer)
+        assert move is not None
+        self.assertEqual(move.command, "look desk")  # one line only
+        self.assertEqual(move.feeling, "curious")
+        self.assertEqual(move.notes, "an office\na desk")
+        self.assertEqual(move.hard_words, ["Society"])
+        self.assertFalse(move.quit)
+
+    def test_an_odd_feeling_becomes_curious(self) -> None:
+        from local import read_move
+
+        move = read_move('{"command": "n", "feeling": "hungry"}')
+        assert move is not None
+        self.assertEqual((move.command, move.feeling, move.notes), ("n", "curious", ""))
+
+    def test_no_move_without_json_or_a_command(self) -> None:
+        from local import read_move
+
+        self.assertIsNone(read_move("I would go north."))
+        self.assertIsNone(read_move('{"command": ""}'))
+        self.assertIsNone(read_move('{"command": "n",'))
+
+    def test_the_same_local_models_everywhere(self) -> None:
+        import local
+        import playtester
+
+        self.assertEqual(tuple(local.MODELS), playtester.LOCAL_MODELS)

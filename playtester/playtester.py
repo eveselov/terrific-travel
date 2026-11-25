@@ -18,7 +18,7 @@ from pathlib import Path
 
 import anthropic
 
-from brain import DEFAULT_MODEL, Brain, Move
+from brain import DEFAULT_MODEL, Brain, Mind, Move
 from kid import SECONDS_PER_TURN, Kid, Seen, Turn
 from profiles import GameProfile, Persona, load_game, load_persona
 from report import Run, write_report
@@ -31,6 +31,18 @@ from telnet import TelnetClient
 DEFAULT_PASSWORD: str = "kid-playtester-26"
 LOGIN_FAILED: tuple[str, ...] = ("incorrect", "too many")
 FINISHED: str = "finished the game"
+# The local models (local.py), named here so --help lists them without loading torch.
+LOCAL_MODELS: tuple[str, ...] = ("qwen3-0.6b", "qwen3-1.7b", "qwen3-4b")
+
+
+def make_mind(model: str, seed: int) -> Mind:
+    """Claude through the API, or a local Qwen3 (imported only then: torch takes a while)."""
+    if model in LOCAL_MODELS:
+        print(f"Loading {model}...")
+        from local import LocalBrain
+
+        return LocalBrain(model, seed)
+    return Brain(model)
 
 
 def log_in(client: TelnetClient, game: GameProfile, name: str, password: str) -> str:
@@ -113,7 +125,7 @@ def show(turn: Turn, spend: float | None) -> None:
 def play(
     run: Run,
     client: TelnetClient,
-    brain: Brain | None,
+    brain: Mind | None,
     first: str,
     turns: int,
     max_cost: float,
@@ -175,7 +187,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="A kid-like player agent for a text game.")
     parser.add_argument("game", help="a game profile in games/, e.g. phantom_island")
     parser.add_argument("--persona", default="max", help="a persona in personas/ (default: max)")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help=f"default: {DEFAULT_MODEL}")
+    parser.add_argument(
+        "--model",
+        default=DEFAULT_MODEL,
+        help=f"a Claude model (default: {DEFAULT_MODEL}), or a local one: "
+        + ", ".join(LOCAL_MODELS),
+    )
     parser.add_argument("--turns", type=int, default=200, help="most turns to play now (200)")
     parser.add_argument(
         "--max-cost",
@@ -226,9 +243,12 @@ def main() -> int:
             print(f"{problem} Add --reset to start a new playthrough.")
             return 2
     try:
-        brain: Brain | None = None if args.manual else Brain(args.model)
+        brain: Mind | None = None if args.manual else make_mind(args.model, args.seed or 0)
     except anthropic.AnthropicError as error:  # e.g. no API key at all
         print(f"Can't use the Claude API: {error}\nSee README.md, or play with --manual.")
+        return 1
+    except (OSError, ValueError) as error:  # a local model that isn't cached, or no such one
+        print(f"Can't load the local model: {error}")
         return 1
     run: Run = Run(
         game=game,
@@ -238,8 +258,9 @@ def main() -> int:
             game,
             timed=not args.manual and not args.no_time_limit,
         ),
-        model="(you, typing)" if args.manual else args.model,
+        model="(you, typing)" if brain is None else brain.model,
         started=datetime.now(),
+        cost_note="estimate" if brain is None else brain.cost_note,
     )
     if saved:
         run.kid.come_back(saved.turns, saved.notes, saved.howto, saved.known)
@@ -283,12 +304,15 @@ def main() -> int:
         client.close()
     if brain:
         run.dollars = brain.spend.dollars
+        run.unreadable = brain.unreadable
     path: Path = write_report(run, manual=args.manual)
     if not args.manual:
         save_state(run)
     print(f"\n{persona.name}: {run.outcome}.")
     if brain:
-        print(f"Estimated cost: ${run.dollars:.2f}")
+        print(f"Cost ({brain.cost_note}): ${run.dollars:.2f}")
+        if brain.unreadable:
+            print(f"Turns whose answer couldn't be read: {brain.unreadable}")
     print(f"Report: {path}")
     if brain and run.outcome != FINISHED:
         print("To carry on from here, run the same command again, without --reset.")

@@ -1,4 +1,4 @@
-"""The player agent's mind: Claude, playing as the persona.
+"""The player agent's mind: Claude, playing as the persona (local.py: a local model).
 
 Each turn is one request, built afresh: the persona, the kid's notes, the few turns
 still remembered and the screen as the kid read it. Nothing else reaches the model,
@@ -7,7 +7,7 @@ so it knows the game only from its screens. One answer per turn, in a fixed shap
 """
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Protocol
 
 import anthropic
 from anthropic.types.beta import BetaTextBlockParam
@@ -27,6 +27,9 @@ PRICES: dict[str, tuple[float, float, float]] = {
     "claude-sonnet-5-5": (2.00, 10.00, 0.10),
     "claude-haiku-5-5": (0.10, 0.50, 0.01),
 }
+# Local models cost nothing; their tokens are priced as the cheapest Claude model, so the
+# figure shows the least a Claude run would have cost: what running locally saves.
+CHEAPEST_MODEL: str = "claude-haiku-5-5"
 
 Feeling = Literal["curious", "excited", "happy", "proud", "confused", "bored", "frustrated"]
 
@@ -54,19 +57,41 @@ class Spend:
     dollars: float = 0.0
 
     def add(self, model: str, usage: anthropic.types.beta.BetaUsage) -> None:
-        cache_read: int = usage.cache_read_input_tokens or 0
-        cache_write: int = usage.cache_creation_input_tokens or 0
-        fresh: int = usage.input_tokens
+        self.add_tokens(
+            model,
+            fresh=usage.input_tokens,
+            output=usage.output_tokens,
+            cache_write=usage.cache_creation_input_tokens or 0,
+            cache_read=usage.cache_read_input_tokens or 0,
+        )
+
+    def add_tokens(
+        self, model: str, fresh: int, output: int, cache_write: int = 0, cache_read: int = 0
+    ) -> None:
+        """Count tokens, priced as `model` (a model not in PRICES is priced as the default)."""
         self.input_tokens += fresh + cache_write
-        self.output_tokens += usage.output_tokens
+        self.output_tokens += output
         self.cache_read_tokens += cache_read
         price_in, price_out, price_cache = PRICES.get(model, PRICES[DEFAULT_MODEL])
         self.dollars += (
             fresh * price_in
             + cache_write * price_in * 1.25
             + cache_read * price_cache
-            + usage.output_tokens * price_out
+            + output * price_out
         ) / 1_000_000
+
+
+class Mind(Protocol):
+    """What plays the kid: Claude (Brain), or a local model (local.LocalBrain)."""
+
+    model: str  # the name shown in the report
+    spend: Spend
+    cost_note: str  # what the cost figure means, for the console and the report
+    unreadable: int  # turns whose answer couldn't be read (local models only)
+
+    def decide(self, kid: Kid, seen: Seen) -> Move: ...
+
+    def debrief(self, kid: Kid, outcome: str) -> str: ...
 
 
 def system_prompt(kid: Kid) -> str:
@@ -149,8 +174,27 @@ def turn_prompt(kid: Kid, seen: Seen) -> str:
     return "\n\n".join(parts)
 
 
+def debrief_question(kid: Kid, outcome: str) -> str:
+    """The question after a sitting: how did it go?"""
+    recent: str = "\n".join(
+        f"You typed: {turn.typed}. You thought: {turn.thought}" for turn in kid.recent()
+    )
+    return (
+        f"You have stopped playing ({outcome}) after {len(kid.turns)} turns.\n\n"
+        f"Your notes about this game:\n{kid.notes or '(nothing)'}\n\n"
+        f"Your howto:\n{kid.howto or '(nothing)'}\n\nYour last turns:\n{recent}\n\n"
+        "The grown-up who made the game asks you how it went. Answer honestly, in your own "
+        "words, in a few short paragraphs: what was fun, what was boring or confusing, "
+        "where you got stuck, what you think the game wanted you to do or find out, and "
+        "whether you'd play again. Don't answer with JSON this time; just talk."
+    )
+
+
 class Brain:
     """Asks Claude for the kid's next move."""
+
+    cost_note: str = "estimate"
+    unreadable: int = 0  # structured output: every answer can be read
 
     def __init__(self, model: str) -> None:
         self.model: str = model
@@ -184,18 +228,7 @@ class Brain:
 
     def debrief(self, kid: Kid, outcome: str) -> str:
         """Afterwards, the kid tells the grown-up who made the game how it went."""
-        recent: str = "\n".join(
-            f"You typed: {turn.typed}. You thought: {turn.thought}" for turn in kid.recent()
-        )
-        question: str = (
-            f"You have stopped playing ({outcome}) after {len(kid.turns)} turns.\n\n"
-            f"Your notes about this game:\n{kid.notes or '(nothing)'}\n\n"
-            f"Your howto:\n{kid.howto or '(nothing)'}\n\nYour last turns:\n{recent}\n\n"
-            "The grown-up who made the game asks you how it went. Answer honestly, in your own "
-            "words, in a few short paragraphs: what was fun, what was boring or confusing, "
-            "where you got stuck, what you think the game wanted you to do or find out, and "
-            "whether you'd play again. Don't answer with JSON this time; just talk."
-        )
+        question: str = debrief_question(kid, outcome)
         response = self.client.beta.messages.create(
             model=self.model,
             max_tokens=16000,

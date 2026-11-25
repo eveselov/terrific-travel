@@ -40,6 +40,8 @@ class Run:
     earlier: list[Sitting] = field(default_factory=list)  # sittings before this one
     stamp: str = ""  # the first sitting's time, in the report's file name
     reset_at: str = ""  # when the game was started over for this playthrough
+    cost_note: str = "estimate"  # what the cost means (a local model: as the cheapest Claude)
+    unreadable: int = 0  # this sitting's turns whose answer couldn't be read (local models)
 
     def sittings(self) -> list[Sitting]:
         """Every sitting, this one last."""
@@ -90,8 +92,9 @@ def render(run: Run) -> str:
         f"- **Model:** `{run.model}`",
         f"- **Outcome:** {run.outcome}",
         f"- **Turns:** {len(turns)}, hints asked: {hints_used(run)}, typos: "
-        f"{sum(1 for t in turns if t.typed != t.intended)}",
-        f"- **Cost (estimate):** ${sum(s.dollars for s in sittings):.2f}",
+        f"{sum(1 for t in turns if t.typed != t.intended)}"
+        + (f", unreadable answers this sitting: {run.unreadable}" if run.unreadable else ""),
+        f"- **Cost ({run.cost_note}):** ${sum(s.dollars for s in sittings):.2f}",
         "",
     ]
     if len(sittings) > 1:
