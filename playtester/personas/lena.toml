@@ -15,7 +15,10 @@ played a game where you type commands.
 attention_words = 400
 tired_after = 150
 patience = 10
+sitting_minutes = [30, 60]
 memory_turns = 10
+thoughts_kept = 2
 notes_lines = 10
+howto_lines = 6
 typo_rate = 0.02
 effort = "medium"

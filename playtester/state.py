@@ -29,6 +29,7 @@ class Saved:
     stamp: str  # the first sitting's time, in the report's file name
     reset_at: str  # when the game was started over for it ('' if unknown)
     notes: str
+    howto: str
     known: set[str]
     turns: list[Turn]
     sittings: list[Sitting]
@@ -67,6 +68,7 @@ def save_state(run: Run) -> Path:
         "stamp": run.stamp,
         "reset_at": run.reset_at,
         "notes": run.kid.notes,
+        "howto": run.kid.howto,
         "known": sorted(run.kid.known),
         "sittings": [asdict(sitting) for sitting in run.sittings()],
         "turns": [asdict(turn) for turn in run.kid.turns],
@@ -91,6 +93,7 @@ def load_state(game: str, persona: str) -> Saved:
         stamp=str(data["stamp"]),
         reset_at=str(data.get("reset_at", "")),
         notes=str(data["notes"]),
+        howto=str(data.get("howto", "")),
         known=set(data["known"]),
         turns=turns,
         sittings=[Sitting(**sitting) for sitting in data["sittings"]],

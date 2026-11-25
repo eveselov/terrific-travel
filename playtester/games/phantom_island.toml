@@ -1,5 +1,5 @@
 # Phantom Island as the playtester reaches it. Nothing in this file is shown to the
-# player agent: it is only how to connect, start over and notice the end.
+# player agent: it is only how to connect, start over, notice progress and the end.
 
 title = "Phantom Island"
 host = "localhost"
@@ -13,6 +13,23 @@ end_texts = ["That is the end of the story."]
 
 # Counted in the report as hints asked for.
 hint_commands = ["hint", "stuck"]
+
+# Progress: the game has moved on. It ends the kid's boredom, and it is a good moment
+# to stop a sitting. Patterns (regular expressions) searched in the screen's text, its
+# colours taken out: a clue (world/clues.py, NOTED), a new or grown notebook entry
+# (world/notebook.py), an answer proved, a council's conclusion.
+progress = [
+    'Noted in the journal:',
+    'New in your notebook:',
+    'Your notebook entr(y|ies) on .+ grew',
+    'Proved by:',
+    'New possibilities for the report',
+    'So the council agrees',
+]
+
+# A room's title line, in the colour tags the playtester gives it. A title not seen
+# before (a place reached for the first time) is progress too.
+room_title = '^<cyan>([^<]+)</cyan>$'
 
 # A voyage is told one line every 3 seconds (world/ship.py, STEP_SECONDS), so the
 # game has finished answering only after a longer silence.

@@ -84,7 +84,9 @@ def render(run: Run) -> str:
         f"- **When:** {sittings[0].started.replace('T', ' ')}",
         f"- **Persona:** `{kid.persona.key}` ({name}, {kid.persona.age}), effort "
         f"`{traits.effort}`, attention {traits.attention_words} words, patience "
-        f"{traits.patience} turns, memory {traits.memory_turns} turns",
+        f"{traits.patience} turns, memory {traits.memory_turns} turns ({traits.thoughts_kept} "
+        f"with thoughts), notes {traits.notes_lines} + howto {traits.howto_lines} lines, "
+        f"sittings of {traits.sitting_minutes[0]}–{traits.sitting_minutes[1]} minutes",
         f"- **Model:** `{run.model}`",
         f"- **Outcome:** {run.outcome}",
         f"- **Turns:** {len(turns)}, hints asked: {hints_used(run)}, typos: "
@@ -146,6 +148,11 @@ def render(run: Run) -> str:
         out += ["## Screens too long to read", ""]
         out += [f"- **{t.number}**: {t.seen.skipped} words not read" for t in skimmed]
         out.append("")
+
+    if kid.notes or kid.howto:
+        out += [f"## What {name} kept in mind at the end", ""]
+        out += ["About the game:", "", "```text", kid.notes or "(nothing)", "```", ""]
+        out += ["How to play:", "", "```text", kid.howto or "(nothing)", "```", ""]
 
     out += ["## Transcript", ""]
     starts: dict[int, int] = {s.first_turn: n for n, s in enumerate(sittings, 1)}

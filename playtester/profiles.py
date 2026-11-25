@@ -24,9 +24,12 @@ class Traits:
 
     attention_words: int = 150  # words of one screen read before skimming past the rest
     tired_after: int = 80  # turns; after that, attention is halved
-    patience: int = 6  # turns with nothing new before boredom shows
+    patience: int = 6  # turns with nothing happening before boredom shows; twice: gives up
+    sitting_minutes: tuple[int, int] = (20, 45)  # how long one sitting lasts, picked between
     memory_turns: int = 6  # earlier turns remembered word for word
-    notes_lines: int = 6  # lines of notes kept "in the head"
+    thoughts_kept: int = 1  # of those turns, how many recent ones bring their thought back
+    notes_lines: int = 6  # lines of notes about this game kept "in the head"
+    howto_lines: int = 4  # lines of notes about how to play
     typo_rate: float = 0.05  # chance that a typed command gets a typo
     effort: Effort = "low"  # how hard the model thinks: the persona's smartness
 
@@ -51,6 +54,8 @@ class GameProfile:
     end_texts: tuple[str, ...]  # the run is finished when the game shows one of these
     hint_commands: tuple[str, ...]  # counted in the report
     quiet_seconds: float  # the game has finished answering after this much silence
+    progress: tuple[str, ...] = ()  # patterns of the game's "something happened" messages
+    room_title: str = ""  # pattern of a room's title line; a new one counts as progress
 
 
 def _read(path: Path) -> dict[str, Any]:
@@ -69,6 +74,11 @@ def load_persona(key: str) -> Persona:
         raise ValueError(f"personas/{key}.toml: unknown traits {', '.join(sorted(unknown))}.")
     if raw.get("effort", "low") not in EFFORTS:
         raise ValueError(f"personas/{key}.toml: effort is one of {', '.join(EFFORTS)}.")
+    if "sitting_minutes" in raw:
+        low, high = (int(value) for value in raw["sitting_minutes"])
+        if not 0 < low <= high:
+            raise ValueError(f"personas/{key}.toml: sitting_minutes is [shortest, longest].")
+        raw["sitting_minutes"] = (low, high)
     return Persona(
         key=key,
         name=str(data["name"]),
@@ -90,4 +100,6 @@ def load_game(key: str) -> GameProfile:
         end_texts=tuple(cast(list[str], data.get("end_texts", []))),
         hint_commands=tuple(cast(list[str], data.get("hint_commands", []))),
         quiet_seconds=float(data.get("quiet_seconds", 2.0)),
+        progress=tuple(cast(list[str], data.get("progress", []))),
+        room_title=str(data.get("room_title", "")),
     )

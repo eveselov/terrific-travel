@@ -80,15 +80,50 @@ class KidTests(unittest.TestCase):
         self.assertEqual((seen.text, seen.skipped), ("one two\n\nthree", 0))
 
     def test_boredom_grows_on_old_news(self) -> None:
-        kid = Kid(persona(patience=2), random.Random(1))
-        self.assertTrue(kid.see("You can't go that way.").novel)
+        kid = Kid(persona(patience=2), random.Random(1), load_game("phantom_island"))
         for _ in range(4):
             seen = kid.see("You can't go that way.")
             kid.remember(Turn(number=kid.turn_number, seen=seen), "")
         self.assertTrue(seen.bored)
         self.assertTrue(kid.gives_up())
-        kid.see("A gull lands on the rail.")
+        kid.see("Noted in the journal: a gull lands on the rail.")
         self.assertEqual(kid.boredom, 0)
+
+    def test_a_different_typo_is_not_news(self) -> None:
+        kid = Kid(persona(), random.Random(1))
+        kid.see("Command 'norht' is not available. Maybe you meant \"north\"?")
+        seen = kid.see("Command 'suth' is not available. Maybe you meant \"south\"?")
+        self.assertFalse(seen.novel)
+        self.assertEqual(kid.boredom, 2)
+
+    def test_new_text_eases_boredom_and_progress_ends_it(self) -> None:
+        kid = Kid(persona(), random.Random(1), load_game("phantom_island"))
+        kid.boredom = 3
+        talk = "Barnaby says: the storm of seventy-five came from the west and lasted three days."
+        self.assertTrue(kid.see(talk).novel)
+        self.assertEqual(kid.boredom, 2)
+        self.assertTrue(kid.see("<cyan>Quay</cyan>\nThe harbour.").progress)  # a new place
+        self.assertEqual(kid.boredom, 0)
+        self.assertFalse(kid.see("<cyan>Quay</cyan>\nThe harbour.").progress)  # not new now
+        coloured = kid.see("<grey>(New in your <white>notebook</white>: Coral.)</grey>")
+        self.assertTrue(coloured.progress)  # colours don't hide a progress message
+
+    def test_sitting_stops_at_a_good_moment_or_a_little_later(self) -> None:
+        kid = Kid(persona(sitting_minutes=(1, 1)), random.Random(1), load_game("phantom_island"))
+        self.assertEqual(kid.sitting_turns, 2)  # a minute, at 30 seconds a turn
+        for number in (1, 2):
+            kid.remember(Turn(number=number, seen=kid.see(f"Screen {number}.")), "")
+        seen = kid.see("Noted in the journal: the compass.")
+        self.assertTrue(seen.time_up and seen.progress)
+        for number in range(3, 8):
+            kid.remember(Turn(number=number, seen=kid.see(f"Screen {number}.")), "")
+        self.assertTrue(kid.must_stop())
+
+    def test_untimed_kid_plays_on(self) -> None:
+        kid = Kid(persona(sitting_minutes=(1, 1)), random.Random(1), timed=False)
+        for number in range(1, 10):
+            kid.remember(Turn(number=number, seen=kid.see("x")), "")
+        self.assertFalse(kid.time_up() or kid.must_stop())
 
     def test_notes_cut_to_what_fits(self) -> None:
         kid = Kid(persona(notes_lines=2), random.Random(1))
@@ -113,6 +148,30 @@ class PromptTests(unittest.TestCase):
         self.assertIn("You typed: lok   (you meant: look)", prompt)
         self.assertIn("an office", prompt)
         self.assertIn("You see no lok here.", prompt)
+
+    def test_only_the_last_thoughts_come_back(self) -> None:
+        kid = Kid(persona(memory_turns=3, thoughts_kept=1), random.Random(1))
+        for number, thought in ((1, "Who is she?"), (2, "Maybe the harbour.")):
+            seen = kid.see(f"Screen {number}.")
+            kid.remember(Turn(number=number, seen=seen, thought=thought, typed="x"), "", "")
+        prompt = turn_prompt(kid, kid.see("Screen 3."))
+        self.assertIn("You thought: Maybe the harbour.", prompt)
+        self.assertNotIn("Who is she?", prompt)
+
+    def test_no_thoughts_kept(self) -> None:
+        kid = Kid(persona(thoughts_kept=0), random.Random(1))
+        kid.remember(Turn(number=1, seen=kid.see("A."), thought="Hmm.", typed="x"), "", "")
+        self.assertNotIn("You thought", turn_prompt(kid, kid.see("B.")))
+
+    def test_howto_kept_apart_and_cut(self) -> None:
+        kid = Kid(persona(notes_lines=1, howto_lines=2), random.Random(1))
+        kid.remember(Turn(number=1, seen=kid.see("A.")), "a ship\nan island", "help\nask X\nlook")
+        self.assertEqual((kid.notes, kid.howto), ("a ship", "help\nask X"))
+        kid.remember(Turn(number=2, seen=kid.see("B.")), "a quay")  # the end of a sitting
+        self.assertEqual(kid.howto, "help\nask X")
+        prompt = turn_prompt(kid, kid.see("C."))
+        self.assertIn("Your notes about this game:\na quay", prompt)
+        self.assertIn("Your howto:\nhelp\nask X", prompt)
 
 
 class ContinueTests(unittest.TestCase):
@@ -170,7 +229,7 @@ class ContinueTests(unittest.TestCase):
     def test_kid_comes_back_rested_and_remembering(self) -> None:
         old = self.played()
         kid = Kid(old.kid.persona, random.Random(1))
-        kid.come_back(old.kid.turns, old.kid.notes, old.kid.known)
+        kid.come_back(old.kid.turns, old.kid.notes, old.kid.howto, old.kid.known)
         self.assertEqual((kid.turn_number, kid.just_back, kid.tired()), (3, True, False))
         prompt = turn_prompt(kid, kid.see("The quay."))
         self.assertIn("come back to the game", prompt)
@@ -180,7 +239,7 @@ class ContinueTests(unittest.TestCase):
     def test_report_has_a_section_per_sitting(self) -> None:
         first = self.played()
         run = Run(game=first.game, kid=first.kid, model="m", started=datetime(2026, 11, 26, 9, 0))
-        run.kid.come_back(first.kid.turns, first.kid.notes, first.kid.known)
+        run.kid.come_back(first.kid.turns, first.kid.notes, first.kid.howto, first.kid.known)
         run.earlier = first.sittings()
         run.kid.remember(Turn(number=3, seen=run.kid.see("A gull."), typed="z", intended="z"), "")
         text = render(run)

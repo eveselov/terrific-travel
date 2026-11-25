@@ -39,7 +39,8 @@ class Move(BaseModel):
     feeling: Feeling
     noticed: str = Field(description="Something on this screen that looks important, or ''.")
     hard_words: list[str] = Field(description="Words on this screen you didn't understand.")
-    notes: str = Field(description="What you keep in your head about the game, short lines.")
+    notes: str = Field(description="What you keep in your head about this game, short lines.")
+    howto: str = Field(description="What you've worked out about how to play, short lines.")
     quit: bool = Field(description="True only if you stop playing now.")
 
 
@@ -97,10 +98,14 @@ would say it out loud to a friend sitting next to you.
 - noticed: if something on this screen looks important to you (a clue, something to try, \
 someone to talk to), say what in a few words; otherwise ''.
 - hard_words: words on this screen you didn't understand, often none.
-- notes: what you keep in your head about the game so far, at most \
-{p.traits.notes_lines} short lines. They replace your earlier notes: what you leave out, \
-you forget.
+- notes: what you keep in your head about this game's story so far: people, places, \
+things, what you're trying to find out. At most {p.traits.notes_lines} short lines.
+- howto: what you've worked out about how to play: which commands work and how to type \
+them, how to talk to people, what seems to help when you're stuck. At most \
+{p.traits.howto_lines} short lines.
 - quit: true only if you would stop playing now; then say why in your thought.
+
+Your notes and howto replace the earlier ones each turn: what you leave out, you forget.
 
 Stay {p.name}: a {p.age}-year-old's words, patience and attention. You may use what you know \
 about the real world, as much as someone your age knows, but nothing about this game that \
@@ -110,12 +115,16 @@ you could only know from outside it."""
 def turn_prompt(kid: Kid, seen: Seen) -> str:
     """This turn's request: notes, the remembered turns, and the screen now."""
     parts: list[str] = [f"Turn {kid.turn_number}."]
-    parts.append("Your notes:\n" + (kid.notes or "(nothing yet)"))
+    parts.append("Your notes about this game:\n" + (kid.notes or "(nothing yet)"))
+    parts.append("Your howto:\n" + (kid.howto or "(nothing yet)"))
     recent: list[Turn] = kid.recent()
     if recent:
         lines: list[str] = ["What happened just before (oldest first):"]
+        thinking: set[int] = {turn.number for turn in kid.kept_thoughts()}
         for turn in recent:
             lines.append(f"<screen>\n{turn.seen.text}\n</screen>")
+            if turn.number in thinking:
+                lines.append(f"You thought: {turn.thought}")
             if not turn.typed and not turn.intended:  # the last screen of an earlier sitting
                 lines.append("(You stopped playing here.)")
             elif turn.typed != turn.intended:
@@ -132,6 +141,11 @@ def turn_prompt(kid: Kid, seen: Seen) -> str:
         parts.append("You have been playing for a long time, and you're getting tired.")
     if seen.bored:
         parts.append("Nothing new has happened for a while, and you're getting bored.")
+    if seen.time_up:
+        parts.append(
+            "It's getting late: you'll have to stop playing soon. You'd like to stop at a good "
+            "moment, when you've just found something out or got somewhere."
+        )
     return "\n\n".join(parts)
 
 
@@ -175,7 +189,8 @@ class Brain:
         )
         question: str = (
             f"You have stopped playing ({outcome}) after {len(kid.turns)} turns.\n\n"
-            f"Your notes:\n{kid.notes or '(nothing)'}\n\nYour last turns:\n{recent}\n\n"
+            f"Your notes about this game:\n{kid.notes or '(nothing)'}\n\n"
+            f"Your howto:\n{kid.howto or '(nothing)'}\n\nYour last turns:\n{recent}\n\n"
             "The grown-up who made the game asks you how it went. Answer honestly, in your own "
             "words, in a few short paragraphs: what was fun, what was boring or confusing, "
             "where you got stuck, what you think the game wanted you to do or find out, and "

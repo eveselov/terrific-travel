@@ -15,7 +15,10 @@ commands, but you know you can usually type "help".
 attention_words = 120
 tired_after = 80
 patience = 6
+sitting_minutes = [20, 45]
 memory_turns = 6
+thoughts_kept = 1
 notes_lines = 6
+howto_lines = 4
 typo_rate = 0.08
 effort = "low"

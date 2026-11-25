@@ -61,20 +61,37 @@ the run; the report is still written.
 | `--persona <key>` | who plays: a file in `personas/` (default `max`) |
 | `--model <id>` | `claude-opus-5-5` (default), `claude-sonnet-5-5`, `claude-haiku-5-5`... the same key works for all |
 | `--turns <n>` | most turns to play in this run (200) |
+| `--max-cost <dollars>` | stop this run once its estimated cost reaches this much (5; `0` for no limit). Checked before each turn, so a run can go over by one turn and the talk afterwards |
 | `--reset` | start the game over and a new playthrough with fresh memory; without it, the persona's last playthrough carries on (see below) |
 | `--no-debrief` | skip the talk afterwards |
+| `--no-time-limit` | ignore the persona's sitting length (below), so only `--turns` and `--max-cost` end the run: for one long run to compare with another |
 | `--manual` | you type instead of the model, and see each screen exactly as the agent would (no API key needed). Plays the game as it stands, or started over with `--reset`; no memory is loaded or saved, and the report is named `...-manual-...` |
-| `--seed <n>` | the same typos on every run |
+| `--seed <n>` | the same typos and sitting length on every run |
 
 **Cost:** each turn is one request, a few thousand tokens. With Opus 5.5, an estimate of
 1 to 4 cents a turn (Sam about 1, Max 2, Lena 4: longer attention and memory mean more
 text sent); Sonnet 5.5 about half that; Haiku 5.5 well under a cent. The printed figure is an
 estimate; the Console's Usage page has the real one. Set a spend limit there.
 
+### Progress
+
+What counts as the game moving on is set in the game profile (`games/*.toml`): `progress`,
+patterns of the game's own messages (for Phantom Island a new clue, a new or grown notebook
+entry, an answer proved, a council's conclusion), and `room_title`, the pattern of a room's
+title, so that reaching a place for the first time counts too. Progress ends boredom, and
+it is where a kid whose time is up stops. Colours are taken out before matching, and the
+whole screen counts, whether the kid read that far or not.
+
 ### Playing in several sittings
 
+A sitting is one run: it ends when the kid stops for today, gives up, finishes, or hits
+`--turns` or `--max-cost`, and the kid leaves the game. Leaving has effects in the game
+too: Phantom Island puts back whatever the player carried (DECISIONS.md, 21). So several
+short runs are not the same as one long one; for comparing two versions of the game, use
+one long run (`--no-time-limit`).
+
 Every run saves the kid's side of the playthrough in `runs/<game>-<persona>.state.json`:
-the turns, its notes and what it has already seen. The game keeps its own side on the
+the turns, both kinds of notes and what it has already seen. The game keeps its own side on the
 server. A run without `--reset` picks both up: the turns numbered on from where they
 stopped, and the kid told it has come back after a break. It comes back rested (tiredness
 counts from the start of the sitting) and no longer bored. The report stays one file, with
@@ -102,9 +119,12 @@ So the persona's traits are enforced by the program, not left to the model
 |---|---|
 | `attention_words` | only that many words of each screen reach the model; the rest is marked `[... 85 more words you didn't read ...]` |
 | `tired_after` | after that many turns, attention is halved and the kid is told it's tired |
-| `patience` | turns with nothing new on screen before the kid is told it's bored; after twice as many it gives up and the run ends |
-| `memory_turns` | how many earlier turns it remembers word for word |
-| `notes_lines` | its notes "in the head", rewritten every turn and cut to this many lines |
+| `patience` | how long the kid stands nothing happening before it is told it's bored; at twice that it gives up and the run ends. Progress (below) ends boredom, a screen with a good amount of new text eases it by a turn, and anything else adds a turn. Text that differs only in a short quoted word (a different typo in "Command 'norht' is not available") isn't new |
+| `sitting_minutes` | `[shortest, longest]`: how long one sitting lasts, picked at random between the two (at about 30 seconds a turn). When the time is up the kid is told it must stop soon, and stops at the next good moment (progress), or 5 turns later anyway |
+| `memory_turns` | how many earlier turns it remembers word for word (each screen and what it typed) |
+| `thoughts_kept` | of those turns, how many of the latest bring back what the kid thought then, so its line of reasoning carries on (0 for none) |
+| `notes_lines` | its notes "in the head" about this game (people, places, things, the mystery), rewritten every turn and cut to this many lines |
+| `howto_lines` | its notes about how to play (commands that work, how to talk to people, getting unstuck), kept apart so game facts can't push them out |
 | `typo_rate` | the chance that a command gets a slip of the fingers before it is sent |
 | `effort` | how hard the model thinks (`low`, `medium`, `high`): the persona's smartness |
 
@@ -119,13 +139,15 @@ they mean: a kid sees colours too, and working out what they mean is part of pla
 
 `runs/<game>-<persona>-<time>.md` (git-ignored: it quotes the game, spoilers included):
 
-- the outcome (finished, gave up bored, quit and why, turn limit), turns, hints, typos, cost;
+- the outcome (finished, gave up bored, quit and why, stopped for today at a good moment
+  or because time was up, turn or cost limit), turns, hints, typos, cost;
 - **what the kid said afterwards**: fun, boring, confusing, stuck, what it thinks the
   game wanted;
 - feelings turn by turn, and every confused, bored or frustrated moment with its thought;
 - **what it thought was important**: compare with the real clues, since anything here that
   leads nowhere looked like a lead (Phantom Island's design rule 1);
 - words it didn't understand, and screens too long to read;
+- what it kept in mind at the end: its notes about the game, and about how to play;
 - the transcript: each screen as the kid read it, its thought and what it typed.
 
 ## Files
