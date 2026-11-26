@@ -30,7 +30,7 @@ from .discover import (
     CmdThink,
     CmdUse,
 )
-from .explore import CmdGo, CmdMap
+from .explore import CmdAboard, CmdAshore, CmdGo, CmdMap
 from .report import CmdCouncil, CmdReport
 from .talk import CmdAsk, CmdTalk
 
@@ -94,6 +94,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         self.add(CmdMap())
         self.add(CmdGo())
+        self.add(CmdAboard())
+        self.add(CmdAshore())
         self.add(CmdAsk())
         self.add(CmdTalk())
         self.add(CmdLook())

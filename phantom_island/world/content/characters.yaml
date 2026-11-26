@@ -347,6 +347,7 @@ characters:
       Crane shrugs. "Not my line of business, friend. Now, that |wcompass|n..."
     topics:
       compass:
+        aliases: [coral, hinge]  # what players ask once the coral is found (2026-11-26)
         stance: hiding
         reply: >
           "Found it on a |wbeach|n, I did, washed up after a |wstorm|n. A lucky find. Lucky
@@ -571,7 +572,7 @@ characters:
       clinks when Tui moves.
     greeting: >
       "Hello! Are you from a ship? Grandmother says strangers must show |wrespect|n. Do
-      you want to see my |wbuttons|n? I found them near the big |wbones|n. I know a
+      you want to see my |wbuttons|n? I know where the big |wbones|n are. I know a
       |wsong|n, too, and I know all the |wgoats|n by name!"
     suggest: [respect, buttons, bones, song, goats]
     fallback: >
@@ -581,9 +582,8 @@ characters:
         aliases: [bag, shiny]
         stance: truth
         reply: >
-          Tui tips out a handful of brass buttons. "Shiny ones! I find them out by the
-          |wbig bones|n, and Grandmother has old ones in her basket. Look, this one has a
-          little anchor on it. Old |wJonah|n says it's off a sailor's coat."
+          Tui tips out a handful of brass buttons. "Shiny ones! I keep them in my bag. Look,
+          this one has a little anchor on it. Old |wJonah|n says it's off a sailor's coat."
       bones:
         aliases: [big bones, monster, reef]
         stance: truth

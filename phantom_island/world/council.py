@@ -46,6 +46,7 @@ from world.content import (
 from world.expedition import connected_characters, get_expedition
 from world.notices import quiet
 from world.report import proved_by, signing_command
+from world.ship import way_aboard
 
 COUNCIL: str = "council"
 NO_COUNCIL: str = (
@@ -58,15 +59,17 @@ WAITS: str = (
 )
 PROPOSED: str = "proposed:"  # + a step's flag: its right answer waits for its proof
 READY_ABOARD: str = f"That's what the council was waiting for: |w{COUNCIL}|n carries on."
+# Ashore, with the way aboard from where the player stands (world/ship.py, `way_aboard`).
 READY_ASHORE: str = (
-    f"That's what the council was waiting for. Back |waboard|n, |w{COUNCIL}|n carries on."
+    "That's what the council was waiting for. To carry on, {way}, then |w" + COUNCIL + "|n."
 )
 EVIDENCE_ABOARD: str = (
     f"The journal now holds all that the council needs. Type |w{COUNCIL}|n to put it together."
 )
 EVIDENCE_ASHORE: str = (
-    "The journal now holds all that the council needs. Go |waboard|n and type "
-    f"|w{COUNCIL}|n to put it together."
+    "The journal now holds all that the council needs. To put it together, {way}, then |w"
+    + COUNCIL
+    + "|n."
 )
 
 
@@ -137,14 +140,22 @@ def watching() -> Iterator[None]:
     if complete_before is None and evidence_complete() is not None:
         for character in connected_characters():
             aboard_now: bool = isinstance(character.location, ShipRoom)
-            notices.after(character, EVIDENCE_ABOARD if aboard_now else EVIDENCE_ASHORE)
+            notices.after(
+                character,
+                EVIDENCE_ABOARD
+                if aboard_now
+                else EVIDENCE_ASHORE.format(way=way_aboard(character)),
+            )
         return
     after: CouncilStepSpec | None = ready_step()
     if after is None or after == before:
         return
     for character in connected_characters():
         aboard: bool = isinstance(character.location, ShipRoom)
-        notices.tell(character, READY_ABOARD if aboard else READY_ASHORE)
+        notices.tell(
+            character,
+            READY_ABOARD if aboard else READY_ASHORE.format(way=way_aboard(character)),
+        )
 
 
 def status_line() -> str:

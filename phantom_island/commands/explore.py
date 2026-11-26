@@ -5,6 +5,7 @@ from typing import Any
 from typeclasses.rooms import Room
 from world.content import LookSpec, find_look, names_whole
 from world.discovery import find_thing_at_hand, location_details
+from world.ship import ABOARD, ASHORE, not_aboard_here, not_ashore_here
 
 from .command import Command
 
@@ -48,6 +49,9 @@ class CmdGo(Command):
             if wanted in names:
                 caller.execute_cmd(str(exit_obj.key))
                 return
+        if wanted in (ABOARD, ASHORE):  # no gangway here: say where it is
+            caller.msg(not_aboard_here(caller) if wanted == ABOARD else not_ashore_here(caller))
+            return
         if _here_to_look_at(caller, wanted):
             # Something here, not a way out (playtest 2026-11-25: `enter chart house`).
             caller.msg(
@@ -70,6 +74,42 @@ def _exits_line(exits: list[Any]) -> str:
     if not exits:
         return "There is no way out of here."
     return "Exits: " + ", ".join(f"|w{exit_obj.key}|n" for exit_obj in exits) + "."
+
+
+class CmdAboard(Command):
+    """
+    Go aboard your ship, from the place where she lies.
+
+    Usage:
+      aboard
+    """
+
+    # Where the ship lies, her `aboard` exit takes this word first; anywhere else this
+    # says where to go (playtest 2026-11-26: "Command 'aboard' is not available").
+    key = ABOARD
+    locks = "cmd:all()"
+    help_category = "General"
+    auto_help = False
+
+    def func(self) -> None:
+        self.caller.msg(not_aboard_here(self.caller))
+
+
+class CmdAshore(Command):
+    """
+    Go ashore from your ship.
+
+    Usage:
+      ashore
+    """
+
+    key = ASHORE
+    locks = "cmd:all()"
+    help_category = "General"
+    auto_help = False
+
+    def func(self) -> None:
+        self.caller.msg(not_ashore_here(self.caller))
 
 
 class CmdMap(Command):

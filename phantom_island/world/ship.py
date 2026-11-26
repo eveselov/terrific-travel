@@ -98,6 +98,43 @@ def moor_ship(position: PositionSpec) -> None:
     aboard_exit.destination = deck
 
 
+def shore_room() -> Any | None:
+    """The room the ship is reached from at her position (the Quay...), or None at sea."""
+    position: PositionSpec = current_position()
+    return find_place(position.ashore) if position.ashore else None
+
+
+def way_aboard(character: Any) -> str:
+    """
+    How this character gets aboard from where they are, to go in a sentence: `type
+    |waboard|n` where the ship is moored, else `go to the Quay and type |waboard|n`
+    (playtest 2026-11-26: "Go aboard" read in the Market led nowhere).
+    """
+    shore: Any = shore_room()
+    if shore is None or character.location == shore:
+        return f"type |w{ABOARD}|n"
+    return f"go to the {shore.key} and type |w{ABOARD}|n"
+
+
+def not_aboard_here(character: Any) -> str:
+    """What `aboard` says where there's no gangway: you're aboard, or where to go."""
+    if isinstance(character.location, ShipRoom):
+        return "You're aboard already."
+    shore: Any = shore_room()
+    if shore is None:
+        return "The Good Hope isn't here."
+    return f"You can go aboard from the {shore.key}, where the Good Hope lies. Go there first."
+
+
+def not_ashore_here(character: Any) -> str:
+    """What `ashore` says where there's no gangway: you're ashore, or at sea."""
+    if not isinstance(character.location, ShipRoom):
+        return "You're ashore already."
+    if get_expedition().voyage is not None:
+        return STILL_SAILING
+    return "There's no shore here: open sea all round."
+
+
 def crew_ashore() -> list[Any]:
     """
     Connected players who are not aboard, so the ship mustn't leave without them.

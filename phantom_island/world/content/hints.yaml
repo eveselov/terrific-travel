@@ -76,8 +76,8 @@ situations:
     ship: [port]
     missing: [C3]
     hints:
-      - Silas Crane says the compass washed up on a beach last winter. Does the coral in
-        its hinge fit that story?
+      - The coral in the compass hinge says it lay in the sea for years, not on a beach.
+        Silas Crane may tell it differently now.
       - Ask Silas Crane about the compass again, now that the coral is in the journal.
       - In the Market, type |wask crane about compass|n.
 
@@ -226,26 +226,10 @@ situations:
       - Carry the animal guide (|wget animal guide|n), and on the Lagoon Beach, type
         |wlook goats|n.
 
-  - id: coastline
-    ship: [anchorage]
-    missing: [C10]
-    hints:
-      - Is this really the island on the Halcyon's chart?
-      - Take the Halcyon's chart up to the Hilltop, and compare it with the coastline.
-      - Carry the chart (|wget chart|n, in the chart house), and on the Hilltop, type
-        |wlook coastline|n.
-
-  - id: position
-    ship: [anchorage]
-    missing: [C5]
-    hints:
-      - And where exactly is this island? The chart's numbers are about to be tested.
-      - Measure the island's position with the sextant, then the chronometer.
-      - Aboard, |wuse sextant|n, then |wread chronometer|n.
-
   # The final council (councils.yaml, DECISIONS.md, 37): with the evidence found, back
   # aboard to put it together, then the report. Players who answer the report directly
-  # skip it (offered, never forced).
+  # skip it (offered, never forced). Before the coastline and the position, which the
+  # council doesn't need: the hint and the council's own line agree (playtest 2026-11-26).
   - id: island_council
     ship: [anchorage]
     missing: [crew_settled]
@@ -255,6 +239,24 @@ situations:
       - Go back aboard and call a council. The Good Hope will ask the Society's questions one
         at a time.
       - From the Lagoon Beach, type |waboard|n, then |wcouncil|n.
+
+  - id: coastline
+    ship: [anchorage]
+    missing: [C10]
+    hints:
+      - Is this really the island on the Halcyon's chart?
+      - Take the Halcyon's chart from the chart house, aboard, up to the Hilltop, and
+        compare it with the coastline.
+      - Carry the chart (|wget chart|n, in the chart house aboard), and on the Hilltop, type
+        |wlook coastline|n.
+
+  - id: position
+    ship: [anchorage]
+    missing: [C5]
+    hints:
+      - And where exactly is this island? The chart's numbers are about to be tested.
+      - Measure the island's position with the sextant, then the chronometer.
+      - Aboard, |wuse sextant|n, then |wread chronometer|n.
 
   # --- The report -------------------------------------------------------------------------
 

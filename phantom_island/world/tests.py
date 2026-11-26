@@ -2509,7 +2509,11 @@ class TestPortCouncil(DiscoveryTest):
             get_expedition().add_clue("C3", "someone", "Market")
         # The last proof it needs, so it is said in the ordinary voice (playtest 2026-11-25).
         heard: str = texts(mock_msg)
-        self.assertIn("all that the council needs. Go |waboard|n", heard)
+        self.assertIn(
+            "all that the council needs. To put it together, go to the Quay and type "
+            "|waboard|n, then |wcouncil|n.",
+            heard,
+        )
         self.assertNotIn("council was waiting for", heard)
 
     def test_the_council_ends_with_the_exact_order(self) -> None:
@@ -2734,9 +2738,62 @@ class TestLenasPlaytest(DiscoveryTest):
         with patch.object(self.char1, "msg") as mock_msg:
             get_expedition().add_clue("C13", "someone", "Boat Cove")
         self.assertIn(
-            "The journal now holds all that the council needs. Go |waboard|n and type |wcouncil|n",
+            "The journal now holds all that the council needs. To put it together, go to the "
+            "Lagoon Beach and type |waboard|n, then |wcouncil|n.",
             texts(mock_msg),
         )
 
     def test_the_title_page_names_hint(self) -> None:
         self.assertIn("Stuck at any time? Type |whint|n.", load_content().places["limbo"].desc)
+
+
+class TestLenasSecondPlaytest(DiscoveryTest):
+    """What Lena's run of 2026-11-26 showed: the way aboard, the hints' order, the coral."""
+
+    def test_aboard_elsewhere_says_where_the_ship_is(self) -> None:
+        self.at(self.char1, "market")
+        for order in ("aboard", "go aboard"):
+            self.assertIn("You can go aboard from the Quay", self.do(self.char1, order), order)
+        self.assertIn("You're ashore already", self.do(self.char1, "ashore"))
+
+    def test_the_gangway_still_works_where_the_ship_lies(self) -> None:
+        self.at(self.char1, "quay")
+        self.do(self.char1, "aboard")
+        self.assertEqual(self.char1.location, self.rooms["deck"])
+        self.assertIn("You're aboard already", self.do(self.char1, "aboard"))
+        self.do(self.char1, "ashore")
+        self.assertEqual(self.char1.location, self.rooms["quay"])
+
+    def test_at_sea_there_is_no_shore(self) -> None:
+        self.ship_at("charted")
+        self.at(self.char1, "deck")
+        self.assertIn("open sea all round", self.do(self.char1, "ashore"))
+
+    def test_where_the_ship_lies_the_council_line_says_type_aboard(self) -> None:
+        get_expedition().set_flag("chart_read")
+        self.at(self.char1, "deck")
+        self.do(self.char1, "council a")
+        self.do(self.char1, "council b")
+        self.at(self.char1, "quay")
+        with patch.object(self.char1, "msg") as mock_msg:
+            get_expedition().add_clue("C3", "someone", "Market")
+        self.assertIn("To put it together, type |waboard|n, then |wcouncil|n.", texts(mock_msg))
+
+    def test_crane_can_be_asked_about_the_coral(self) -> None:
+        self.at(self.char1, "market")
+        get_expedition().add_clue("C2", "someone", "Market")
+        self.assertIn("I traded for it", self.do(self.char1, "ask crane about coral"))
+
+    def test_with_the_councils_evidence_the_hint_is_the_council(self) -> None:
+        self.ship_at("charted")
+        self.ship_at("anchorage")
+        for flag in ("village_seen", "respect_rule", "respect_ama", "respect_tui"):
+            get_expedition().set_flag(flag)
+        for clue in ("C7", "C12", "C13", "C8", "C9", "C11"):
+            get_expedition().add_clue(clue, "someone", "Village")
+        self.at(self.char1, "village")
+        self.assertIn("put it together, aboard", self.do(self.char1, "hint"))
+
+    def test_tuis_buttons_send_nobody_searching(self) -> None:
+        self.at(self.char1, "village")
+        self.assertNotIn("bones", self.do(self.char1, "ask tui about buttons"))
