@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Elder Ama weaving a fishing net">
+  <!-- Elder Ama in the Village: an old woman in the shade of a hut, weaving a fishing net
+       with quick, sure fingers. Same style as crane.svg. -->
+  <title>Elder Ama weaving a fishing net</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The hut's thatched eave, and the ground -->
+  <path d="M14 40 L240 20 L466 40 L466 76 L14 76 Z" fill="#c9a96e" stroke="#7a4a21" stroke-width="2.5"/>
+  <path d="M40 76 l-6 14 M80 76 l-4 14 M120 76 l-4 14 M160 76 l-2 14 M200 76 v14 M240 76 v14 M280 76 v14 M320 76 l2 14 M360 76 l4 14 M400 76 l4 14 M440 76 l6 14" stroke="#a8803f" stroke-width="3"/>
+  <rect x="14" y="230" width="452" height="58" fill="#e6d3a8"/>
+  <path d="M14 230 H466" stroke="#7a4a21" stroke-width="2"/>
+
+  <!-- Ama, sitting -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M150 236 C148 176 168 150 204 150 C240 150 260 176 258 236 Z" fill="#a8452e"/>
+    <path d="M160 190 C176 200 232 200 248 190" fill="none" stroke="#f3e6c4" stroke-width="3"/>
+    <ellipse cx="204" cy="118" rx="24" ry="27" fill="#8a5a3a"/>
+    <path d="M180 112 C178 82 230 82 228 112 C222 96 186 96 180 112 Z" fill="#e8e8e8"/>
+    <path d="M192 120 q4 2 8 0 M208 120 q4 2 8 0" fill="none" stroke-width="2"/>
+    <path d="M196 134 q8 4 16 0" fill="none" stroke-width="2"/>
+    <path d="M190 128 l-4 6 M218 128 l4 6" fill="none" stroke-width="1.5"/>
+    <!-- Hands at the net -->
+    <ellipse cx="262" cy="200" rx="9" ry="7" fill="#8a5a3a"/>
+    <ellipse cx="270" cy="222" rx="9" ry="7" fill="#8a5a3a"/>
+  </g>
+
+  <!-- The net, spread out on the ground -->
+  <g fill="none" stroke="#5b4632" stroke-width="1.8">
+    <path d="M266 196 L440 170 L456 260 L272 226"/>
+    <path d="M290 193 L298 230 M314 190 L324 234 M338 186 L350 238 M362 183 L376 243 M386 180 L402 247 M410 176 L428 252"/>
+    <path d="M268 204 L444 184 M270 214 L448 200 M271 222 L452 218 M274 230 L454 238"/>
+  </g>
+  <circle cx="452" cy="262" r="6" fill="#c9a96e" stroke="#5b4632" stroke-width="2"/>
+</svg>

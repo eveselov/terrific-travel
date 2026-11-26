@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="The Halcyon's chart">
+  <!-- The fair copy of the Halcyon's chart: an island in careful ink, its position written
+       beside it. The shape follows the chart's own text (`read chart`): round in the east
+       with a lagoon, a hill in the middle, a long reef down the west side, a little cove in
+       the south like a hook. The position is shown as handwriting, not numbers: they are
+       read with `read chart`. Same style as crane.svg. -->
+  <title>The Halcyon's chart</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The paper, slightly rolled at the ends -->
+  <rect x="40" y="34" width="400" height="232" fill="#fbf4e0" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M40 34 q-14 116 0 232 M440 34 q14 116 0 232" fill="#e6d3a8" stroke="#7a4a21" stroke-width="2"/>
+  <!-- Faint grid lines -->
+  <path d="M40 110 H440 M40 190 H440 M140 34 V266 M240 34 V266 M340 34 V266" stroke="#e0caa0" stroke-width="1.5"/>
+
+  <!-- The island -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M190 90 C230 64 300 70 316 116 C330 160 300 200 262 206 C252 222 236 232 222 226 C232 222 240 214 236 206 C214 204 196 196 188 180 C178 160 176 112 190 90 Z" fill="#e6d3a8"/>
+    <!-- The lagoon, in the round east -->
+    <path d="M272 112 C292 112 300 132 294 152 C286 168 266 164 264 146 C262 130 262 114 272 112 Z" fill="#a9c2c8" stroke-width="1.8"/>
+    <!-- The hill in the middle -->
+    <path d="M214 152 l14 -24 l14 24" fill="none" stroke-width="2"/>
+    <path d="M224 140 l4 -6 l4 6" fill="none" stroke-width="1.5"/>
+  </g>
+  <!-- The long reef down the west side -->
+  <path d="M170 92 l-4 8 l4 8 l-4 8 l4 8 l-4 8 l4 8 l-4 8 l4 8 l-4 8 l4 8 l-4 8" fill="none" stroke="#7a4a21" stroke-width="2"/>
+
+  <!-- The position, written beside it in the master's careful hand -->
+  <g fill="none" stroke="#5b4632" stroke-width="1.8" stroke-linecap="round">
+    <path d="M336 214 q6 -10 12 0 t12 0 t12 0 t12 0 t12 0"/>
+    <path d="M336 232 q6 -10 12 0 t12 0 t12 0 t12 0 t12 0 t12 0"/>
+  </g>
+  <!-- A compass rose -->
+  <g stroke="#7a4a21" stroke-width="1.5">
+    <path d="M90 214 l6 -22 l6 22 l-6 22 Z" fill="#c9a96e"/>
+    <path d="M74 214 l22 -6 l22 6 l-22 6 Z" fill="#f3e6c4"/>
+  </g>
+  <text x="96" y="186" text-anchor="middle" font-family="Georgia, serif" font-size="12" font-weight="bold" fill="#3b2a14">N</text>
+</svg>

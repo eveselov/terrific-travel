@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Mrs. Fairweather at her desk">
+  <!-- Mrs. Fairweather, the Society's patron: tall, grey coat, ink on her fingers, a pile of
+       papers. Same style as crane.svg (parchment and brown ink). -->
+  <title>Mrs. Fairweather at her desk</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- Bookshelf behind -->
+  <g stroke="#7a4a21" stroke-width="2">
+    <rect x="40" y="36" width="130" height="170" fill="#e6d3a8"/>
+    <path d="M40 92 H170 M40 148 H170" fill="none"/>
+    <rect x="48" y="52" width="12" height="40" fill="#a8452e"/>
+    <rect x="62" y="56" width="10" height="36" fill="#5b4632"/>
+    <rect x="74" y="50" width="14" height="42" fill="#6f8f9f"/>
+    <rect x="92" y="58" width="10" height="34" fill="#8b5a2b"/>
+    <rect x="48" y="110" width="14" height="38" fill="#5b4632"/>
+    <rect x="64" y="106" width="10" height="42" fill="#c9a96e"/>
+    <rect x="78" y="112" width="12" height="36" fill="#a8452e"/>
+    <path d="M110 120 h50 M110 130 h46 M110 140 h50" stroke="#c9a96e" stroke-width="6"/>
+  </g>
+
+  <!-- Mrs. Fairweather: tall, grey coat, hair in a bun -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M196 230 C194 150 214 132 248 132 C282 132 302 150 300 230 Z" fill="#8a8f94"/>
+    <path d="M236 132 L248 160 L260 132" fill="#e8dcc0"/>
+    <path d="M248 160 V226" fill="none" stroke-width="2"/>
+    <circle cx="248" cy="186" r="2.5" fill="#3b2a14"/>
+    <circle cx="248" cy="204" r="2.5" fill="#3b2a14"/>
+    <ellipse cx="248" cy="100" rx="24" ry="29" fill="#ecc9a3"/>
+    <path d="M224 96 C224 66 272 66 272 96 C266 80 230 80 224 96 Z" fill="#7d7d7d"/>
+    <circle cx="248" cy="66" r="11" fill="#7d7d7d"/>
+    <path d="M236 98 h7 M253 98 h7" fill="none" stroke-width="2"/>
+    <circle cx="239" cy="102" r="2" fill="#3b2a14"/>
+    <circle cx="257" cy="102" r="2" fill="#3b2a14"/>
+    <path d="M240 116 q8 4 16 0" fill="none" stroke-width="2"/>
+  </g>
+
+  <!-- The desk, papers, an inkwell and quill; ink on her fingers -->
+  <rect x="150" y="226" width="290" height="18" fill="#8b5a2b" stroke="#3b2a14" stroke-width="2.5"/>
+  <rect x="164" y="244" width="12" height="32" fill="#7a4a21"/>
+  <rect x="414" y="244" width="12" height="32" fill="#7a4a21"/>
+  <g stroke="#7a4a21" stroke-width="1.5">
+    <path d="M318 226 l6 -40 h58 l-4 40 Z" fill="#fbf4e0"/>
+    <path d="M322 222 l6 -38 h58 l-4 38 Z" fill="#fbf4e0"/>
+    <path d="M334 196 h36 M332 204 h38 M330 212 h34" fill="none" stroke="#c9a96e"/>
+  </g>
+  <path d="M212 226 c0 -10 22 -10 22 0" fill="#ecc9a3" stroke="#3b2a14" stroke-width="2"/>
+  <circle cx="222" cy="221" r="3" fill="#3b2a14"/>
+  <rect x="270" y="210" width="20" height="16" rx="3" fill="#3b2a14"/>
+  <path d="M286 210 L304 176" stroke="#5b4632" stroke-width="2.5"/>
+</svg>

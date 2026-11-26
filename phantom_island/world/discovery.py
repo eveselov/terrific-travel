@@ -103,11 +103,13 @@ def nothing_more(caller: Any, text: str) -> str | None:
     return f"You take a good look at the {wanted}, but there's no more to it than you've seen."
 
 
-def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:
+def show_look(
+    caller: Any, look: LookSpec, close: bool, title: str, image: str | None = None
+) -> None:
     """
     Show a detail or thing to the caller, and write any clue it reveals into the journal.
-    The Focus pane shows a card with its `title` (DECISIONS.md, 16: whatever is being
-    examined) until the caller looks around or moves on.
+    The Focus pane shows its picture, or a card with its `title` (DECISIONS.md, 16: whatever
+    is being examined), until the caller looks around or moves on.
     """
     first: Reveal = look.close if close and look.close is not None else look.desc
     carried: set[str] = carried_ids(caller)
@@ -121,7 +123,7 @@ def show_look(caller: Any, look: LookSpec, close: bool, title: str) -> None:
         if thing_id in carried
     )
     caller.msg("\n\n".join(show_marks(reveal.text) for reveal, _ in shown))
-    caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], None))
+    caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], image))
     found: set[str] = set()
     with notices.together():
         for reveal, source in shown:
@@ -147,7 +149,7 @@ def look_at(caller: Any, text: str, close: bool = False) -> bool:
         if names_whole(text, detail.words) and not names_whole(text, thing.spec.look.words):
             thing = None
     if thing is not None and thing.spec is not None:
-        show_look(caller, thing.spec.look, close, thing.spec.name)
+        show_look(caller, thing.spec.look, close, thing.spec.name, thing.spec.image)
         return True
     if detail is not None:
         show_look(caller, detail, close, detail.id)

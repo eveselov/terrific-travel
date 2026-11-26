@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Old Barnaby on his coil of rope">
+  <!-- Old Barnaby on the Quay: white beard, a pipe that has gone out, sitting on a coil of
+       rope. Same style as crane.svg. -->
+  <title>Old Barnaby on his coil of rope</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- Harbour water and the quay's stones -->
+  <path d="M14 150 H466" stroke="#6f8f9f" stroke-width="2"/>
+  <path d="M40 170 q20 -8 40 0 t40 0 M330 164 q20 -8 40 0 t40 0 M360 190 q20 -8 40 0" fill="none" stroke="#6f8f9f" stroke-width="2"/>
+  <rect x="14" y="236" width="452" height="52" fill="#c9b48a" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M60 236 v52 M150 236 v52 M240 236 v52 M330 236 v52 M420 236 v52" stroke="#a89068" stroke-width="2"/>
+  <!-- A gull -->
+  <path d="M380 70 q12 -12 24 0 q12 -12 24 0" fill="none" stroke="#3b2a14" stroke-width="2.5"/>
+
+  <!-- The coil of rope -->
+  <g fill="none" stroke="#8b5a2b" stroke-width="7">
+    <ellipse cx="236" cy="232" rx="92" ry="20" fill="#c9a96e"/>
+    <ellipse cx="236" cy="226" rx="70" ry="14"/>
+    <ellipse cx="236" cy="222" rx="46" ry="9"/>
+  </g>
+
+  <!-- Barnaby -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M176 222 C176 160 198 140 236 140 C274 140 296 160 296 222 Z" fill="#3f5a73"/>
+    <ellipse cx="236" cy="108" rx="25" ry="28" fill="#e2b98f"/>
+    <path d="M212 112 C214 156 258 156 260 112 C252 128 220 128 212 112 Z" fill="#ffffff"/>
+    <path d="M212 96 C212 74 260 74 260 96 Z" fill="#3f5a73"/>
+    <path d="M206 96 H266" stroke-width="5" stroke-linecap="round"/>
+    <path d="M222 104 q4 -3 8 0 M242 104 q4 -3 8 0" fill="none" stroke-width="2"/>
+    <circle cx="226" cy="107" r="2" fill="#3b2a14"/>
+    <circle cx="246" cy="107" r="2" fill="#3b2a14"/>
+    <!-- The pipe, gone out: no smoke -->
+    <path d="M246 126 L272 132" stroke-width="3"/>
+    <path d="M270 122 h12 v14 h-12 Z" fill="#5b4632"/>
+  </g>
+</svg>

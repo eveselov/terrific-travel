@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="A sextant in its box">
+  <!-- The sextant: a brass instrument shaped like a slice of pie, with a small telescope,
+       mirrors and a curved scale, in its box. Same style as crane.svg. -->
+  <title>A sextant in its box</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The open box -->
+  <path d="M60 250 L90 206 H390 L420 250 Z" fill="#8b5a2b" stroke="#3b2a14" stroke-width="2.5"/>
+  <rect x="60" y="250" width="360" height="30" fill="#7a4a21" stroke="#3b2a14" stroke-width="2.5"/>
+
+  <!-- The frame: a slice of pie, point up -->
+  <g stroke="#3b2a14" stroke-width="3" stroke-linejoin="round">
+    <path d="M240 40 L150 206 A150 150 0 0 0 330 206 Z" fill="none" stroke="#d4a017" stroke-width="10"/>
+    <path d="M240 40 L150 206 A150 150 0 0 0 330 206 Z" fill="none"/>
+    <path d="M240 40 L240 196 M240 40 L196 180 M240 40 L284 180" fill="none" stroke="#a8803f" stroke-width="4"/>
+    <!-- The curved scale -->
+    <path d="M152 210 A150 150 0 0 0 328 210" fill="none" stroke="#f3e6c4" stroke-width="6"/>
+    <path d="M170 214 v8 M190 218 v8 M210 221 v8 M230 222 v8 M250 222 v8 M270 221 v8 M290 218 v8 M310 214 v8" stroke-width="1.5"/>
+    <!-- The index arm, from the top down to the scale -->
+    <path d="M240 40 L272 216" stroke="#a8803f" stroke-width="5"/>
+    <!-- The mirrors -->
+    <rect x="228" y="36" width="24" height="20" fill="#a9c2c8"/>
+    <rect x="176" y="112" width="20" height="26" fill="#a9c2c8"/>
+    <!-- The small telescope -->
+    <rect x="244" y="118" width="70" height="16" rx="6" fill="#5b4632"/>
+    <rect x="306" y="114" width="16" height="24" rx="4" fill="#3b2a14"/>
+  </g>
+</svg>

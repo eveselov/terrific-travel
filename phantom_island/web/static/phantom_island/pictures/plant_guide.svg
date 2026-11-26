@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="A Naturalist's Guide to Useful Plants">
+  <!-- The plant guide: "A Naturalist's Guide to Useful Plants", a thick book full of
+       careful drawings, open at a leaf and an onion. Same style as crane.svg. -->
+  <title>A Naturalist's Guide to Useful Plants</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The thick open book -->
+  <path d="M40 70 L240 56 L440 70 L440 252 L240 240 L40 252 Z" fill="#5b6f3a" stroke="#3b2a14" stroke-width="2.5"/>
+  <path d="M52 64 C120 50 200 52 240 64 V236 C200 226 120 228 52 242 Z" fill="#fbf4e0" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M428 64 C360 50 280 52 240 64 V236 C280 226 360 228 428 242 Z" fill="#fbf4e0" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M240 64 V236" stroke="#7a4a21" stroke-width="2"/>
+
+  <!-- Left page: a leafy branch -->
+  <g stroke="#3b5a2b" stroke-width="2" fill="#a9c28f">
+    <path d="M80 200 C110 170 150 130 200 92" fill="none"/>
+    <path d="M110 170 C92 150 96 132 110 128 C120 142 120 158 110 170 Z"/>
+    <path d="M136 146 C154 128 172 130 174 140 C160 150 148 152 136 146 Z"/>
+    <path d="M156 126 C140 104 146 88 160 86 C168 102 166 116 156 126 Z"/>
+    <path d="M180 106 C198 94 212 98 212 106 C200 114 190 114 180 106 Z"/>
+  </g>
+  <!-- Right page: a flowering plant (nothing the look text doesn't name: no onion, which
+       only `read plant guide` tells of) -->
+  <g stroke="#3b5a2b" stroke-width="2">
+    <path d="M334 200 V120" fill="none"/>
+    <path d="M334 170 C312 160 306 144 312 138 C326 144 334 156 334 170 Z M334 150 C356 140 362 124 356 118 C342 124 334 136 334 150 Z" fill="#a9c28f"/>
+  </g>
+  <g stroke="#7a4a21" stroke-width="2" fill="#e3b93a">
+    <circle cx="334" cy="104" r="9"/>
+    <circle cx="334" cy="88" r="9"/>
+    <circle cx="349" cy="100" r="9"/>
+    <circle cx="319" cy="100" r="9"/>
+    <circle cx="334" cy="102" r="6" fill="#a8452e"/>
+  </g>
+  <!-- Lines of small writing -->
+  <g stroke="#c9a96e" stroke-width="2">
+    <path d="M80 222 h120 M276 218 h120 M276 206 h90"/>
+  </g>
+</svg>

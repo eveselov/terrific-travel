@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="The chronometer in its wooden box">
+  <!-- The chronometer: a fat brass clock in a wooden box, fixed beside the chart table. The
+       hands show no particular time: reading it is `read chronometer`. Same style as
+       crane.svg. -->
+  <title>The chronometer in its wooden box</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The chart table's edge -->
+  <rect x="14" y="250" width="452" height="38" fill="#8b5a2b"/>
+  <path d="M14 250 H466" stroke="#3b2a14" stroke-width="2.5"/>
+
+  <!-- The wooden box, lid open behind -->
+  <path d="M110 60 L140 30 H340 L370 60 Z" fill="#a8803f" stroke="#3b2a14" stroke-width="2.5"/>
+  <rect x="110" y="60" width="260" height="190" fill="#7a4a21" stroke="#3b2a14" stroke-width="2.5"/>
+  <rect x="122" y="72" width="236" height="166" fill="#8b5a2b" stroke="#5b4632" stroke-width="2"/>
+
+  <!-- The fat brass clock -->
+  <circle cx="240" cy="155" r="72" fill="#d4a017" stroke="#3b2a14" stroke-width="3"/>
+  <circle cx="240" cy="155" r="58" fill="#fbf4e0" stroke="#a8803f" stroke-width="2"/>
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linecap="round">
+    <path d="M240 101 v8 M240 201 v8 M186 155 h8 M286 155 h8"/>
+    <path d="M267 108 l-3 6 M287 128 l-6 3 M287 182 l-6 -3 M267 202 l-3 -6 M213 202 l3 -6 M193 182 l6 -3 M193 128 l6 3 M213 108 l3 6" stroke-width="1.5"/>
+    <!-- Hands -->
+    <path d="M240 155 L240 116" stroke-width="3"/>
+    <path d="M240 155 L268 168" stroke-width="4"/>
+  </g>
+  <circle cx="240" cy="155" r="4" fill="#3b2a14"/>
+  <!-- The small seconds dial -->
+  <circle cx="240" cy="182" r="10" fill="none" stroke="#a8803f" stroke-width="1.5"/>
+</svg>

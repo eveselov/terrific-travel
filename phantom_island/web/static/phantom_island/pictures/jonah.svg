@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Jonah Pike shaping a plank with an adze">
+  <!-- Jonah Pike at the Boat Cove: grey hair tied back, island clothes, a sailor's
+       sunburn, shaping a plank with an adze. Same style as crane.svg. -->
+  <title>Jonah Pike shaping a plank with an adze</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The cove: water, sand, the slipway's logs -->
+  <path d="M14 170 q60 -14 120 0 t120 0 t120 0 t92 0 V200 H14 Z" fill="#a9c2c8" stroke="#6f8f9f" stroke-width="2"/>
+  <rect x="14" y="200" width="452" height="88" fill="#e6d3a8"/>
+  <g fill="#8b5a2b" stroke="#3b2a14" stroke-width="2">
+    <rect x="300" y="250" width="150" height="10" rx="5"/>
+    <rect x="300" y="268" width="150" height="10" rx="5"/>
+  </g>
+
+  <!-- The plank on two trestles, chips flying -->
+  <g stroke="#3b2a14" stroke-width="2.5">
+    <path d="M110 250 l10 -26 l10 26 M330 250 l10 -26 l10 26" fill="none"/>
+    <rect x="90" y="212" width="280" height="12" fill="#c9a96e"/>
+    <path d="M300 204 l6 -6 M312 200 l2 -8 M290 198 l-4 -6" fill="none" stroke="#a8803f" stroke-width="2"/>
+  </g>
+
+  <!-- Jonah, bent over the plank -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M176 212 C170 160 186 130 222 128 C254 126 268 150 266 212 Z" fill="#c9a96e"/>
+    <path d="M186 170 C200 176 240 176 256 170" fill="none" stroke="#a8452e" stroke-width="4"/>
+    <ellipse cx="226" cy="98" rx="23" ry="26" fill="#c98a5a"/>
+    <path d="M204 92 C204 66 250 66 250 92 C242 80 212 80 204 92 Z" fill="#9a9a9a"/>
+    <path d="M250 88 q14 4 18 18" fill="none" stroke="#9a9a9a" stroke-width="5"/>
+    <path d="M214 100 h8 M232 100 h8" fill="none" stroke-width="2"/>
+    <path d="M216 116 q10 -3 20 0" fill="none" stroke-width="2"/>
+    <!-- Arm and the adze -->
+    <path d="M250 150 L284 182" fill="none" stroke="#c98a5a" stroke-width="9"/>
+    <path d="M284 182 L298 206" stroke="#8b5a2b" stroke-width="5"/>
+    <path d="M290 206 L308 202 L306 212 Z" fill="#7d7d7d"/>
+  </g>
+</svg>

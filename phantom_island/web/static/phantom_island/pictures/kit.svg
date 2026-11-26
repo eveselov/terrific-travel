@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Kit, the youngest aboard">
+  <!-- Kit, the youngest aboard: about twelve, quick and sunburnt, in a shirt a size too
+       big, always with a question. Same style as crane.svg. -->
+  <title>Kit, the youngest aboard</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The Deck and the ship's rail -->
+  <rect x="14" y="246" width="452" height="42" fill="#c9a96e"/>
+  <path d="M14 246 H466 M14 260 H466 M14 274 H466" stroke="#8b5a2b" stroke-width="2"/>
+  <path d="M14 170 H466" stroke="#8b5a2b" stroke-width="8"/>
+  <path d="M60 170 V246 M140 170 V246 M340 170 V246 M420 170 V246" stroke="#8b5a2b" stroke-width="5"/>
+
+  <!-- Kit: a shirt a size too big, sleeves past the wrists -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M222 246 L226 214 M254 246 L250 214" fill="none" stroke="#5b4632" stroke-width="10"/>
+    <path d="M196 220 C190 170 204 144 238 144 C272 144 286 170 280 220 Z" fill="#f8f4ea"/>
+    <path d="M200 160 L170 200 L180 208 L206 178" fill="#f8f4ea"/>
+    <path d="M276 160 L304 116 L294 110 L270 150" fill="#f8f4ea"/>
+    <circle cx="300" cy="106" r="8" fill="#c98a5a"/>
+    <ellipse cx="238" cy="112" rx="22" ry="25" fill="#c98a5a"/>
+    <path d="M214 106 C212 80 262 80 262 106 C258 92 238 98 226 92 C220 100 216 102 214 106 Z" fill="#a8452e"/>
+    <circle cx="230" cy="114" r="2.5" fill="#3b2a14"/>
+    <circle cx="246" cy="114" r="2.5" fill="#3b2a14"/>
+    <ellipse cx="238" cy="128" rx="4" ry="3" fill="#3b2a14"/>
+  </g>
+  <!-- Always a question -->
+  <text x="330" y="96" font-family="Georgia, serif" font-size="54" font-weight="bold" fill="#7a4a21">?</text>
+</svg>

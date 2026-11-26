@@ -526,6 +526,7 @@ class ThingSpec:
     look: LookSpec
     read: ActionSpec | None
     use: ActionSpec | None
+    image: str | None = None  # URL of its picture for the Focus pane, if there is one
 
 
 @dataclass(frozen=True)
@@ -1391,6 +1392,7 @@ def _thing(thing_id: str, value: Any) -> ThingSpec:
         look=look,
         read=_action(data.get("read"), f"{where}, read"),
         use=_action(data.get("use"), f"{where}, use"),
+        image=_optional_text(data, "image", where),
     )
 
 

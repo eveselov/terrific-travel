@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Tui with a little bag on a string">
+  <!-- Tui, a barefoot child of about ten, with a little bag on a string around the neck
+       that clinks. Same style as crane.svg. -->
+  <title>Tui with a little bag on a string</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- Sand and a palm -->
+  <rect x="14" y="240" width="452" height="48" fill="#e6d3a8"/>
+  <path d="M14 240 H466" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M400 240 C396 180 404 120 420 70" fill="none" stroke="#8b5a2b" stroke-width="10"/>
+  <g fill="#6f8f5f" stroke="#3b5a2b" stroke-width="2">
+    <path d="M420 70 C390 56 360 66 344 88 C372 74 396 74 420 70 Z"/>
+    <path d="M420 70 C440 46 466 48 466 60 C448 58 434 62 420 70 Z"/>
+    <path d="M420 70 C402 40 380 32 360 36 C386 46 404 56 420 70 Z"/>
+    <path d="M420 70 C446 76 460 96 462 118 C446 98 432 84 420 70 Z"/>
+  </g>
+
+  <!-- Tui, arms up, mid-skip, barefoot -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M214 236 L222 196 M250 236 L244 196" fill="none" stroke="#8a5a3a" stroke-width="9"/>
+    <path d="M204 200 C202 166 214 148 234 148 C254 148 266 166 264 200 Z" fill="#d4a017"/>
+    <path d="M206 158 L176 122 M262 158 L292 122" fill="none" stroke="#8a5a3a" stroke-width="9"/>
+    <ellipse cx="234" cy="116" rx="22" ry="24" fill="#8a5a3a"/>
+    <path d="M212 108 C210 84 258 84 256 108 C250 96 218 96 212 108 Z" fill="#3b2a14"/>
+    <circle cx="226" cy="116" r="2.5" fill="#3b2a14"/>
+    <circle cx="242" cy="116" r="2.5" fill="#3b2a14"/>
+    <path d="M222 128 q12 10 24 0" fill="none" stroke-width="2"/>
+    <!-- The little bag on its string -->
+    <path d="M222 140 L234 176 L246 140" fill="none" stroke-width="1.5"/>
+    <path d="M226 176 h16 l2 16 h-20 Z" fill="#c9a96e"/>
+  </g>
+  <!-- The clink -->
+  <path d="M256 184 l8 -4 M258 194 h10 M254 202 l8 4" stroke="#7a4a21" stroke-width="2" stroke-linecap="round"/>
+</svg>

@@ -126,6 +126,7 @@ characters:
     name: Mrs. Fairweather
     aliases: [fairweather, patron, mrs fairweather]
     where: office
+    image: /static/phantom_island/pictures/fairweather.svg
     voice: >
       Formal and precise, a little old-fashioned; full sentences, no slang. Kind but
       businesslike: she chooses her words like someone used to writing letters. Honest
@@ -247,6 +248,7 @@ characters:
     name: Old Barnaby
     aliases: [barnaby, sailor, old sailor]
     where: quay
+    image: /static/phantom_island/pictures/barnaby.svg
     voice: >
       An old sailor's talk: short, salty sentences, sea sayings and rhymes, "mark my
       words", "aught". Sure of himself, kindly, fond of a story. Says what he believes,
@@ -412,6 +414,7 @@ characters:
     name: Elder Ama
     aliases: [ama, elder]
     where: village
+    image: /static/phantom_island/pictures/ama.svg
     voice: >
       Slow, calm and proverbial; few words, each one weighed. Speaks in images from the
       island's life (the lagoon, the reef, the generations). Courteous to strangers, and
@@ -563,6 +566,7 @@ characters:
     name: Tui
     aliases: [child, kid]
     where: [village, reef]
+    image: /static/phantom_island/pictures/tui.svg
     voice: >
       A child: excited, quick, jumps from one thing to the next. Short sentences,
       exclamations, funny little details (the goat ate her hat). Repeats what the grown-ups
@@ -666,6 +670,7 @@ characters:
     name: Jonah Pike
     aliases: [jonah, pike, carpenter]
     where: cove
+    image: /static/phantom_island/pictures/jonah.svg
     voice: >
       Plain and tired, a working man's English after fifteen years among islanders; short
       sentences, no fuss. Honest, a little sad, glad to tell it at last. A carpenter's eye
@@ -767,6 +772,7 @@ characters:
     name: Mr. Rowe
     aliases: [rowe, mate, thomas rowe, mr rowe, the mate]
     where: deck
+    image: /static/phantom_island/pictures/rowe.svg
     crew: true
     voice: >
       Careful, quiet and exact: short, plain sentences, numbers where he has them, "Steady,
@@ -828,6 +834,7 @@ characters:
     name: Ned Tarrant
     aliases: [tarrant, ned, bosun, boatswain, ned tarrant, the bosun]
     where: deck
+    image: /static/phantom_island/pictures/tarrant.svg
     crew: true
     voice: >
       Big, loud, salty and kind: "Blow me down", "by thunder", laughs at himself. Full of
@@ -897,6 +904,7 @@ characters:
     name: Kit
     aliases: [kit, kit lowe, youngest]
     where: deck
+    image: /static/phantom_island/pictures/kit.svg
     crew: true
     voice: >
       About twelve: eager, curious, quick to notice things and to ask questions back. Short

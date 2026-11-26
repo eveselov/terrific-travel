@@ -28,6 +28,8 @@
 #   close     optional: what `examine <thing>` shows (a closer look): {text, clue}
 #   with      optional: more to see when the looker carries another thing:
 #             {thing id: {text, clue}}
+#   image     optional: URL of its picture, shown in the Focus pane when someone looks at it
+#             (without one, a card with its name)
 #   read      optional: what `read <thing>` does (see "Actions" below)
 #   use       optional: what `use <thing>` does
 #
@@ -52,6 +54,7 @@ things:
     name: brass compass
     aliases: [compass, halcyon compass]
     where: market
+    image: /static/phantom_island/pictures/compass.svg
     stays: >
       Crane's hand comes down on the compass. "Looking is free, friend. Taking isn't."
     desc: >
@@ -73,6 +76,7 @@ things:
     name: sextant
     aliases: [the sextant]
     where: deck
+    image: /static/phantom_island/pictures/sextant.svg
     stays: >
       The sextant lives in its box in the chart house, and it's used right here on deck,
       where the sun and the horizon are. There's nothing to measure with it ashore.
@@ -139,6 +143,7 @@ things:
     name: chronometer
     aliases: [clock, sea clock, brass clock]
     where: deck
+    image: /static/phantom_island/pictures/chronometer.svg
     stays: >
       The chronometer is screwed into its box, and the box is screwed to the ship. It
       stays where it is. (And it really should: moving it would spoil its timekeeping.)
@@ -214,6 +219,7 @@ things:
     name: Halcyon's chart
     aliases: [chart, old chart, the chart, map, halcyon chart]
     where: deck
+    image: /static/phantom_island/pictures/chart.svg
     portable: true
     desc: >
       A fair copy of the Halcyon's chart, lent by the Society. It shows an island drawn in
@@ -251,6 +257,7 @@ things:
     name: plant guide
     aliases: [guide to plants, plants, plant book, botany]
     where: deck
+    image: /static/phantom_island/pictures/plant_guide.svg
     portable: true
     desc: >
       "A Naturalist's Guide to Useful Plants", a thick book full of careful drawings. Carry
@@ -268,6 +275,7 @@ things:
     name: animal guide
     aliases: [guide to animals, animals, animal book, zoology]
     where: deck
+    image: /static/phantom_island/pictures/animal_guide.svg
     portable: true
     desc: >
       "A Naturalist's Guide to Animals", with drawings of beasts, birds and fish. Carry it,

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Ned Tarrant, the bosun">
+  <!-- Ned Tarrant, the bosun: big and sunburnt, arms like ropes, bellowing; a little carved
+       wooden fish on a cord round his neck. Same style as crane.svg. -->
+  <title>Ned Tarrant, the bosun</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The Deck and a coil of rope -->
+  <rect x="14" y="246" width="452" height="42" fill="#c9a96e"/>
+  <path d="M14 246 H466 M14 260 H466 M14 274 H466" stroke="#8b5a2b" stroke-width="2"/>
+  <g fill="none" stroke="#8b5a2b" stroke-width="6">
+    <ellipse cx="390" cy="238" rx="50" ry="12" fill="#c9a96e"/>
+    <ellipse cx="390" cy="232" rx="32" ry="8"/>
+  </g>
+
+  <!-- Tarrant: broad, sleeves rolled, one arm raised, shouting -->
+  <g stroke="#3b2a14" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M150 246 C144 170 170 140 220 140 C270 140 296 170 290 246 Z" fill="#a8452e"/>
+    <path d="M160 150 L112 98" fill="none" stroke="#c98a5a" stroke-width="16"/>
+    <path d="M280 156 L318 214" fill="none" stroke="#c98a5a" stroke-width="16"/>
+    <circle cx="108" cy="92" r="11" fill="#c98a5a"/>
+    <ellipse cx="220" cy="104" rx="30" ry="32" fill="#c98a5a"/>
+    <path d="M190 96 C190 64 250 64 250 96 C240 80 200 80 190 96 Z" fill="#5b4632"/>
+    <path d="M204 98 h10 M226 98 h10" fill="none" stroke-width="2.5"/>
+    <!-- Shouting mouth -->
+    <ellipse cx="220" cy="120" rx="9" ry="7" fill="#3b2a14"/>
+    <!-- The carved wooden fish on its cord -->
+    <path d="M200 136 L220 166 L240 136" fill="none" stroke-width="1.5"/>
+    <path d="M208 172 C214 162 228 162 234 172 C228 182 214 182 208 172 Z M234 172 l8 -6 v12 Z" fill="#8b5a2b" stroke-width="1.5"/>
+  </g>
+  <!-- The voice that carries from bow to stern -->
+  <path d="M258 112 q10 8 0 16 M270 104 q16 16 0 32 M282 96 q22 24 0 48" fill="none" stroke="#7a4a21" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

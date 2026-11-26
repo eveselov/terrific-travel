@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="A Naturalist's Guide to Animals">
+  <!-- The animal guide: "A Naturalist's Guide to Animals", with drawings of beasts, birds
+       and fish, open at a bird and a fish. Same style as crane.svg. -->
+  <title>A Naturalist's Guide to Animals</title>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+
+  <!-- The open book -->
+  <path d="M40 70 L240 56 L440 70 L440 252 L240 240 L40 252 Z" fill="#6b3b2a" stroke="#3b2a14" stroke-width="2.5"/>
+  <path d="M52 64 C120 50 200 52 240 64 V236 C200 226 120 228 52 242 Z" fill="#fbf4e0" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M428 64 C360 50 280 52 240 64 V236 C280 226 360 228 428 242 Z" fill="#fbf4e0" stroke="#7a4a21" stroke-width="2"/>
+  <path d="M240 64 V236" stroke="#7a4a21" stroke-width="2"/>
+
+  <!-- Left page: a bird with spread wings -->
+  <g stroke="#3b2a14" stroke-width="2" stroke-linejoin="round">
+    <path d="M90 140 C110 110 130 104 146 124 C162 104 182 110 202 140 C180 128 164 132 146 142 C128 132 112 128 90 140 Z" fill="#ffffff"/>
+    <ellipse cx="146" cy="146" rx="14" ry="8" fill="#ffffff"/>
+    <circle cx="158" cy="144" r="1.8" fill="#3b2a14"/>
+    <path d="M160 146 l8 2 l-8 2" fill="#3b2a14"/>
+  </g>
+  <!-- Right page: a fish -->
+  <g stroke="#3b2a14" stroke-width="2" stroke-linejoin="round">
+    <path d="M290 150 C310 124 360 124 384 150 C360 176 310 176 290 150 Z" fill="#a9c2c8"/>
+    <path d="M384 150 L408 132 L404 150 L408 168 Z" fill="#a9c2c8"/>
+    <circle cx="304" cy="146" r="2.5" fill="#3b2a14"/>
+    <path d="M320 132 C326 142 326 158 320 168 M340 130 C346 142 346 158 340 170" fill="none" stroke-width="1.5"/>
+  </g>
+  <!-- Lines of small writing -->
+  <g stroke="#c9a96e" stroke-width="2">
+    <path d="M80 200 h120 M80 214 h100 M276 200 h120 M276 214 h90"/>
+  </g>
+</svg>

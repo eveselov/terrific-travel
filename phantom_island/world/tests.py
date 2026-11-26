@@ -2854,3 +2854,39 @@ class TestLenasThirdPlaytest(DiscoveryTest):
         self.assertIn("they made it", jonah.topics["crew"].reply)
         self.assertNotIn("never heard", jonah.topics["crew"].reply)
         self.assertIn("Fishermen took it east", jonah.topics["compass"].reply)
+
+
+class TestPictures(DiscoveryTest):
+    """The Focus pane's pictures of characters and things (2026-11-26)."""
+
+    def test_every_picture_named_exists_and_is_an_svg(self) -> None:
+        import xml.etree.ElementTree as ElementTree
+
+        content: Any = load_content()
+        urls: list[str | None] = [spec.image for spec in content.characters.values()]
+        urls += [spec.image for spec in content.things.values()]
+        static: Path = Path(__file__).resolve().parent.parent / "web" / "static"
+        for url in urls:
+            if url is None:
+                continue
+            path: Path = static / url.removeprefix("/static/")
+            self.assertTrue(path.is_file(), url)
+            root: Any = ElementTree.parse(path).getroot()
+            self.assertTrue(root.tag.endswith("svg"), url)
+
+    def test_every_thing_and_person_has_a_picture(self) -> None:
+        content: Any = load_content()
+        for spec in content.things.values():
+            self.assertIsNotNone(spec.image, spec.id)
+        for person in content.characters.values():
+            if not person.aboard:  # the Good Hope can't be looked at: you stand on her
+                self.assertIsNotNone(person.image, person.id)
+
+    def test_looking_at_a_thing_shows_its_picture(self) -> None:
+        self.at(self.char1, "market")
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("look compass")
+        focus: list[str] = [
+            str(call.kwargs["focus"]) for call in mock_msg.call_args_list if "focus" in call.kwargs
+        ]
+        self.assertTrue(any("pictures/compass.svg" in html for html in focus), focus)
