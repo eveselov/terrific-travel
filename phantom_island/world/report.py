@@ -33,6 +33,7 @@ from world.content import (
     load_content,
 )
 from world.expedition import connected_characters, get_expedition
+from world.hints import want_proof
 
 QUESTION_SEEN: str = "report_question"  # the question a player last looked at (its id)
 PAGE_SEEN: str = "report_page"  # the epilogue page a player last read (its index)
@@ -301,6 +302,7 @@ def answer(caller: Any, spec: ReportSpec, question: QuestionSpec, index: int) ->
     missing: ProofSpec | None = missing_proof(choice)
     if missing is not None:
         recorder.note(caller, f"Report: {question.id} {letter}, not proved yet")
+        want_proof(caller, missing.clues)  # the next hint agrees (2026-11-26)
         _tell_room(
             caller,
             f"{heading}\n{verdict(NOT_PROVED)}\n{missing.missing} Once the proof is in the "

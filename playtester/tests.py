@@ -298,3 +298,29 @@ class LocalAnswerTests(unittest.TestCase):
         import playtester
 
         self.assertEqual(tuple(local.MODELS), playtester.LOCAL_MODELS)
+
+
+class ConsoleLogTests(unittest.TestCase):
+    def test_a_new_playthrough_starts_the_log_and_a_sitting_appends(self) -> None:
+        import contextlib
+        import io
+
+        from console import console_log
+        from report import report_path
+
+        self.assertEqual(
+            report_path("phantom_island", "lena", "20261126-2115").with_suffix(".txt").name,
+            "phantom_island-lena-20261126-2115.txt",
+        )
+        with tempfile.TemporaryDirectory() as folder:
+            log: Path = Path(folder) / "runs" / "game-kid-1.txt"
+            log.parent.mkdir()
+            log.write_text("an old playthrough\n", encoding="utf-8")
+            screen = io.StringIO()
+            with contextlib.redirect_stdout(screen):
+                with console_log(log, append=False):
+                    print("sitting 1")
+                with console_log(log, append=True):
+                    print("sitting 2")
+            self.assertEqual(log.read_text(encoding="utf-8"), "sitting 1\n\nsitting 2\n")
+            self.assertEqual(screen.getvalue(), "sitting 1\nsitting 2\n")  # still on screen

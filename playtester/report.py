@@ -64,13 +64,21 @@ def hints_used(run: Run) -> int:
     return sum(1 for first in firsts if first and first[0] in words)
 
 
+STAMP: str = "%Y%m%d-%H%M"  # the first sitting's time, in the file names
+
+
+def report_path(game: str, persona: str, stamp: str, manual: bool = False) -> Path:
+    """`runs/<game>-<persona>-<time>.md`; manual runs are named apart (`-manual`)."""
+    kind: str = "-manual" if manual else ""
+    return RUNS / f"{game}-{persona}{kind}-{stamp}.md"
+
+
 def write_report(run: Run, manual: bool = False) -> Path:
-    """Write the report and return its path. Manual runs are named apart."""
+    """Write the report and return its path."""
     RUNS.mkdir(exist_ok=True)
     if not run.stamp:
-        run.stamp = run.started.strftime("%Y%m%d-%H%M")
-    kind: str = "-manual" if manual else ""
-    path: Path = RUNS / f"{run.game.key}-{run.kid.persona.key}{kind}-{run.stamp}.md"
+        run.stamp = run.started.strftime(STAMP)
+    path: Path = report_path(run.game.key, run.kid.persona.key, run.stamp, manual)
     path.write_text(render(run), encoding="utf-8")
     return path
 

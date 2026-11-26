@@ -58,6 +58,7 @@ before real kids play. It does not replace them.
 | [local.py](local.py) | The same `Mind` on a local Qwen3, reading a JSON answer leniently. |
 | [playtester.py](playtester.py) | The command line; reset and login; the loop; what ends a run. |
 | [report.py](report.py) | The run and its sittings (`Run`, `Sitting`); the Markdown report. |
+| [console.py](console.py) | Copies everything printed (and errors) into `runs/<...>.txt`, the report's name: started by a new playthrough, appended to by the next sittings. |
 | [state.py](state.py) | Saving and loading a playthrough between runs, and noting resets. |
 | [tests.py](tests.py) | Unit tests that need no game and no API. |
 

@@ -11,6 +11,7 @@ from world.clues import journal_sources_text, journal_text, think_text
 from world.discovery import act, look_at, nothing_more, notice_surroundings, show_focus_for
 from world.hints import hint
 from world.notebook import READ_IT, notebook_text, sources_text
+from world.ways import where_is_thing
 
 from .command import Command
 
@@ -62,6 +63,10 @@ class CmdGet(DefaultCmdGet):
                 names: list[str] = [str(obj.get_display_name(caller)) for obj in carried]
                 listed: str = " and ".join(f"the {name}" for name in names)
                 caller.msg(f"You already have {listed}. (|winventory|n shows what you carry.)")
+                return
+            elsewhere: str | None = where_is_thing(caller, self.args)  # and the way there
+            if elsewhere is not None:
+                caller.msg(elsewhere)
                 return
         super().func()
 
@@ -129,6 +134,12 @@ class CmdLook(DefaultCmdLook):
             if plain is not None:
                 self.msg(plain)
                 return
+        # A thing of the game that is somewhere else: where it is, and the way there.
+        if not caller.search(text, quiet=True):
+            elsewhere: str | None = where_is_thing(caller, text)
+            if elsewhere is not None:
+                self.msg(elsewhere)
+                return
         # Anything else (a character, an exit...): as Evennia's own look does, then the
         # Focus pane follows what was looked at.
         target: Any = caller.search(text)
@@ -163,7 +174,8 @@ class CmdExamine(Command):
             self.caller.msg("What do you want to examine? (For example: |wexamine compass|n)")
             return
         if not look_at(self.caller, target, close=True):
-            self.caller.msg(f"You don't see any '{target}' here.")
+            elsewhere: str | None = where_is_thing(self.caller, target)
+            self.caller.msg(elsewhere or f"You don't see any '{target}' here.")
 
 
 class CmdRead(Command):

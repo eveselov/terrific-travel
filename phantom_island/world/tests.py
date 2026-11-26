@@ -2637,7 +2637,11 @@ class TestPlaytestFixes(DiscoveryTest):
         self.at_the_island()
         for order in ("enter chart house", "go into the chart house"):
             self.assertIn("|wlook chart house|n", self.do(self.char1, order), order)
-        self.assertIn("You can't go 'hilltop'", self.do(self.char1, "go hilltop"))
+        # A place further off: the way there (2026-11-26).
+        self.assertIn(
+            "To get to the Hilltop: |washore|n, then |wnorthwest|n, then |wnorth|n.",
+            self.do(self.char1, "go hilltop"),
+        )
 
     def test_the_deck_says_what_is_new_first(self) -> None:
         self.at_the_island()
@@ -2753,7 +2757,7 @@ class TestLenasPlaytest(DiscoveryTest):
             get_expedition().add_clue("C13", "someone", "Boat Cove")
         self.assertIn(
             "The journal now holds all that the council needs. To put it together, go to the "
-            "Lagoon Beach and type |waboard|n, then |wcouncil|n.",
+            "Lagoon Beach (|weast|n) and type |waboard|n, then |wcouncil|n.",
             texts(mock_msg),
         )
 
@@ -2767,7 +2771,12 @@ class TestLenasSecondPlaytest(DiscoveryTest):
     def test_aboard_elsewhere_says_where_the_ship_is(self) -> None:
         self.at(self.char1, "market")
         for order in ("aboard", "go aboard"):
-            self.assertIn("You can go aboard from the Quay", self.do(self.char1, order), order)
+            self.assertIn(
+                "You go aboard from the Quay, where the Good Hope lies. To get there: "
+                "|wsouthwest|n, then |waboard|n.",
+                self.do(self.char1, order),
+                order,
+            )
         self.assertIn("You're ashore already", self.do(self.char1, "ashore"))
 
     def test_the_gangway_still_works_where_the_ship_lies(self) -> None:
@@ -2912,3 +2921,69 @@ class TestPictures(DiscoveryTest):
             str(call.kwargs["focus"]) for call in mock_msg.call_args_list if "focus" in call.kwargs
         ]
         self.assertTrue(any("pictures/quay_gulls.svg" in html for html in focus), focus)
+
+
+class TestTheWayThere(DiscoveryTest):
+    """Lena's runs of 2026-11-26: the way to a place, the ship or a thing; hints and report."""
+
+    def on_the_island(self) -> None:
+        self.ship_at("charted")
+        self.ship_at("anchorage")
+
+    def test_go_to_a_place_further_off_says_the_way(self) -> None:
+        self.on_the_island()
+        self.at(self.char1, "beach")
+        self.assertIn(
+            "To get to the Hilltop: |wnorthwest|n, then |wnorth|n.",
+            self.do(self.char1, "go to the hilltop"),
+        )
+
+    def test_a_path_not_learned_is_not_given_away(self) -> None:
+        self.on_the_island()
+        self.at(self.char1, "beach")
+        self.assertIn("You can't go 'boat cove'", self.do(self.char1, "go to the boat cove"))
+
+    def test_go_to_the_ship_says_where_she_lies(self) -> None:
+        self.on_the_island()
+        self.at(self.char1, "hilltop")
+        heard: str = self.do(self.char1, "go to the ship")
+        self.assertIn("You go aboard from the Lagoon Beach", heard)
+        self.assertIn("then |waboard|n.", heard)
+        self.at(self.char1, "deck")
+        self.assertIn("You're aboard already", self.do(self.char1, "go to the ship"))
+
+    def test_a_thing_elsewhere_says_where_it_is(self) -> None:
+        self.at(self.char1, "office")
+        self.assertIn(
+            "The brass compass isn't here: it's in the Market. To get there: |weast|n.",
+            self.do(self.char1, "look compass"),
+        )
+        self.assertIn("it's in the Market", self.do(self.char1, "examine compass"))
+        self.assertIn(
+            "The Halcyon's chart isn't here: it's aboard the Good Hope.",
+            self.do(self.char1, "get chart"),
+        )
+
+    def test_the_hint_follows_the_proof_the_report_asked_for(self) -> None:
+        from world.clues import open_theories
+
+        self.on_the_island()
+        get_expedition().add_clue("C4", "someone", "the charted position")
+        self.at(self.char1, "village")
+        report: Any = load_content().report
+        why: Any = next(q for q in report.questions if q.id == "why")
+        letter: str = "abcde"[[c.right for c in open_theories(why)].index(True)]
+        number: int = report.questions.index(why) + 1
+        self.assertIn("coastline", self.do(self.char1, f"report {number} {letter}"))
+        self.assertIn("really the island on the Halcyon's chart", self.do(self.char1, "hint"))
+        # Once that proof is found, the hints follow their usual order again.
+        get_expedition().add_clue("C10", "someone", "Hilltop")
+        self.assertNotIn("really the island", self.do(self.char1, "hint"))
+
+    def test_typos_are_not_answered_with_builder_commands(self) -> None:
+        player: Any = self.char2  # an ordinary player; char1 is a Developer
+        self.at(player, "office")
+        heard: str = self.do(player, "setdes")
+        self.assertIn("Command 'setdes' is not available.", heard)
+        self.assertNotIn("setdesc", heard.replace("'setdes'", ""))
+        self.assertIn('"look"', self.do(player, "lookk"))

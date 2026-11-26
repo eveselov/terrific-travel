@@ -6,8 +6,12 @@ from typeclasses.rooms import Room
 from world.content import LookSpec, find_look, names_whole
 from world.discovery import find_thing_at_hand, location_details
 from world.ship import ABOARD, ASHORE, not_aboard_here, not_ashore_here
+from world.ways import way_to_place
 
 from .command import Command
+
+# `go to the ship`: anywhere but where she's boarded, says where she lies (2026-11-26).
+SHIP_WORDS: frozenset[str] = frozenset({"ship", "boat", "hope", "good hope", "the good hope"})
 
 
 class CmdGo(Command):
@@ -51,6 +55,13 @@ class CmdGo(Command):
                 return
         if wanted in (ABOARD, ASHORE):  # no gangway here: say where it is
             caller.msg(not_aboard_here(caller) if wanted == ABOARD else not_ashore_here(caller))
+            return
+        if wanted in SHIP_WORDS:
+            caller.msg(not_aboard_here(caller))
+            return
+        way: str | None = way_to_place(caller, wanted)  # a place further off: the way there
+        if way is not None:
+            caller.msg(way)
             return
         if _here_to_look_at(caller, wanted):
             # Something here, not a way out (playtest 2026-11-25: `enter chart house`).

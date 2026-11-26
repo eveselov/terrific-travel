@@ -17,6 +17,9 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 from typing import Any
 
 from evennia import default_cmds
+from evennia.commands.cmdhandler import CMD_NOMATCH
+from evennia.commands.command import Command as BaseCommand
+from evennia.utils.utils import list_to_string, string_suggestions
 
 from .admin import CmdRecord, CmdStartOver
 from .discover import (
@@ -75,6 +78,35 @@ def hide_from_players_help(cmdset: Any) -> None:
             cmd.lockhandler.reset()
 
 
+class CmdNoMatch(BaseCommand):
+    """
+    What a command nobody recognises gets: as Evennia's own answer, but its "Maybe you
+    meant..." suggests only commands the player can see in `help` (playtest 2026-11-26:
+    typos were answered with `charcreate` and `setdesc`). Not counted for pushed hints, as
+    before.
+    """
+
+    key = CMD_NOMATCH
+    locks = "cmd:all()"
+    auto_help = False
+
+    def func(self) -> None:
+        caller: Any = self.caller
+        typed: str = (self.args or self.raw_string or "").strip()
+        names: list[str] = []
+        for cmd in self.cmdset.commands:
+            if cmd.key.startswith("__") or not cmd.access(caller, "view", default=True):
+                continue
+            names.extend([cmd.key, *cmd.aliases])
+        suggestions: list[str] = string_suggestions(typed, names, cutoff=0.7, maxnum=3)
+        answer: str = f"Command '{typed}' is not available."
+        if suggestions:
+            answer += f" Maybe you meant {list_to_string(suggestions, endsep='or', addquote=True)}?"
+        else:
+            answer += ' Type "help" for help.'
+        caller.msg(answer)
+
+
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
     """
     The `CharacterCmdSet` contains general in-game commands like `look`,
@@ -111,6 +143,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdCouncil())
         self.add(CmdStartOver())
         self.add(CmdRecord())
+        self.add(CmdNoMatch())
         hide_from_players_help(self)
 
 

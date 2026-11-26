@@ -37,6 +37,7 @@ from world.content import (
 from world.expedition import connected_characters, current_position, get_expedition
 from world.notebook import learn
 from world.places import find_place, find_ship_exit
+from world.ways import route, steps_text
 
 ASHORE: str = "ashore"
 ABOARD: str = "aboard"
@@ -104,26 +105,45 @@ def shore_room() -> Any | None:
     return find_place(position.ashore) if position.ashore else None
 
 
+def _way_to_shore(character: Any) -> list[str] | None:
+    """The exits from the character to the room the ship is boarded from, or None."""
+    found: tuple[Any, list[str]] | None = route(character, lambda room: isinstance(room, ShipRoom))
+    if found is None or not found[1] or found[1][-1] != ABOARD:
+        return None
+    return found[1][:-1]
+
+
 def way_aboard(character: Any) -> str:
     """
     How this character gets aboard from where they are, to go in a sentence: `type
-    |waboard|n` where the ship is moored, else `go to the Quay and type |waboard|n`
-    (playtest 2026-11-26: "Go aboard" read in the Market led nowhere).
+    |waboard|n` where the ship is moored, else `go to the Quay (|wnortheast|n) and type
+    |waboard|n` (playtest 2026-11-26: "Go aboard" read in the Market led nowhere).
     """
     shore: Any = shore_room()
     if shore is None or character.location == shore:
         return f"type |w{ABOARD}|n"
-    return f"go to the {shore.key} and type |w{ABOARD}|n"
+    steps: list[str] | None = _way_to_shore(character)
+    way: str = f" ({steps_text(steps)})" if steps else ""
+    return f"go to the {shore.key}{way} and type |w{ABOARD}|n"
 
 
 def not_aboard_here(character: Any) -> str:
-    """What `aboard` says where there's no gangway: you're aboard, or where to go."""
+    """
+    What `aboard` (or `go to the ship`) says where there's no gangway: you're aboard, or
+    where the ship lies and the way there.
+    """
     if isinstance(character.location, ShipRoom):
         return "You're aboard already."
     shore: Any = shore_room()
     if shore is None:
         return "The Good Hope isn't here."
-    return f"You can go aboard from the {shore.key}, where the Good Hope lies. Go there first."
+    steps: list[str] | None = _way_to_shore(character)
+    if not steps:
+        return f"You can go aboard from the {shore.key}, where the Good Hope lies. Go there first."
+    return (
+        f"You go aboard from the {shore.key}, where the Good Hope lies. To get there: "
+        f"{steps_text(steps)}, then |w{ABOARD}|n."
+    )
 
 
 def not_ashore_here(character: Any) -> str:

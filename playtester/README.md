@@ -54,7 +54,10 @@ The first starts a new playthrough: the game is started over and Max begins with
 memory. The second carries on Max's playthrough from where the last run stopped.
 
 Each turn prints what the kid typed, what it thought and the cost so far. Ctrl+C stops
-the run; the report is still written.
+the run; the report is still written. Everything printed is also kept in
+`runs/<game>-<persona>-<time>.txt`, beside the report and with the same name: a new
+playthrough (`--reset`) starts it, a run that carries one on appends to it, each sitting
+beginning with its command line.
 
 | Option | What it does |
 |---|---|
@@ -72,6 +75,21 @@ the run; the report is still written.
 1 to 4 cents a turn (Sam about 1, Max 2, Lena 4: longer attention and memory mean more
 text sent); Sonnet 5.5 about half that; Haiku 5.5 well under a cent. The printed figure is an
 estimate; the Console's Usage page has the real one. Set a spend limit there.
+
+### Which model
+
+The model is the player's ability, and it matters more than the persona's traits. What
+the Phantom Island runs of 2026-11-25 and 26 showed:
+
+| Model | How it plays | Use it for |
+|---|---|---|
+| **Sonnet 5.5** | Keeps useful notes, follows hints and the game's lines, reasons through the councils. Lena finished twice: 192 turns, then 144 after the fixes it pointed to. About 1 cent a turn ($1.40 for the 144-turn run). | The usual check: can a kid get through, and where does it slow down? A good default. |
+| **Haiku 5.5** | Reasons well over a single screen, but goes round in circles: asks the same people the same things, reads past grey lines, forgets the way between places. It never finished (four runs), and gave up where the next step wasn't spelled out. About $0.10 a run. | A stress test of the signposting: where Haiku gets stuck, a tired or hurried kid may too. Cheap enough to run after every change. |
+| **Opus 5.5** (default) | The strongest player: uses hints and moves on. Max finished on it. The most expensive. | When a Sonnet run leaves it unclear whether a problem is the game's or the player's. |
+| **Local Qwen3** | 0.6B types nonsense; 1.7B plays sensibly but very slowly here. | Trying the playtester itself, at no cost (below). |
+
+Compare versions of the game with the same model and persona: a change in model changes
+the result more than most changes in the game.
 
 ### Local models
 
@@ -188,6 +206,7 @@ they mean: a kid sees colours too, and working out what they mean is part of pla
 | [brain.py](brain.py) | the prompts and the Claude call, one structured answer per turn |
 | [local.py](local.py) | the same on a local Qwen3, its JSON answer read leniently |
 | [report.py](report.py) | the Markdown report |
+| [console.py](console.py) | the console, copied into a text file beside the report |
 | [state.py](state.py) | the kid's memory between runs, and when the game was last started over |
 | [profiles.py](profiles.py) | reading `personas/*.toml` and `games/*.toml` |
 | [tests.py](tests.py) | tests that need no game and no API: `uv run python -m unittest tests` (inside this folder) |

@@ -15,6 +15,10 @@ and a fast one get it after the same amount of trying, and a break never counts.
 
 Aboard, the Ship speaks the hint; anywhere else, the journal does, as the expedition's own
 thinking.
+
+A report answer that waits for proof names what's missing; until it's found, that player's
+hints are about it too, from the first situation whose `missing` holds it (playtest
+2026-11-26: the report asked for the coastline while `hint` spoke of the beams).
 """
 
 from typing import Any
@@ -27,6 +31,7 @@ from world.notices import quiet
 
 HINT: str = "hint"
 HINT_STATE: str = "hint_state"  # on a character: the situation, level and progress last hinted
+WANTED_PROOF: str = "wanted_proof"  # on a character: the clues the report last asked for
 NO_HINTS: str = "There are no hints in this game."
 PUSHES: int = 2  # pushed hints per stretch without progress: the first level, then the second
 
@@ -52,11 +57,29 @@ def matches(situation: SituationSpec, content: Content) -> bool:
     return True
 
 
-def current_situation() -> SituationSpec | None:
-    """The first situation in hints.yaml that matches the state of play, or None."""
+def want_proof(caller: Any, clues: tuple[str, ...]) -> None:
+    """Remember the proof a report answer waits for (any one of these clues will do)."""
+    caller.attributes.add(WANTED_PROOF, list(clues))
+
+
+def current_situation(caller: Any = None) -> SituationSpec | None:
+    """
+    The situation to hint at: for a caller whose report answer waits for proof not found
+    yet, the first that leads to it; otherwise the first in hints.yaml that matches the
+    state of play. None if there's none.
+    """
     content: Content = load_content()
     if content.hints is None:
         return None
+    wanted: list[str] = (
+        [str(c) for c in (caller.attributes.get(WANTED_PROOF) or [])] if caller else []
+    )
+    if wanted and any(get_expedition().met((clue,)) for clue in wanted):
+        caller.attributes.remove(WANTED_PROOF)  # found: back to the usual order
+        wanted = []
+    for situation in content.hints.situations:
+        if any(clue in situation.missing for clue in wanted) and matches(situation, content):
+            return situation
     for situation in content.hints.situations:
         if matches(situation, content):
             return situation
@@ -72,7 +95,7 @@ def spoken(caller: Any, spec: HintsSpec, text: str) -> str:
 def hint(caller: Any) -> None:
     """`hint`: the next level of the hint for the current situation."""
     spec: HintsSpec | None = load_content().hints
-    situation: SituationSpec | None = current_situation()
+    situation: SituationSpec | None = current_situation(caller)
     if spec is None or situation is None:
         caller.msg(NO_HINTS)
         return
@@ -116,7 +139,7 @@ def after_command(caller: Any) -> None:
     pushed: int = int(clock.get("pushed") or 0)  # `True` in clocks kept before 2026-11-26
     due: bool = pushed < PUSHES and typed >= spec.push_after * (pushed + 1)
     if due and expedition.voyage is None:
-        situation: SituationSpec | None = current_situation()
+        situation: SituationSpec | None = current_situation(caller)
         if situation is not None:
             clock["pushed"] = pushed + 1
             state: dict[str, Any] = dict(caller.attributes.get(HINT_STATE) or {})

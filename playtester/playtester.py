@@ -19,9 +19,10 @@ from pathlib import Path
 import anthropic
 
 from brain import DEFAULT_MODEL, Brain, Mind, Move
+from console import console_log
 from kid import SECONDS_PER_TURN, Kid, Seen, Turn
 from profiles import GameProfile, Persona, load_game, load_persona
-from report import Run, write_report
+from report import STAMP, Run, report_path, write_report
 from screen import to_screen
 from state import Saved, last_reset, load_state, record_reset, save_state
 from telnet import TelnetClient
@@ -242,6 +243,22 @@ def main() -> int:
         if problem:
             print(f"{problem} Add --reset to start a new playthrough.")
             return 2
+    # The console goes into a text file beside the report: started by a new playthrough,
+    # appended to by a run that carries one on.
+    stamp: str = saved.stamp if saved and saved.stamp else datetime.now().strftime(STAMP)
+    log: Path = report_path(game.key, persona.key, stamp, args.manual).with_suffix(".txt")
+    with console_log(log, append=saved is not None):
+        command: str = " ".join(["uv run python playtester/playtester.py", *sys.argv[1:]])
+        print(f"{datetime.now():%Y-%m-%d %H:%M} > {command}")
+        code: int = sitting(args, game, persona, saved, stamp)
+    print(f"Console: {log}")
+    return code
+
+
+def sitting(
+    args: argparse.Namespace, game: GameProfile, persona: Persona, saved: Saved | None, stamp: str
+) -> int:
+    """One run of the program: reset or carry on, log in, play, then report and save."""
     try:
         brain: Mind | None = None if args.manual else make_mind(args.model, args.seed or 0)
     except anthropic.AnthropicError as error:  # e.g. no API key at all
@@ -262,9 +279,10 @@ def main() -> int:
         started=datetime.now(),
         cost_note="estimate" if brain is None else brain.cost_note,
     )
+    run.stamp = stamp
     if saved:
         run.kid.come_back(saved.turns, saved.notes, saved.howto, saved.known)
-        run.earlier, run.stamp, run.reset_at = saved.sittings, saved.stamp, saved.reset_at
+        run.earlier, run.reset_at = saved.sittings, saved.reset_at
     client: TelnetClient = TelnetClient(game.host, game.port)
     try:
         if args.reset:
