@@ -6,17 +6,16 @@ matches the state of play (where the ship is, the journal, the flags, the report
 its next level: a nudge, then more direct, then the exact command. The level starts over
 whenever the expedition makes progress (a clue found, a report question answered).
 
-Pushed hints: after every command a player types, the expedition's clock adds the time
-since the last command (at most `GAP_CAP` seconds, so a break or a night away doesn't count
-as play). Once `push_after` minutes of play pass without progress, the player gets the first
-level, once per stretch without progress, with a quiet note if `think` or `report` holds
-something new the player hasn't looked at (DECISIONS.md, 33).
+Pushed hints: the expedition's clock counts the commands players type. Once `push_after`
+commands pass without progress, the player gets the first level, once per stretch without
+progress, with a quiet note if `think` or `report` holds something new the player hasn't
+looked at (DECISIONS.md, 33). Commands, not minutes (playtest 2026-11-25): a slow reader
+and a fast one get it after the same amount of trying, and a break never counts.
 
 Aboard, the Ship speaks the hint; anywhere else, the journal does, as the expedition's own
 thinking.
 """
 
-import time
 from typing import Any
 
 from typeclasses.rooms import Room, ShipRoom
@@ -27,13 +26,7 @@ from world.notices import quiet
 
 HINT: str = "hint"
 HINT_STATE: str = "hint_state"  # on a character: the situation, level and progress last hinted
-GAP_CAP: float = 60.0  # seconds: the most one pause between commands counts as play
 NO_HINTS: str = "There are no hints in this game."
-
-
-def now() -> float:
-    """The time in seconds (a function, so tests can move the clock)."""
-    return time.time()
 
 
 def matches(situation: SituationSpec, content: Content) -> bool:
@@ -103,25 +96,21 @@ def _in_the_expedition(caller: Any) -> bool:
 
 def after_command(caller: Any) -> None:
     """
-    Count a command's play on the expedition's clock, and push a first-level hint once
-    `push_after` minutes of play have passed without progress.
+    Count a command on the expedition's clock, and push a first-level hint once
+    `push_after` commands have passed without progress.
     """
     spec: HintsSpec | None = load_content().hints
     if spec is None or not _in_the_expedition(caller):
         return
     expedition: Any = get_expedition()
     progress: int = expedition.progress
-    time_now: float = now()
     clock: dict[str, Any] = expedition.hint_clock
     if clock.get("progress") != progress:
-        expedition.set_hint_clock(
-            {"progress": progress, "played": 0.0, "last": time_now, "pushed": False}
-        )
+        expedition.set_hint_clock({"progress": progress, "commands": 0, "pushed": False})
         return
-    played: float = float(clock.get("played", 0.0))
-    played += max(0.0, min(time_now - float(clock.get("last", time_now)), GAP_CAP))
-    clock.update({"played": played, "last": time_now})
-    due: bool = not clock.get("pushed") and played >= spec.push_after * 60
+    typed: int = int(clock.get("commands", 0)) + 1
+    clock["commands"] = typed
+    due: bool = not clock.get("pushed") and typed >= spec.push_after
     if due and expedition.voyage is None:
         situation: SituationSpec | None = current_situation()
         if situation is not None:

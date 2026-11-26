@@ -24,6 +24,9 @@ else. A right answer that waits for its proof is remembered (a `proposed:` flag)
 moment the proof comes in, everyone hears that the council can carry on, wherever they
 are. Called again, the council says what it has agreed so far, takes up a waiting answer
 whose proof has come in, and asks the next question. The Deck shows where it stands.
+When the last proof the council needs comes in, everyone hears that too, in the game's
+ordinary voice and with the way back to it (playtest 2026-11-25: a player who had found
+everything never went back aboard).
 """
 
 from collections.abc import Iterator
@@ -57,6 +60,13 @@ PROPOSED: str = "proposed:"  # + a step's flag: its right answer waits for its p
 READY_ABOARD: str = f"That's what the council was waiting for: |w{COUNCIL}|n carries on."
 READY_ASHORE: str = (
     f"That's what the council was waiting for. Back |waboard|n, |w{COUNCIL}|n carries on."
+)
+EVIDENCE_ABOARD: str = (
+    f"The journal now holds all that the council needs. Type |w{COUNCIL}|n to put it together."
+)
+EVIDENCE_ASHORE: str = (
+    "The journal now holds all that the council needs. Go |waboard|n and type "
+    f"|w{COUNCIL}|n to put it together."
 )
 
 
@@ -97,11 +107,38 @@ def ready_step() -> CouncilStepSpec | None:
     return step
 
 
+def evidence_complete() -> CouncilSpec | None:
+    """
+    The open council, once the journal holds the proof for every step it has left; None
+    before, and once the report already holds what the council would conclude.
+    """
+    spec: CouncilSpec | None = open_council()
+    step: CouncilStepSpec | None = current_step(spec) if spec is not None else None
+    if spec is None or step is None:
+        return None
+    left: tuple[CouncilStepSpec, ...] = spec.steps[spec.steps.index(step) :]
+    if any(_missing(each.right) is not None for each in left):
+        return None
+    answers: dict[str, str] = get_expedition().answers
+    if spec.concludes and all(question in answers for question in spec.concludes):
+        return None
+    return spec
+
+
 @contextmanager
 def watching() -> Iterator[None]:
-    """Tell everyone when what the council waits for comes in while the body runs."""
+    """
+    Tell everyone when what the council waits for comes in while the body runs: the proof
+    of a waiting answer (quietly), or the last proof it needs (in the ordinary voice).
+    """
     before: CouncilStepSpec | None = ready_step()
+    complete_before: CouncilSpec | None = evidence_complete()
     yield
+    if complete_before is None and evidence_complete() is not None:
+        for character in connected_characters():
+            aboard_now: bool = isinstance(character.location, ShipRoom)
+            notices.after(character, EVIDENCE_ABOARD if aboard_now else EVIDENCE_ASHORE)
+        return
     after: CouncilStepSpec | None = ready_step()
     if after is None or after == before:
         return

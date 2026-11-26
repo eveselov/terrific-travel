@@ -65,7 +65,9 @@
 #             game adds no list, only the Good Hope's (her topics change with where she is)
 #   suggest   topics offered to players who don't know what to ask
 #   fallback  the polite reply for any topic the character doesn't know; name a topic or
-#             two in white there too, so nobody is left without a next question
+#             two in white there too, so nobody is left without a next question. The game
+#             adds what is left to ask, once the player has heard anything from them; a
+#             reply asked again gets the same line (world/conversation.py, 2026-11-25)
 #   topics    topic id: what they say about it
 #   trust     optional: what it takes to win them over (DECISIONS.md, 41): `marks`, the flags
 #             set by what players do, each with what earns it, a `label` for the progress

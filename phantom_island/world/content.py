@@ -454,7 +454,7 @@ class SituationSpec:
 class HintsSpec:
     """The hints: who speaks them, when they are pushed, and the situations in order."""
 
-    push_after: int  # minutes of play without progress before a hint is pushed
+    push_after: int  # commands without progress before a hint is pushed
     aboard: str  # the Ship's voice, with `{hint}` where the hint goes
     ashore: str  # the journal's voice, anywhere else
     situations: tuple[SituationSpec, ...]

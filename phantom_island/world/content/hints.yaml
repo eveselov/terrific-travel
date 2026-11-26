@@ -6,8 +6,8 @@
 # first `hint` is a nudge (where to look), the second is more direct (what to do), the third
 # gives the exact command. The level starts over whenever the expedition makes progress (a
 # new clue in the journal, or a question of the report answered). A player who goes
-# `push_after` minutes of play without progress gets the first level after their next
-# command, once per stretch without progress.
+# `push_after` commands without progress gets the first level after the last of them,
+# once per stretch without progress (commands, not minutes: playtest 2026-11-25).
 #
 # Who speaks: aboard, the Ship; anywhere else, the journal, as the expedition's own
 # thinking. So write hints as plain advice that suits both ("The compass is worth a closer
@@ -25,7 +25,7 @@
 # When a gate or a timed event is added, add its situation here too, with at least one way
 # through (DECISIONS.md, 6b). After editing, `reload` in the game is enough.
 
-push_after: 10
+push_after: 20
 voices:
   aboard: 'The Good Hope creaks: "{hint}"'
   ashore: "You leaf through the journal, and think. {hint}"

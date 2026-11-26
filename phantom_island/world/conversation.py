@@ -11,6 +11,13 @@ A character who hides something gives their `truth` reply once its `needs` are m
 in the journal (Crane admits the truth once the coral in the compass hinge, C2, has been
 found), or flags set by what players do (Ama's `respect`, from stage A4). A reply that reveals
 a clue shows the fact in yellow and writes the clue into the journal (`world/clues.py`).
+
+Asked again, a character says the same again, so a player can always hear it once more,
+followed by a quiet line: that it was said before, and the topics this character has
+offered that the player hasn't heard yet, or that this is all they have to say (playtest
+2026-11-25: a player went round and round topics already answered, led on by white words
+and fallbacks naming them). A fallback or greeting, once the player has heard anything from
+the character, gets the same line.
 """
 
 from dataclasses import dataclass
@@ -21,6 +28,7 @@ from typeclasses.rooms import ShipRoom
 from world import notices
 from world.clues import discover, show_marks, unseen
 from world.content import (
+    WHITE_WORD,
     CharacterSpec,
     Content,
     Reveal,
@@ -120,26 +128,110 @@ def last_listener(caller: Any) -> Listener | None:
     return next((item for item in listeners(caller) if item.spec.id == last), None)
 
 
+def named(spec: CharacterSpec) -> str:
+    """The character's name to start a sentence: `The Good Hope`, `Old Barnaby`."""
+    return f"{spec.name[0].upper()}{spec.name[1:]}"
+
+
 def speech(spec: CharacterSpec, text: str) -> str:
     """
     A line from a character: `Old Barnaby says: "..."`, or the text itself if it narrates.
     A clue's fact in it, marked `[[...]]`, is shown in yellow.
     """
     if text.startswith('"'):
-        text = f"{spec.name[0].upper()}{spec.name[1:]} says: {text}"
+        text = f"{named(spec)} says: {text}"
     return show_marks(text)
+
+
+def _current(topic: TopicSpec) -> tuple[str, Reveal]:
+    """Which of a topic's replies is given now (`reply`, `truth`, `meanwhile0`...), and it."""
+    truth: TruthSpec | None = topic.truth
+    expedition: Any = get_expedition()
+    if truth is not None and expedition.met(truth.needs):
+        return "truth", Reveal(
+            text=truth.reply, clue=truth.clue, teaches=truth.teaches, sets=truth.sets
+        )
+    for index, meanwhile in enumerate(topic.meanwhile):  # part of the way (playtest 2026-11-24)
+        if expedition.met(meanwhile.needs):
+            return f"meanwhile{index}", Reveal(
+                text=meanwhile.reply, clue=topic.clue, teaches=topic.teaches
+            )
+    return "reply", Reveal(text=topic.reply, clue=topic.clue, teaches=topic.teaches)
 
 
 def answer(topic: TopicSpec) -> Reveal:
     """What a character says about a topic now: the truth, once its `needs` are met."""
-    truth: TruthSpec | None = topic.truth
+    return _current(topic)[1]
+
+
+SAID_KEY: str = "said:"  # + character:topic:reply, `seen` once a player has heard it
+
+
+def _said_key(spec: CharacterSpec, topic: TopicSpec, which: str) -> str:
+    return f"{SAID_KEY}{spec.id}:{topic.id}:{which}"
+
+
+def _replies(topic: TopicSpec) -> list[tuple[str, str]]:
+    """Every reply a topic can give, with which one it is (as `_current` names them)."""
+    found: list[tuple[str, str]] = [("reply", topic.reply)]
+    found.extend((f"meanwhile{index}", m.reply) for index, m in enumerate(topic.meanwhile))
+    if topic.truth is not None:
+        found.append(("truth", topic.truth.reply))
+    return found
+
+
+def _heard(caller: Any, spec: CharacterSpec, topic: TopicSpec) -> bool:
+    """Whether the caller has heard what this character says about the topic now."""
+    return not unseen(caller, [_said_key(spec, topic, _current(topic)[0])])
+
+
+def _heard_anything(caller: Any, spec: CharacterSpec) -> bool:
+    prefix: str = f"{SAID_KEY}{spec.id}:"
+    return any(key.startswith(prefix) for key in get_expedition().seen(caller.id))
+
+
+def _offered(caller: Any, spec: CharacterSpec) -> list[TopicSpec]:
+    """
+    The topics this character has offered the caller: suggested, or white in the greeting,
+    the fallback, or a reply the caller has heard. Hidden topics are never offered.
+    """
+    known: set[str] = get_expedition().seen(caller.id)
+    texts: list[str] = [spec.greeting, spec.fallback]
+    for each in spec.topics.values():
+        texts.extend(
+            text for which, text in _replies(each) if _said_key(spec, each, which) in known
+        )
+    found: list[TopicSpec] = []
+    for name in [*suggested(spec), *(word for text in texts for word in WHITE_WORD.findall(text))]:
+        topic: TopicSpec | None = spec.topic(name)
+        if topic is not None and not topic.hidden and topic not in found:
+            found.append(topic)
+    return found
+
+
+def what_is_left(caller: Any, spec: CharacterSpec) -> str:
+    """
+    The quiet line's end: the topics this character has offered that the caller hasn't
+    heard yet (or has heard, but the answer has changed since), or that this is all.
+    """
+    offered: list[TopicSpec] = _offered(caller, spec)
+    left: list[TopicSpec] = [topic for topic in offered if not _heard(caller, spec, topic)]
+    if left:
+        return "Still to ask about: " + ", ".join(f"|w{topic.id}|n" for topic in left) + "."
     expedition: Any = get_expedition()
-    if truth is not None and expedition.met(truth.needs):
-        return Reveal(text=truth.reply, clue=truth.clue, teaches=truth.teaches, sets=truth.sets)
-    for meanwhile in topic.meanwhile:  # part of the way there (playtest 2026-11-24)
-        if expedition.met(meanwhile.needs):
-            return Reveal(text=meanwhile.reply, clue=topic.clue, teaches=topic.teaches)
-    return Reveal(text=topic.reply, clue=topic.clue, teaches=topic.teaches)
+    hiding: bool = any(
+        topic.truth is not None and not expedition.met(topic.truth.needs) for topic in offered
+    )
+    return (
+        f"That's all {named(spec)} has to say{' for now' if hiding else ''}. Stuck? Type |whint|n."
+    )
+
+
+def _hear(caller: Any, spec: CharacterSpec, topic: TopicSpec, which: str) -> None:
+    """Everyone in the room heard this reply."""
+    expedition: Any = get_expedition()
+    for player in dict.fromkeys([caller, *_players_here(caller)]):
+        expedition.mark_seen(player.id, [_said_key(spec, topic, which)])
 
 
 def suggested(spec: CharacterSpec) -> tuple[str, ...]:
@@ -438,6 +530,8 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
         example: str = ask_example(caller, spec)
         if example:
             caller.msg(example)
+        elif _heard_anything(caller, spec):
+            caller.msg(notices.quiet(what_is_left(caller, spec)))
         return None
 
     topic: TopicSpec | None = spec.topic(what)
@@ -456,10 +550,16 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
         hint = _look_hint(caller, what)
         if hint:
             caller.msg(hint)
+        elif _heard_anything(caller, spec):
+            caller.msg(notices.quiet(what_is_left(caller, spec)))
         return None
-    said: Reveal = answer(topic)
+    which: str
+    said: Reveal
+    which, said = _current(topic)
+    again: bool = _heard(caller, spec, topic)
     waiting: str | None = waiting_on_trust(spec, topic)
     get_expedition().mark_seen(caller.id, [ASKED_KEY])
+    _hear(caller, spec, topic, which)
     _say_to_room(caller, mine, theirs, speech(spec, said.text))
     if waiting is not None:
         caller.msg(notices.quiet(waiting))
@@ -472,4 +572,6 @@ def ask(caller: Any, text: str) -> TopicSpec | None:
         if said.clue is not None:
             discover(said.clue, caller, spec.name)
         learn(caller, said.teaches, spec.name, _players_here(caller))
+        if again:
+            notices.tell(caller, f"You've heard that before. {what_is_left(caller, spec)}")
     return topic

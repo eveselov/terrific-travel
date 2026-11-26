@@ -1935,19 +1935,12 @@ class TestConnections(DiscoveryTest):
 class TestHints(DiscoveryTest):
     """The next step at three levels, and pushed hints (DECISIONS.md, 31)."""
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.clock: list[float] = [1000.0]
-        moved: Any = patch("world.hints.now", side_effect=lambda: self.clock[0])
-        moved.start()
-        self.addCleanup(moved.stop)
-
     def test_a_pushed_hint_mentions_what_is_new(self) -> None:
         get_expedition().add_clue("C7", "someone", "Western Reef")
         get_expedition().add_clue("C8", "someone", "Village")  # the oak question
         self.at(self.char1, "village")
-        self.play(self.char1, 1, 0)
-        pushed: str = self.play(self.char1, 20, 30)
+        self.play(self.char1, 1)
+        pushed: str = self.play(self.char1, 20)
         self.assertIn("Something new you haven't looked at yet: |wthink|n", pushed)
 
     def test_hints_get_more_direct(self) -> None:
@@ -1988,40 +1981,31 @@ class TestHints(DiscoveryTest):
         self.at(self.char1, "village")
         self.assertIn("The report is complete", self.do(self.char1, "hint"))
 
-    def play(self, character: Character, commands: int, seconds: float) -> str:
-        """Type `look` several times, `seconds` apart; what the character read meanwhile."""
-        heard: list[str] = []
-        for _ in range(commands):
-            self.clock[0] += seconds
-            heard.append(self.do(character, "look"))
-        return "\n".join(heard)
+    def play(self, character: Character, commands: int) -> str:
+        """Type `look` several times; what the character read meanwhile."""
+        return "\n".join(self.do(character, "look") for _ in range(commands))
 
-    def test_a_hint_is_pushed_after_ten_minutes_without_progress(self) -> None:
+    def test_a_hint_is_pushed_after_twenty_commands_without_progress(self) -> None:
         self.at(self.char1, "office")
-        self.play(self.char1, 1, 0)  # starts the clock
-        self.assertNotIn("leaf through the journal", self.play(self.char1, 19, 30))
-        pushed: str = self.play(self.char1, 1, 30)  # 600 seconds of play
+        self.play(self.char1, 1)  # starts the clock
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 19))
+        pushed: str = self.play(self.char1, 1)  # the 20th command without progress
         self.assertIn("compass in the market", pushed)
         self.assertIn("Stuck?", pushed)
-        self.assertNotIn("leaf through the journal", self.play(self.char1, 30, 30))
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 30))
         # The next asked-for hint is the second level.
         self.assertIn("Silas Crane's stall", self.do(self.char1, "hint"))
 
-    def test_a_break_does_not_count_as_play(self) -> None:
-        self.at(self.char1, "office")
-        self.play(self.char1, 1, 0)
-        self.assertNotIn("leaf through the journal", self.play(self.char1, 5, 3600))
-
     def test_progress_resets_the_clock(self) -> None:
         self.at(self.char1, "office")
-        self.play(self.char1, 1, 0)
-        self.play(self.char1, 19, 30)
+        self.play(self.char1, 1)
+        self.play(self.char1, 19)
         get_expedition().add_clue("C1", "someone", "Market")
-        self.assertNotIn("leaf through the journal", self.play(self.char1, 5, 30))
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 5))
 
     def test_no_hints_are_pushed_in_limbo(self) -> None:
-        self.play(self.char1, 1, 0)
-        self.assertNotIn("leaf through the journal", self.play(self.char1, 30, 30))
+        self.play(self.char1, 1)
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 30))
 
 
 class TestFindFirst(DiscoveryTest):
@@ -2523,7 +2507,10 @@ class TestPortCouncil(DiscoveryTest):
         self.at(self.char1, "market")
         with patch.object(self.char1, "msg") as mock_msg:
             get_expedition().add_clue("C3", "someone", "Market")
-        self.assertIn("council was waiting for. Back |waboard|n", texts(mock_msg))
+        # The last proof it needs, so it is said in the ordinary voice (playtest 2026-11-25).
+        heard: str = texts(mock_msg)
+        self.assertIn("all that the council needs. Go |waboard|n", heard)
+        self.assertNotIn("council was waiting for", heard)
 
     def test_the_council_ends_with_the_exact_order(self) -> None:
         self.at(self.char1, "deck")
@@ -2674,3 +2661,82 @@ class TestPlaytestFixes(DiscoveryTest):
             put_back_text(self.char2.db.put_back),
             "While you were away, these went back where they belong: the plant guide (Deck).",
         )
+
+
+class TestLenasPlaytest(DiscoveryTest):
+    """What Lena's run of 2026-11-25 showed: answers asked again, and the way back aboard."""
+
+    def test_an_answer_asked_again_is_given_again_and_says_what_is_left(self) -> None:
+        self.at(self.char1, "quay")
+        first: str = self.do(self.char1, "ask barnaby about storm")
+        self.assertNotIn("You've heard that before", first)
+        again: str = self.do(self.char1, "ask barnaby about storm")
+        self.assertIn("Worst I ever saw", again)  # still said in full
+        self.assertIn("You've heard that before. Still to ask about:", again)
+        self.assertIn("|wsailing|n", again)
+        self.assertIn("|wisland|n", again)  # white in the storm's reply
+        self.assertNotIn("|wstorm|n", again)
+
+    def test_once_everything_is_heard_the_hint_is_offered(self) -> None:
+        self.at(self.char1, "quay")
+        for topic in ("expedition", "halcyon", "storm", "island", "sailing", "sextant", "compass"):
+            self.do(self.char1, f"ask barnaby about {topic}")
+        again: str = self.do(self.char1, "ask barnaby about island")
+        self.assertIn("That's all Old Barnaby has to say. Stuck? Type |whint|n", again)
+        fallback: str = self.do(self.char1, "ask barnaby about goats")
+        self.assertIn("Can't say I know aught", fallback)
+        self.assertIn("That's all Old Barnaby has to say.", fallback)
+
+    def test_a_fallback_lists_what_is_left_once_something_is_heard(self) -> None:
+        self.at(self.char1, "quay")
+        self.assertNotIn("Still to ask about", self.do(self.char1, "ask barnaby about goats"))
+        self.do(self.char1, "ask barnaby about storm")
+        heard: str = self.do(self.char1, "ask barnaby about goats")
+        self.assertIn("Still to ask about:", heard)
+        self.assertNotIn("|wstorm|n,", heard)
+
+    def test_a_greeting_lists_what_is_left(self) -> None:
+        self.at(self.char1, "quay")
+        self.do(self.char1, "ask barnaby about storm")
+        self.assertIn("Still to ask about:", self.do(self.char1, "ask barnaby"))
+
+    def test_someone_hiding_something_has_more_to_say_later(self) -> None:
+        self.at(self.char1, "market")
+        for topic in ("compass", "trade", "halcyon", "beach", "storm"):
+            self.do(self.char1, f"ask crane about {topic}")
+        self.assertIn(
+            "That's all Silas Crane has to say for now.",
+            self.do(self.char1, "ask crane about trade"),
+        )
+        get_expedition().add_clue("C2", "someone", "Market")
+        self.assertIn(
+            "Still to ask about: |wcompass|n", self.do(self.char1, "ask crane about trade")
+        )
+        confession: str = self.do(self.char1, "ask crane about compass")
+        self.assertIn("I traded for it", confession)
+        self.assertNotIn("You've heard that before", confession)  # a new answer
+
+    def test_everyone_in_the_room_heard_it(self) -> None:
+        self.at(self.char1, "quay")
+        self.at(self.char2, "quay")
+        self.do(self.char1, "ask barnaby about storm")
+        self.assertIn("You've heard that before", self.do(self.char2, "ask barnaby about storm"))
+
+    def test_the_last_proof_for_the_final_council_says_go_aboard(self) -> None:
+        self.ship_at("charted")
+        self.ship_at("anchorage")
+        self.at(self.char1, "village")
+        for clue in ("C7", "C12", "C9", "C8"):
+            get_expedition().add_clue(clue, "someone", "Village")
+        with patch.object(self.char1, "msg") as mock_msg:
+            get_expedition().add_clue("C11", "someone", "Village")
+        self.assertNotIn("all that the council needs", texts(mock_msg))
+        with patch.object(self.char1, "msg") as mock_msg:
+            get_expedition().add_clue("C13", "someone", "Boat Cove")
+        self.assertIn(
+            "The journal now holds all that the council needs. Go |waboard|n and type |wcouncil|n",
+            texts(mock_msg),
+        )
+
+    def test_the_title_page_names_hint(self) -> None:
+        self.assertIn("Stuck at any time? Type |whint|n.", load_content().places["limbo"].desc)
