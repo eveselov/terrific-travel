@@ -380,7 +380,7 @@ hilltop:
       desc: >
         Round in the east, with the lagoon. A long reef down the west side. A little cove in
         the south, curled like a hook. You feel you've seen this shape before, drawn on
-        paper. On a chart, perhaps?
+        paper. On a chart, perhaps? With the Halcyon's chart in your hands, you could compare.
       with:
         chart:
           clue: C10

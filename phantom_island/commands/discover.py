@@ -37,29 +37,50 @@ class CmdGet(DefaultCmdGet):
     help_category = "General"
 
     def func(self) -> None:
-        """As Evennia's get, and a plural (`get guides`) takes every one of them here."""
-        group: list[Any] = self.plural_group()
-        if not group:
-            super().func()
-            return
-        for obj in group:
-            self.args = str(obj.key)
-            super().func()
-
-    def plural_group(self) -> list[Any]:
         """
-        The things here a plural means, when nothing is called by that word itself: `get
-        guides` takes the plant guide and the animal guide (playtest 2026-11-25).
+        As Evennia's get, and a plural (`get guides`) takes every one of them here. What
+        the caller already carries is said so, not "Could not find" (playtest 2026-11-26:
+        a player who had the chart concluded she hadn't).
         """
         caller: Any = self.caller
+        group: list[Any] = self.plural_group()
+        if group:
+            for obj in group:
+                self.args = str(obj.key)
+                super().func()
+            return
+        here: Any = caller.location
+        if (
+            here is not None
+            and self.args.strip()
+            and not caller.search(self.args, location=here, quiet=True)
+        ):
+            carried: list[Any] = list(
+                caller.search(self.args, location=caller, quiet=True)
+            ) or self.plural_group(caller)
+            if carried:
+                names: list[str] = [str(obj.get_display_name(caller)) for obj in carried]
+                listed: str = " and ".join(f"the {name}" for name in names)
+                caller.msg(f"You already have {listed}. (|winventory|n shows what you carry.)")
+                return
+        super().func()
+
+    def plural_group(self, where: Any = None) -> list[Any]:
+        """
+        The things here (or in `where`) a plural means, when nothing is called by that word
+        itself: `get guides` takes the plant guide and the animal guide (playtest
+        2026-11-25).
+        """
+        caller: Any = self.caller
+        place: Any = caller.location if where is None else where
         words: list[str] = [w for w in self.args.lower().split() if w not in ("the", "both", "all")]
-        if not words or not words[-1].endswith("s") or caller.location is None:
+        if not words or not words[-1].endswith("s") or place is None:
             return []
-        if caller.search(self.args, location=caller.location, quiet=True):
+        if caller.search(self.args, location=place, quiet=True):
             return []
         kind: str = " ".join([*words[:-1], words[-1][:-1]])  # `guides` -> `guide`
         found: list[Any] = []
-        for obj in caller.location.contents:
+        for obj in place.contents:
             if not isinstance(obj, Thing) or obj.spec is None or not obj.spec.portable:
                 continue
             names: list[str] = [str(obj.key).lower()]

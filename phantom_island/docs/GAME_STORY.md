@@ -55,8 +55,11 @@ The game keeps this as data. Characters reveal parts of it; they never make up n
 2. A storm drove her onto the reef. Nobody died: islanders paddled out and rescued the crew.
 3. The crew lived in the village for a season. They salvaged oak timbers from the wreck and,
    with the islanders' help, built a small boat in a sheltered cove.
-4. Most of the crew sailed west in the boat, hoping to reach a known trading route. What
-   happened to them after that is unknown, and the game leaves it open.
+4. Most of the crew sailed west in the boat, hoping to reach a known trading route. They
+   reached a Dutch trading port far to the west and signed on whatever ships would take
+   them. Years later a whaler calling at the island brought Jonah word of it; no word ever
+   reached home, so the expedition brings the families the first news. (Settled
+   2026-11-26: the open ending read as a lead, playtest of 2026-11-26.)
 5. The ship's carpenter, **Jonah Pike**, stayed. He married into the village and still lives
    there, 15 years later.
 6. The ship's compass went down with the wreck and lay on the reef for fifteen years, where
@@ -134,9 +137,9 @@ Holds as a lie: the dates and the coral contradict him, which is the point.
 | A boat was built at the cove from the ship's oak, with island rope and a canvas sail | The slipway and old wood chips at the Boat Cove | Jonah's *boat*, `places.yaml` (*slipway*) |
 | "A new canoe with a white wing flew away to where the sun goes to sleep" (C11) | A sailing boat, seen by children: the white sail is the wing; the sun sets in the west | Tui's *song* |
 | Tui finds brass buttons with little anchors near the wreck, and Ama keeps more | Buttons off sailors' coats: the crew lived in the village (Jonah says so); Tui is Ama's grandchild | Tui's *buttons*, Ama's *tui* |
-| Most of the crew sailed west, Jonah stayed | West led to the trading routes; he had married into the village | Jonah's *crew* |
+| Most of the crew sailed west, Jonah stayed; they reached a Dutch port far to the west and signed on other ships | West led to the trading routes; he had married into the village; a whaler brought him the word years later | Jonah's *crew*, the epilogue, report *crew* |
 | They sailed west, not home to the east | Out here the trade wind blows from the east (south-east) all year: the voyage out had it behind (Day 4), going home is slower against it, and a small boat can't beat into it for weeks | Jonah's *home*, the voyage's Day 4, the Ship's *home* route |
-| The crew's families in the port still wait for news | Most of the crew came from this port; nobody ever came home, and the boat that sailed west was never heard of | Fairweather's *crew* |
+| The crew's families in the port still wait for news | Most of the crew came from this port; nobody ever came home, and word of the boat that sailed west reached only the island | Fairweather's *crew* |
 | The compass reached the port through fishermen from the west (C3) | It went down with the wreck and lay on the reef for fifteen years (the coral, C2); island boys found it at low tide last year, and it was traded from island to island, eastward to the port | Crane's *compass* (truth), *fishermen*, Jonah's *compass* |
 
 Holds.

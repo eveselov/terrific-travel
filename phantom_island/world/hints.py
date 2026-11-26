@@ -7,8 +7,9 @@ its next level: a nudge, then more direct, then the exact command. The level sta
 whenever the expedition makes progress (a clue found, a report question answered).
 
 Pushed hints: the expedition's clock counts the commands players type. Once `push_after`
-commands pass without progress, the player gets the first level, once per stretch without
-progress, with a quiet note if `think` or `report` holds something new the player hasn't
+commands pass without progress, the player gets the first level, and after as many more the
+second (playtest 2026-11-26: a nudge alone was read past for 30 commands), never the exact
+command. With it, a quiet note if `think` or `report` holds something new the player hasn't
 looked at (DECISIONS.md, 33). Commands, not minutes (playtest 2026-11-25): a slow reader
 and a fast one get it after the same amount of trying, and a break never counts.
 
@@ -27,6 +28,7 @@ from world.notices import quiet
 HINT: str = "hint"
 HINT_STATE: str = "hint_state"  # on a character: the situation, level and progress last hinted
 NO_HINTS: str = "There are no hints in this game."
+PUSHES: int = 2  # pushed hints per stretch without progress: the first level, then the second
 
 
 def matches(situation: SituationSpec, content: Content) -> bool:
@@ -96,8 +98,9 @@ def _in_the_expedition(caller: Any) -> bool:
 
 def after_command(caller: Any) -> None:
     """
-    Count a command on the expedition's clock, and push a first-level hint once
-    `push_after` commands have passed without progress.
+    Count a command on the expedition's clock, and push a hint once `push_after` commands
+    have passed without progress: the first level, then, as many commands later, the second
+    (or the one after the level the player has asked for).
     """
     spec: HintsSpec | None = load_content().hints
     if spec is None or not _in_the_expedition(caller):
@@ -106,19 +109,25 @@ def after_command(caller: Any) -> None:
     progress: int = expedition.progress
     clock: dict[str, Any] = expedition.hint_clock
     if clock.get("progress") != progress:
-        expedition.set_hint_clock({"progress": progress, "commands": 0, "pushed": False})
+        expedition.set_hint_clock({"progress": progress, "commands": 0, "pushed": 0})
         return
     typed: int = int(clock.get("commands", 0)) + 1
     clock["commands"] = typed
-    due: bool = not clock.get("pushed") and typed >= spec.push_after
+    pushed: int = int(clock.get("pushed") or 0)  # `True` in clocks kept before 2026-11-26
+    due: bool = pushed < PUSHES and typed >= spec.push_after * (pushed + 1)
     if due and expedition.voyage is None:
         situation: SituationSpec | None = current_situation()
         if situation is not None:
-            clock["pushed"] = True
+            clock["pushed"] = pushed + 1
+            state: dict[str, Any] = dict(caller.attributes.get(HINT_STATE) or {})
+            level: int = pushed
+            if state.get("situation") == situation.id and state.get("progress") == progress:
+                level = max(level, int(state.get("level", -1)) + 1)
+            level = min(level, len(situation.hints) - 2)  # the exact command only when asked
             caller.attributes.add(
-                HINT_STATE, {"situation": situation.id, "level": 0, "progress": progress}
+                HINT_STATE, {"situation": situation.id, "level": level, "progress": progress}
             )
-            text: str = spoken(caller, spec, situation.hints[0])
+            text: str = spoken(caller, spec, situation.hints[level])
             text += f" (Stuck? |w{HINT}|n tells you more.)"
             fresh: list[str] = news(caller)
             if fresh:  # found earlier, never announced (DECISIONS.md, 33)

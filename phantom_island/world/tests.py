@@ -1024,10 +1024,11 @@ class TestAsk(WorldTest):
             text: Any = call.kwargs["text"]
             classes.append(text[1].get("cls") if isinstance(text, tuple) else None)
         # char1: "You ask..." and the reply, untagged. char2: "asks..." (a new turn), then
-        # the reply (the same turn). Barnaby hears both untagged too. Twice.
+        # the reply (the same turn). Barnaby hears both untagged too. Twice; the second time
+        # char1 also hears, untagged, that it was said before.
         self.assertEqual(classes.count("pi-other pi-turn"), 2)
         self.assertEqual(classes.count("pi-other"), 2)
-        self.assertEqual(classes.count(None), 8)
+        self.assertEqual(classes.count(None), 9)
 
     def test_nobody_by_that_name(self) -> None:
         self.at("quay")
@@ -1992,9 +1993,22 @@ class TestHints(DiscoveryTest):
         pushed: str = self.play(self.char1, 1)  # the 20th command without progress
         self.assertIn("compass in the market", pushed)
         self.assertIn("Stuck?", pushed)
-        self.assertNotIn("leaf through the journal", self.play(self.char1, 30))
-        # The next asked-for hint is the second level.
-        self.assertIn("Silas Crane's stall", self.do(self.char1, "hint"))
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 19))
+        # As many commands later, the second level (playtest 2026-11-26), and no more.
+        self.assertIn("Silas Crane's stall", self.play(self.char1, 1))
+        self.assertNotIn("leaf through the journal", self.play(self.char1, 60))
+        # The next asked-for hint is the third level.
+        self.assertIn("|wlook compass|n", self.do(self.char1, "hint"))
+
+    def test_the_second_push_follows_the_level_asked_for(self) -> None:
+        self.at(self.char1, "office")
+        self.do(self.char1, "hint")
+        self.do(self.char1, "hint")  # the second level, asked for
+        self.play(self.char1, 1)
+        self.play(self.char1, 39)
+        pushed: str = self.play(self.char1, 1)
+        self.assertIn("Silas Crane's stall", pushed)  # never the exact command
+        self.assertNotIn("|wlook compass|n", pushed)
 
     def test_progress_resets_the_clock(self) -> None:
         self.at(self.char1, "office")
@@ -2797,3 +2811,46 @@ class TestLenasSecondPlaytest(DiscoveryTest):
     def test_tuis_buttons_send_nobody_searching(self) -> None:
         self.at(self.char1, "village")
         self.assertNotIn("bones", self.do(self.char1, "ask tui about buttons"))
+
+
+class TestLenasThirdPlaytest(DiscoveryTest):
+    """What Lena's runs of 2026-11-26 (Haiku, then Sonnet) showed."""
+
+    def test_a_clue_found_before_the_compass_is_looked_at_skips_its_hints(self) -> None:
+        get_expedition().add_clue("C2", "someone", "Market")
+        get_expedition().add_clue("C3", "someone", "Market")
+        self.at(self.char1, "office")
+        heard: str = self.do(self.char1, "hint")
+        self.assertNotIn("compass in the market", heard)
+        self.assertIn("Time to sail", heard)
+
+    def test_get_what_you_carry_says_so(self) -> None:
+        self.ship_at("charted")
+        self.ship_at("anchorage")
+        self.at(self.char1, "deck")
+        self.do(self.char1, "get chart")
+        self.assertIn("You already have the Halcyon's chart", self.do(self.char1, "get chart"))
+        self.do(self.char1, "get guides")
+        again: str = self.do(self.char1, "get guides")
+        self.assertIn("You already have", again)
+        self.assertIn("plant guide", again)
+        self.assertIn("animal guide", again)
+        self.assertIn("Could not find", self.do(self.char1, "get unicorn"))
+
+    def test_the_hilltop_says_to_bring_the_chart(self) -> None:
+        self.assertIn(
+            "With the Halcyon's chart in your hands, you could compare.",
+            load_content().places["hilltop"].details["coastline"].desc.text,
+        )
+
+    def test_the_position_hint_names_the_way_aboard(self) -> None:
+        hints: Any = load_content().hints
+        texts_: str = " ".join(next(s for s in hints.situations if s.id == "position").hints)
+        self.assertIn("Back aboard the Good Hope", texts_)
+        self.assertIn("From the Lagoon Beach, type |waboard|n", texts_)
+
+    def test_jonah_tells_what_became_of_the_crew(self) -> None:
+        jonah: Any = load_content().characters["jonah"]
+        self.assertIn("they made it", jonah.topics["crew"].reply)
+        self.assertNotIn("never heard", jonah.topics["crew"].reply)
+        self.assertIn("Fishermen took it east", jonah.topics["compass"].reply)

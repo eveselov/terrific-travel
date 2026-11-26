@@ -217,7 +217,7 @@ A4 is built one step at a time (the order is in docs/GAME_INCEPTION.md). Built s
 
 - **Hints** (`hint`, DECISIONS.md, 31): the next step at three levels, a nudge first and
   the exact command last, starting over when something new is found. After 20 commands
-  without progress, a hint comes by itself, once. The Ship speaks aboard, the journal
+  without progress, a hint comes by itself, and 20 later the next level. The Ship speaks aboard, the journal
   elsewhere. The situations are in [world/content/hints.yaml](world/content/hints.yaml).
 
 To try it (spoilers):

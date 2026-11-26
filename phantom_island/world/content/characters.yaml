@@ -721,8 +721,9 @@ characters:
         reply: >
           "[[Most of them sailed west in the boat]], to reach the trading routes, not
           |whome|n.
-          I never heard what became of them. I stayed. I'd married by then, and this was
-          home now."
+          And they made it: years back a whaler brought me word from a Dutch port far to the
+          west, where they'd signed on any ship that would take them. I stayed. I'd married
+          by then, and this was home now."
       home:
         aliases: [east, going home, why west, wind, trade wind]
         stance: truth
@@ -747,14 +748,14 @@ characters:
         reply: >
           "A whaler put in for water while we lay at anchor. Our master sent his letter
           home with her, and a fair copy of his |wchart|n. She sailed a week before the
-          |wstorm|n. So the letter got home, and we didn't."
+          |wstorm|n. So the letter got home, and we didn't. I'd guess it's what brought you."
       compass:
         stance: truth
         reply: >
           "The compass? It went down with her. We came ashore with our lives and little
           else. Fifteen years it lay out there on the reef, and last year the boys found it
-          at low tide, all grown over. It went east with the traders. Funny: the old compass
-          went home, and I never did."
+          at low tide, all grown over. Fishermen took it east to trade, island to island,
+          towards home. Funny: the old compass went home, and I never did."
 
   # --- The crew ---------------------------------------------------------------------------
   # Personality, not plot (2026-11-22): `crew: true` keeps them plot-neutral. The content

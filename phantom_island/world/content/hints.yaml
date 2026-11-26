@@ -6,8 +6,9 @@
 # first `hint` is a nudge (where to look), the second is more direct (what to do), the third
 # gives the exact command. The level starts over whenever the expedition makes progress (a
 # new clue in the journal, or a question of the report answered). A player who goes
-# `push_after` commands without progress gets the first level after the last of them,
-# once per stretch without progress (commands, not minutes: playtest 2026-11-25).
+# `push_after` commands without progress gets the first level after the last of them, and
+# as many commands later the second; never the exact command (commands, not minutes:
+# playtest 2026-11-25; the second push: 2026-11-26).
 #
 # Who speaks: aboard, the Ship; anywhere else, the journal, as the expedition's own
 # thinking. So write hints as plain advice that suits both ("The compass is worth a closer
@@ -57,7 +58,7 @@ situations:
 
   - id: compass
     ship: [port]
-    missing: [C1]
+    missing: [C1, C2, C3]  # a later clue found first (examined, not looked at) skips it
     hints:
       - Mrs. Fairweather spoke of a compass in the market. That's the place to start.
       - The compass is on Silas Crane's stall in the Market, east of the Society Office.
@@ -66,7 +67,7 @@ situations:
 
   - id: coral
     ship: [port]
-    missing: [C2]
+    missing: [C2, C3]
     hints:
       - The compass is worth a closer look than a glance.
       - Look very closely at the compass in the Market, at its hinge.
@@ -255,8 +256,9 @@ situations:
     missing: [C5]
     hints:
       - And where exactly is this island? The chart's numbers are about to be tested.
-      - Measure the island's position with the sextant, then the chronometer.
-      - Aboard, |wuse sextant|n, then |wread chronometer|n.
+      - Back aboard the Good Hope, measure the island's position with the sextant, then the
+        chronometer.
+      - From the Lagoon Beach, type |waboard|n. Then |wuse sextant|n, and |wread chronometer|n.
 
   # --- The report -------------------------------------------------------------------------
 
