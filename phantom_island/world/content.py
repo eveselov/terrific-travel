@@ -166,6 +166,7 @@ class LookSpec:
     desc: Reveal
     close: Reveal | None
     extras: dict[str, Reveal]
+    image: str | None = None  # URL of its picture for the Focus pane, if there is one
 
 
 @dataclass(frozen=True)
@@ -786,6 +787,7 @@ def _look(look_id: str, data: dict[str, Any], aliases: tuple[str, ...], where: s
             thing_id: _reveal(_mapping(item, f"{where}, with {thing_id}"), "text", where)
             for thing_id, item in extras_data.items()
         },
+        image=_optional_text(data, "image", where),
     )
 
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="The chart house">
+  <!-- A little wooden hut on deck: inside, the chart table, the chronometer, the sextant in its box, the chart, and two books on a shelf. Only what the look text says; same style as crane.svg. -->
+  <title>The chart house</title>
+  <defs><clipPath id="frame"><rect x="9" y="9" width="462" height="282" rx="11"/></clipPath></defs>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+  <g clip-path="url(#frame)">
+  <g ><rect x="14" y="250" width="452" height="36" rx="0" fill="#c9a96e" stroke="#7a4a21" stroke-width="0"/><path d="M14 250 H466" fill="none" stroke="#8b5a2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M14 264 H466" fill="none" stroke="#8b5a2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M14 278 H466" fill="none" stroke="#8b5a2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><rect x="90" y="60" width="300" height="190" rx="0" fill="#8b5a2b" stroke="#3b2a14" stroke-width="3"/><rect x="110" y="80" width="260" height="150" rx="0" fill="#e6d3a8" stroke="#7a4a21" stroke-width="2"/><rect x="120" y="190" width="240" height="14" rx="0" fill="#7a4a21" stroke="#3b2a14" stroke-width="2"/><rect x="130" y="166" width="70" height="24" rx="0" fill="#fbf4e0" stroke="#7a4a21" stroke-width="1.5"/><circle cx="250" cy="176" r="14" fill="#d4a017" stroke="#3b2a14" stroke-width="2"/><rect x="290" y="172" width="50" height="18" rx="0" fill="#7a4a21" stroke="#3b2a14" stroke-width="2"/><rect x="150" y="100" width="180" height="8" rx="0" fill="#7a4a21" stroke="#3b2a14" stroke-width="2"/><rect x="170" y="72" width="18" height="28" rx="0" fill="#5b6f3a" stroke="#3b2a14" stroke-width="2"/><rect x="192" y="74" width="18" height="26" rx="0" fill="#6b3b2a" stroke="#3b2a14" stroke-width="2"/></g>
+  </g>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="none" stroke="#7a4a21" stroke-width="6"/>
+</svg>

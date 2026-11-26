@@ -2865,6 +2865,7 @@ class TestPictures(DiscoveryTest):
         content: Any = load_content()
         urls: list[str | None] = [spec.image for spec in content.characters.values()]
         urls += [spec.image for spec in content.things.values()]
+        urls += [look.image for look in self.details(content)]
         static: Path = Path(__file__).resolve().parent.parent / "web" / "static"
         for url in urls:
             if url is None:
@@ -2874,8 +2875,20 @@ class TestPictures(DiscoveryTest):
             root: Any = ElementTree.parse(path).getroot()
             self.assertTrue(root.tag.endswith("svg"), url)
 
-    def test_every_thing_and_person_has_a_picture(self) -> None:
+    def details(self, content: Any) -> list[Any]:
+        """Every detail of a place or a ship's position, and the ship seen from the shore."""
+        looks: list[Any] = [
+            look for place in content.places.values() for look in place.details.values()
+        ]
+        looks += [look for spot in content.positions.values() for look in spot.details.values()]
+        if content.from_shore is not None:
+            looks.append(content.from_shore)
+        return looks
+
+    def test_everything_looked_at_has_a_picture(self) -> None:
         content: Any = load_content()
+        for look in self.details(content):
+            self.assertIsNotNone(look.image, look.id)
         for spec in content.things.values():
             self.assertIsNotNone(spec.image, spec.id)
         for person in content.characters.values():
@@ -2890,3 +2903,12 @@ class TestPictures(DiscoveryTest):
             str(call.kwargs["focus"]) for call in mock_msg.call_args_list if "focus" in call.kwargs
         ]
         self.assertTrue(any("pictures/compass.svg" in html for html in focus), focus)
+
+    def test_looking_at_a_detail_shows_its_picture(self) -> None:
+        self.at(self.char1, "quay")
+        with patch.object(self.char1, "msg") as mock_msg:
+            self.char1.execute_cmd("look gulls")
+        focus: list[str] = [
+            str(call.kwargs["focus"]) for call in mock_msg.call_args_list if "focus" in call.kwargs
+        ]
+        self.assertTrue(any("pictures/quay_gulls.svg" in html for html in focus), focus)

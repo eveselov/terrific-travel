@@ -26,6 +26,8 @@
 #
 # Each detail has (things in things.yaml have the same looking fields):
 #   aliases  other words for it
+#   image    optional: URL of its picture, shown in the Focus pane when someone looks at it
+#            (without one, a card with its name)
 #   desc     what `look <detail>` shows. With a `clue`, the fact itself is marked
 #            [[like this]] and shown in yellow (DECISIONS.md, 20).
 #   clue     optional: the clue (see clues.yaml) that `desc` reveals
@@ -78,29 +80,34 @@ office:
     east: market
   details:
     window:
+      image: /static/phantom_island/pictures/office_window.svg
       aliases: [harbour, harbor, view]
       desc: >
         Below the window the harbour is busy: fishing boats coming in, a merchant ship
         unloading, gulls over the water. At the end of the quay lies a ship with her sails
         furled: the Good Hope, waiting for you.
     bookshelves:
+      image: /static/phantom_island/pictures/office_bookshelves.svg
       aliases: [bookshelf, shelves, shelf, books]
       desc: >
         Rows of logbooks and journals from every voyage the Society could get hold of, each
         with a year on its spine. Someone has checked them all: the margins are full of
         small notes in red ink.
     charts:
+      image: /static/phantom_island/pictures/office_charts.svg
       aliases: [chart, rolled-up charts, rolls]
       desc: >
         Charts of coasts and seas, rolled up and tied with ribbon. Far out in the oceans many
         of them are still blank, where nobody has looked yet. The Halcyon's chart isn't
         among them: its fair copy is in your ship's chart house.
     desk:
+      image: /static/phantom_island/pictures/office_desk.svg
       aliases: [papers, pile, inkpot, ink]
       desc: >
         A wide desk covered in letters, lists and accounts, in neat piles that Mrs.
         Fairweather keeps straightening. An inkpot, a quill, and a little brass bell.
     street:
+      image: /static/phantom_island/pictures/office_street.svg
       aliases: [road, carts]
       desc: >
         From up here you hear carts rattling over the cobbles, and the shouting from the
@@ -118,17 +125,20 @@ market:
     southwest: quay
   details:
     goods:
+      image: /static/phantom_island/pictures/market_goods.svg
       aliases: [fish, rope, spices, lamps, odd things, things]
       desc: >
         Silver fish on wet boards, coils of rope, sacks of pepper and cinnamon, brass lamps,
         and odd things that ships bring home from far away: a carved paddle, a shell as big
         as your head, a feather cloak nobody can explain.
     traders:
+      image: /static/phantom_island/pictures/market_traders.svg
       aliases: [trader, prices, noise, square]
       desc: >
         Everyone here is selling something, and saying so as loudly as they can. "Fresh
         today!" "Cheapest in the port!" "Straight off the ship!"
     stall:
+      image: /static/phantom_island/pictures/market_stall.svg
       aliases: [stalls, crowd, table]
       desc: >
         Silas Crane's stall: pots, cloth, knives, and right in the middle, where everyone
@@ -147,21 +157,25 @@ quay:
     northeast: market
   details:
     barrels:
+      image: /static/phantom_island/pictures/quay_barrels.svg
       aliases: [barrel, stores, supplies]
       desc: >
         Barrels of salt beef, ship's biscuit and fresh water, waiting to be carried aboard.
         Some have GOOD HOPE chalked on the lid.
     rope:
+      image: /static/phantom_island/pictures/quay_rope.svg
       aliases: [ropes, coils, coil]
       desc: >
         Thick hemp rope, coiled neatly in big rings and smelling of tar. Old Barnaby sits on
         one of them as if it were his own armchair.
     gulls:
+      image: /static/phantom_island/pictures/quay_gulls.svg
       aliases: [gull, scraps, birds]
       desc: >
         Grey and white gulls, loud and greedy, squabbling over fish heads. Gulls keep close
         to the coast: sailors say that far out on the open ocean you won't see one.
     harbour:
+      image: /static/phantom_island/pictures/quay_harbour.svg
       aliases: [harbor, water, ships, boats]
       desc: >
         Ships at anchor, fishing boats coming and going, and beyond the harbour mouth the
@@ -182,21 +196,25 @@ beach:
     west: village
   details:
     lagoon:
+      image: /static/phantom_island/pictures/beach_lagoon.svg
       aliases: [water, sand, beach]
       desc: >
         Warm, clear water over white sand, so still that you can see small fish over the
         bottom. Out in the lagoon your ship rides at anchor.
     palms:
+      image: /static/phantom_island/pictures/beach_palms.svg
       aliases: [palm, palm trees, palm tree]
       desc: >
         Tall, bending trunks with a crown of long leaves at the top, and a few coconuts
         hanging under them. Nothing like the trees at home.
     path:
+      image: /static/phantom_island/pictures/beach_path.svg
       aliases: [forest, narrow path]
       desc: >
         A narrow path climbs from the sand into the forest, to the northwest. Somebody walks
         here often: it is trodden smooth.
     goats:
+      image: /static/phantom_island/pictures/beach_goats.svg
       aliases: [goat, bushes]
       desc: >
         Three brown goats with clever yellow eyes. One is chewing a palm leaf and watches
@@ -227,16 +245,19 @@ village:
     southwest: cove
   details:
     huts:
+      image: /static/phantom_island/pictures/village_huts.svg
       aliases: [roofs, roof, leaves, earth, open space]
       desc: >
         Small round huts of light poles, with roofs of woven palm leaves that hang down
         almost to the ground. The open space between them is swept clean.
     fire:
+      image: /static/phantom_island/pictures/village_fire.svg
       aliases: [smoke, cooking fire]
       desc: >
         A low fire in a ring of stones, with something wrapped in leaves cooking in the
         ashes. It smells wonderful.
     beams:
+      image: /static/phantom_island/pictures/village_beams.svg
       aliases: [beam, timbers, timber, hut, big hut, wood]
       desc: >
         The big hut stands on thick, dark beams, much heavier than the light wood of the
@@ -270,12 +291,14 @@ reef:
     southeast: cove
   details:
     coral:
+      image: /static/phantom_island/pictures/reef_coral.svg
       aliases: [reef, waves, edge, water, shallows]
       desc: >
         The water over the reef is shallow and very clear, and the coral in it is every
         colour: pink, yellow, purple, branching like little trees. Further out, the waves
         break white over the reef's edge.
     bones:
+      image: /static/phantom_island/pictures/reef_bones.svg
       # Time is told, not kept (DECISIONS.md, 38): the wait for low tide is part of the look.
       teaches: {coral: used, tides: used}
       aliases: [big bones, shapes, ribs, wreck, cannon]
@@ -301,11 +324,13 @@ forest:
     southeast: beach
   details:
     birds:
+      image: /static/phantom_island/pictures/forest_birds.svg
       aliases: [bird, calls]
       desc: >
         You hear them all around, whistling and chattering, but they stay hidden in the
         leaves high above you.
     trees:
+      image: /static/phantom_island/pictures/forest_trees.svg
       aliases: [tree, leaves, fruit]
       desc: >
         Tall smooth trunks, broad shiny leaves, and big green fruit hanging high up. The
@@ -328,11 +353,13 @@ spring:
     east: forest
   details:
     water:
+      image: /static/phantom_island/pictures/spring_water.svg
       aliases: [spring, stream, rocks, moss]
       desc: >
         You cup your hands and drink. The water is cold and sweet, far better than anything
         from a ship's cask.
     shoots:
+      image: /static/phantom_island/pictures/spring_shoots.svg
       aliases: [shoot, patch, rows, garden]
       desc: >
         Thin green shoots, planted in straight rows like a garden at home. You pull one up:
@@ -360,22 +387,26 @@ hilltop:
     south: forest
   details:
     smoke:
+      image: /static/phantom_island/pictures/hilltop_smoke.svg
       aliases: [clearing, huts, fires, cooking fires, people]
       desc: >
         Thin smoke rising from a clearing south of the forest. You can make out the roofs of
         huts. The forest path should lead down that way.
     ocean:
+      image: /static/phantom_island/pictures/hilltop_ocean.svg
       aliases: [sea, open ocean, lagoon]
       desc: >
         Open ocean all round, empty to the horizon. Inside the reef, the lagoon is pale green,
         and your ship lies in it, very small from up here.
     reef:
+      image: /static/phantom_island/pictures/hilltop_reef.svg
       aliases: [western reef, surf]
       desc: >
         A long line of white surf down the west side of the island, where the waves break on
         the reef. Thick forest lies between it and you: from up here, you can't see a way
         down to it.
     coastline:
+      image: /static/phantom_island/pictures/hilltop_coastline.svg
       aliases: [coast, shape, view, shore]
       desc: >
         Round in the east, with the lagoon. A long reef down the west side. A little cove in
@@ -401,11 +432,13 @@ cove:
     northwest: reef
   details:
     rocks:
+      image: /static/phantom_island/pictures/cove_rocks.svg
       aliases: [rock, arms, sand, water]
       desc: >
         Two long arms of dark rock almost close the cove off from the sea. Inside them the
         water is calm: a good place to build a boat, and to launch it.
     slipway:
+      image: /static/phantom_island/pictures/cove_slipway.svg
       aliases: [logs, chips, wood chips]
       desc: >
         A row of smooth logs laid down to the water, for rolling boats in and out. Old wood

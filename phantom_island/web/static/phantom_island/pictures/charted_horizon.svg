@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="An empty horizon">
+  <!-- Water meeting sky in a clean, empty line all round. Only what the look text says; same style as crane.svg. -->
+  <title>An empty horizon</title>
+  <defs><clipPath id="frame"><rect x="9" y="9" width="462" height="282" rx="11"/></clipPath></defs>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+  <g clip-path="url(#frame)">
+  <g ><rect x="14" y="150" width="452" height="136" rx="0" fill="#a9c2c8" stroke="#6f8f9f" stroke-width="0"/><path d="M14 150 H466" fill="none" stroke="#6f8f9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M40 168 q15 -7 30 0 t30 0 M240 174 q15 -7 30 0 t30 0" fill="none" stroke="#6f8f9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M100 196 q15 -7 30 0 t30 0 M300 202 q15 -7 30 0 t30 0" fill="none" stroke="#6f8f9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M40 224 q15 -7 30 0 t30 0 M240 230 q15 -7 30 0 t30 0" fill="none" stroke="#6f8f9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M100 252 q15 -7 30 0 t30 0 M300 258 q15 -7 30 0 t30 0" fill="none" stroke="#6f8f9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M14 150 H466" fill="none" stroke="#3b2a14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></g>
+  </g>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="none" stroke="#7a4a21" stroke-width="6"/>
+</svg>

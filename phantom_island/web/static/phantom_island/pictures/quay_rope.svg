@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Coils of tarred rope">
+  <!-- Thick hemp rope coiled in big rings, smelling of tar; Old Barnaby sits on one. Only what the look text says; same style as crane.svg. -->
+  <title>Coils of tarred rope</title>
+  <defs><clipPath id="frame"><rect x="9" y="9" width="462" height="282" rx="11"/></clipPath></defs>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="#f3e6c4" stroke="#7a4a21" stroke-width="6"/>
+  <g clip-path="url(#frame)">
+  <g ><rect x="14" y="236" width="452" height="50" rx="0" fill="#c9b48a" stroke="#7a4a21" stroke-width="0"/><ellipse cx="120" cy="230" rx="80" ry="19.2" fill="#c9a96e" stroke="#8b5a2b" stroke-width="6"/><ellipse cx="120" cy="225" rx="64" ry="15.36" fill="none" stroke="#8b5a2b" stroke-width="6"/><ellipse cx="120" cy="220" rx="48" ry="11.52" fill="none" stroke="#8b5a2b" stroke-width="6"/><ellipse cx="330" cy="236" rx="70" ry="16.8" fill="#c9a96e" stroke="#8b5a2b" stroke-width="6"/><ellipse cx="330" cy="231" rx="54" ry="12.959999999999999" fill="none" stroke="#8b5a2b" stroke-width="6"/><ellipse cx="330" cy="226" rx="38" ry="9.12" fill="none" stroke="#8b5a2b" stroke-width="6"/><path d="M300 228 C300 198 316 188 330 188 C344 188 360 198 360 228 Z" fill="#3f5a73" stroke="#3b2a14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /><circle cx="330" cy="174" r="15" fill="#e2b98f" stroke="#3b2a14" stroke-width="2"/><path d="M316 178 C318 198 342 198 344 178" fill="#ffffff" stroke="#3b2a14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M60 120 q8 -10 0 -20 M80 110 q8 -10 0 -20" fill="none" stroke="#5b4632" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></g>
+  </g>
+  <rect x="6" y="6" width="468" height="288" rx="14" fill="none" stroke="#7a4a21" stroke-width="6"/>
+</svg>

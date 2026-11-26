@@ -123,7 +123,8 @@ def show_look(
         if thing_id in carried
     )
     caller.msg("\n\n".join(show_marks(reveal.text) for reveal, _ in shown))
-    caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], image))
+    picture: str | None = image if image is not None else look.image
+    caller.msg(focus=render_focus_html(title[:1].upper() + title[1:], picture))
     found: set[str] = set()
     with notices.together():
         for reveal, source in shown:
