@@ -135,6 +135,12 @@ class ShipRoom(Room):
         """What is seen from the ship here; its clue (the empty sea, C4) shows in yellow."""
         return show_marks(position.deck)
 
+    @property
+    def image_url(self) -> str | None:
+        """The view from the ship where she is (ship.yaml, a position's `image`), else its own."""
+        view: str | None = current_position().image
+        return view if view is not None else super().image_url
+
     def map_location(self) -> MapLocation | None:
         """The ship's rooms are wherever the ship is."""
         return ship_map_location(current_position(), load_content())

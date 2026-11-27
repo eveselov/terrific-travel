@@ -2875,6 +2875,8 @@ class TestPictures(DiscoveryTest):
         urls: list[str | None] = [spec.image for spec in content.characters.values()]
         urls += [spec.image for spec in content.things.values()]
         urls += [look.image for look in self.details(content)]
+        urls += [place.image for place in content.places.values()]
+        urls += [spot.image for spot in content.positions.values()]
         static: Path = Path(__file__).resolve().parent.parent / "web" / "static"
         for url in urls:
             if url is None:
@@ -2898,6 +2900,10 @@ class TestPictures(DiscoveryTest):
         content: Any = load_content()
         for look in self.details(content):
             self.assertIsNotNone(look.image, look.id)
+        for place in content.places.values():
+            self.assertIsNotNone(place.image, place.id)
+        for spot in content.positions.values():
+            self.assertIsNotNone(spot.image, spot.id)
         for spec in content.things.values():
             self.assertIsNotNone(spec.image, spec.id)
         for person in content.characters.values():
@@ -2921,6 +2927,14 @@ class TestPictures(DiscoveryTest):
             str(call.kwargs["focus"]) for call in mock_msg.call_args_list if "focus" in call.kwargs
         ]
         self.assertTrue(any("pictures/quay_gulls.svg" in html for html in focus), focus)
+
+    def test_the_decks_picture_follows_the_ship(self) -> None:
+        deck: Any = self.rooms["deck"]
+        self.assertIn("view_port.svg", str(deck.image_url))
+        self.ship_at("charted")
+        self.assertIn("view_charted.svg", str(deck.image_url))
+        self.ship_at("anchorage")
+        self.assertIn("view_anchorage.svg", str(deck.image_url))
 
 
 class TestTheWayThere(DiscoveryTest):

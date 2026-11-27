@@ -122,7 +122,7 @@ Clues can now be found, and every clue goes into the expedition's shared **journ
   Hilltop. Carried things go back to their place when their carrier leaves the game, and
   also when the server starts cold or on `batchcode build`, if their carrier isn't being played.
 - Looking at a thing, a detail or a character shows its picture in the Focus pane, or a
-  card with its name (only Crane has a picture so far, `image:` in characters.yaml);
+  card with its name (`image:` in the content files; every one has a picture since 2026-11-27);
   looking at anything else, a plain `look` or moving on brings back the room's picture.
 - `read <thing>` and `use <thing>` are heard by the whole room. The longitude puzzle: at sea,
   `use sextant` (the noon sight), then `read chronometer`. Anyone can do either step.
@@ -252,6 +252,7 @@ The choices, the proof each answer needs, and the epilogue are in
 | Rooms: land, and the ship's Deck | `typeclasses/rooms.py` |
 | Sailing, and the `ashore`/`aboard` exits | `world/ship.py`, `commands/ship.py` (`sail`) |
 | Map and Focus panes, `map` command | `world/maps.py`, `world/focus.py`, `commands/explore.py` |
+| Focus pictures | `web/static/phantom_island/pictures/`; details, places and the Deck's views are drawn by `tools/draw_pictures.py` (characters and things by hand) |
 | Characters and `ask` | `world/content/characters.yaml`, `typeclasses/inhabitants.py`, `world/conversation.py`, `commands/talk.py` |
 | Web client | `web/templates/webclient/webclient.html`, `web/static/webclient/js/plugins/`, `web/static/phantom_island/` (pane styles, map pictures) |
 

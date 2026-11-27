@@ -14,6 +14,7 @@ rooms:
   # The ship is one room, her Deck (DECISIONS.md, 36). The instruments and books are kept in
   # the chart house, a detail of the Deck, so nothing aboard is more than a step away.
   deck:
+    image: /static/phantom_island/pictures/place_deck.svg
     name: Deck
     kind: deck        # where `sail` works and the sea and sky are seen
     desc: >
@@ -118,6 +119,7 @@ sea_chart: sea_chart
 #   map_pos    the ship's place on it
 #   ashore     optional: the place the `ashore` exit leads to
 #   deck       what is seen from the Deck here
+#   image      optional: the view from the Deck here, for the Focus pane (else the Deck's own)
 #   clue       optional: the clue (clues.yaml) the `deck` text reveals, its fact marked
 #              [[like this]]. It's found when the ship arrives, or someone looks around.
 #   details    optional: what can be seen from the Deck here with `look <detail>`, written
@@ -142,6 +144,7 @@ sea_chart: sea_chart
 # and the noddies join them on the way west.
 positions:
   port:
+    image: /static/phantom_island/pictures/view_port.svg
     name: Moored at the Quay
     coords: 14 S, 0 W
     suggest: [course, chart, sextant, chronometer, advice]
@@ -213,6 +216,7 @@ positions:
             then |wread chronometer|n."
 
   charted:
+    image: /static/phantom_island/pictures/view_charted.svg
     name: The charted position
     coords: 14 S, 40 W
     # Orders by position are read as a direction here (`search`, DECISIONS.md, 34), and no list
@@ -327,6 +331,7 @@ positions:
             At last the familiar harbour comes into view.
 
   north_of_chart:
+    image: /static/phantom_island/pictures/view_open_sea.svg
     name: A day north of the chart's position
     coords: 12 S, 40 W
     suggest: [sextant, latitude, longitude, advice]
@@ -356,6 +361,7 @@ positions:
             The Good Hope creaks: "Back at the chart's position: fourteen South, forty West."
 
   south_of_chart:
+    image: /static/phantom_island/pictures/view_open_sea.svg
     name: A day south of the chart's position
     coords: 16 S, 40 W
     suggest: [sextant, latitude, longitude, advice]
@@ -370,6 +376,7 @@ positions:
       north: *back_to_chart
 
   east_of_chart:
+    image: /static/phantom_island/pictures/view_open_sea.svg
     name: A day east of the chart's position
     coords: 14 S, 38 W
     suggest: [sextant, longitude, chronometer, advice]
@@ -398,6 +405,7 @@ positions:
             At last the familiar harbour comes into view.
 
   anchorage:
+    image: /static/phantom_island/pictures/view_anchorage.svg
     name: Anchored off the island
     coords: 14 S, 41 W
     suggest: [council, tide, wind, witnesses, advice]
@@ -430,6 +438,7 @@ positions:
       together.
 
   under_way:
+    image: /static/phantom_island/pictures/view_under_way.svg
     name: Under way
     chart_pos: [720, 290]
     deck: >

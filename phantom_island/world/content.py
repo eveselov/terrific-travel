@@ -227,6 +227,7 @@ class PositionSpec:
     search: bool = False
     # What the Ship suggests asking about here, instead of her usual `suggest` (her topics).
     suggest: tuple[str, ...] = ()
+    image: str | None = None  # the view from the Deck here, for the Focus pane
 
     def route(self, direction: str) -> RouteSpec | None:
         """The route in this direction, or None if the ship can't sail that way from here."""
@@ -892,6 +893,7 @@ def _position(position_id: str, value: Any) -> PositionSpec:
         ),
         search=_flag(data, "search", where),
         suggest=_words(data.get("suggest"), "suggest", where),
+        image=_optional_text(data, "image", where),
     )
 
 

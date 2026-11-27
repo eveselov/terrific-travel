@@ -40,6 +40,7 @@
 # Placeholder texts: short on purpose. Better writing comes in stage A5.
 
 limbo:
+  image: /static/phantom_island/pictures/place_limbo.svg
   name: Phantom Island
   desc: >
     It is 1790. Fifteen years ago a sailing ship, the Halcyon, left port to chart a small
@@ -69,6 +70,7 @@ limbo:
 # --- The port ---------------------------------------------------------------------------
 
 office:
+  image: /static/phantom_island/pictures/place_office.svg
   name: Society Office
   map: port
   map_pos: [300, 230]
@@ -114,6 +116,7 @@ office:
         market next door.
 
 market:
+  image: /static/phantom_island/pictures/place_market.svg
   name: Market
   map: port
   map_pos: [700, 230]
@@ -145,6 +148,7 @@ market:
         can see it, a brass |wcompass|n. People keep pointing at it and whispering.
 
 quay:
+  image: /static/phantom_island/pictures/place_quay.svg
   name: Quay
   map: port
   map_pos: [500, 450]
@@ -184,6 +188,7 @@ quay:
 # --- The island -------------------------------------------------------------------------
 
 beach:
+  image: /static/phantom_island/pictures/place_beach.svg
   name: Lagoon Beach
   map: island
   map_pos: [780, 390]
@@ -230,6 +235,7 @@ beach:
             stay]].
 
 village:
+  image: /static/phantom_island/pictures/place_village.svg
   name: Village
   hidden_until: [village_seen]  # its smoke, seen from the Hilltop
   map: island
@@ -278,6 +284,7 @@ village:
             oak, and no oak grows anywhere near here]]. Ships are built of oak.
 
 reef:
+  image: /static/phantom_island/pictures/place_reef.svg
   name: Western Reef
   hidden_until: [respect_tui]  # Tui shows the way, once you have listened to her song
   map: island
@@ -311,6 +318,7 @@ reef:
         coral where she struck the reef]].
 
 forest:
+  image: /static/phantom_island/pictures/place_forest.svg
   name: Forest Path
   map: island
   map_pos: [520, 260]
@@ -343,6 +351,7 @@ forest:
             of warm islands. Nothing like the oaks of home.
 
 spring:
+  image: /static/phantom_island/pictures/place_spring.svg
   name: Spring
   map: island
   map_pos: [320, 220]
@@ -374,6 +383,7 @@ spring:
             ships and plant wherever they stay a while]].
 
 hilltop:
+  image: /static/phantom_island/pictures/place_hilltop.svg
   name: Hilltop
   sets: village_seen  # the smoke: the path to the Village opens (DECISIONS.md, 40)
   map: island
@@ -420,6 +430,7 @@ hilltop:
             reef, the hook of the cove: [[it is the same island, line for line]].
 
 cove:
+  image: /static/phantom_island/pictures/place_cove.svg
   name: Boat Cove
   hidden_until: [cove_told]  # Elder Ama tells you where the one who stayed lives
   map: island
