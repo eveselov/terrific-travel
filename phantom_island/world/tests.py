@@ -2524,8 +2524,8 @@ class TestPortCouncil(DiscoveryTest):
         # The last proof it needs, so it is said in the ordinary voice (playtest 2026-11-25).
         heard: str = texts(mock_msg)
         self.assertIn(
-            "all that the council needs. To put it together, go to the Quay and type "
-            "|waboard|n, then |wcouncil|n.",
+            "all that the council needs. To put it together, go to the Quay (|wsouthwest|n) "
+            "and type |waboard|n, then |wcouncil|n.",
             heard,
         )
         self.assertNotIn("council was waiting for", heard)
